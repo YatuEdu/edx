@@ -1,0 +1,19 @@
+.tag {
+    display: inline-block;
+    font-size: 10px;
+    line-height: 16px;
+    padding: 5px 20px;
+    border: 1px solid $border-color;
+    color: $black;
+    transition:  all 0.3s ease-in-out;
+    border-radius: 18px;
+    margin: 5px 3px;
+    margin-left: 0px;
+
+    &:hover {
+        text-decoration: none;
+        background-color: theme-color(primary);
+        color: $white;
+        border-color: theme-color(primary);
+    }
+}

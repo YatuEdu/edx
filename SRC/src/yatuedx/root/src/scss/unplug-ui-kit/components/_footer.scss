@@ -1,0 +1,83 @@
+.up-common-footer {
+    background-color: #001731;
+    padding-top: 110px;
+    padding-bottom: 75px;
+
+    .nav-link {
+        color: $text-muted;
+        transition: color 0.2s ease;
+        font-size: 16px;
+
+        &:hover {
+            color: $white;
+        }
+    }
+}
+
+.footer-brand {
+    display: inline-block;
+    margin-bottom: 28px;
+}
+
+.footer-social-nav {
+    padding-top: 36px;
+    padding-bottom: 36px;
+    .nav-link {
+        color: #121973;
+        background-color: #f9f9f9;
+        height: 35px;
+        width: 35px;
+        padding: 0;
+        text-align: center;
+        line-height: 35px;
+        border-radius: 50%;
+        margin-right: 10px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+    }
+
+    @each $brand, $value in $social-colors {
+        .social-link-#{$brand} {
+            &:hover {
+                background-color: $value;
+                color: $white;
+            }
+        }
+    }
+}
+
+.footer-text {
+    padding-top: 30px;
+    font-size: 12px;
+}
+
+.social-nav {
+    .nav-link {
+        color: #121973;
+        background-color: #f9f9f9;
+        height: 35px;
+        width: 35px;
+        padding: 0;
+        text-align: center;
+        line-height: 35px;
+        border-radius: 50%;
+        margin-right: 10px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
+    @each $brand, $value in $social-colors {
+        .social-link-#{$brand} {
+            transition: all 0.3s ease-in-out;
+            &:hover {
+                background-color: $value;
+                color: $white;
+            }
+        }
+    }
+}

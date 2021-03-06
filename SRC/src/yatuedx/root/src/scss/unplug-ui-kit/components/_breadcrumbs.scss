@@ -1,0 +1,20 @@
+.breadcrumb {
+    background-color: transparent;
+}
+
+.breadcrumb-item {
+    font-size: 12px;
+    line-height: 1.33;
+    letter-spacing: 2px;
+    color: #bbbbbb;
+    a {
+        color: #bbbbbb;
+    }
+    &.active {
+        color: #bbbbbb;
+    }
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: #bbbbbb;
+}

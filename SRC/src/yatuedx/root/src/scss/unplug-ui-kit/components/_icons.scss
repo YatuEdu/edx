@@ -1,0 +1,47 @@
+.icon {
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.icon-sm {
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+}
+
+.up-icon-30 {
+    font-size: 30px;
+}
+
+.up-icon-40 {
+    font-size: 40px;
+}
+
+.up-icon-70 {
+    font-size: 70px;
+}
+
+.up-icon-150 {
+    font-size: 150px;
+}
+
+.icon-rounded {
+    border-radius: 50%;
+}
+
+
+@each $color, $value in $theme-colors {
+    .icon-#{$color} {
+        background-color: rgba($value, 0.3);
+        color: $value;
+    }
+}
+
+.icon-white {
+    background-color: rgba($white, 0.3);
+    color: $white;
+}

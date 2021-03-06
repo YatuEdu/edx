@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/rtc/future-api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-api-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-app-devel/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-app-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-app-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-bussflow-engine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-bussflow-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-data-center/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-data-center/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-data-synchronizer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-dataaccess/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-maven-plugin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rtc/future-postgres-dataloader/src/main/java" charset="UTF-8" />
+  </component>
+</project>

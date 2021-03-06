@@ -1,0 +1,24 @@
+.alert{
+    &:not(.alert-light) {
+        color: $white;
+
+        .close {
+            opacity: 1;
+            color: inherit;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+    .close {
+        font-size: 12px;
+    }
+    font-weight: $font-weight-medium;
+    line-height: 1.64;
+}
+
+.alert-dismissible .close {
+    top: 50%;
+    transform: translateY(-50%);
+}

@@ -1,0 +1,24 @@
+@mixin nav-pills-variant($background) {
+    .nav-link.active,
+    .show > .nav-link {
+        color: color-yiq($background);
+        background-color: $background;
+    }
+}
+
+@mixin card-tab-variant($background) {
+    .card-header{
+        background-color: $background;
+
+        .card-header-pills {
+            .nav-link{
+                color: color-yiq($background);
+            }
+        }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            background-color: color-yiq($background);
+            color: color-yiq(color-yiq($background));
+        }
+    }
+}

@@ -1,0 +1,176 @@
+// Color scheme
+
+$primary: #6e00ff;
+$secondary: #eff2f7;
+$success: #36b37e;
+$info: #00b8d9;
+$warning: #ffab00;
+$danger: #ff5630; 
+$light: #eff2f7;
+$dark: #273444;
+
+$white: #ffffff;
+$black: #000000;
+
+$social-colors: (
+    "facebook": #3b5998,
+    "twitter": #1da1f2,
+    "instagram": #c13584,
+    "youtube": #ff0000,
+    "linkedin": #0077b5,
+    "pinterest": #bd081c,
+    "dribbble": #ea4c89,
+    "behance": #1769ff,
+    "google": #ea4335,
+    "tumblr": #35465c
+);
+
+$body-color: $black;
+$body-bg: $white;
+$text-muted: #575d78;
+$border-color: #e9ecf1;
+
+;
+$headings-color: $black;
+$paragraph-color: $text-muted;
+$link-color: #273444;
+$yiq-text-dark: $black;
+$yiq-text-light: $white;
+
+$type1: 'Roboto', sans-serif;
+$type2: $type1;
+
+// Typography
+
+$font-family-base: $type1;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+$h1-font-size: 40px;
+$h2-font-size: 32px;
+$h3-font-size: 28px;
+$h4-font-size: 24px;
+$h5-font-size: 20px;
+$h6-font-size: 16px;
+
+$display1-size: 96px;
+$display2-size: 88px;
+$display3-size: 72px;
+$display4-size: 56px;
+
+$p-font-size: 16px;
+
+$border-radius: 6px;
+
+$grid-margin: 1rem;
+
+// Card
+
+$card-spacer-x: 2.25rem;
+$card-border-radius: 0;
+$card-border-color: #e1e5ee;
+
+// Buttons
+
+$btn-padding-x: 15px;
+$btn-padding-y: 12px;
+$btn-font-size: 12px;
+$btn-border-radius: $border-radius;
+$btn-line-height: 1.33;
+
+
+$btn-padding-x-sm: 10px;
+$btn-padding-y-sm: 7px;
+$btn-font-size-sm: 12px;
+$btn-line-height: 1.33;
+
+
+$btn-padding-x-lg: 2.375rem;
+$btn-padding-y-lg: 1.125rem;
+$btn-font-size-lg: 16px;
+
+$btn-line-height-lg: 1.31;
+
+
+// Forms
+
+$input-height: 40px;
+$input-lg-height: 56px;
+
+$input-padding-x: 1.375rem;
+$input-padding-y: 0.75rem;
+
+$input-padding-x-lg: 1.562rem;
+$input-padding-y-lg: 1.25rem;
+
+$input-border-color: #d9dfe7;
+$input-border-radius: 6px;
+
+$input-font-size: 12px; 
+$input-font-weight: $font-weight-regular;
+$input-line-height: 0.83;
+
+$input-font-size-lg: 0.875rem;
+$input-line-height-lg: 1.14;
+
+$input-placeholder-color: #bbbbbb;
+
+// Progress Bar
+
+$progress-height: 8px;
+$progress-border-radius: $progress-height / 4;
+
+// Range
+
+$track-color: $light;
+$thumb-color: $primary;
+
+$thumb-radius: $border-radius;
+$thumb-height: 8px;
+$thumb-width: 8px;
+
+$track-width: 100%;
+$track-height: 6px;
+
+$track-radius: 4px;
+
+//Badges
+
+$badge-padding-x: 12px;
+$badge-padding-y: 6px;
+$badge-font-size: 13px;
+$badge-font-weight: 500;
+$badge-border-radius: 4px;
+$badge-pill-padding-x: $badge-padding-x;
+
+//List Group
+
+$list-group-border-color: $border-color;
+
+$list-notificatons-border-color: $border-color;
+$list-notificatons-border-radius: 0;
+$list-notificatons-item-padding-y: 12px;
+$list-notificatons-item-padding-x: 28px;
+
+// Nav Tabs
+
+$nav-tabs-border-color: $border-color;
+$nav-pills-border-radius: $btn-border-radius;
+
+// Alerts
+
+$alert-bg-level: 0;
+$alert-padding-y: 1rem;
+$alert-padding-x: 1.5rem;
+
+//Navbar
+
+$navbar-dark-color: $white;
+$navbar-nav-link-padding-x : 16px;
+
+//Tables
+$table-striped-order: even;
+$table-accent-bg: #f8f9fc;

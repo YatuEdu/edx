@@ -1,0 +1,71 @@
+button:focus, .btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-square {
+    border-radius: 0;
+}
+
+.btn-rounded {
+    border-radius: 50rem;
+}
+
+.btn-icon {
+    line-height: 1;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+@each $color,
+$value in $theme-colors {
+    .btn-soft-#{$color} {
+        @include button-variant(lighten($value, 20%), lighten($value, 20%));
+    }
+}
+
+@each $brand,
+$value in $social-colors {
+    .btn-#{$brand} {
+        @include button-variant($value, $value);
+        font-size: 16px;
+        padding: 12px;
+        line-height: 1;
+    }
+}
+
+@each $brand,
+$value in $social-colors {
+    .btn-#{$brand}-block {
+        @include button-variant($value, $value);
+        @extend .btn-block;
+        font-size: 13px;
+        padding: 5px 7px;
+        line-height: 30px;
+        .brand-icon{
+            background: $white;
+            color: $value;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            float: left;
+            margin-right: 2p;
+        }
+    }
+}
+
+.btn-white {
+    background-color: $white;
+    color: $black;
+    border-color: $white;
+    font-weight: $font-weight-bold;
+
+    @include hover-focus-active {
+        background-color: darken($white, 15%);
+        border-color: darken($white, 15%);
+    }
+}

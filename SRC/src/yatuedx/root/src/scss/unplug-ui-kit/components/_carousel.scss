@@ -1,0 +1,15 @@
+.carousel-caption {
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+
+    p{
+        font-size: 14px;
+        font-family: $type1;
+        line-height: 1.64;
+    }
+}
+.carousel-control-prev, .carousel-control-next {
+    font-size: 28px;
+    width: 64px;
+}

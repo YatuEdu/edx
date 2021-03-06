@@ -1,0 +1,11 @@
+bugs: ly8838 cannot log in
+      PC still says no access to camera
+	  
+source:
+   node js
+   
+ fron end:
+     react JS
+	 how to connect with vert.x
+	 
+   filter:  how to add?

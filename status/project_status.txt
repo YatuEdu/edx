@@ -1,0 +1,10 @@
+yatu status
+---------------
+
+2021/2/6
+1） 安全问题： session能否被截获
+
+2） intelliJ Idea 的·代码结构和build
+3） 服务可以one-box 测试
+4） 高翔工作
+5） Java common lib 的构建

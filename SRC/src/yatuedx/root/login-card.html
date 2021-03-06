@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Unplug UI</title>
+    <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
+    <link rel="stylesheet" href="./assets/css/unplug-ui-kit-demo.css">
+    <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
+</head>
+<body class="auth-card-page">
+    <main class="auth auth-card-container">
+        <div class="auth-card">
+            <div class="row">
+                <div class="col-md-6 d-flex align-items-center justify-content-center auth-bg-section">
+                    <img src="assets/images/login.png" class="img-fluid" alt="login">
+                </div>
+                <div class="col-md-6 d-flex py-5 flex-column justify-content-center bg-white">
+                    <div class="auth-form-section">
+                        <div class="logo"><img src="assets/images/logo.svg" class="img-fluid" alt="Unplug UI" width="200"></div>
+                        <h2>Sign in</h2>
+                        <p>Free access to our dashboard</p>
+                        <div class="signin_form">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" name="username" id="user_name" class="form-control" placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="userPassword">Password</label>
+                                <input type="password" name="userPassword" id="user_password" class="form-control"
+                                    placeholder="********">
+                            </div>
+                            <button id="login_button" type="button" class="btn btn-danger btn-block mb-3">Sign in</button>
+                        </form>
+                        <p class="text-left mb-0">Don't have an account yet? <a href="register-card.html">Sign Up!</a> </p>
+                        <p class="text-muted">OR</p>
+                        <div>
+                            <button class="btn btn-facebook-block"><span class="brand-icon"><i class="mdi mdi-facebook"></i></span>Sign in with facebook</span></button>
+                            <button class="btn btn-twitter-block"><span class="brand-icon"><i class="mdi mdi-twitter"></i></span>Sign in with twitter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+	
+	<script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script> 	
+	<script type="module" src="./assets/js/pages/login.js"></script> 
+</body>
+</html>

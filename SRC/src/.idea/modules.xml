@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-api-gateway/api-gateway.iml" filepath="$PROJECT_DIR$/rtc/future-api-gateway/api-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-app-devel/app-devel.iml" filepath="$PROJECT_DIR$/rtc/future-app-devel/app-devel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-app-server/app-server.iml" filepath="$PROJECT_DIR$/rtc/future-app-server/app-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-bussflow-engine/bussflow-engine.iml" filepath="$PROJECT_DIR$/rtc/future-bussflow-engine/bussflow-engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-bussflow-server/bussflow-server.iml" filepath="$PROJECT_DIR$/rtc/future-bussflow-server/bussflow-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-core/core.iml" filepath="$PROJECT_DIR$/rtc/future-core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-data-center/data-center.iml" filepath="$PROJECT_DIR$/rtc/future-data-center/data-center.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-data-synchronizer/data-synchronizer.iml" filepath="$PROJECT_DIR$/rtc/future-data-synchronizer/data-synchronizer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-dataaccess/dataaccess.iml" filepath="$PROJECT_DIR$/rtc/future-dataaccess/dataaccess.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-maven-plugin/future-maven-plugin.iml" filepath="$PROJECT_DIR$/rtc/future-maven-plugin/future-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-parent.iml" filepath="$PROJECT_DIR$/rtc/future-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rtc/future-postgres-dataloader/postgres-dataloader.iml" filepath="$PROJECT_DIR$/rtc/future-postgres-dataloader/postgres-dataloader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/src.iml" filepath="$PROJECT_DIR$/.idea/src.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,17 @@
+.progress-bar {
+    border-radius: $progress-border-radius;
+}
+.progress-square {
+    border-radius: 0;
+
+    .progress-bar {
+        border-radius: 0;
+    }
+}
+.progress-pill {
+    border-radius: $progress-height/2 $progress-border-radius $progress-border-radius $progress-height /2;
+
+    .progress-bar {
+        border-radius: $progress-height/2;
+    }
+}

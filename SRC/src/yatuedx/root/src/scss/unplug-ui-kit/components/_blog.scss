@@ -1,0 +1,40 @@
+.blog-post-header {
+    max-width: 660px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.blog-post-content {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+
+    p, blockquote{
+        max-width: 535px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.blog-post-widget {
+    max-width: 590px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.blog-post-widget-title {
+    display: flex;
+
+    &::before, &::after {
+        content: "";
+        flex-grow: 1;
+        background-image: linear-gradient( $border-color, $border-color);
+        background-size: calc(100% - 20px) 1px;
+        background-repeat: no-repeat;
+    }
+    &::before {
+     background-position: left center;
+    }
+    &::after {
+        background-position: right center;
+    }
+}

@@ -1,0 +1,123 @@
+.nav-pills {
+    .nav-link {
+        color: $black;
+        font-size: 0.875rem;
+        font-weight: $font-weight-medium;
+    }
+}
+
+.tab-content {
+    padding-top: 2rem;
+}
+
+.card-header-pills {
+    margin-left: 0;
+    margin-right: 0;
+
+    .nav-link.active, .show > .nav-link {
+        border-radius: 10rem;
+    }
+}
+
+.nav-pills-icon-colored {
+    .nav-link i {
+        color: $nav-pills-link-active-bg;
+    }
+    .nav-link.active i, .show > .nav-link i {
+        color: color-yiq($nav-pills-link-active-bg);
+    }
+}
+
+.nav-tabs-bordered{
+    .nav-link.active,  .show > .nav-link {
+        position: relative;
+        overflow: hidden;
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 3px;
+            background-color: #00b9d4;
+        }
+    }
+}
+
+.nav-pills-vertical {
+    flex-direction: column; 
+
+    &.nav-pills-with-icon {
+        .nav-link {
+            margin-right: 0;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+.tab-content-bordered {
+    border: 1px solid #e1e5ee;
+    border-top: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 20px;
+}
+
+.nav-pills-with-icon {
+    .nav-link {
+        i {
+            display: block;
+            text-align: center;
+            font-size: 1.125rem;
+            line-height: 1.44;
+        }
+
+        margin-right: 1rem;
+        padding: 20px;
+    }
+
+    .nav-item:last-child .nav-link,  .nav-item:last-child.nav-link {
+        margin-right: 0;
+    }
+}
+
+@each $color, $value in $theme-colors {
+    .nav-pills-#{$color} {
+        @include nav-pills-variant($value);
+
+        &.nav-pills-icon-colored {
+            .nav-link i {
+                color: $value;
+            }
+            .nav-link.active i, .show > .nav-link i {
+                color: color-yiq($value);
+            }
+        }
+    }
+}
+
+@each $color, $value in $theme-colors {
+    .card-tab-#{$color} {
+        @include card-tab-variant($value);
+    }
+}
+
+.pricing-tab {
+    justify-content: center;
+    .nav-link {
+        font-size: 12px;
+        line-height: 1.33;
+        color: #bbbbbb;
+        font-weight: $font-weight-normal;
+        border: 0;
+    }
+
+    .nav-link.active, .show > .nav-link {
+        color: #273444;
+        font-weight: $font-weight-medium;
+        box-shadow: 0 2px 20px 0 rgba(97, 97, 97, 0.07);
+        border: solid 1px #e9ecf1;
+        background-color: #ffffff;
+    }
+}

@@ -1,0 +1,84 @@
+.list-notifications {
+    list-style: none;
+    padding-left: 0;
+    border: 1px solid $list-notificatons-border-color;
+    border-radius: $list-notificatons-border-radius;
+    padding-top: $list-notificatons-item-padding-x - $list-notificatons-item-padding-y;
+    padding-bottom: $list-notificatons-item-padding-x - $list-notificatons-item-padding-y;
+}
+.list-notifications-item {
+    border: 0;
+    padding: $list-notificatons-item-padding-y $list-notificatons-item-padding-x;
+    display: flex;
+    align-items: center;
+
+    &:nth-child(5n) {
+        .list-notifications-icon {
+            background-color: theme-color(primary);
+        }
+    }
+    &:nth-child(5n+1) {
+        .list-notifications-icon {
+            background-color: theme-color(success);
+        }
+    }
+    &:nth-child(5n+2) {
+        .list-notifications-icon {
+            background-color: theme-color(danger);
+        }
+    }
+    &:nth-child(5n+3) {
+        .list-notifications-icon {
+            background-color: theme-color(warning);
+        }
+    }
+    &:nth-child(5n+4) {
+        .list-notifications-icon {
+            background-color: theme-color(info);
+        }
+    }
+}
+
+.list-notifications-img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+
+.list-notifications-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+.list-notifications-content {
+    flex: 1;
+
+    .notification-title {
+        font-family: $type1;
+        font-size: 14px;
+        font-weight: $font-weight-medium;
+        line-height: 1.64;
+        color: #000000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+    }
+
+    .notification-subtitle {
+        font-family: $type2;
+        font-size: 12px;
+        line-height: 1.33;
+        color: #bbbbbb;
+        margin-bottom: 0;
+    }
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="data-center" />
+        <module name="core" />
+        <module name="dataaccess" />
+        <module name="common" />
+        <module name="bussflow-engine" />
+        <module name="app-devel" />
+        <module name="data-synchronizer" />
+        <module name="api-gateway" />
+        <module name="postgres-dataloader" />
+        <module name="future-maven-plugin" />
+        <module name="bussflow-server" />
+        <module name="app-server" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="api-gateway" target="1.8" />
+      <module name="app-devel" target="1.8" />
+      <module name="app-server" target="1.8" />
+      <module name="bussflow-engine" target="1.8" />
+      <module name="bussflow-server" target="1.8" />
+      <module name="common" target="13" />
+      <module name="core" target="1.8" />
+      <module name="data-center" target="1.8" />
+      <module name="data-synchronizer" target="1.8" />
+      <module name="dataaccess" target="1.8" />
+      <module name="future-maven-plugin" target="1.8" />
+      <module name="future-parent" target="1.8" />
+      <module name="postgres-dataloader" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="bussflow-server" options="-parameters" />
+      <module name="dataaccess" options="-parameters" />
+    </option>
+  </component>
+</project>

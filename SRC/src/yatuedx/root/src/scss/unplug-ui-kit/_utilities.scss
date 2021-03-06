@@ -1,0 +1,100 @@
+.p-dark {
+    color: $black;
+}
+
+.grid-margin {
+    margin-bottom: 2.625rem;
+}
+
+.header-content {
+    min-height: 500px;
+}
+
+.text-tracking-tighter {
+    letter-spacing: -0.1px;
+}
+
+.text-tracking-tight {
+    letter-spacing: -0.5px;
+}
+
+.text-tracking-normal {
+    letter-spacing: 0
+}
+
+.text-tracking-wide {
+    letter-spacing: 2px;
+}
+
+.text-tracking-wider {
+    letter-spacing: 3px;
+}
+
+.up-subscribe {
+    padding-top: 94px;
+    padding-bottom: 76px;
+}
+.page-head {
+    padding-top: 55px;
+    padding-bottom: 60px;
+}
+
+.text-gray {
+    color: #bbbbbb!important;
+}
+
+@each $brand, $value in $social-colors {
+    .social-link-#{$brand} {
+        &:hover {
+            background-color: $value;
+            color: $white;
+        }
+    }
+
+    .text-#{$brand} {
+        color: $value !important;
+    }
+
+    a.text-#{$brand}:hover {
+        color: darken($value, 15%) !important;
+    }
+
+    .hover-text-#{$brand}:hover {
+        color: $value !important;
+    }
+
+    .bg-#{$brand} {
+        background-color: $value!important;
+    }
+    .hover-bg-#{$brand}:hover {
+        background-color: $value!important;
+        color: color-yiq($value);
+    }
+}
+
+.small {
+    font-size: 85%!important;
+}
+
+.ribbon {
+    display: inline-block;
+    position: relative;
+    padding:4px 15px;
+    font-size: 13px;
+    font-weight: $font-weight-bold;
+    color: $white;
+    background-color: #ff3737;
+
+    &::after{
+        content: "";
+        display: inline-block;
+        border: 13.5px solid #ff3737;
+        border-right-color: transparent;
+        position: absolute;
+        left: calc(100% - 1px);
+        top: 0;
+    }
+}
+.error-404 {
+    background-color: #f7b731;
+}

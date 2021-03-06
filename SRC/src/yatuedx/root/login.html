@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Unplug UI</title>
+    <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
+    <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
+    <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
+</head>
+<body>
+    <main class="auth">
+        <div class="container-fluid">
+            <div class="row vh-100">
+                <div class="col-md-6 text-center py-5 d-flex flex-column justify-content-center auth-bg-section text-white" style="background-image: url(assets/images/login-bg.jpg)">
+                    <h1 class="text-reset">Welcome to <br> Yatu </h1>
+                    <p class="font-weight-bold text-reset">Enter your information and join Yatu community.</p>
+                </div>
+                <div class="col-md-6 text-center d-flex flex-column py-5 justify-content-center">
+                    <div class="auth-form-section">
+                        <div class="logo"><img src="assets/images/logo.svg" class="img-fluid" alt="Unplug UI" width="200"></div>
+                        <h2>Sign in</h2>
+                        <p>Becoming a member to a growing new world</p>
+                        <form action="index.html" class="auth-form">
+                            <div class="form-group">
+                                <label for="username" class="sr-only">Username</label>
+                                <input type="text" name="username" id="username" class="form-control" placeholder="Username">
+                            </div>
+                            <div class="form-group">
+                            <label for="userPassword" class="sr-only">Password</label>
+                            <input type="password" name="userPassword" id="userPassword" class="form-control" placeholder="Password">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block mb-3">Sign in</button>
+                            <div class="d-md-flex justify-content-between">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="termsAgriment" id="termsAgriment" value="termsAgreed">
+                                    <label class="form-check-label" for="termsAgriment">
+                                        Remember Me
+                                    </label>
+                                </div>
+                                <a href="#" class="text-info">Forgot Password?</a>
+                            </div>
+
+                        </form>
+                        <h5 class="text-left mb-3">Sign in to Dribbble</h5>
+                        <p class="mb-0 d-flex">
+                            <a href="#" class="btn btn-light btn-block mr-2">Sign in with google</a>
+                            <a href="#" class="btn btn-facebook mr-2"> <i class="mdi mdi-facebook"></i></a>
+                            <a href="#" class="btn btn-twitter"><i class="mdi mdi-twitter"></i></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+</body>
+</html>

@@ -1,0 +1,32 @@
+.pricing-table {
+    @include media-breakpoint-down(sm) {
+
+        .plan-content-title {
+            font-size: 16px;
+        }
+        .pricing-plan-title {
+            font-size: 10px;
+        }
+        .pricing-plan-amount {
+            font-size: 18px;
+            white-space: nowrap;
+        }
+        .pricing-plan-allotment {
+            font-size: 75%!important;
+        }
+
+        th {
+            min-width: 85px;
+            &:first-child {
+                min-width: auto;;
+            }
+        }
+        td:first-child {
+            font-size: 10px;
+        }
+        td {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}

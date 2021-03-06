@@ -1,0 +1,157 @@
+body {
+    font-size: $p-font-size;
+}
+h1,h2,h3,h4,h5,h6,
+.h1,.h2,.h3,.h4,.h5,.h6 {
+    color: $headings-color;
+}
+h1,.h1 {
+    font-size: $h1-font-size;
+    line-height: 60px;
+}
+h2,.h2 {
+    font-size: $h2-font-size;
+    line-height: 48px;
+}
+h3,.h3 {
+    font-size: $h3-font-size;
+    line-height: 42px;
+}
+h4,.h4 {
+    font-size: $h4-font-size;
+    line-height: 36px;
+}
+h5,.h5 {
+    font-size: $h5-font-size;
+    line-height: 30px;
+}
+h6,.h6 {
+    font-size: $h6-font-size;
+    line-height: 24px;
+}
+
+p{
+    font-family: $type2;
+    font-weight: $font-weight-regular;
+    line-height: 27px;
+    color: $paragraph-color;
+}
+
+blockquote, .blockquote{
+    font-size: 1.125rem;
+    font-weight: $font-weight-light;
+
+    p {
+        margin-bottom: 0.5rem;
+        line-height: 1.61;
+        font-family: $type1;
+        color: $black;
+    }
+
+    footer, .blockquote-footer {
+        font-size: 0.812rem;
+        color: $text-muted;
+        font-family: $type2;
+        font-weight: $font-weight-medium;
+
+        &::before {
+            content: "-";
+        }
+    }
+
+    &.blockquote-left-bordered {
+        padding-left: 1.25rem;
+        position: relative;
+
+        &::before {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            border-radius: 6px;
+            background-color: #d8d8d8;
+        }
+    }
+    &.blockquote-center-bordered {
+        padding-left: 1.25rem;
+        position: relative;
+        text-align: center;
+
+        &::before {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            border-radius: 6px;
+            background-color: #d8d8d8;
+        }
+    }
+    &.blockquote-right-bordered {
+        padding-right: 1.25rem;
+        position: relative;
+        text-align: right;
+
+        &::before {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            border-radius: 6px;
+            background-color: #d8d8d8;
+        }
+    }
+}
+
+.display-1, .display-2, .display-3, .display-4 {
+    color: $headings-color;
+    font-weight: $font-weight-medium;
+}
+
+.display-1 {
+    font-size: $display1-size;
+    line-height: 1.21;
+}
+.display-2 {
+    font-size: $display2-size;
+    line-height: 1.31;
+}
+.display-3 {
+    font-size: $display3-size;
+    line-height: 1.4;
+}
+.display-4 {
+    font-size: $display4-size;
+    line-height: 1.5;
+}
+
+.font-weight-medium {
+    font-weight: $font-weight-medium;
+}
+
+.font-weight-bold {
+    font-weight: $font-weight-bold;
+}
+
+.lead {
+    font-size: 1rem;
+}
+
+.font-type1 {
+    font-family: $type1;
+}
+.font-type2 {
+    font-family: $type2;
+}
+
+small, .small {
+    font-size: 85%;
+}
