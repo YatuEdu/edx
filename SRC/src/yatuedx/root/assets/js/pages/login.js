@@ -1,5 +1,6 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credential.js'
+import {uiMan} from '../core/uiManager.js';
 
 class LoginPageHandler {
 	#credMan;
@@ -14,15 +15,44 @@ class LoginPageHandler {
 	// hook up events
 	init() {
 		$( "#login_button" ).click(this.handleSubmit.bind(this));
+		$( "#user_name" ).focusout(this.validateInput)
+		$( "#user_password" ).focusout(this.validateInput);
 	}
 	
-	handleSubmit(e) {
-		debugger;
+	// handling input focus loss to check valid input
+	// add error message <p> element if empty text for the necessary fields
+	validateInput(e) {
+		e.preventDefault();
+		if (!$(this).val()) {
+			$(this).next('p').remove();
+			const dataId = $(this).attr('data-text-id');
+			const warning = uiMan.getText(dataId);
+			$(this).after( `<p style="color:red;">${warning}</p>` );  
+		} else {
+			$(this).next('p').remove();
+		}
+	}
+	
+	// signin submit request to server
+	async handleSubmit(e) {
 		e.preventDefault();
 		
-		const name = $("#user_name").val();
-		const pw = $("#user_password" ).val();
-		this.authenticate(name, pw);
+		// remove the error message if any
+		$(e.target).next('p').remove();
+		const name = $("#user_name").val().trim();
+		const pw = $("#user_password" ).val().trim();
+		if (!name || !pw) {
+			return;
+		}
+		await this.#credMan.authenticate(name, pw);
+		if (!this.#credMan.lastError) {
+			// go to my page
+			window.location.href = "./landing.html";
+		}
+		else {
+			// dispaly error message
+			$(e.target).after( `<p style="color:red;">${this.#credMan.lastError}</p>` ); 
+		}
 	}
 	
 	async authenticate(name, pw) {
@@ -60,5 +90,4 @@ let loginPageHandler = null;
 $( document ).ready(function() {
     console.log( "ready!" );
 	loginPageHandler = new LoginPageHandler(credMan);
- 	console.log(credMan.credential.token);
 });
