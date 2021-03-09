@@ -1,6 +1,7 @@
 import {sysConstants, languageConstants} from './sysConst.js'
 import {LocalStoreAccess} from './localStore.js';
 import {uiMan} from './uiManager.js';
+import {remoteCall} from './net.js';
 
 class CredentialManager {
 	#userCredInfo = {name: '', token: '', email: ''};
@@ -35,34 +36,53 @@ class CredentialManager {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(loginData),
 		};
-
 		
-		try {
-			// clear previous auth info before new login request
-			this.private_clear();
-			
-			const response = await fetch(sysConstants.YATU_AUTH_URL, requestOptions);
-			
-			if (!response.ok) {
-				const message = uiMan.getTextWithParams(languageConstants.SERVER_ERROR_WITH_RESPONSE, response.status);
-				throw new Error(message);
-			}
-			let authToken = null;
-			const data = await response.json();
-			if (data.result.code === 0) {
-				authToken = data.data[0].token; 
-				this.private_login({name: userName, token: authToken, email: ''});
-			}
-			else {
-				this.#authError = uiMan.getTextWithParams(languageConstants.SERVER_ERROR_WITH_RESPONSE, data.result.code);
-			}
-			
-		}
-		catch (err) {
-			this.#authError = err;
-		}
+		// clear previous auth info before new login request
+		this.private_clear();
 		
+		// call remote API
+		const ret = await remoteCall(sysConstants.YATU_AUTH_URL, requestOptions);
+		
+		// error?
+		if (ret.err) {
+			// TO DO: GO TO ERROR PAGE
+			this.#authError = ret.err;
+		}
+		else {
+			// got result in data:
+			this.private_login({name: userName, token: ret[0].token, email: ''});
+		}
 		return this.#authError;
+	}
+	
+	// call remote auth server to sign in a user
+	async signUp(userName, email, userPassword) {
+		const loginData = {
+			header: {
+				token: "",
+				api_id: 202101
+			},
+			
+			data: {					
+				name: userName,
+				email: email,
+				fistName: userName,
+				lastName: userName,
+				pwh: sha256(sha256(userPassword))
+			}
+		};
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(loginData),
+		};
+		
+		// clear previous auth info before new login request
+		this.private_clear();
+
+		// remote call
+		const ret = await remoteCall(sysConstants.YATU_AUTH_URL, requestOptions);
+		return ret.err;
 	}
 	
 	

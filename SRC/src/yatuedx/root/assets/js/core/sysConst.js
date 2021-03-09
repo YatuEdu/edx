@@ -18,8 +18,10 @@ const languageConstants = {
 	STATE_LANG_CN: 1,
 	
 	// UI Text Id
-	SIGNIN_NAME_NEEDED: "p_login_f_nm",			// login page error: name expected
-	SIGNIN_PW_NEEDED: "p_login_f_pw",			// login page error: pw expected
+	SIGNIN_NAME_NEEDED: "p_login_fld_nm",			// login page error: name expected
+	SIGNIN_PW_NEEDED: "p_login_fld_pw",			// login page error: pw expected
+	SIGNUP_EMAIL_NEEDED: "p_signup_fld_em",			// login page error: pw expected
+
 	SERVER_UNEXPECTED_ERR: "ge_une",			// generic error: unexpected service error
 	SERVER_ERROR_WITH_RESPONSE: "ge_une_res",  	// generic error: unexpected service error
 };
