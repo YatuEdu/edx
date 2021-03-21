@@ -1,10 +1,11 @@
 import {sysConstants, languageConstants} from './sysConst.js'
+import {TimeUtil} from './util.js'
 import {LocalStoreAccess} from './localStore.js';
 import {uiMan} from './uiManager.js';
-import {remoteCall} from './net.js';
+import {Net} from './net.js';
 
 class CredentialManager {
-	#userCredInfo = {name: '', token: '', email: ''};
+	#userCredInfo = {name: '', token: '', email: '', creationTime: null};
 	#authError;
 	#store;
 	
@@ -14,34 +15,23 @@ class CredentialManager {
     constructor(store) {
 		this.#store = store;
 		
-		if (this.#store.getItem()) {
-			this.#userCredInfo  = JSON.parse(this.#store.getItem());
+		try {
+			if (this.#store.getItem()) {
+				this.#userCredInfo  = JSON.parse(this.#store.getItem());
+			}
+		}
+		catch(err) {
+			this.#authError = err;
 		}
 	}
 	
 	// call remote auth server to sign in a user
 	async authenticate(userName, userPassword) {
-		const loginData = {
-			header: {
-				token: "",
-				api_id: 202102
-			},
-			data: {					
-				name: userName,
-				pwh: sha256(sha256(userPassword))
-			}
-		};
-		const requestOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(loginData),
-		};
-		
 		// clear previous auth info before new login request
 		this.private_clear();
 		
 		// call remote API
-		const ret = await remoteCall(sysConstants.YATU_AUTH_URL, requestOptions);
+		const ret = await Net.login(userName, userPassword);
 		
 		// error?
 		if (ret.err) {
@@ -50,41 +40,44 @@ class CredentialManager {
 		}
 		else {
 			// got result in data:
-			this.private_login({name: userName, token: ret[0].token, email: ''});
+			this.update_cred({name: userName, token: ret.data[0].token, email: ''});
 		}
 		return this.#authError;
 	}
 	
 	// call remote auth server to sign in a user
 	async signUp(userName, email, userPassword) {
-		const loginData = {
-			header: {
-				token: "",
-				api_id: 202101
-			},
-			
-			data: {					
-				name: userName,
-				email: email,
-				fistName: userName,
-				lastName: userName,
-				pwh: sha256(sha256(userPassword))
-			}
-		};
-		const requestOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(loginData),
-		};
-		
 		// clear previous auth info before new login request
 		this.private_clear();
 
-		// remote call
-		const ret = await remoteCall(sysConstants.YATU_AUTH_URL, requestOptions);
+		// remote call to sign up
+		const ret = await Net.signUp(userName, email, userPassword);
 		return ret.err;
 	}
 	
+	// test if we have a valid token
+	async hasLoggedIn() {
+		const t = this.#userCredInfo.token;
+		const tt = this.#userCredInfo.creationTime;
+		if (t) {
+			// yatu token still valid?
+			const diff = TimeUtil.diffMinutes(tt, Date.now());
+			if (diff < sysConstants.YATU_TOKEN_VALID_IN_MIN) {
+				return true;
+			}
+			
+			// remote call
+			const ret = await Net.tokenCheck(t);
+			if ( ret.code == 0 ) {
+				this.update_cred(this.#userCredInfo);
+				return true;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
 	
 	// Getter get credential info
 	get credential() {
@@ -96,17 +89,19 @@ class CredentialManager {
 		return this.#authError;
 	}
 	
+	
 	/**
 		private methods
 	 **/
 	 
 	// after logged in successfully
-	private_login(cred) {
+	update_cred(cred) {
 		this.#userCredInfo = cred;
+		this.#userCredInfo.creationTime = Date.now();
 		const authStr = JSON.stringify(cred);
         this.#store.setItem(authStr);
 	}
-	
+
 	// clear auth info prior to new login request
 	private_clear() {
 		this.#authError = null;

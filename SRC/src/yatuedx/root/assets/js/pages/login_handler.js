@@ -60,7 +60,7 @@ class LoginPageHandler {
 			await this.#credMan.authenticate(name, pw);
 			if (!this.#credMan.lastError) {
 				// go to my page
-				window.location.href = "./landing.html";
+				window.location.href = "./index.html";
 			}
 			else {
 				// dispaly error message

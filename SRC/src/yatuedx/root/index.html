@@ -24,10 +24,10 @@
                 <div class="collapse navbar-collapse" id="unplugNavbar">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="index.html">Home</a>
+                            <a class="nav-link translatable" href="index.html" data-txt-id="p_indx_link_home">Home</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#!">Pages</a>
+                            <a class="nav-link dropdown-toggle translatable" data-txt-id="p_indx_link_pages" data-toggle="dropdown" href="#!">Pages</a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <a href="components.html" class="dropdown-item">Components</a>
                                 <a href="landing.html" class="dropdown-item">Landing</a>
@@ -39,16 +39,19 @@
                                 <a href="contact.html" class="dropdown-item">Contact</a>
                                 <a href="register.html" class="dropdown-item">Register</a>
                                 <a href="register-card.html" class="dropdown-item">Register 2</a>
-                                <a href="login.html" class="dropdown-item">Login</a>
+                                <a href="login.html" class="dropdown-item">Login（&）</a>
                                 <a href="login-card.html" class="dropdown-item">Login 2</a>
                                 <a href="404.html" class="dropdown-item">404</a>
                             </div>
                         </li>
+						<li class="nav-item for-authenticated-only">
+                            <a class="nav-link translatable" href="mygroup.html" data-txt-id="p_indx_link_group">My Groups</a>
+                        </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="login.html">Login</a>
+                            <a class="nav-link translatable" href="about.html">About</a>
                         </li>
                         <form class="form-inline">
-                            <button class="btn btn-danger"> Buy Now</button>
+                            <button id="index_login_or_account" data-text-id="p_inx_signin_btn_nm" class="btn btn-danger"> Login</button>
                         </form>
                     </ul>
                 </div>
@@ -229,10 +232,11 @@
             <p class="footer-text text-center">©2019 This page is protected by BootstrapDash and is subject to the Google Privacy Policy and Terms of Service.</p>
         </div>
     </footer>
-<script src="../src/vendors/jquery/dist/jquery.min.js"></script>
-<script src="../src/vendors/popper.js/dist/umd/popper.min.js"></script>
-<script src="../src/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="assets/js/simple-ui-kit-demo.js"></script>
-</body>
+
+	<script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script> 	
+	<script type="module" src="./assets/js/pages/index.js"></script> </body>
 
 </html>

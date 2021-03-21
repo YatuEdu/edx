@@ -1,0 +1,10 @@
+"a62d3b2f0d1b87554d4fba25c1a5fb2a73e192e31b9aa1b5a61e9ef24236d12d88ff9731876ebafc58008fec58d9834438c7e7dd5118d4f5021a3d5330609a65"
+0. UI 已经基本就绪， 翻译问题难以解决
+
+1. token 时间太短
+   每次 call api 202106 后， 延长30分钟
+   视频期间token自动延期吗？
+   
+2. 视频的安全性
+
+3. screen-sharing进展
