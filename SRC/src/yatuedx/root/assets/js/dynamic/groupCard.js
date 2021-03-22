@@ -3,7 +3,7 @@
 //  1 - image file name
 //	2 - 
 const GROUP_CARD_TEMPLATE = `
- <div id="card_div##1" data-type="##3" class="col-sm-6 col-lg-4 py-3 group-card">
+ <div id="card_div##1"  class="col-sm-6 col-lg-4 py-3 group-card">
 	<div class="card h-100">
 		<div class="card-body text-center">
 			<img src="assets/images/dynamic/group_##1.png" class="img-fluid py-1 my-4" alt="Product 2" height="180">
@@ -11,6 +11,8 @@ const GROUP_CARD_TEMPLATE = `
 			<p class="mb-0"></p>
 			<p class="h5 font-weight-bold mb-3 translatable" data-text-id="c_group_fld_num_online_##1">（##4）人在线</p>
 			<button class="btn btn-rounded btn-outline-primary translatable" id="card_btn_##1" 
+					data-grp-type="##3"
+					data-grp-name="##2"
 			        data-text-id="c_group_fld_btn_enter">进入</button>
 		</div>
 	</div>

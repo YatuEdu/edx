@@ -28,7 +28,7 @@ class MyGroupPageHandler {
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
 				const g = ret.data[i];
-				$(".myGroupRow").append(getGroupCardHtml({id: 0, name: g.name, type: 102}));
+				$(".myGroupRow").append(getGroupCardHtml({id: g.id, name: g.name, type: 102}));
 				const bntId = `#card_btn_${g.id}`;
 				
 				// still a valid member?
@@ -59,12 +59,18 @@ class MyGroupPageHandler {
 	
 	handleRefill(e) {
 		e.preventDefault();
-		alert('Refilling:' + $(this).attr('id'));
+		alert('entering:' + $(this).attr('data-grp-name') + ":" + $(this).attr('data-grp-type'));
 	}
 	
+	/**
+		Enter the video chat group if applicable
+	**/
 	handleEntering(e) {
 		e.preventDefault();
-		alert('Entering:' + $(this).attr('id'));
+		// 
+		// go to login page
+		const groupName = $(this).attr('data-grp-name');
+		window.location.href = `./legacy/chat.html??group=${groupName}`;
 	}
 	
 	handleJoining(e) {
