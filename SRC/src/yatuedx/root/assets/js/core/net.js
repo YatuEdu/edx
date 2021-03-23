@@ -55,7 +55,7 @@ class Net {
 	}
 	
 	static async signUp(userName, email, userPassword) {
-		const req = Net.composeRequestDataForSignUp(userName, userPassword);
+		const req = Net.composeRequestDataForSignUp(userName, email, userPassword);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}

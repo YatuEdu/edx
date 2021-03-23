@@ -20,6 +20,7 @@ class LoginPageHandler {
 	// hook up events
 	init() {
 		$( "#auth_button" ).click(this.handleSubmit.bind(this));
+		$( "#signup_button" ).click(this.handleGotoSignup);
 		$( "#user_name" ).focusout(this.validateInput)
 		$( "#user_password" ).focusout(this.validateInput);
 		if (this.#forSignup) {
@@ -39,6 +40,11 @@ class LoginPageHandler {
 		} else {
 			$(this).next('p').remove();
 		}
+	}
+	
+	// go to sign up page
+	handleGotoSignup() {
+		window.location.href = "./register.html";
 	}
 	
 	// signin submit request to server
