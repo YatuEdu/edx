@@ -1,8 +1,25 @@
-// Polyfill in Firefox.
-			// See https://blog.mozilla.org/webrtc/getdisplaymedia-now-available-in-adapter-js/
-			if (adapter.browserDetails.browser == 'firefox') {
+import {sysConstants, languageConstants} from '../core/sysConst.js'
+import {credMan} from '../core/credential.js'
+import {uiMan} from '../core/uiManager.js';
+
+/**
+	This class manages both login and sigup workflow
+**/
+class PeerTalk {
+	#credMan;
+	#userName;
+	
+    constructor(credMan) {
+		this.#credMan = credMan;
+		this.init();
+	}
+	
+	init() {
+		// Polyfill in Firefox.
+		// See https://blog.mozilla.org/webrtc/getdisplaymedia-now-available-in-adapter-js/
+		if (adapter.browserDetails.browser == 'firefox') {
 			  adapter.browserShim.shimGetDisplayMedia(window, 'screen');
-			}
+		}
 
             var signaling_socket = null;   /* our socket.io connection to our webserver */
             var local_media_stream = null; /* our own microphone / webcam */
