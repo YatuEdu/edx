@@ -29,7 +29,8 @@ class IndexPageHandler {
 		let btnTxt = '';
 		if (!this.#loggedIn) {
 			// fix nav bar red button
-			btnTxt = uiMan.getText(languageConstants.SIGNIN);
+			//btnTxt = uiMan.getText(languageConstants.SIGNIN);
+			btnTxt = "登录/注册";
 			$( "#index_login_or_account" ).click(this.handleLogin);
 			
 			// fix nav bar authenticated user onky items
@@ -37,7 +38,8 @@ class IndexPageHandler {
 		}
 		else {
 			
-			btnTxt = uiMan.getText(languageConstants.ACCOUNT);
+			//btnTxt = uiMan.getText(languageConstants.ACCOUNT);
+			btnTxt = "我的账户";
 			$( "#index_login_or_account" ).click(this.handleAccount);
 			
 			// fix nav bar authenticated user onky items

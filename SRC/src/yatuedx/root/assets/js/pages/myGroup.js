@@ -3,6 +3,8 @@ import {credMan}                         from '../core/credential.js'
 import {uiMan}                           from '../core/uiManager.js';
 import {Net}                             from '../core/net.js';
 import {getGroupCardHtml}				 from '../dynamic/groupCard.js';
+import {StringUtil}						 from '../core/util.js';
+
 /**
 	This class manages both login and sigup workflow
 **/
@@ -52,7 +54,7 @@ class MyGroupPageHandler {
 				const bntId = `#card_btn_${g.id}`;
 				$(".publicGroupRow").append(getGroupCardHtml({id: g.id, name: g.name, type: g.type}));
 				$( bntId ).text("申请加入");
-				$( bntId ).click(this.handleJoining);
+				$( bntId ).click(this.handleJoining.bind(this));
 			}
 		}
 	}
@@ -73,10 +75,23 @@ class MyGroupPageHandler {
 		window.location.href = `./legacy/chat.html??group=${groupName}`;
 	}
 	
-	handleJoining(e) {
+	async handleJoining(e) {
 		e.preventDefault();
-		alert('Joining:' + $(this).attr('id'));
+		
+		// call remote API to apply for the membership
+		const t = this.#credMan.credential.token;
+		const btnId = $(e.target).attr('id');
+		const ret = await Net.applyForAGroup(t, StringUtil.getIdFromBtnId(btnId));
+	
+		if (ret.code == 0) {
+			alert('申请已经发送， 待批准');
+		}
+		else{
+			alert('错误码： ' + ret.code);
+		}
 	}
+	
+	
 }
 
 let myGroupPageHandler = null;

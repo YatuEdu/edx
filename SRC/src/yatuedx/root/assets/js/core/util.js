@@ -38,4 +38,15 @@ class TimeUtil {
 	}
 }
 
-export { TimeUtil };
+class StringUtil {
+	/*
+	  most of Yatu control id is in form of "btn_xxx", where xxx is the associated
+	  object id.  The id could be user, group, or anything else.
+	  */
+	static getIdFromBtnId(btnId) {
+		const indx = btnId.lastIndexOf("_");
+		return parseInt(btnId.substring(indx+1));
+	}
+}
+
+export { TimeUtil, StringUtil };

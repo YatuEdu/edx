@@ -168,8 +168,8 @@ class Net {
 		};
 	}
 	
-	static async applyForAGroup(token, top) {
-		const req = Net.compoesRequestFoGroupApplication(token, top);
+	static async applyForAGroup(token, groupId) {
+		const req = Net.compoesRequestFoGroupApplication(token, groupId);
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
 	
