@@ -30,8 +30,8 @@ class MyGroupPageHandler {
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
 				const g = ret.data[i];
-				$(".myGroupRow").append(getGroupCardHtml({id: g.id, name: g.name, type: 102}));
-				const bntId = `#card_btn_${g.id}`;
+				$(".myGroupRow").append(getGroupCardHtml({id: g.secId, name: g.name, type: 102}));
+				const bntId = `#card_btn_${g.secId}`;
 				
 				// still a valid member?
 				if (g.credit > 0) {
@@ -51,8 +51,8 @@ class MyGroupPageHandler {
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
 				const g = ret.data[i];
-				const bntId = `#card_btn_${g.id}`;
-				$(".publicGroupRow").append(getGroupCardHtml({id: g.id, name: g.name, type: g.type}));
+				const bntId = `#card_btn_${g.secId}`;
+				$(".publicGroupRow").append(getGroupCardHtml({id: g.secId, name: g.name, type: g.type}));
 				$( bntId ).text("申请加入");
 				$( bntId ).click(this.handleJoining.bind(this));
 			}
@@ -71,8 +71,8 @@ class MyGroupPageHandler {
 		e.preventDefault();
 		// 
 		// go to login page
-		const groupName = $(this).attr('data-grp-name');
-		window.location.href = `./legacy/chat.html??group=${groupName}`;
+		const groupId = $(this).attr('data-grp-id');
+		window.location.href = `./legacy/chat.html??group=${groupId}`;
 	}
 	
 	async handleJoining(e) {

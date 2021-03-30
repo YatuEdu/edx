@@ -13,6 +13,7 @@ const GROUP_CARD_TEMPLATE = `
 			<button class="btn btn-rounded btn-outline-primary translatable" id="card_btn_##1" 
 					data-grp-type="##3"
 					data-grp-name="##2"
+					data-grp-id="##5"
 			        data-text-id="c_group_fld_btn_enter">进入</button>
 		</div>
 	</div>
@@ -25,7 +26,8 @@ function getGroupCardHtml(groupInfo) {
 	htmlCard = 	htmlCard.replace(new RegExp(`##1`, 'g'), groupInfo.id)
 						.replace(new RegExp(`##2`, 'g'), groupInfo.name)
 						.replace(new RegExp(`##3`, 'g'), groupInfo.type)
-						.replace(new RegExp(`##4`, 'g'), 1);
+						.replace(new RegExp(`##4`, 'g'), 1)
+						.replace(new RegExp(`##5`, 'g'), groupInfo.id);
 	return htmlCard;
 }
 
