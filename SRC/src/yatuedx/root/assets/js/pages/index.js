@@ -60,7 +60,7 @@ class IndexPageHandler {
 		e.preventDefault();
 		
 		// todo: go to account page
-		window.location.href = "./groups.html";
+		window.location.href = "./group-man.html";
 	}
 }
 

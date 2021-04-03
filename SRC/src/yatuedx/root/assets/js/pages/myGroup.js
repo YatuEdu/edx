@@ -71,8 +71,11 @@ class MyGroupPageHandler {
 		e.preventDefault();
 		// 
 		// go to login page
-		const groupName = $(this).attr('data-grp-name');
-		window.location.href = `./legacy/chat.html??group=${groupName}`;
+		const grpId = StringUtil.getIdFromBtnId($(e.target).attr('id'));
+		const ret = await Net.applyForAGroup(t, btnId);
+	
+		//const groupName = $(this).attr('data-grp-name');
+		window.location.href = `./legacy/chat.html??group=${grpId}`;
 	}
 	
 	async handleJoining(e) {
