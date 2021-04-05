@@ -30,16 +30,16 @@ class MyGroupPageHandler {
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
 				const g = ret.data[i];
-				$(".myGroupRow").append(getGroupCardHtml({id: g.secId, name: g.name, type: 102}));
-				const bntId = `#card_btn_${g.secId}`;
+				const  {buttonId, html} = getGroupCardHtml({id: g.secId, name: g.name, type: 102});
+				$(".myGroupRow").append(html);
 				
 				// still a valid member?
 				if (g.credit > 0) {
-					$( bntId ).click(this.handleEntering);
+					$( buttonId ).click(this.handleEntering);
 				}
 				else {
-					$( bntId ).text("付费加入");
-					$( bntId ).click(this.handleRefill);
+					$( buttonId ).text("付费加入");
+					$( buttonId ).click(this.handleRefill);
 				}
 			}
 		}
@@ -72,7 +72,9 @@ class MyGroupPageHandler {
 	
 		// go to chat page
 		const groupId = $(this).attr('data-grp-id');
-		window.location.href = `./legacy/chat.html??group=${groupId}`;
+		window.location.href = `./videoChat.html`;
+
+		// `./legacy/chat.html??group=${groupId}`;
 	}
 	
 	async handleJoining(e) {

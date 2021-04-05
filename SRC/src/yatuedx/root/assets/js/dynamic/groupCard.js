@@ -26,12 +26,14 @@ function cutShort(length, str) {
 
 function getGroupCardHtml(groupInfo) {
 	let htmlCard = GROUP_CARD_TEMPLATE;
-	htmlCard = 	htmlCard.replace(new RegExp(`##1`, 'g'), cutShort(10, groupInfo.id))
+	const btnId = cutShort(10, groupInfo.id);
+	const btnAttrId = `#card_btn_${btnId}`;
+	htmlCard = 	htmlCard.replace(new RegExp(`##1`, 'g'), btnId)
 						.replace(new RegExp(`##2`, 'g'), groupInfo.name)
 						.replace(new RegExp(`##3`, 'g'), groupInfo.type)
 						.replace(new RegExp(`##4`, 'g'), 1)
 						.replace(new RegExp(`##5`, 'g'), groupInfo.id);
-	return htmlCard;
+	return  {buttonId: btnAttrId, html: htmlCard};
 }
 
 export {getGroupCardHtml};
