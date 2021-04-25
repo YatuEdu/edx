@@ -75,12 +75,11 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	
 	// get question in xml format for saving to API server
 	get serverXML() {
-		return 
-		`<qa>
+		const ret = `<qa>
 			<id>${this.id}</id>
 			<strv>${this._value}</strv>
-		</qa>
-		`;
+		</qa>`;
+		return ret;
 	}
 }  
 

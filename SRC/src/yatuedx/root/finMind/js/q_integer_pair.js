@@ -86,13 +86,14 @@ class UserIntegerPairQuestion extends UserQuestionBase {
 	
 	// get the question in xml format for saving to API server
 	get serverXML() {
-		return 
+		const ret =  
 		`<qa>
 			<id>${this.id}</id>
 			<intv>${this._firstValue}</intv>
 			<intv2>${this._secondValue}</intv2>
 		</qa>
 		`;
+		return ret;
 	}
 }  
 
