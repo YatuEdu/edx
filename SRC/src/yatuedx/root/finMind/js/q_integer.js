@@ -19,30 +19,50 @@ class UserIntegerQuestionText extends UserQuestionBase {
 		this._max = high; 
     }  
 	
-	setValue(obj) {
-		if (typeof obj !== 'number') {
-			throw new Error('invalid value for question ' + super._qid);
+	// Method for validating the result value upon moving away 
+	// from the page.
+	onValidating() {
+		if (this._value === parseInt(this._value, 10)) {
+			return true;
 		}
-		this._value = obj;
+		return false;
 	}
 	
-	// get radio class 
+	// Method for hooking up event handler to handle text change event
+	onChangeEvent() {
+		const self = this;
+		$(`.${this.uiClass}`).blur(function() {
+			self.setValue($(this).val());
+		});
+	}
+	
+	// Validate the input value and save teh legit value
+	setValue(obj) {
+		this._value = parseInt(obj, 10);
+	}
+	
+	// get the input UI element class 
 	get uiClass() {
 		return `integer_for_${this._qid}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons
-	displayHtml() {
+	get displayHtml() {
 		const clssStr= this.uiClass;
 		const htmlStr = q_template_integer.replace(replacementForClass, clssStr)
 								   .replace(replacementForMin, this._min)
 								   .replace(replacementForMax, this._max);
-		return {class: clssStr, html: htmlStr}; 
+		return htmlStr; 
 	}
 	
-	// get xml for service
+	// get the question in xml format for saving to API server
 	get serverXML() {
-		throw new Error('displayHtml: sub-class-should-overload-this');
+		return 
+		`<qa>
+			<id>${this.id}</id>
+			<intv>${this._value}</intv>
+		</qa>
+		`;
 	}
 }  
 

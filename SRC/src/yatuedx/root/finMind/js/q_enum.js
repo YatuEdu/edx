@@ -19,6 +19,29 @@ class UserEnumQuestionRadio extends UserQuestionBase {
         this._enumValues = enumValues;  
     }  
 	
+	// Method for validating the result value upon moving away 
+	// from the page.
+	onValidating() {
+		if (this._value) {
+			return true;
+		}
+		return false;
+	}
+	
+	// Method for hooking up event handler to handle RADIO 
+	// selectioon change event
+	onChangeEvent() {
+		const radioName = this.radioName;
+		const jqName = `input[name=${radioName}]`;
+		const jqStatus = `input[name=${radioName}]:checked`;
+		const self = this;
+		$(jqName).change(function(){
+			self.setValue( $( jqStatus ).val());
+		});
+	}
+	
+	// Setting the enum value from the UI when handling the
+	// selection change event
 	setValue(obj) {
 		if (typeof obj !== 'string') {
 			throw new Error('invalid value for question ' + super._qid);
@@ -37,7 +60,7 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	}
 	
 	// get display html for the entire enum group in form of radio buttons
-	displayHtml() {
+	get displayHtml() {
 		const clssStr= this.radioClass;
 		const name = this.radioName;	
 		let htmlStr = "";
@@ -45,15 +68,19 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 			const theValue = this._enumValues[i];
 			htmlStr += q_template_enum.replace(replacementForClass, clssStr)
 								   .replace(replacementForName, name)
-								   .replace(new RegExp(replacementForValue, 'g'),theValue);
-			
+								   .replace(new RegExp(replacementForValue, 'g'),theValue);	
 		}
-		return {class: clssStr, html: htmlStr}; 
+		return htmlStr; 
 	}
 	
-	// get xml for service
+	// get question in xml format for saving to API server
 	get serverXML() {
-		throw new Error('displayHtml: sub-class-should-overload-this');
+		return 
+		`<qa>
+			<id>${this.id}</id>
+			<strv>${this._value}</strv>
+		</qa>
+		`;
 	}
 }  
 

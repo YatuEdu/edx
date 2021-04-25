@@ -30,43 +30,53 @@ const enumDrinkingFrequency =  ['light', 'social', 'heavy', 'never' ];
 const enumType = [6, 7, 8];
 
 class QuestionView {
-	#_blockId;
+	#blockId;
+	#quesions;
 	
 	constructor(blockId){         
-        this.#_blockId = blockId; 
+        this.#blockId = blockId; 
+		this.#quesions = new Map();
     } 
 	
 	get blockId() {
-		return this.#_blockId;
+		return this.#blockId;
 	}
 	
 	set	blockId(blockId) {
-		this.#_blockId = blockId;
+		this.#blockId = blockId;
 	}
 		
 	
-	static formEnumQuestionb(qid, qtype, qtext) {
+	getBlockQuestions(blck) {
+		return this.#quesions.get(blck);
+	}
 	
+	getCurrentQuestions() {
+		return this.#quesions.get(this.#blockId);
 	}
 
 	getUserQustionHtml(qList) {
 		if (!qList || qList.length == 0) {
 			return '';
 		}
-		this.#_blockId = qList[0].block_id;
-		
+		this.#blockId = qList[0].block_id;
+		const newQuestionList = [];
 		// form the question block HTML by enumerating each question
 		// and make each question forms its onw html div element:
 		let htmlStr = '';
 		for(let i = 0; i < qList.length; ++i) {
 			const q = this.createQuestion(qList[i]);
-			const qHtml = q.obj.displayHtml();
+			newQuestionList.push(q);
 			htmlStr +=  q_template_question
-										.replace('{q_id}', q.id)
-										.replace('{q_text}', q.question)
-										.replace('{choice_html}', qHtml.html);
+						.replace('{q_id}', q.id)
+						.replace('{q_text}', q.question)
+						.replace('{choice_html}', q.displayHtml);
 		}	
 		
+		// cache all the questions for this block into the Map object
+		this.#quesions.set(this.#blockId, newQuestionList);
+		
+		// return the html string to outer methods
 		return htmlStr;
 	}
 	
@@ -75,61 +85,22 @@ class QuestionView {
 		let qObj = null;
 		switch(qInfo.type) {
 			case 1:
-				qObj = new UserIntegerQuestionText(qInfo.id, "", 1, 1, 80); 
+				qObj = new UserIntegerQuestionText(qInfo.id, qText, 1, 1, 80); 
 				break;
 			case 3:
 			case 4:
-				qObj = new UserIntegerPairQuestion(qInfo.id, "", qInfo.type, 1, 100, 1, 100); 
+				qObj = new UserIntegerPairQuestion(qInfo.id, qText, qInfo.type, 1, 100, 1, 100); 
 				break;
 			case 6:
 			case 7:
 			case 8:
 			case 9:
-				qObj = new UserEnumQuestionRadio(qInfo.id, "", qInfo.type, enumMap.get(qInfo.type)); 
+				qObj = new UserEnumQuestionRadio(qInfo.id, qText, qInfo.type, enumMap.get(qInfo.type)); 
 				break;
 			default:
 				throw new Error("Invalid type");
 		}
-		return {id: qInfo.id, question: qText, obj: qObj};
-		
-		/*
-		const q1 = new UserEnumQuestionRadio(1, qText, 6, enumMap.get(6));
-		const qHtml1 = q1.displayHtml();
-		let htmlStr =  q_template_question
-									.replace('{q_id}', "1")
-									.replace('{q_text}', qText)
-									.replace('{choice_html}', qHtml1.html);
-								   
-		const qText2 = 'your marriage status';
-		const q2 = new UserEnumQuestionRadio(2, qText2, 7, enumMap.get(7));
-		const qHtml2 = q2.displayHtml();
-		htmlStr  +=  q_template_question
-									.replace('{q_id}', "2")
-									.replace('{q_text}', qText2)
-									.replace('{choice_html}', qHtml2.html);
-									
-		const qText3 = 'your weekly exercise habit';
-		const q3 = new UserEnumQuestionRadio(3, qText2, 8, enumMap.get(8));
-		const qHtml3 = q3.displayHtml();
-		htmlStr  +=  q_template_question
-									.replace('{q_id}', "3")
-									.replace('{q_text}', qText3)
-									.replace('{choice_html}', qHtml3.html);
-		this.#_blockId++;
-		return htmlStr;
-		*/
-	}
-	
-	getUserQustionHtml1() {
-		const qText = 'your age';
-		const q1 = new UserIntegerQuestionText(4, qText, 1, 1, 80);
-		const qHtml1 = q1.displayHtml();
-		this.#_blockId++;
-		return  q_template_question
-								.replace('{q_id}', "4")
-								.replace('{q_text}', qText)
-								.replace('{choice_html}', qHtml1.html);
-								   
+		return qObj;
 	}
 }
 	

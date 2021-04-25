@@ -10,8 +10,31 @@ class UserQuestionBase {
 		this._qType = type;
 	}
 	
-	setValue(obj) {
-		throw new Error('setValue: sub-class-should-overload-this');
+	// virtual method for hooking up event handler to handleEvent
+	// question answer change event
+	onChangeEvent() {
+		throw new Error('onChangeEvent: sub-class-should-overload-this');
+	}
+	
+	// virtual method for validating the result value upon moving away 
+	// from the page.
+	onValidating() {
+		throw new Error('onChangeEvent: sub-class-should-overload-this');
+	}
+	
+	// property getter for question id 
+	get id() {
+		return this._qid;
+	}
+	
+	// property getter for question text 
+	get question() {
+		return this._qText;
+	}
+	
+	// property getter for question type 
+	get type() {
+		return this._qType;
 	}
 	
 	// get display html 
