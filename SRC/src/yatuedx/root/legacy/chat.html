@@ -25,6 +25,7 @@
                 flex-direction: column;
             }
 			#textbox {width:320px; height:230px;display: flex;flex-direction: column;}
+            #textTarget{width:60px;}
 
         </style>
 		
@@ -194,6 +195,8 @@
                                 console.log("Error sending offer: ", error);
                             });
                     }
+
+                    $("#textTarget").append("<option value='"+peer_id+"'>"+peer_id+"</option>");
                 });
 
 
@@ -275,6 +278,8 @@
 
                     delete peers[peer_id];
                     delete peer_media_elements[config.peer_id];
+
+                    $("#textTarget option[value='"+peer_id+"']").remove();
                 });
 
                 signaling_socket.on('message', function (message) {
@@ -367,8 +372,9 @@
 			function sendMsg() {
 				var msg = $("#tosend").val();
 				if (msg=='') return;
-				console.log("sendMsg: ", $("#tosend").val());
-				signaling_socket.emit('txtMsg', msg);
+				var target = $("#textTarget option:selected").val();
+				console.log("sendMsg: ", $("#tosend").val(), "to ", target);
+				signaling_socket.emit('txtMsg', {'channel': DEFAULT_CHANNEL, 'target': target, 'msg': msg});
 				$("#tosend").val('');
             }
 
@@ -382,6 +388,9 @@
         -->
 		<div>
 			<textarea id="textbox"></textarea>
+            <select id="textTarget">
+                <option value ="all">all</option>
+            </select>
 			<input id='tosend'></input>
 			<button onclick='sendMsg();'>发送</button>
             <button id="startShareButton" disabled>共享</button>
