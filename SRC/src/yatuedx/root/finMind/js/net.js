@@ -1,4 +1,4 @@
-import {sysConstants, languageConstants} from '../../assets/js/core/sysConst.js'
+import {sysConstants} from './sysConst.js'
 
 class Net {
 	/**
@@ -41,14 +41,14 @@ class Net {
 	/**
 		finMind API for user-question
 	**/
-	static composeRequestDataForUserQuestionBlock(startBlock, token) {
+	static composeRequestDataForUserQuestionBlock(appId, token) {
 		const requestData = {
 			header: {
 				token: token,
-				api_id: 2021801
+				api_id: 2021805
 			},
 			data: {					
-				currentBlockId: startBlock,
+				appId: appId,
 			}
 		};
 		return {
@@ -65,11 +65,11 @@ class Net {
 		const loginData = {
 			header: {
 				token: "",
-				api_id: 201051
+				api_id: 202102
 			},
 			data: {					
-				login_name: userName,
-				pwhsh: sha256(sha256(userPassword))
+				name: userName,
+				pwh: sha256(sha256(userPassword))
 			}
 		};
 		return {

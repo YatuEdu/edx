@@ -26,7 +26,7 @@ class QuestionAnswerRecorder {
 		const isLoggedIn = await credMan.hasLoggedIn();
 
 		//if (!isLoggedIn) {
-			await this.#credMan.authenticate('ly8838', 'BeiGuz0605!');
+			await this.#credMan.authenticate('chenlili', 'abc123456!');
 //}	
 	}	
 	
@@ -72,8 +72,21 @@ class QuestionAnswerRecorder {
 	// Get next blck of questions from DB and dispolay it
 	async populateNextQuestionBlock() {
 		const currentBlockId = this.#questionMan.blockId;
+		/* temp test code  XXX
 		const t = this.#credMan.credential.token;
 		const resp = await Net.getBlockQuestions(currentBlockId, t);
+		*/
+		
+		const resp = { err: '', data: 
+					   [
+					   {block_id: 100, attr_id: 31, attr_type: 18, order_id: 1,
+						 question_text: 'Does any of the following apply to the insured?'
+					   },
+					   {block_id: 100, attr_id: 1, attr_type: 6, order_id: 0,
+						 question_text: 'Your marriage status'
+					   },
+		] };
+		
 		// fill question html
 		if (resp && resp.err) {
 			alert(resp.err);
