@@ -13,8 +13,8 @@ class Net {
 	/**
 		FinMind API for getting a block of user-questions
 	**/	
-	static async getBlockQuestions(startBlock, token) {
-		const req = Net.composeRequestDataForUserQuestionBlock(startBlock, token);
+	static async getBlockQuestions(appId, token) {
+		const req = Net.composeRequestDataForUserQuestionBlock(appId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}

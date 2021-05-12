@@ -16,6 +16,11 @@ class UserQuestionBase {
 		throw new Error('onChangeEvent: sub-class-should-overload-this');
 	}
 	
+	// This method can be called after the UI is rendered to display its
+	// input value (or selection fo check box and radio button and dropdown)
+	setDisplayValue() {
+	}
+	
 	// virtual method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {

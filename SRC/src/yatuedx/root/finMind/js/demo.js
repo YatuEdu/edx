@@ -1,7 +1,7 @@
 import {sysConstants} from './sysConst.js'
 import {credMan}      from './credManFinMind.js'
 import {Net}          from './net.js';
-import {QuestionView} from './q_template.js';
+import {ApplicationQAndAManager} from './q_template.js';
 
 
 /**
@@ -13,7 +13,7 @@ class QuestionAnswerRecorder {
 	
     constructor(credMan) {
 		this.#credMan = credMan;
-		this.#questionMan = new QuestionView(0);
+		this.#questionMan = new ApplicationQAndAManager(0);
 		this.init();
 	}
 	
@@ -71,12 +71,13 @@ class QuestionAnswerRecorder {
 	
 	// Get next blck of questions from DB and dispolay it
 	async populateNextQuestionBlock() {
-		const currentBlockId = this.#questionMan.blockId;
-		/* temp test code  XXX
-		const t = this.#credMan.credential.token;
-		const resp = await Net.getBlockQuestions(currentBlockId, t);
-		*/
+		const appId =  999; // this.#questionMan.blockId;
 		
+		const t = this.#credMan.credential.token;
+		const resp = await Net.getBlockQuestions(appId, t);
+		
+		
+		/*  temp test code  XXX
 		const resp = { err: '', data: 
 					   [
 					   {block_id: 100, attr_id: 31, attr_type: 18, order_id: 1,
@@ -86,6 +87,7 @@ class QuestionAnswerRecorder {
 						 question_text: 'Your marriage status'
 					   },
 		] };
+		*/
 		
 		// fill question html
 		if (resp && resp.err) {
@@ -97,9 +99,13 @@ class QuestionAnswerRecorder {
 				$('#user_question_block').html(qHtml);
 				$('#next_button').text('Next');
 				
-				// now hook up all the input elements event handlers for 
-				// every newly appended input elements
+				// Obtain the list for every newly appended input elements
 				const inputElements = this.#questionMan.getCurrentQuestions();
+				
+				// now set the input value (or selection) if any
+				inputElements.forEach(e => e.setDisplayValue());
+				
+				// now hook up all the input elements event handlers for 
 				inputElements.forEach(e => e.onChangeEvent());
 			}
 			else {

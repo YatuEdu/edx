@@ -21,6 +21,16 @@ class StringUtil {
 		const indx = btnId.lastIndexOf("_");
 		return parseInt(btnId.substring(indx+1));
 	}
+	
+	/********************************************************
+	*	Camel case string
+	*	Camel case is widely used in Java, C++, c# as variable 
+	*	names. Here we use this function to turn any string into
+	 *  camel case. Assume a word is given.
+	 ********************************************************/
+	static convertToCamelCase(singWord) {
+		return singWord.charAt(0).toUpperCase() + singWord.slice(1).toLowerCase();
+	}
 }
 
 export { TimeUtil, StringUtil };

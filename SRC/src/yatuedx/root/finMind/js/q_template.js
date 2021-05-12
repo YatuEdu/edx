@@ -51,7 +51,7 @@ const enumImminentEvent =
 
 const enumType = [6, 7, 8];
 
-class QuestionView {
+class ApplicationQAndAManager {
 	#blockId;
 	#quesions;
 	
@@ -62,12 +62,7 @@ class QuestionView {
 	
 	get blockId() {
 		return this.#blockId;
-	}
-	
-	set	blockId(blockId) {
-		this.#blockId = blockId;
-	}
-		
+	}	
 	
 	getBlockQuestions(blck) {
 		return this.#quesions.get(blck);
@@ -113,9 +108,10 @@ class QuestionView {
 	
 	createQuestion(qInfo) {
 		let qObj = null;
+		
 		switch(qInfo.attr_type) {
 			case 1:
-				qObj = new UserIntegerQuestionText(qInfo.attr_id, qInfo.question_text, qInfo.attr_type, 1, 80); 
+				qObj = new UserIntegerQuestionText(qInfo, 1, 80); 
 				break;
 			case 3:
 			case 4:
@@ -132,7 +128,7 @@ class QuestionView {
 			case 15:
 			case 16:
 			case 17:
-				qObj = new UserEnumQuestionRadio(qInfo.attr_id, qInfo.question_text, qInfo.attr_type, enumMap.get(qInfo.attr_type)); 
+				qObj = new UserEnumQuestionRadio(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
 			case 18:
 				qObj = new UserEnumQuestionCheckbox(qInfo.attr_id, qInfo.question_text, qInfo.attr_type, enumMap.get(qInfo.attr_type)); 
@@ -144,5 +140,5 @@ class QuestionView {
 	}
 }
 	
-export {QuestionView};
+export {ApplicationQAndAManager};
 						

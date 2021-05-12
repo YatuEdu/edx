@@ -3,20 +3,22 @@ import {UserQuestionBase} from './q_base.js';
 const replacementForClass = '{clss}';
 const replacementForMin = '{min}';
 const replacementForMax = '{max}';
+const replacementValue  = '{val}';
 
-
-const q_template_integer = `<input type="number" min="{min}"  max="{max}" step="1" class="{clss}"/>`;
+const q_template_integer = `<input type="number" min="{min}"  max="{max}" step="1" class="{clss}" value="{val}"/>`;
 		
 class UserIntegerQuestionText extends UserQuestionBase {  
     _min;
 	_max;
 	_value;
 	
-    constructor(id, txt, type, low, high){       
-        super(id, txt, type);  
-          
+    constructor(qInfo, low, high){ 	
+        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);      
         this._min = low; 
 		this._max = high; 
+		
+		// set the existing vlaue
+		this._value = qInfo.iv1;
     }  
 	
 	// Method for validating the result value upon moving away 
@@ -51,7 +53,8 @@ class UserIntegerQuestionText extends UserQuestionBase {
 		const clssStr= this.uiClass;
 		const htmlStr = q_template_integer.replace(replacementForClass, clssStr)
 								   .replace(replacementForMin, this._min)
-								   .replace(replacementForMax, this._max);
+								   .replace(replacementForMax, this._max)
+								   .replace(replacementValue, this._value);
 		return htmlStr; 
 	}
 	

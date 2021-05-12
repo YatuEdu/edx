@@ -1,4 +1,5 @@
 import {UserQuestionBase} from './q_base.js';
+import {StringUtil} from './util.js';
 
 const replacementForClass = '{clss}';
 const replacementForName = '{nm}';
@@ -12,11 +13,14 @@ class UserEnumQuestionRadio extends UserQuestionBase {
     _enumValues; 
 	_value;
 	
-    constructor(id, txt, type, enumValues){  
-          
-        super(id, txt, type);  
-          
-        this._enumValues = enumValues;  
+    constructor(qInfo, enumValues){  
+        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        this._enumValues = enumValues; 
+		this._value = qInfo.sv1;
+		// cameral case
+		if (this._value) {
+			this._value = StringUtil.convertToCamelCase(this._value);
+		}
     }  
 	
 	// Method for validating the result value upon moving away 
@@ -49,6 +53,14 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 		this._value = obj;
 	}
 	
+	setDisplayValue() {
+		// set initial radio selection if selection value is presented:
+		if (this._value) {
+			const selector = `input:radio[name=${this.radioName}][value=${this._value}]`;
+			$(selector).prop('checked', true);
+		}
+
+	}
 	// get radio class 
 	get radioClass() {
 		return `enum_for_${this._qid}`;
@@ -70,6 +82,7 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 								   .replace(replacementForName, name)
 								   .replace(new RegExp(replacementForValue, 'g'),theValue);	
 		}
+		
 		return htmlStr; 
 	}
 	
