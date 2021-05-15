@@ -52,13 +52,19 @@ const enumImminentEvent =
 const enumType = [6, 7, 8];
 
 class ApplicationQAndAManager {
+	#appId;
 	#blockId;
 	#quesions;
 	
-	constructor(blockId){         
+	constructor(appId, blockId) {
+		this.#appId = appId;
         this.#blockId = blockId; 
 		this.#quesions = new Map();
     } 
+	
+	get appId() {
+		return this.#appId;
+	}	
 	
 	get blockId() {
 		return this.#blockId;
@@ -106,6 +112,10 @@ class ApplicationQAndAManager {
 		return htmlStr;
 	}
 	
+	/**
+		To create question class instance by json format from
+		service API Calls
+	**/
 	createQuestion(qInfo) {
 		let qObj = null;
 		
@@ -115,7 +125,7 @@ class ApplicationQAndAManager {
 				break;
 			case 3:
 			case 4:
-				qObj = new UserIntegerPairQuestion(qInfo.attr_id, qInfo.question_text, qInfo.attr_type, 1, 100, 1, 100); 
+				qObj = new UserIntegerPairQuestion(qInfo, 1, 100, 1, 100); 
 				break;
 			case 6:
 			case 7:
@@ -131,7 +141,7 @@ class ApplicationQAndAManager {
 				qObj = new UserEnumQuestionRadio(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
 			case 18:
-				qObj = new UserEnumQuestionCheckbox(qInfo.attr_id, qInfo.question_text, qInfo.attr_type, enumMap.get(qInfo.attr_type)); 
+				qObj = new UserEnumQuestionCheckbox(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
 			default:
 				throw new Error("Invalid attr_type");

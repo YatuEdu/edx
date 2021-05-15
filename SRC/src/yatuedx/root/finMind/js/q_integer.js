@@ -60,12 +60,15 @@ class UserIntegerQuestionText extends UserQuestionBase {
 	
 	// get the question in xml format for saving to API server
 	get serverXML() {
-		const ret =  
-		`<qa>
-			<id>${this.id}</id>
-			<intv>${this._value}</intv>
-		</qa>
-		`;
+		let ret = '';
+		if (this.onValidating()) {
+			ret  =
+				`<qa>
+					<id>${this.id}</id>
+					<intv>${this._value}</intv>
+				</qa>
+				`;
+		} 
 		return ret;
 	}
 }  

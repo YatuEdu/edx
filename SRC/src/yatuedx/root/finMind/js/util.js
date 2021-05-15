@@ -25,11 +25,24 @@ class StringUtil {
 	/********************************************************
 	*	Camel case string
 	*	Camel case is widely used in Java, C++, c# as variable 
-	*	names. Here we use this function to turn any string into
-	 *  camel case. Assume a word is given.
-	 ********************************************************/
+	*	names. Assume a word is given, we use this function to 
+	*   turn the word into camel case word.
+    *   For example, father is turned into Father
+    *	
+	*********************************************************/
 	static convertToCamelCase(singWord) {
 		return singWord.charAt(0).toUpperCase() + singWord.slice(1).toLowerCase();
+	}
+	
+	/********************************************************
+	*	Convert ',' separated integers into integer array
+	*	
+	*	For example， ‘1，3，5’ -> [1, 3, 5]
+	*
+	*********************************************************/
+	static convertStringToArray(comaSeparatedArray) {
+		const digits = comaSeparatedArray.split(',');
+		return digits.map(s => parseInt(s));
 	}
 }
 

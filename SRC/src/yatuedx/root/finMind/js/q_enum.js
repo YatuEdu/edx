@@ -7,7 +7,7 @@ const replacementForValue = '{vl}';
 
 const q_template_enum = `
 		<input type="radio" class="{clss}" name="{nm}" value="{vl}">
-		<label for="{vl}">{vl}</label>
+		<label for="{vl}">{vl}</label><br>
 	`;
 class UserEnumQuestionRadio extends UserQuestionBase {  
     _enumValues; 
@@ -26,7 +26,7 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
-		if (this._value) {
+		if (this._value && this._enumValues.includes(this._value)) {
 			return true;
 		}
 		return false;
@@ -47,20 +47,22 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	// Setting the enum value from the UI when handling the
 	// selection change event
 	setValue(obj) {
-		if (typeof obj !== 'string') {
+		this._value = obj;
+		if (typeof obj !== 'string' || !this.onValidating()) {
 			throw new Error('invalid value for question ' + super._qid);
 		}
-		this._value = obj;
 	}
 	
+	// This method is called after the UI is rendered to display its
+	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
 		// set initial radio selection if selection value is presented:
 		if (this._value) {
 			const selector = `input:radio[name=${this.radioName}][value=${this._value}]`;
 			$(selector).prop('checked', true);
 		}
-
 	}
+	
 	// get radio class 
 	get radioClass() {
 		return `enum_for_${this._qid}`;
@@ -88,10 +90,14 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	
 	// get question in xml format for saving to API server
 	get serverXML() {
-		const ret = `<qa>
-			<id>${this.id}</id>
-			<strv>${this._value}</strv>
-		</qa>`;
+		let ret ='';
+		if (this.onValidating()) {
+			ret = 
+				`<qa>
+					<id>${this.id}</id>
+					<strv>${this._value}</strv>
+				</qa>`;
+		}
 		return ret;
 	}
 }  

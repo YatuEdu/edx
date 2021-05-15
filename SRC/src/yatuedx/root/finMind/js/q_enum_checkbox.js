@@ -1,4 +1,5 @@
 import {UserQuestionBase} from './q_base.js';
+import {StringUtil} from './util.js';
 
 const replacementForClass = '{clss}';
 const replacementQuestion = '{qst}';
@@ -26,16 +27,35 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
     _enumValues; 
 	_value;
 	
-    constructor(id, txt, type, enumValues){  
-          
-        super(id, txt, type);  
-          
-        this._enumValues = enumValues;  
+    constructor(qInfo, enumValues){  
+        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        this._enumValues = enumValues;
+		if (qInfo.sv1) {
+			this._value = StringUtil.convertStringToArray(qInfo.sv1);
+		} 
+		else {
+			this._value = [];
+		}
     }  
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
+		// make sure all the index value is in range and no duplicates found
+		if (!Array.isArray(this._value)) {
+			return false;
+		}
+		const indxSet = new Set(this._value);
+		
+		// detect duplicates
+		if (this._value.length != indxSet.size) {
+			return false;
+		}
+		// detect range error
+		if (undefined !== this._value.find(e => e >= this._enumValues.length || e < 0) ) 
+		{
+			return false;
+		}
 		return true;
 	}
 	
@@ -48,24 +68,45 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 		$(classSelector).change(function(){
 			// get all the indexs of the selected items
 			const checkboxes = $(classSelector); 
-			const selected = [];			
+			self._value = [];			
 			for(var i = 0; i < checkboxes.length; i++) {
 				if(checkboxes[i].checked){
 					const inx = $(checkboxes[i]).attr("data-indx");
-					selected.push(inx);
+					self._value.push(inx);
 				}
-			}
-			self.setValue(selected);			
+			}			
 		});
 	}
 	
 	// Setting the enum value from the UI when handling the
 	// selection change event
 	setValue(obj) {
-		if (!Array.isArray(obj)) {
+		this._value = obj;
+		if (!Array.isArray(obj) || !this.onValidating() ) {
 			throw new Error('invalid value for question ' + super._qid);
 		}
-		this._value = obj;
+	}
+	
+	// This method is called after the UI is rendered to display its
+	// input value (or selection fo check box and radio button and dropdown)
+	setDisplayValue() {
+		if (this._value.length ==0 ) {
+			return;
+		}
+		const classSelector = `.${this.groupClass}`;
+		// get all the indexs of the selected items
+		const checkboxes = $(classSelector); 			
+		for(var i = 0; i < checkboxes.length; i++) {
+			const target = checkboxes[i];
+			const inxStr = $(target).attr("data-indx");
+			const index = parseInt(inxStr, 10);
+			if (this._value.includes(index)) {
+				$(target).prop('checked', true);
+			}
+			else {
+				$(target).prop('checked', false);
+			}
+		}			
 	}
 	
 	// get radio class 
@@ -99,14 +140,17 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 	
 	// get question in xml format for saving to API server
 	get serverXML() {
-		let ret = `
-		<qa>
-			<id>${this.id}</id>
-			{body}
-		</qa>`;
-		let body = '';
-		this._value.forEach(i => body += `<indx>${i}</indx>`);
-		ret = ret.replace('{body}', body);
+		let ret = '';
+		if (this.onValidating()) {
+			ret = `
+<qa>
+	<id>${this.id}</id>	
+	{body}
+</qa>`;
+			let body = '';
+			this._value.forEach(i => body += `<indx>${i}</indx>`);
+			ret = ret.replace('{body}', body);
+		}
 		return ret;
 	}
 }  

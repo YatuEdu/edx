@@ -13,7 +13,7 @@ class QuestionAnswerRecorder {
 	
     constructor(credMan) {
 		this.#credMan = credMan;
-		this.#questionMan = new ApplicationQAndAManager(0);
+		this.#questionMan = new ApplicationQAndAManager(999, 0);
 		this.init();
 	}
 	
@@ -27,7 +27,7 @@ class QuestionAnswerRecorder {
 
 		//if (!isLoggedIn) {
 			await this.#credMan.authenticate('chenlili', 'abc123456!');
-//}	
+		//}	
 	}	
 	
 	//async 
@@ -53,6 +53,7 @@ class QuestionAnswerRecorder {
 	
 	async validateAndSaveCurrentQuestionBlock() {
 		const currentBlockId = this.#questionMan.blockId;
+		const appId = this.#questionMan.appId;
 		if (currentBlockId <= 0) {
 			return true;
 		}
@@ -66,28 +67,21 @@ class QuestionAnswerRecorder {
 		}
 		
 		// now save the questions to DB
-		return await this.saveAnswersToDB(currentQuestions);
+		const resp = await this.saveAnswersToDB(appId, currentBlockId, currentQuestions);
+		if (resp && resp.err) {
+			alert(resp.err);
+			return;
+		} else {
+			return true;
+		}
 	}
 	
 	// Get next blck of questions from DB and dispolay it
 	async populateNextQuestionBlock() {
-		const appId =  999; // this.#questionMan.blockId;
+		//const appId =  999; // this.#questionMan.blockId;
 		
 		const t = this.#credMan.credential.token;
-		const resp = await Net.getBlockQuestions(appId, t);
-		
-		
-		/*  temp test code  XXX
-		const resp = { err: '', data: 
-					   [
-					   {block_id: 100, attr_id: 31, attr_type: 18, order_id: 1,
-						 question_text: 'Does any of the following apply to the insured?'
-					   },
-					   {block_id: 100, attr_id: 1, attr_type: 6, order_id: 0,
-						 question_text: 'Your marriage status'
-					   },
-		] };
-		*/
+		const resp = await Net.getBlockQuestions(this.#questionMan.appId, t);
 		
 		// fill question html
 		if (resp && resp.err) {
@@ -115,9 +109,23 @@ class QuestionAnswerRecorder {
 		}
 	}
 	
-	// Save all the answered questions to data base
-	async saveAnswersToDB(currentQuestions) {
-		return await Net.saveBlockQuestions(currentQuestions, this.#credMan.credential.token);
+	/**
+		To save all the answered questions to data base
+	**/
+	async saveAnswersToDB(appId, blckId, questions) {
+		const qXML = this.formQuestionsXml(questions);
+		return await Net.saveBlockQuestions(appId, blckId, qXML, this.#credMan.credential.token);
+	}
+	
+	/**
+		To save all questions in XML format to reduce
+		service call and DB trafic.
+	**/
+	formQuestionsXml(questions) {
+		let xml = '<block>';
+		questions.forEach(q => xml += q.serverXML);
+		xml += '</block>';
+		return xml;
 	}
 }
 

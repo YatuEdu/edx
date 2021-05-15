@@ -22,8 +22,8 @@ class Net {
 	/**
 		FinMind API for saving a block of user-questions-answerws
 	**/	
-	static async saveBlockQuestions(questions, token) {
-		const req = Net.composeRequestDataForSavingUserQuestionBlock_private(questions, token);
+	static async saveBlockQuestions(appId, blckId, questions, token) {
+		const req = Net.composeRequestDataForSavingUserQuestionBlock_private(appId, blckId, questions, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -103,14 +103,16 @@ class Net {
 	/**
 		finMind request forming for saving user questions API
 	**/
-	static composeRequestDataForSavingUserQuestionBlock_private(questions, token) {
+	static composeRequestDataForSavingUserQuestionBlock_private(aid, bid, questionsXml, token) {
 		const requestData = {
 			header: {
 				token: token,
-				api_id: 2021802
+				api_id: 2021806
 			},
-			data: {					
-				qa: Net.formQuestionsXml_private(questions),
+			data: {
+				appId: aid,
+				blockId: bid,
+				qAndA: questionsXml,
 			}
 		};
 		return {
@@ -118,19 +120,6 @@ class Net {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestData),
 		};
-	}
-	
-	/**
-		To save a block of questions in XML format to reduce
-		service call and DB trafic.
-	**/
-	static formQuestionsXml_private(questions) {
-		let xml = '<block>';
-		for(let i = 0; i < questions.length; i++) {
-			xml += questions[i].serverXML;
-		}
-		xml += '</block>';
-		return xml;
 	}
 	
 	/**
