@@ -29,6 +29,15 @@ class Net {
 	}
 	
 	/**
+		FinMind API for getting the next block of user-questions for anonymous user
+	**/	
+	static async getWizardQuestions(prodId, blckId) {
+		const req = Net.composeRequestDataForNextWizardBlock_private(prodId, blckId);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		Yatu API for user-token validness check.
 		Warning: do not call too often
 	**/
@@ -113,6 +122,27 @@ class Net {
 				appId: aid,
 				blockId: bid,
 				qAndA: questionsXml,
+			}
+		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
+		};
+	}
+	
+	/**
+		finMind request forming for API of obtaining next block of wizard questions
+	**/
+	static composeRequestDataForNextWizardBlock_private(prodId, blckId) {
+		const requestData = {
+			header: {
+				token: "",
+				api_id: 2021803
+			},
+			data: {
+				productId: prodId,
+				currentBlockId: blckId,
 			}
 		};
 		return {
