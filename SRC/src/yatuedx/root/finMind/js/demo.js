@@ -103,7 +103,8 @@ class QuestionAnswerRecorder {
 				inputElements.forEach(e => e.onChangeEvent());
 			}
 			else {
-				this.#questionMan.blockId = 0;
+				alert ('no more questions to answer');
+				$('#user_question_block').html('');
 				$('#next_button').text('Start');
 			}	
 		}

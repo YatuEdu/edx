@@ -2,15 +2,16 @@ import {UserEnumQuestionRadio} 		from './q_enum.js'
 import {UserEnumQuestionCheckbox} 	from './q_enum_checkbox.js'
 import {UserIntegerQuestionText} 	from './q_integer.js'
 import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
+import {UserDateQuestion}			from './q_date.js'
 
 const q_template_question = `
 	<div class="row py-5">
 		<div class='col-sm-10 col-lg-10 py-10'>
 			<div id="card_div_{q_id}"  class="group-card">
 				<div class="card h-100">
-					<div class="card-body text-center">
+					<div class="card-body text-left">
 						<h3 class="mb-0 font-weight-bold">{q_text}</h3>
-						<p>{choice_html}</p>
+						{choice_html}
 					</div>
 				</div>
 			</div>
@@ -19,12 +20,30 @@ const q_template_question = `
 
 const enumValueForSex =  ['Male', 'Female', 'Other' ];
 const enumValueForMarriage =  ['Single', 'Married', 'Divorced', 'Widowed' ];
-const enumExerciseFrequency =  ['Never', '1~2 times per week', '3~5 times per week', 'Everyday' ];
+const enumExerciseFrequency =  ['Never', 'Rarely', 'Sometimes', 'Often' ];
 const enumDrinkingFrequency =  ['Never', 'Light', 'Social Occasion', 'Heavy' ];
 const enumResidence =  ['Own', 'Rent' ];
 const enumIncomeRange =  ['Under 20K', '20-50K', '50-100K', '100-150K', 'Above 150K'];
 const enumYesNo =  ['Yes', 'No'];
-const enumCoverageAmount =  ['200K', '500K', '1 mil', '10 mil'];
+const enumCoverageAmount =  [
+'$300,000',
+'$400,000',
+'$500,000',
+'$600,000',
+'$700,000',
+'$800,000',
+'$900,000',
+'$1 million',
+'$2 millions',
+'$3 millions',
+'$4 millions',
+'$5 millions',
+'$6 millions',
+'$7 millions',
+'$8 millions',
+'$9 millions',
+'$10 millions',
+];
 const enumCoverageType =  ['Term', 'Permanant'];
 const enumTermCoverageYears = ['10 years', '15 years', '20 years', '25 years', '30 years', '35 years', '40 years'];
 const enumApplicantRelationship = ['self', 'child', 'parent', 'spouse'];
@@ -78,8 +97,12 @@ class ApplicationQAndAManager {
 		return this.#quesions.get(this.#blockId);
 	}
 
+	/**
+		Form question/answer UI by dynamically generate HTML block based
+		on the questions obtained from server.
+	**/
 	getUserQustionHtml(qList) {
-		if (!qList || qList.length == 0) {
+		if (!qList || qList.length == 0 || qList[0].block_id === 0) {
 			return '';
 		}
 		this.#blockId = qList[0].block_id;
@@ -126,6 +149,9 @@ class ApplicationQAndAManager {
 			case 3:
 			case 4:
 				qObj = new UserIntegerPairQuestion(qInfo, 1, 100, 1, 100); 
+				break;
+			case 11:
+				qObj = new UserDateQuestion(qInfo); 
 				break;
 			case 6:
 			case 7:
