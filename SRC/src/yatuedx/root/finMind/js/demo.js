@@ -1,7 +1,7 @@
 import {sysConstants} from './sysConst.js'
 import {credMan}      from './credManFinMind.js'
 import {Net}          from './net.js';
-import {ApplicationQAndAManager} from './q_template.js';
+import {ApplicationPipeLineManager, WizardPipeLineManager} from './q_template.js';
 
 
 /**
@@ -9,11 +9,13 @@ import {ApplicationQAndAManager} from './q_template.js';
 **/
 class QuestionAnswerRecorder {
 	#credMan;
-	#questionMan;
+	#applicationMan;
+	#wizardMan;
 	
     constructor(credMan) {
 		this.#credMan = credMan;
-		this.#questionMan = new ApplicationQAndAManager(999, 0);
+		this.#applicationMan = null;
+		this.#wizardMan = null;
 		this.init();
 	}
 	
@@ -57,20 +59,7 @@ class QuestionAnswerRecorder {
 			alert(resp.err);
 			return;
 		} else {
-			const qHtml = this.#questionMan.getUserQustionHtml(resp.data);
-			if (qHtml) {
-				$('#user_question_block').html(qHtml);
-				$('#next_button').text('Next');
-				
-				// Obtain the list for every newly appended input elements
-				const inputElements = this.#questionMan.getCurrentQuestions();
-				
-				// now set the input value (or selection) if any
-				inputElements.forEach(e => e.setDisplayValue());
-				
-				// now hook up all the input elements event handlers for 
-				inputElements.forEach(e => e.onChangeEvent());
-			}
+			alert('not ready');
 		}
 	}
 	
@@ -82,8 +71,12 @@ class QuestionAnswerRecorder {
 	async handleNextQuestionBlock(e) {
 		e.preventDefault();
 		
+		if (this.#applicationMan == null) {
+			this.#applicationMan =  new ApplicationPipeLineManager(999, 0); //TODO: GET APP ID
+		}
+		
 		// validate and save the current block of question answers
-		const canMove = await this.validateAndSaveCurrentQuestionBlock();
+		const canMove = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
 		
 		// get next block of questions
 		if (canMove) {
@@ -91,82 +84,21 @@ class QuestionAnswerRecorder {
 		}
 	}
 	
-	async validateAndSaveCurrentQuestionBlock() {
-		const currentBlockId = this.#questionMan.blockId;
-		const appId = this.#questionMan.appId;
-		if (currentBlockId <= 0) {
-			return true;
-		}
-		
-		// first validate the current questions
-		const currentQuestions = this.#questionMan.getCurrentQuestions();
-		const found = currentQuestions.find(e => e.onValidating() === false);
-		if (found) {
-			alert(`Question '${found.question}' needs to be answered`);
-			return false;
-		}
-		
-		// now save the questions to DB
-		const resp = await this.saveAnswersToDB(appId, currentBlockId, currentQuestions);
-		if (resp && resp.err) {
-			alert(resp.err);
-			return;
-		} else {
-			return true;
-		}
-	}
-	
 	// Get next blck of questions from DB and dispolay it
 	async populateNextQuestionBlock() {
-		//const appId =  999; // this.#questionMan.blockId;
-		
-		const t = this.#credMan.credential.token;
-		const resp = await Net.getBlockQuestions(this.#questionMan.appId, t);
-		
-		// fill question html
-		if (resp && resp.err) {
-			alert(resp.err);
-			return;
-		} else {
-			const qHtml = this.#questionMan.getUserQustionHtml(resp.data);
-			if (qHtml) {
-				$('#user_question_block').html(qHtml);
-				$('#next_button').text('Next');
-				
-				// Obtain the list for every newly appended input elements
-				const inputElements = this.#questionMan.getCurrentQuestions();
-				
-				// now set the input value (or selection) if any
-				inputElements.forEach(e => e.setDisplayValue());
-				
-				// now hook up all the input elements event handlers for 
-				inputElements.forEach(e => e.onChangeEvent());
-			}
-			else {
-				alert ('no more questions to answer');
-				$('#user_question_block').html('');
-				$('#next_button').text('Start');
-			}	
+		//const appId =  999; 
+		const qHtml = await this.#applicationMan.populateNextQuestionBlock(this.#credMan.credential.token);
+		if (qHtml) {
+			$('#user_question_block').html(qHtml);
+			$('#next_button').text('Next');
+			
+			this.#applicationMan.hookUpEvents();
 		}
-	}
-	
-	/**
-		To save all the answered questions to data base
-	**/
-	async saveAnswersToDB(appId, blckId, questions) {
-		const qXML = this.formQuestionsXml(questions);
-		return await Net.saveBlockQuestions(appId, blckId, qXML, this.#credMan.credential.token);
-	}
-	
-	/**
-		To save all questions in XML format to reduce
-		service call and DB trafic.
-	**/
-	formQuestionsXml(questions) {
-		let xml = '<block>';
-		questions.forEach(q => xml += q.serverXML);
-		xml += '</block>';
-		return xml;
+		else {
+			alert ('no more questions to answer');
+			$('#user_question_block').html('');
+			$('#next_button').text('Start');
+		}	
 	}
 }
 

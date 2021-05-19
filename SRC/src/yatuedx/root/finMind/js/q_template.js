@@ -3,7 +3,11 @@ import {UserEnumQuestionCheckbox} 	from './q_enum_checkbox.js'
 import {UserIntegerQuestionText} 	from './q_integer.js'
 import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
 import {UserDateQuestion}			from './q_date.js'
+import {Net}          				from './net.js';
 
+/**
+	Container that holds dynamically generated HTML input controls
+**/
 const q_template_question = `
 	<div class="row py-5">
 		<div class='col-sm-10 col-lg-10 py-10'>
@@ -18,6 +22,9 @@ const q_template_question = `
 		</div>
 	</div>`;
 
+/**
+	Enum strings.  TODO: generate them from finMind API
+**/
 const enumValueForSex =  ['Male', 'Female', 'Other' ];
 const enumValueForMarriage =  ['Single', 'Married', 'Divorced', 'Widowed' ];
 const enumExerciseFrequency =  ['Never', 'Rarely', 'Sometimes', 'Often' ];
@@ -71,30 +78,20 @@ const enumImminentEvent =
 const enumType = [6, 7, 8];
 
 class ApplicationQAndAManager {
-	#appId;
 	#blockId;
-	#quesions;
+	#quesionList;
 	
-	constructor(appId, blockId) {
-		this.#appId = appId;
-        this.#blockId = blockId; 
-		this.#quesions = new Map();
+	constructor() {
+		this.#blockId = 0;
+		this.#quesionList = [];
     } 
-	
-	get appId() {
-		return this.#appId;
-	}	
 	
 	get blockId() {
 		return this.#blockId;
 	}	
 	
-	getBlockQuestions(blck) {
-		return this.#quesions.get(blck);
-	}
-	
-	getCurrentQuestions() {
-		return this.#quesions.get(this.#blockId);
+	get currentQuestions() {
+		return this.#quesionList;
 	}
 
 	/**
@@ -106,7 +103,7 @@ class ApplicationQAndAManager {
 			return '';
 		}
 		this.#blockId = qList[0].block_id;
-		const newQuestionList = [];
+		this.#quesionList = [];
 		
 		// SORT THE QUESTION BY ORDER ID
 		const qListSorted = qList.sort( (q1, q2) => 
@@ -121,15 +118,12 @@ class ApplicationQAndAManager {
 		let htmlStr = '';
 		for(let i = 0; i < qListSorted.length; ++i) {
 			const q = this.createQuestion(qListSorted[i]);
-			newQuestionList.push(q);
+			this.#quesionList.push(q);
 			htmlStr +=  q_template_question
 						.replace('{q_id}', q.id)
 						.replace('{q_text}', q.question)
 						.replace('{choice_html}', q.displayHtml);
 		}	
-		
-		// cache all the questions for this block into the Map object
-		this.#quesions.set(this.#blockId, newQuestionList);
 		
 		// return the html string to outer methods
 		return htmlStr;
@@ -175,6 +169,170 @@ class ApplicationQAndAManager {
 		return qObj;
 	}
 }
+
+/**
+	Manager for pipeline question down-loading, dynamic HTML generation,
+	event handling, and question-answer saving.
+	There are two derivation classes: 
+		- ApplicationPipeLineManager
+		- WizardPipeLineManager
+**/
+class PipeLineManager {
+	_qAndAManager;
 	
-export {ApplicationQAndAManager};
+	constructor() {
+		this._qAndAManager = new ApplicationQAndAManager();
+    } 
+	
+	/**
+		Form question/answer UI by dynamically generate HTML block based
+		on the questions obtained from server.
+	**/
+	composeUserQustionHtml(qList) {
+		return this._qAndAManager.getUserQustionHtml(qList);
+	}
+	
+	/**
+		Dynamically generated html input controls hooking up event handler
+	**/
+	hookUpEvents() {
+		// Obtain the list for every newly appended input elements
+		const inputElements = this._qAndAManager.currentQuestions;
+		
+		// now set the input value (or selection) if any
+		inputElements.forEach(e => e.setDisplayValue());
+		
+		// now hook up all the input elements event handlers for 
+		inputElements.forEach(e => e.onChangeEvent());
+	}
+	
+	/**
+		Get the next block of questions from finMind and 
+		dispolay it dynamically as HTML text
+	**/
+	async populateNextQuestionBlock(token) {	
+		// get next block from finMind
+		const resp = await this.v_getNextQuestionBlock(token);
+				
+		// fill question html
+		if (resp && resp.err) {
+			alert(resp.err);
+			return '';
+		} else {
+			return this.composeUserQustionHtml(resp.data);
+		}
+	}
+	
+	/**
+		Validate and then save all the answered questions to finMind service
+	**/
+	async validateAndSaveCurrentBlock(token) {
+		const currentBlockId = this._qAndAManager.blockId;
+		if (currentBlockId <= 0) {
+			return true;
+		}
+		
+		// first validate the current questions
+		const currentQuestions = this._qAndAManager.currentQuestions;
+		const found = currentQuestions.find(e => e.onValidating() === false);
+		if (found) {
+			alert(`Question '${found.question}' needs to be answered`);
+			return false;
+		}
+		
+		// now save the questions to DB
+		const resp = await this.v_save(token);
+		if (resp && resp.err) {
+			alert(resp.err);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+		To save all the answered questions to finMind service.
+		This method shall be overriden by the child classes.
+	**/
+	async v_save(t) {
+		throw new Error('save: sub-class-should-overload-this');
+	}
+	
+	/**
+		Get the next block of questions from finMind and dispolay it
+	**/
+	async v_getNextQuestionBlock(t) {		
+		throw new Error('save: sub-class-should-overload-this');
+	}
+	
+	/**
+		Serialize all questions ans answsers in one XML node.
+	**/
+	formQuestionsXml() {
+		const questions = this._qAndAManager.currentQuestions;
+		let xml = '<block>';
+		questions.forEach(q => xml += q.serverXML);
+		xml += '</block>';
+		return xml;
+	}
+}
+
+/**
+	Manager for Application PipeLine
+**/
+class ApplicationPipeLineManager extends PipeLineManager {
+	#appId;
+	
+	constructor(appId) {
+		super();
+		this.#appId = appId;
+    } 
+	
+	/**
+		Get the next block of questions from finMind and dispolay it
+	**/
+	async v_getNextQuestionBlock(t) {		
+		return await Net.getBlockQuestions(this.#appId, t);
+	}
+	
+	/**
+		To save all the answered questions to finMind service
+	**/
+	async v_save(t) {
+		const qXML = this.formQuestionsXml();
+		return await Net.saveBlockQuestions(
+							this.#appId, 
+							this._qAndAManager.blockId, 
+							qXML, 
+							t);
+	}
+}
+
+/**
+	Manager for Wizard PipeLine 
+**/
+class WizardPipeLineManager extends PipeLineManager {
+	#productId;
+	
+	constructor(prodId) {
+		super();
+		this.#productId = prodId;
+		
+		// deserialize from session storage
+    } 
+	
+	/**
+		Get the next block of questions from finMind
+	**/
+	async v_getNextQuestionBlock() {		
+		throw new Error('unimplemented');
+	}
+	
+	async v_save(t) {
+		throw new Error('unimplemented');
+	}
+}
+
+	
+export {ApplicationPipeLineManager, WizardPipeLineManager};
 						
