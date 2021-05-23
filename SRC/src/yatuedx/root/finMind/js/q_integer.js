@@ -13,7 +13,7 @@ class UserIntegerQuestionText extends UserQuestionBase {
 	_value;
 	
     constructor(qInfo, low, high){ 	
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);      
+        super(qInfo);      
         this._min = low; 
 		this._max = high; 
 		
@@ -43,9 +43,15 @@ class UserIntegerQuestionText extends UserQuestionBase {
 		this._value = parseInt(obj, 10);
 	}
 	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.iv1 = this._value;
+	}
+	
 	// get the input UI element class 
 	get uiClass() {
-		return `integer_for_${this._qid}`;
+		return `integer_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons

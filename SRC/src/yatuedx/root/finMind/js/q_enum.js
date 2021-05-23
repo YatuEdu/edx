@@ -14,7 +14,7 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	_value;
 	
     constructor(qInfo, enumValues){  
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        super(qInfo);  
         this._enumValues = enumValues; 
 		this._value = qInfo.sv1;
 		// cameral case
@@ -35,11 +35,12 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	// Method for hooking up event handler to handle RADIO 
 	// selectioon change event
 	onChangeEvent() {
+		const self = this;
 		const radioName = this.radioName;
 		const jqName = `input[name=${radioName}]`;
-		const jqStatus = `input[name=${radioName}]:checked`;
-		const self = this;
 		$(jqName).change(function(){
+			const rName = self.radioName;
+			const jqStatus = `input[name=${rName}]:checked`;
 			self.setValue( $( jqStatus ).val());
 		});
 	}
@@ -49,8 +50,14 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	setValue(obj) {
 		this._value = obj;
 		if (typeof obj !== 'string' || !this.onValidating()) {
-			throw new Error('invalid value for question ' + super._qid);
+			throw new Error('invalid value for question: ' + this.id);
 		}
+	}
+	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.sv1 = this._value;
 	}
 	
 	// This method is called after the UI is rendered to display its
@@ -65,12 +72,12 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	
 	// get radio class 
 	get radioClass() {
-		return `enum_for_${this._qid}`;
+		return `enum_for_${this.id}`;
 	}
 	
 	// get radio (group) nsme 
 	get radioName() {
-		return `name_for_${this._qid}`;
+		return `name_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons

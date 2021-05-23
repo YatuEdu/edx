@@ -19,7 +19,7 @@ class UserDateQuestion extends UserQuestionBase {
 	_dateStr;
 	
     constructor(qInfo){       
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type); 
+        super(qInfo); 
 		this.validateAndSave(qInfo.sv1);		
     }  
 	
@@ -63,9 +63,15 @@ class UserDateQuestion extends UserQuestionBase {
 		this._dateStr = obj;
 	}
 	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.sv1 = this._dateStr;
+	}
+	
 	// get low value class 
 	get uiClass() {
-		return `date_for_${this._qid}`;
+		return `date_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons

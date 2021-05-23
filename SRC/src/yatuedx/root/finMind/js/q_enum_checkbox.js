@@ -28,7 +28,7 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 	_value;
 	
     constructor(qInfo, enumValues){  
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        super(qInfo);  
         this._enumValues = enumValues;
 		if (qInfo.sv1) {
 			this._value = StringUtil.convertStringToArray(qInfo.sv1);
@@ -83,8 +83,24 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 	setValue(obj) {
 		this._value = obj;
 		if (!Array.isArray(obj) || !this.onValidating() ) {
-			throw new Error('invalid value for question ' + super._qid);
+			throw new Error('invalid value for question ' + this.id);
 		}
+	}
+	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.sv1 = this.getSerializedValue();
+	}
+	getSerializedValue() {
+		let sv = '';
+		for(let i = 0; i < this._value.lenght; i++) {
+			if (i > 0) {
+				sv += ',';
+			}
+			sv += this._value[i];
+		}
+		return sv;
 	}
 	
 	// This method is called after the UI is rendered to display its
@@ -111,12 +127,12 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 	
 	// get radio class 
 	get groupClass() {
-		return `enum_multi_for_${this._qid}`;
+		return `enum_multi_for_${this.id}`;
 	}
 	
 	// get radio (group) nsme 
 	get groupName() {
-		return `name_for_${this._qid}`;
+		return `name_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of checkboxes

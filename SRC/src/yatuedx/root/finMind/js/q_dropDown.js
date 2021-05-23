@@ -65,12 +65,12 @@ class UserDateQuestionText extends UserQuestionBase {
 	
 	// get radio class 
 	get radioClass() {
-		return `enum_for_${this._qid}`;
+		return `dropdown_for_${this.id}`;
 	}
 	
 	// get radio (group) nsme 
 	get radioName() {
-		return `name_for_${this._qid}`;
+		return `dropdown_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons

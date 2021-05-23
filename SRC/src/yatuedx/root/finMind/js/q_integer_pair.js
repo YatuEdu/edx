@@ -23,7 +23,7 @@ class UserIntegerPairQuestion extends UserQuestionBase {
 	_secondValue;
 	
     constructor(qInfo, low1, high1, low2, high2){       
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        super(qInfo);  
           
         this._min1 = low1; 
 		this._max1 = high1; 
@@ -65,14 +65,21 @@ class UserIntegerPairQuestion extends UserQuestionBase {
 		this._secondValue = parseInt(obj, 10);
 	}
 	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.iv1 = this._firstValue;
+		this.qInfo.iv2 = this._secondValue;
+	}
+	
 	// get low value class 
 	get uiClass1() {
-		return `integer_pair1_for_${this._qid}`;
+		return `integer_pair1_for_${this.id}`;
 	}
 	
 	// get high value class 
 	get uiClass2() {
-		return `integer_pair2_for_${this._qid}`;
+		return `integer_pair2_for_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons

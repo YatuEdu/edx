@@ -1,8 +1,9 @@
-import {sysConstants} from './sysConst.js'
-import {credMan}      from './credManFinMind.js'
-import {Net}          from './net.js';
-import {ApplicationPipeLineManager, WizardPipeLineManager} from './q_template.js';
-
+import {sysConstants} 				from './sysConst.js'
+import {credMan}      				from './credManFinMind.js'
+import {Net}          				from './net.js';
+import {SessionStoreAccess}			from './sessionStorage.js'
+import {ApplicationPipelineManager} from './applicationPipelineManager.js';
+import {WizardPipelineManager} 		from './wizardPipelineManager.js';
 
 /**
 	This class manages both login and sigup workflow
@@ -10,12 +11,11 @@ import {ApplicationPipeLineManager, WizardPipeLineManager} from './q_template.js
 class QuestionAnswerRecorder {
 	#credMan;
 	#applicationMan;
-	#wizardMan;
+	
 	
     constructor(credMan) {
 		this.#credMan = credMan;
 		this.#applicationMan = null;
-		this.#wizardMan = null;
 		this.init();
 	}
 	
@@ -50,17 +50,25 @@ class QuestionAnswerRecorder {
 	//		3) populate the next block questions or conclude
 	//
 	async handleNextWizardBlock(e) {
-		// get the anomymous response from server
+		e.preventDefault();
 		
-		const resp = await Net.getWizardQuestions(1, 0);
+		if (this.#applicationMan == null) {
+			const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+			this.#applicationMan =  new WizardPipelineManager(sessionStore, 1); //TODO: GET prod ID
+		}
+		
+		await this.populateNextQuestionBlock();
+		
+		/*
+		// get the anomymous response from server
+		const qHtml = await this.#wizardMan.populateNextQuestionBlock("", null);
 		
 		// fill question html
-		if (resp && resp.err) {
-			alert(resp.err);
-			return;
-		} else {
-			alert('not ready');
-		}
+		if (qHtml) {
+			$('#user_question_block').html(qHtml);
+			$('#next_button').text('Next');
+			this.#applicationMan.hookUpEvents();
+		}*/
 	}
 	
 	// When user clicks 'next', we need to 
@@ -72,7 +80,8 @@ class QuestionAnswerRecorder {
 		e.preventDefault();
 		
 		if (this.#applicationMan == null) {
-			this.#applicationMan =  new ApplicationPipeLineManager(999, 0); //TODO: GET APP ID
+			const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+			this.#applicationMan =  new ApplicationPipelineManager(sessionStore, 999, 0); //TODO: GET APP ID
 		}
 		
 		// validate and save the current block of question answers
@@ -87,18 +96,21 @@ class QuestionAnswerRecorder {
 	// Get next blck of questions from DB and dispolay it
 	async populateNextQuestionBlock() {
 		//const appId =  999; 
-		const qHtml = await this.#applicationMan.populateNextQuestionBlock(this.#credMan.credential.token);
-		if (qHtml) {
-			$('#user_question_block').html(qHtml);
-			$('#next_button').text('Next');
-			
-			this.#applicationMan.hookUpEvents();
+		if (typeof this.#applicationMan.blockId !== 'undefined') {
+			const qHtml = await this.#applicationMan.populateNextQuestionBlock(this.#credMan.credential.token);
+			if (qHtml) {
+				$('#user_question_block').html(qHtml);
+				$('#next_button').text('Next');
+				
+				this.#applicationMan.hookUpEvents();
+				return;
+			}
 		}
-		else {
-			alert ('no more questions to answer');
-			$('#user_question_block').html('');
-			$('#next_button').text('Start');
-		}	
+		
+		// no more blocks
+		alert ('no more questions to answer');
+		$('#user_question_block').html('');
+		$('#next_button').text('Start');
 	}
 }
 
