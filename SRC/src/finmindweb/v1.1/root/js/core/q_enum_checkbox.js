@@ -8,12 +8,29 @@ const replacementForIndex = '{indx}';
 const replacementForValue = '{vlu}';
 const replacementForCheckBoxGroup = '{cbg}';
 
-const q_template_enum_single = `
+const q_template_enum_single_old = `
 	<input 	type="checkbox" 
 			name="{nm}" 
 			class="{clss}"
 			data-indx="{indx}"
 			value="{vlu}">{vlu}<br>`;
+			
+const q_template_enum_single = `
+<div class="div-block-62">
+	<div class="div-block-61"><label class="w-checkbox checkbox-field-3 _3">
+		<div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-3"></div>
+		<input type="checkbox" class="{clss}" id="checkbox-3" name="{nm}" value="{vlu}" data-indx="{indx}" data-name="Checkbox 3">
+		<span class="radio-button-label-2 w-form-label">{vlu}</span>
+	  </label></div>
+	<div data-hover="1" data-delay="0" class="tip w-dropdown">
+	  <div class="tip-toggle w-dropdown-toggle"><img src="../images/help-circle.svg" loading="eager" alt=""></div>
+	  <nav class="tip-list w-dropdown-list">
+		<div class="tip-text">There should be some explanation here.</div>
+	  </nav>
+	</div>
+</div>
+`;
+
 		
 const q_template_enum_multiple = `
 <form>      
