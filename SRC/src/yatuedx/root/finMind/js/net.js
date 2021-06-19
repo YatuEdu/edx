@@ -38,6 +38,15 @@ class Net {
 	}
 	
 	/**
+		FinMind API for updating block branching information
+	**/	
+	static async agentUpdateBlockBranchingConditions(token, blockId, xml) {
+		const req = Net.composeRequestDataForUpdateBlockBranchingConditions_private(token, blockId, xml);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		Yatu API for user-token validness check.
 		Warning: do not call too often
 	**/
@@ -143,6 +152,27 @@ class Net {
 			data: {
 				productId: prodId,
 				currentBlockId: blckId,
+			}
+		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
+		};
+	}
+	
+	/**
+		finMind request forming for API of updating block branching information
+	**/
+	static composeRequestDataForUpdateBlockBranchingConditions_private(token, blockId, xml) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021815
+			},
+			data: {
+				blockId: blockId,
+				conditionXML: xml,
 			}
 		};
 		return {

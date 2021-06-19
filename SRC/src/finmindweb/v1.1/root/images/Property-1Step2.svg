@@ -1,0 +1,35 @@
+<svg width="1633" height="28" viewBox="0 0 1633 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Property 1=Step2">
+<rect id="Rectangle 19" x="1428" width="205" height="6" fill="#1F1534" fill-opacity="0.2"/>
+<g id="Stepper">
+<g id=".Atoms / Minimal Stepper / Steps">
+<path id="Progress" d="M205 0H371.571C373.228 0 374.571 1.34315 374.571 3C374.571 4.65685 373.228 6 371.571 6H205V0Z" fill="url(#paint0_linear)"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_2">
+<rect id="Progress Bg" x="380.571" width="169.571" height="6" rx="3" fill="#458FF6"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_3">
+<rect id="Progress Bar" x="556.143" width="169.571" height="6" rx="3" fill="#1F1534" fill-opacity="0.2"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_4">
+<rect id="Progress Bar_2" x="731.714" width="169.571" height="6" rx="3" fill="#1F1534" fill-opacity="0.2"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_5">
+<path id="Progress Bar_3" d="M907.286 3C907.286 1.34315 908.629 0 910.286 0H1073.86C1075.51 0 1076.86 1.34315 1076.86 3C1076.86 4.65685 1075.51 6 1073.86 6H910.286C908.629 6 907.286 4.65685 907.286 3Z" fill="#1F1534" fill-opacity="0.2"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_6">
+<path id="Progress Bar_4" d="M1082.86 3C1082.86 1.34315 1084.2 0 1085.86 0H1249.43C1251.09 0 1252.43 1.34315 1252.43 3C1252.43 4.65685 1251.09 6 1249.43 6H1085.86C1084.2 6 1082.86 4.65685 1082.86 3Z" fill="#1F1534" fill-opacity="0.2"/>
+</g>
+<g id=".Atoms / Minimal Stepper / Steps_7">
+<path id="Progress Bar_5" d="M1258.43 3C1258.43 1.34315 1259.77 0 1261.43 0H1428V6H1261.43C1259.77 6 1258.43 4.65685 1258.43 3Z" fill="#1F1534" fill-opacity="0.2"/>
+</g>
+</g>
+<rect id="Rectangle 18" width="205" height="6" fill="#5B99F3"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear" x1="356.527" y1="0.491955" x2="356.409" y2="6.72727" gradientUnits="userSpaceOnUse">
+<stop stop-color="#67C3F3"/>
+<stop offset="1" stop-color="#5A98F2"/>
+</linearGradient>
+</defs>
+</svg>

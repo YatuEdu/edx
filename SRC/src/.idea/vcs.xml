@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/rtc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/signal-server-node" vcs="Git" />
   </component>
 </project>

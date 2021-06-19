@@ -41,7 +41,7 @@ class QuestionAnswerRecorder {
 	// login as test user 
 	async handleLogin(e) {
 		e.preventDefault();
-		await this.#credMan.authenticate('chenlili', 'abc123456!');
+		await this.#credMan.authenticate('chenlili', 'abc123456!!');
 	}
 	
 	// When user clicks 'next', we need to 
