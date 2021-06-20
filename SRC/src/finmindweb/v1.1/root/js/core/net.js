@@ -20,6 +20,15 @@ class Net {
 	}
 	
 	/**
+		FinMind API for starting an application for a product id
+	**/	
+	static async startAplication(prodId, token) {
+		const req = Net.composeRequestDataForStartAplication_private(prodId, token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		FinMind API for getting a block of user-questions
 	**/	
 	static async getBlockQuestions(appId, token) {
@@ -65,9 +74,29 @@ class Net {
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
 	
+	/**
+		compose finMind API request for starting to apply for a product
+	**/
+	static composeRequestDataForStartAplication_private(prodId, token){
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021807
+			},
+			data: {					
+				prodId: prodId,
+				applicantRelationShip: 0
+			}
+		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
+		};
+	}
 	
 	/**
-		finMind API for user-question
+		compose finMind API request for user-question
 	**/
 	static composeRequestDataForUserQuestionBlock(appId, token) {
 		const requestData = {

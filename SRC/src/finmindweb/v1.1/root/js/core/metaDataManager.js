@@ -9,6 +9,17 @@ const enumExerciseFrequency =  ['Never', 'Rarely', 'Sometimes', 'Often' ];
 const enumDrinkingFrequency =  ['Never', 'Light', 'Social Occasion', 'Heavy' ];
 const enumResidence =  ['Own', 'Rent' ];
 const enumIncomeRange =  ['Under 20K', '20-50K', '50-100K', '100-150K', 'Above 150K'];
+const intention =  [
+	'Providing protection for my family, maximize death benefit', 
+	'Providing living benefits, long term care', 
+	'Providing living benefits with specified medical conditions', 
+	'Cash accumulation for supplemental income', 
+	'Mortgage protection',
+	'Estate planning',
+	'I am not sure',
+	'I want to get an illustration',
+	'I want to know more about product from Insurer List'
+	];
 const enumYesNo =  ['Yes', 'No'];
 const enumCoverageAmount =  [
 '300K',
@@ -52,6 +63,7 @@ const enumMap = new Map([
 	[ 16, enumTermCoverageYears],  		// enum type for term coverage years
 	[ 17, enumApplicantRelationship],  	// enum type for applicant relationship
 	[ 18, enumImminentEvent],  			// enum type for emerneng events
+	[ 19, intention],					// enum type for issurance purpose
   ]);
 
 const attrList =  [
@@ -65,7 +77,8 @@ const attrList =  [
 	{id: 25, question_text: 'Does the insured use marijuana?',	type: 8,	cat: 2},
 	{id: 26, question_text: 'Does the insured smoke?',	type: 8,	cat: 2},
 	{id: 29, question_text: 'Have the insured been diagnosed with critical or severe illnesses such as heart attack, cancer,  tumor, lung or respiratory disorder, brain or nerve system disorder, HIV/AIDS and etc (Tip: Common critical or severe illnesses)?',	type: 13, cat:3},
-	{id: 31, question_text: 'Does any of the following apply to the insured?',	type: 18,	cat: 2},	
+	{id: 31, question_text: 'Does any of the following apply to the insured?',	type: 18,	cat: 2},
+	{id: 1024, question_text: 'Thank you for choosing permanent life insurance. Please check all insurance needs that apply in order for our agent to assist you better?',	type: 19,	cat: 2},
 ];
 
 class MetaDataManager {

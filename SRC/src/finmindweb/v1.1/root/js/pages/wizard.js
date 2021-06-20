@@ -42,15 +42,18 @@ class QuestionAnswerRecorder {
 		// test anomymous wizard
 		$('#start_anom_button').click(this.handleNextWizardBlock.bind(this));
 		
-		// decide if I am logged in or not
-		const isLoggedIn = await credMan.hasLoggedIn();
-
-		// create 'ApplicationPipelineManager' for application pipeline management
-		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
-		this.#applicationMan =  new ApplicationPipelineManager(sessionStore, 1001, 0); //TODO: GET APP ID
-		
-		// immediately start the first block
-		await this.populateNextQuestionBlock();
+		// Start a new application for product 1:
+		const appId = await this.startApplicationForProduct(1); // todo: get product id somewhere
+		if (appId && appId > 0) {
+			// create 'ApplicationPipelineManager' for application pipeline management
+			const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+			this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);
+			
+			// immediately start the first block
+			await this.populateNextQuestionBlock();
+		} else {
+			alert('cannot start application');
+		}
 	}
 	
 	// login as test user 
@@ -66,6 +69,18 @@ class QuestionAnswerRecorder {
 	handlePrevQuestionBlock(e) {
 		e.preventDefault();
 		this.populatePreviousQuestionBlock();
+	}
+	
+	/**
+		start a mre application for product 1
+	**/
+	async startApplicationForProduct(pid) {
+		const res = await Net.startAplication(pid, this.#credMan.credential.token);
+		if (res.err) {
+			alert(res.err);
+			retun;
+		}
+		return res.data[0].applicationId;
 	}
 	
 	// When user clicks 'next', we need to 

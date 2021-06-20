@@ -152,6 +152,7 @@ class ApplicationQAndAManager {
 				qObj = new UserEnumQuestionRadio(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
 			case 18:
+			case 19:
 				qObj = new UserEnumQuestionCheckbox(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
 			default:
