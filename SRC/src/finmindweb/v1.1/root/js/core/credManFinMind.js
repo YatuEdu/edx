@@ -54,6 +54,18 @@ class CredentialManager {
 		return ret.err;
 	}
 	
+	// call remote auth server to sign-out user
+	async signOut() {
+		// remote call to sign out if we are signed-in
+		if (this.#userCredInfo.token) {
+			const ret = await Net.signOut(this.#userCredInfo.token);
+			if (!ret.err) {
+				// clear previous auth info before new login request
+				this.private_clear();
+			}
+		}
+	}
+	
 	// test if we have a valid token
 	async hasLoggedIn() {
 		const t = this.#userCredInfo.token;

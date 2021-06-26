@@ -3,6 +3,7 @@ import {UserEnumQuestionCheckbox} 	from './q_enum_checkbox.js'
 import {UserIntegerQuestionText} 	from './q_integer.js'
 import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
 import {UserDateQuestion}			from './q_date.js'
+import {UserDropdownSelection}      from './q_dropDown.js'
 import {Net}          				from './net.js';
 import {MetaDataManager}			from './metaDataManager.js'
 
@@ -138,6 +139,7 @@ class ApplicationQAndAManager {
 			case 11:
 				qObj = new UserDateQuestion(qInfo); 
 				break;
+				
 			case 6:
 			case 7:
 			case 8:
@@ -145,12 +147,16 @@ class ApplicationQAndAManager {
 			case 10:
 			case 12:
 			case 13:
-			case 14:
 			case 15:
 			case 16:
 			case 17:
 				qObj = new UserEnumQuestionRadio(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
+				
+			case 14:
+				qObj = new UserDropdownSelection(qInfo, enumMap.get(qInfo.attr_type));
+				break;
+				
 			case 18:
 			case 19:
 				qObj = new UserEnumQuestionCheckbox(qInfo, enumMap.get(qInfo.attr_type)); 

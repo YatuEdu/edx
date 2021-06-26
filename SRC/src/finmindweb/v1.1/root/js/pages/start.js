@@ -15,19 +15,7 @@ class StartPageHandler {
 	
 	// hook up events
 	async init() {
-		// get all the translatable elemnts
-		
-		// decide if I am logged in or not
-		this.#loggedIn = await credMan.hasLoggedIn();
-
-		// if logged in, change button to 'My account':
-		let btnTxt = '';
-		if (!this.#loggedIn) {
-			window.location.href = "../sign/sign-in.html";
-		}
-		else {
-		}
-		
+		// initialize ui elements by its login status
 	}
 }
 

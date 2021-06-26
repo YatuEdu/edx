@@ -4,62 +4,67 @@ import {Net}          				from '../core/net.js';
 import {SessionStoreAccess}			from '../core/sessionStorage.js'
 import {ApplicationPipelineManager} from '../core/applicationPipelineManager.js';
 import {WizardPipelineManager} 		from '../core/wizardPipelineManager.js';
+import {HomeAndWizardHeader} 		from './header.js';
 
 /**
 	This class manages both login and sigup workflow
 **/
-class QuestionAnswerRecorder {
-	#credMan;
+class QuestionAnswerRecorder extends HomeAndWizardHeader {
 	#applicationMan;
 	
 	
     constructor(credMan) {
-		this.#credMan = credMan;
+		super(credMan); 
 		this.#applicationMan = null;
 		this.init();
 	}
 	
 	// hook up events
 	async init() {
-		// decide if I am logged in or not
-		const loggedIn = await credMan.hasLoggedIn();
-
-		// if not logged in, go to log in page
-		if (!loggedIn) {
-			window.location.href = "../sign/sign-in.html";
-			return;
-		}
-		
-		// when 'login'  is clicked
-		$('#login_link').click(this.handleLogin.bind(this));
 	
-		// when 'Start' or 'next' button is clicked
+		// when 'Start' button is clicked
 		$('#fm_wz_next_block_button').click(this.handleNextQuestionBlock.bind(this));
+		
+		// when 'Next button' is clicked
+		$('#fm_wz_next_block_button2').click(this.handleNextQuestionBlock.bind(this));
 		
 		// when 'Back' or '<' button is clicked
 		$('#fm_wz_prev_block_button').click(this.handlePrevQuestionBlock.bind(this));
+		$('#fm_wz_prev_block_button2').click(this.handlePrevQuestionBlock.bind(this));
 		
-		// test anomymous wizard
-		$('#start_anom_button').click(this.handleNextWizardBlock.bind(this));
-		
-		// Start a new application for product 1:
-		const appId = await this.startApplicationForProduct(1); // todo: get product id somewhere
-		if (appId && appId > 0) {
-			// create 'ApplicationPipelineManager' for application pipeline management
-			const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
-			this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);
-			
-			// immediately start the first block
-			await this.populateNextQuestionBlock();
-		} else {
-			alert('cannot start application');
-		}
+		// start the wizard or applicaiton pipeline work flow
+		// decide if I am logged in or not
+		const loggedIn = await this.credMan.hasLoggedIn();
+		await this.startAplicationPipeline(loggedIn);
 	}
 	
-	// login as test user 
-	async handleLogin(e) {
-		e.preventDefault();
-		await this.#credMan.authenticate('chenlili', 'abc123456!!');
+	/**
+		Start the application wizard (or pipeline) by getting data for initial block.
+	**/
+	async startAplicationPipeline(loggedIn) {
+		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+		// if not logged in, start wizard pipeline
+		if (!loggedIn) {
+			//TODO: GET prod ID for wizard
+			this.#applicationMan =  new WizardPipelineManager(sessionStore, 1001); 
+		}
+		else {
+			// Start a new application for product 1:
+			// TODO: get product id somewhere
+			const appId = await this.startApplicationForProduct(1); 
+			if (appId && appId > 0) {
+				// create 'ApplicationPipelineManager' for application pipeline management
+				this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);
+				
+			} else {
+				alert('cannot start application');
+				return;
+			}
+		}
+		
+		// immediately start the first block
+		await this.populateNextQuestionBlock();
+
 	}
 	
 	// When user clicks 'prev (<)', we need to 
@@ -75,7 +80,7 @@ class QuestionAnswerRecorder {
 		start a mre application for product 1
 	**/
 	async startApplicationForProduct(pid) {
-		const res = await Net.startAplication(pid, this.#credMan.credential.token);
+		const res = await Net.startAplication(pid, this.credMan.credential.token);
 		if (res.err) {
 			alert(res.err);
 			retun;
@@ -88,22 +93,11 @@ class QuestionAnswerRecorder {
 	//		2) save the questions to server
 	//		3) populate the next block questions or conclude
 	//
-	async handleNextWizardBlock(e) {
-		e.preventDefault();
-		
-		await this.populateNextQuestionBlock();
-	}
-	
-	// When user clicks 'next', we need to 
-	//   	1) validate the selection and
-	//		2) save the questions to server
-	//		3) populate the next block questions or conclude
-	//
 	async handleNextQuestionBlock(e) {
 		e.preventDefault();
 		
 		// validate and save the current block of question answers
-		const canMove = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
+		const canMove = await this.#applicationMan.validateAndSaveCurrentBlock(this.credMan.credential.token);
 		
 		// get next block of questions
 		if (canMove) {
@@ -132,15 +126,25 @@ class QuestionAnswerRecorder {
 	
 	// Get next blck of questions from finMind and dispolay it
 	async populateNextQuestionBlock() {
-		//const appId =  999; 
-	
-		const qHtml = await this.#applicationMan.nextBlock(this.#credMan.credential.token);
+		const qHtml = await this.#applicationMan.nextBlock(this.credMan.credential.token);
 		if (qHtml) {
-			$('#user_question_block').html(qHtml);
-			$('#fm_wz_next_block_button').text('Next');
-			
-			this.#applicationMan.hookUpEvents();
-			return;
+			if (qHtml.quote) {
+				// go to application page
+				window.location.href = "./application/app-before-sign-in.html";
+			}
+			else {
+				// first set the block header and subtitle
+				const blockInfo = await Net.getBlockInfo(this.#applicationMan.blockId);
+				$('#fm_wz_block_name').html(blockInfo.blockName);
+				$('#fm_wz_block_description').html(blockInfo.blockDescription);
+				
+				// then set the html for all the questions of the block
+				$('#user_question_block').html(qHtml);
+				$('#fm_wz_next_block_button').text('Next');
+				
+				this.#applicationMan.hookUpEvents();
+				return;	
+			}
 		}
 		
 		// no more blocks

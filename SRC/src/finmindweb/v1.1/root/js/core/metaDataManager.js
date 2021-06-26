@@ -27,26 +27,31 @@ const enumCoverageAmount =  [
 '500K',
 '600K',
 '700K',
-'$800K',
-'$900K',
-'$1 million',
-'$2 millions',
-'$3 millions',
-'$4 millions',
-'$5 millions',
-'$6 millions',
-'$7 millions',
-'$8 millions',
-'$9 millions',
-'$10 millions',
+'800K',
+'900K',
+'1million',
+'2millions',
+'3millions',
+'4millions',
+'5millions',
+'6millions',
+'7millions',
+'8millions',
+'9millions',
+'10millions',
 ];
-const enumCoverageType =  ['Term', 'Permanant'];
+const enumCoverageType =  ['Term Life', 'Permanent Life'];
 const enumTermCoverageYears = ['10 years', '15 years', '20 years', '25 years', '30 years', '35 years', '40 years'];
 const enumApplicantRelationship = ['Self', 'Child', 'Parent', 'Spouse'];
 const enumImminentEvent = 
 			['Want to consider living benefit option', 
 			 'Take or plan to take any of high-risk activities such as skydiving, scuba diving, car racing, hang gliding, ultralight flying, cave exploration, and etc.', 
-			 'A member of, or plan on joining any branch of, the Armed Forces or reserve military unit.'
+			 'A member of, or plan on joining any branch of, the Armed Forces or reserve military unit.',
+			 'Want to consider adding accidental death benefits as rider.',
+			 'Want to consider adding chronicle illness benefits as rider',
+			 'Want to consider adding critical medical/injuries/disability benefits as rider.',
+			 'Want to consider adding terminal illness benefits as rider.',
+			 "Want to consider adding children's term rider.",
 			];
 
 // TODO: obtain this from server 
@@ -71,7 +76,7 @@ const attrList =  [
 	{id: 2, question_text: 'Insured age',	type: 1,	cat: 1},
 	{id: 3, question_text: 'insured height',	type: 4,	cat: 1},
 	{id: 7, question_text: 'How often does the insured exercise',	type: 8,	cat: 2},
-	{id: 11, question_text: 'insured marriage status',	type: 7,	cat: 1},
+	{id: 11, question_text: 'Insured marriage status',	type: 7,	cat: 1},
 	{id: 12, question_text: 'How often does the insured drink?',	type: 8,	cat: 2},
 	{id: 19, question_text: 'In how many years does the insured plan to retire?',	type: 8,	cat: 2},
 	{id: 25, question_text: 'Does the insured use marijuana?',	type: 8,	cat: 2},

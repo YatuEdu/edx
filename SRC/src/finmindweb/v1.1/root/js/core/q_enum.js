@@ -50,10 +50,10 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	onChangeEvent() {
 		const self = this;
 		const radioName = this.radioName;
-		const jqName = `input[name=${radioName}]`;
+		const jqName = `input[name='${radioName}']`;
 		$(jqName).change(function(){
 			const rName = self.radioName;
-			const jqStatus = `input[name=${rName}]:checked`;
+			const jqStatus = `input[name='${rName}']:checked`;
 			self.setValue( $( jqStatus ).val());
 		});
 	}
@@ -78,7 +78,7 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	setDisplayValue() {
 		// set initial radio selection if selection value is presented:
 		if (this._value) {
-			const selector = `input:radio[name=${this.radioName}][value=${this._value}]`;
+			const selector = `input:radio[name=${this.radioName}][value='${this._value}']`;
 			$(selector).prop('checked', true);
 		}
 	}

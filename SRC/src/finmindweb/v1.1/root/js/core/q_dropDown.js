@@ -1,26 +1,30 @@
 import {UserQuestionBase} from './q_base.js';
 import {StringUtil} from './util.js';
 
-const replacementForClass = '{clss}';
-const replacementForName = '{nm}';
+const replacementForId = '{id}';
 const replacementForValue = '{vl}';
+const replacementForSeq = '{seq}';
+const replacementForOptionBody = '{opt_body}';
 
-const q_template_enum = `
-		<input type="radio" class="{clss}" name="{nm}" value="{vl}">
-		<label for="{vl}">{vl}</label><br>
-	`;
-class UserDateQuestionText extends UserQuestionBase {  
+const select_option_html_template = `
+<select id=select_option_{id}">
+	{opt_body}
+</select>
+`;
+
+const select_option_item_template = `
+<option value="{seq}">{vl}</option>
+`;
+
+class UserDropdownSelection extends UserQuestionBase {  
     _enumValues; 
 	_value;
 	
     constructor(qInfo, enumValues){  
-        super(qInfo.attr_id, qInfo.question_text, qInfo.attr_type);  
+        super(qInfo);  
         this._enumValues = enumValues; 
 		this._value = qInfo.sv1;
-		// cameral case
-		if (this._value) {
-			this._value = StringUtil.convertToCamelCase(this._value);
-		}
+		
     }  
 	
 	// Method for validating the result value upon moving away 
@@ -35,12 +39,12 @@ class UserDateQuestionText extends UserQuestionBase {
 	// Method for hooking up event handler to handle RADIO 
 	// selectioon change event
 	onChangeEvent() {
-		const radioName = this.radioName;
-		const jqName = `input[name=${radioName}]`;
-		const jqStatus = `input[name=${radioName}]:checked`;
+		const jqSel = `#${this.myId}`;
 		const self = this;
-		$(jqName).change(function(){
-			self.setValue( $( jqStatus ).val());
+		$(jqSel).change(function(){
+			const jqSelOpt = `#${self.myId} option:selected`;
+			const selVal = $( jqSelOpt).text();
+			self.setValue( selVal);
 		});
 	}
 	
@@ -58,34 +62,34 @@ class UserDateQuestionText extends UserQuestionBase {
 	setDisplayValue() {
 		// set initial radio selection if selection value is presented:
 		if (this._value) {
-			const selector = `input:radio[name=${this.radioName}][value=${this._value}]`;
-			$(selector).prop('checked', true);
+			const jqSel = `#${this.myId}`;
+			$(jqSel).val(this._value);
 		}
 	}
 	
-	// get radio class 
-	get radioClass() {
-		return `dropdown_for_${this.id}`;
-	}
-	
-	// get radio (group) nsme 
-	get radioName() {
-		return `dropdown_for_${this.id}`;
+	// get the id of the selection controllers
+	get myId () {
+		return `select_option_${this.id}`;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons
-	get displayHtml() {
-		const clssStr= this.radioClass;
-		const name = this.radioName;	
-		let htmlStr = "";
+	get displayHtml() {	
+		let selStr = select_option_html_template.replace(replacementForId, this.id);
+		let optionStr = "";
 		for(let i = 0; i < this._enumValues.length; i++) {
 			const theValue = this._enumValues[i];
-			htmlStr += q_template_enum.replace(replacementForClass, clssStr)
-								   .replace(replacementForName, name)
-								   .replace(new RegExp(replacementForValue, 'g'),theValue);	
+			optionStr += select_option_item_template
+									.replace(replacementForSeq, i)
+								    .replace(replacementForValue, theValue);	
 		}
-		
-		return htmlStr; 
+		selStr = selStr.replace(replacementForOptionBody, optionStr);
+		return selStr; 
+	}
+	
+	// This method can be called when we need to serialize the question / answer
+	// to JSON format (usually for session store)
+	serialize() {
+		this.qInfo.sv1 = this._value;
 	}
 	
 	// get question in xml format for saving to API server
@@ -102,4 +106,4 @@ class UserDateQuestionText extends UserQuestionBase {
 	}
 }  
 
-export { UserDateQuestionText };
+export { UserDropdownSelection };

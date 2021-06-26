@@ -17,9 +17,16 @@ class WizardPipelineManager extends PipelineManager {
 	/**
 		Get the next block of questions from finMind
 	**/
-	async v_getNextQuestionBlock(token, param) {	
-		if (typeof this.blockId !== 'undefined' ) {
-			return await Net.getWizardQuestions(this.#productId, this.blockId);
+	async v_getNextQuestionBlock(token, blckId) {	
+		if (typeof blckId !== 'undefined' ) {
+			const resp = await Net.getWizardQuestions(this.#productId, blckId);
+			
+			// if no data returns, meaning we have reached the end og the block,
+			// now call API to get code
+			if (resp.data[0].block_id === -1) {
+				resp.quote = await this.getQuote();
+			}
+			return resp;
 		}
 		return {data: []};
 	}
@@ -45,6 +52,19 @@ class WizardPipelineManager extends PipelineManager {
 		this.prot_seriaslize(qMap);
 		
 		return true;
+	}
+	
+	/*
+		Use the info we got so far to retieve quote from finMid
+	*/
+	getQuote() {
+		// 1) get the current data from session store
+		const qMap = this.prot_deserialize();
+		
+		// form quote api
+		
+		return "quote: 500k coverage";
+		
 	}
 }
 

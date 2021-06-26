@@ -55,17 +55,24 @@ class PipelineManager {
 			}
 		}
 		
+		const currBlck = this._qAndAManager === null? 0 : this._qAndAManager.blockId ;
 		this._qAndAManager = new ApplicationQAndAManager();
 		this._qAndAManagerHIstoryList.push(this._qAndAManager);
 		
 		// initialize it from finMind API
-		const resp = await this.v_getNextQuestionBlock(token, param);
+		const resp = await this.v_getNextQuestionBlock(token, currBlck);
 		
 		// fill question html
 		if (resp && resp.err) {
 			alert(resp.err);
 			return '';
 		}
+		
+		// got quote already， show it:
+		if (resp.quote) {
+			return resp;
+		}
+		
 		return this.prv_composeUserQustionHtml(resp.data);
 	}
 	

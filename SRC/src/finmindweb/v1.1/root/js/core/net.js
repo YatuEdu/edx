@@ -20,6 +20,15 @@ class Net {
 	}
 	
 	/**
+		FinMind API for user sign-out
+	**/
+	static async signOut(token) {
+		const req = Net.composeRequestDataForSignOut_private(token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		FinMind API for starting an application for a product id
 	**/	
 	static async startAplication(prodId, token) {
@@ -32,9 +41,27 @@ class Net {
 		FinMind API for getting a block of user-questions
 	**/	
 	static async getBlockQuestions(appId, token) {
-		const req = Net.composeRequestDataForUserQuestionBlock(appId, token);
+		const req = Net.composeRequestDataForUserQuestionBlock_private(appId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+		FinMind API for getting basic info for a block
+	**/	
+	static async getBlockInfo(blockId) {
+		const req = Net.composeRequestDataForBlockInfo_private(blockId);
+		// remote call
+		const res = await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+		if (res.error) {
+			return {error: res.error};
+		}
+		else {
+			return {
+						blockName:        res.data[0].name,
+						blockDescription: res.data[0].description
+			       };
+		}
 	}
 	
 	/**
@@ -98,7 +125,7 @@ class Net {
 	/**
 		compose finMind API request for user-question
 	**/
-	static composeRequestDataForUserQuestionBlock(appId, token) {
+	static composeRequestDataForUserQuestionBlock_private(appId, token) {
 		const requestData = {
 			header: {
 				token: token,
@@ -163,6 +190,26 @@ class Net {
 	}
 	
 	/**
+		Yatu API request for user sign-out
+	**/
+	static composeRequestDataForSignOut_private(token) {
+		const loginData = {
+			header: {
+				token: token,
+				api_id: 200001
+			},
+			
+			data: {					
+			}
+		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(loginData),
+		};
+	}
+	
+	/**
 		finMind request forming for token validation
 	**/
 	static composeRequestDataForTokenCheck_private(t) {
@@ -180,6 +227,26 @@ class Net {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(queryData),
+		};
+	}
+	
+	/**
+		finMind request forming for block info retriever API
+	**/
+	static composeRequestDataForBlockInfo_private(blckId) {
+		const requestData = {
+			header: {
+				token: "",
+				api_id: 2021817
+			},
+			data: {
+				blockId: blckId,
+			}
+		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
 		};
 	}
 	
