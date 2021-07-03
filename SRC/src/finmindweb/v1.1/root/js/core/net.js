@@ -92,6 +92,15 @@ class Net {
 	}
 	
 	/**
+		FinMind API for getting a QUOTE premium 
+	**/	
+	static async getPremiumQuote(xml, token) {
+		const req = Net.composeRequestDataForGetPremiumQuote_private(xml, token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		Yatu API for user-token validness check.
 		Warning: do not call too often
 	**/
@@ -286,6 +295,41 @@ class Net {
 				currentBlockId: blckId,
 			}
 		};
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
+		};
+	}
+	
+	static composeRequestDataForGetPremiumQuote_private(xml, token) {
+		const requestData = {
+			header: {
+				token: "",
+				api_id: 2021809
+			},
+			data: {
+				quote: xml,
+				/* quote":"<quoteRequest><gender>MALE</gender>
+				<birthday>2001-06-04</birthday>
+				<haveCriticalIllness>true</haveCriticalIllness>
+				<haveChronicIllness>true</haveChronicIllness
+				><haveGeneticillnessInFamily>true</haveGeneticillnessInFamily>
+				<smoke>NEVER</smoke>
+				<marijuana>RARELY</marijuana>
+				<drug>NEVER</drug>
+				<militaryService>false</militaryService>
+				<highRiskActivity>false</highRiskActivity>
+				<checkedOptions>LIVING_BENEFIT</checkedOptions>
+				<checkedOptions>ACCIDENTAL_DEATH_RIDER</checkedOptions>
+				<checkedOptions>CHRONICLE_ILLNESS_RIDER</checkedOptions>
+				<coverageAmount>200000</coverageAmount>
+				coverageTime>10</coverageTime>
+				</quoteRequest> 
+				*/
+			}
+		}
+		;
 		return {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },

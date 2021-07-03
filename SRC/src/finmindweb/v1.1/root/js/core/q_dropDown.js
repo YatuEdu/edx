@@ -7,7 +7,7 @@ const replacementForSeq = '{seq}';
 const replacementForOptionBody = '{opt_body}';
 
 const select_option_html_template = `
-<select id=select_option_{id}">
+<select id="select_option_{id}">
 	{opt_body}
 </select>
 `;
@@ -23,14 +23,15 @@ class UserDropdownSelection extends UserQuestionBase {
     constructor(qInfo, enumValues){  
         super(qInfo);  
         this._enumValues = enumValues; 
-		this._value = qInfo.sv1;
+		this._value = qInfo.iv1;
 		
     }  
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
-		if (this._value && this._enumValues.includes(this._value)) {
+		const index = parseInt (this._value);
+		if (index >= 0 && index < this._enumValues.length) {
 			return true;
 		}
 		return false;
@@ -41,9 +42,10 @@ class UserDropdownSelection extends UserQuestionBase {
 	onChangeEvent() {
 		const jqSel = `#${this.myId}`;
 		const self = this;
-		$(jqSel).change(function(){
+		$(jqSel).change(function(e){
+			e.preventDefault();
 			const jqSelOpt = `#${self.myId} option:selected`;
-			const selVal = $( jqSelOpt).text();
+			const selVal = $( jqSelOpt).val();
 			self.setValue( selVal);
 		});
 	}
@@ -61,9 +63,9 @@ class UserDropdownSelection extends UserQuestionBase {
 	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
 		// set initial radio selection if selection value is presented:
-		if (this._value) {
-			const jqSel = `#${this.myId}`;
-			$(jqSel).val(this._value);
+		if (Number.isInteger(this._value)) {
+			const jqSel = `#${this.myId}`;		
+			$(jqSel).val(this._value).change();
 		}
 	}
 	
@@ -89,7 +91,7 @@ class UserDropdownSelection extends UserQuestionBase {
 	// This method can be called when we need to serialize the question / answer
 	// to JSON format (usually for session store)
 	serialize() {
-		this.qInfo.sv1 = this._value;
+		this.qInfo.iv1 = parseInt (this._value);
 	}
 	
 	// get question in xml format for saving to API server
@@ -99,7 +101,7 @@ class UserDropdownSelection extends UserQuestionBase {
 			ret = 
 				`<qa>
 					<id>${this.id}</id>
-					<strv>${this._value}</strv>
+					<strv>${this._enumValues[this._value]}</strv>
 				</qa>`;
 		}
 		return ret;

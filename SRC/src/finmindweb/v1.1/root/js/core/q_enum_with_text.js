@@ -6,7 +6,7 @@ const replacementForName = '{nm}';
 const replacementForValue = '{vl}';
 const replacementForId = '{id}';
 
-const q_template_enum = `
+const q_template_enum2 = `
 <label class="radio-button-field-3 w-radio">
    <div class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button-3 w-radio-input"></div>
 	<input type="radio" data-name="Radio 5" name="{nm}" value="{vl}">
@@ -14,7 +14,7 @@ const q_template_enum = `
 </label>
 `;
 
-const q_template_enum2 = `
+const q_template_enum = `
 <label class="radio-button-field-3 w-radio">
     <div class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button-3 w-radio-input"></div>
 	<input id="radio_{id}_{vl}" type="radio" data-name="Radio 5" name="{nm}" value="{vl}" style="opacity:0;position:absolute;z-index:-1">
@@ -22,14 +22,26 @@ const q_template_enum2 = `
 </label>
 `;
 
-class UserEnumQuestionRadio extends UserQuestionBase {  
+const q_template_enum_text = `
+<p id="div_with_text_{id}" style="display:none;">
+ 	<span class="radio-button-label-2 w-form-label">Please add more details:</span>
+	<textarea  class="q_a_text" rows="5" id="radio_with_text_{id}" spellcheck="true" />
+</p>
+`;
+
+	
+
+class UserEnumRadioWithText extends UserQuestionBase {  
     _enumValues; 
 	_value;
+	_value2;
 	
     constructor(qInfo, enumValues){  
         super(qInfo);  
         this._enumValues = enumValues; 
 		this._value = qInfo.sv1;
+		this._value2 = qInfo.sv2;
+		
 		// cameral case
 		if (this._value) {
 			this._value = StringUtil.convertToCamelCase(this._value);
@@ -57,6 +69,12 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 			const jqStatus = `input[name='${rName}']:checked`;
 			self.setValue( $( jqStatus ).val());
 		});
+		
+		// also set text event:
+		const txtField = `#${this.textId}`;
+		$(txtField).blur(function() {
+			self.setValue2($(txtField).val());
+		});
 	}
 	
 	// Setting the enum value from the UI when handling the
@@ -64,7 +82,30 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	setValue(obj) {
 		this._value = obj;
 		if (typeof obj !== 'string' || !this.onValidating()) {
-			throw new Error('invalid value for question: ' + this.id);
+			
+		}
+		this.setTextDisplay();
+	}
+	
+	setValue2(obj) {
+		this._value2 = obj;
+		if (typeof obj !== 'string' ) {
+			
+		}
+	}
+	
+	setTextDisplay() {
+		const txtField = `#${this.textId}`;
+		const textDiv = `#${this.textDivId}`;
+		// if value is the first, show text are, or hide text area
+		if (this._value === this._enumValues[0]){
+			// display text
+			$(textDiv).show();
+			$(txtField).val(this._value2);
+		}
+		else {
+			// hide text
+			$(textDiv).hide();
 		}
 	}
 	
@@ -81,6 +122,9 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 		if (this._value) {
 			const selector = `input:radio[name=${this.radioName}][value='${this._value}']`;
 			$(selector).prop('checked', true);
+			
+			// display text area? or hide it
+			this.setTextDisplay()
 		}
 	}
 	
@@ -99,6 +143,16 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 		return `radio_${this.id}_${this._value}`;
 	}
 	
+	// get text id
+	get textId() {
+		return `radio_with_text_${this.id}`;
+	}
+	
+	// get text div id
+	get textDivId() {
+		return `div_with_text_${this.id}`;
+	}
+	
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {
 		const clssStr= this.radioClass;
@@ -106,12 +160,15 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 		let htmlStr = "";
 		for(let i = 0; i < this._enumValues.length; i++) {
 			const theValue = this._enumValues[i];
-			htmlStr += q_template_enum.replace(replacementForClass, clssStr)
-								   .replace(replacementForName, name)
-								   .replace(replacementForId, this.id)
-								   .replace(new RegExp(replacementForValue, 'g'),theValue);	
+			htmlStr += q_template_enum
+										.replace(replacementForClass, clssStr)
+										.replace(replacementForName, name)
+										.replace(replacementForId, this.id)
+										.replace(new RegExp(replacementForValue, 'g'),theValue);	
 		}
-		
+		// text box for extra text input
+		htmlStr += q_template_enum_text
+									.replace(new RegExp(replacementForId, 'g'), this.id);
 		return htmlStr; 
 	}
 	
@@ -123,10 +180,11 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 `<qa>
 <id>${this.id}</id>
 <strv>${this._value}</strv>
+<strv2>${this._value2}</strv2>
 </qa>`;
 		}
 		return ret;
 	}
 }  
 
-export { UserEnumQuestionRadio };
+export { UserEnumRadioWithText };

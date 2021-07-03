@@ -69,6 +69,7 @@ const enumMap = new Map([
 	[ 17, enumApplicantRelationship],  	// enum type for applicant relationship
 	[ 18, enumImminentEvent],  			// enum type for emerneng events
 	[ 19, intention],					// enum type for issurance purpose
+	[ 20, enumYesNo],  					// enum type for yes no question with extra text area
   ]);
 
 const attrList =  [

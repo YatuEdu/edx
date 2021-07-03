@@ -51,7 +51,8 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 		else {
 			// Start a new application for product 1:
 			// TODO: get product id somewhere
-			const appId = await this.startApplicationForProduct(1); 
+			const productId = 1024;
+			const appId = await this.startApplicationForProduct(productId); //4008; //
 			if (appId && appId > 0) {
 				// create 'ApplicationPipelineManager' for application pipeline management
 				this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);

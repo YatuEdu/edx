@@ -4,6 +4,8 @@ import {UserIntegerQuestionText} 	from './q_integer.js'
 import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
 import {UserDateQuestion}			from './q_date.js'
 import {UserDropdownSelection}      from './q_dropDown.js'
+import {UserEnumRadioWithText} 		from './q_enum_with_text.js'
+import {UserTextQuestion}			from './q_text.js'
 import {Net}          				from './net.js';
 import {MetaDataManager}			from './metaDataManager.js'
 
@@ -132,6 +134,9 @@ class ApplicationQAndAManager {
 			case 1:
 				qObj = new UserIntegerQuestionText(qInfo, 1, 80); 
 				break;
+			case 2:
+				qObj = new UserTextQuestion(qInfo); 
+				break;
 			case 3:
 			case 4:
 				qObj = new UserIntegerPairQuestion(qInfo, 1, 100, 1, 100); 
@@ -161,6 +166,11 @@ class ApplicationQAndAManager {
 			case 19:
 				qObj = new UserEnumQuestionCheckbox(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
+				
+			case 20:
+				qObj = new UserEnumRadioWithText(qInfo, enumMap.get(qInfo.attr_type));
+				break;
+				
 			default:
 				throw new Error("Invalid attr_type");
 		}
