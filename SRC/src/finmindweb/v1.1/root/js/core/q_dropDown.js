@@ -1,19 +1,22 @@
-import {UserQuestionBase} from './q_base.js';
-import {StringUtil} from './util.js';
+import {UserQuestionBase} 	from './q_base.js';
+import {StringUtil} 		from './util.js';
+import {MetaDataManager}	from './metaDataManager.js';
 
 const replacementForId = '{id}';
 const replacementForValue = '{vl}';
-const replacementForSeq = '{seq}';
+const replacementForName = '{nm}';
 const replacementForOptionBody = '{opt_body}';
+const replacementForLabel = '{lb}';
 
 const select_option_html_template = `
+<label>{lb}</label>
 <select id="select_option_{id}">
 	{opt_body}
 </select>
 `;
 
 const select_option_item_template = `
-<option value="{seq}">{vl}</option>
+<option value="{nm}">{vl}</option>
 `;
 
 class UserDropdownSelection extends UserQuestionBase {  
@@ -23,15 +26,14 @@ class UserDropdownSelection extends UserQuestionBase {
     constructor(qInfo, enumValues){  
         super(qInfo);  
         this._enumValues = enumValues; 
-		this._value = qInfo.iv1;
+		this._value = qInfo.sv1;
 		
     }  
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
-		const index = parseInt (this._value);
-		if (index >= 0 && index < this._enumValues.length) {
+		if (this._value && this._value.indexOf(MetaDataManager.dropDownNoneSelection) == -1) {
 			return true;
 		}
 		return false;
@@ -45,7 +47,7 @@ class UserDropdownSelection extends UserQuestionBase {
 		$(jqSel).change(function(e){
 			e.preventDefault();
 			const jqSelOpt = `#${self.myId} option:selected`;
-			const selVal = $( jqSelOpt).val();
+			const selVal = $( jqSelOpt).text();
 			self.setValue( selVal);
 		});
 	}
@@ -54,8 +56,8 @@ class UserDropdownSelection extends UserQuestionBase {
 	// selection change event
 	setValue(obj) {
 		this._value = obj;
-		if (typeof obj !== 'string' || !this.onValidating()) {
-			throw new Error('invalid value for question ' + super._qid);
+		if (!this.onValidating()) {
+			this._value = '';
 		}
 	}
 	
@@ -63,7 +65,7 @@ class UserDropdownSelection extends UserQuestionBase {
 	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
 		// set initial radio selection if selection value is presented:
-		if (Number.isInteger(this._value)) {
+		if (this._value) {
 			const jqSel = `#${this.myId}`;		
 			$(jqSel).val(this._value).change();
 		}
@@ -74,14 +76,23 @@ class UserDropdownSelection extends UserQuestionBase {
 		return `select_option_${this.id}`;
 	}
 	
+	// get XML element for parent control if I am serving as a sub-control
+	get xmlElement() {
+		return {tag: 'strv', obj: this._value};
+	}
+	
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {	
-		let selStr = select_option_html_template.replace(replacementForId, this.id);
+		let selStr = select_option_html_template
+									.replace(replacementForId, this.id)
+									.replace(replacementForLabel, this.label);
+									
 		let optionStr = "";
 		for(let i = 0; i < this._enumValues.length; i++) {
 			const theValue = this._enumValues[i];
+			
 			optionStr += select_option_item_template
-									.replace(replacementForSeq, i)
+									.replace(replacementForName, i)
 								    .replace(replacementForValue, theValue);	
 		}
 		selStr = selStr.replace(replacementForOptionBody, optionStr);
@@ -91,7 +102,7 @@ class UserDropdownSelection extends UserQuestionBase {
 	// This method can be called when we need to serialize the question / answer
 	// to JSON format (usually for session store)
 	serialize() {
-		this.qInfo.iv1 = parseInt (this._value);
+		this.qInfo.sv1 = (this._value);
 	}
 	
 	// get question in xml format for saving to API server
@@ -101,7 +112,7 @@ class UserDropdownSelection extends UserQuestionBase {
 			ret = 
 				`<qa>
 					<id>${this.id}</id>
-					<strv>${this._enumValues[this._value]}</strv>
+					<strv>${this._value}</strv>
 				</qa>`;
 		}
 		return ret;

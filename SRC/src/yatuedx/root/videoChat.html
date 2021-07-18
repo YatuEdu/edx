@@ -110,17 +110,30 @@
             </section>
             <section class="blog-post-widget py-4">
                 <div class="container">
-                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">短信</h5>
-                        <form action="#!" class="pb-5 border-bottom">
+                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">White-board</h5>
+                        <form  class="pb-5 border-bottom">
                             <div class="row">
                                 <div class="form-group col-12 mb-4">
-                                    <textarea name="comment" id="comment" class="form-control" rows="15"></textarea>
+                                    <textarea name="comment" id="ta_white_board" spellcheck-"false" 
+									class="form-control" rows="15"></textarea>
                                 </div>
                             </div>
                           
                             <div class="row">
                                 <div class="col-12 text-center">
-                                    <button class="btn btn-danger">发送</button>
+                                    <button id="bt_white_board_run" class="btn btn-danger">Run</button>
+									<button id="bt_white_board_send" class="btn btn-danger">Send</button>
+									<button id="bt_white_board_clear" class="btn btn-danger">Clear board</button>
+                                </div>
+                            </div>
+							<div class="row">
+                                <div class="form-group col-12 mb-4">
+                                    <textarea name="comment" id="ta_console" spellcheck="false" class="form-control" rows="15"></textarea>
+                                </div>
+                            </div>
+							<div class="row">
+                                <div class="col-12 text-center">
+									<button id="bt_console_clear" class="btn btn-danger">Clear output</button>
                                 </div>
                             </div>
                         </form>
@@ -169,9 +182,10 @@
                 Google Privacy Policy and Terms of Service.</p>
         </div>
     </footer>
-    <script src="../src/vendors/jquery/dist/jquery.min.js"></script>
-    <script src="../src/vendors/popper.js/dist/umd/popper.min.js"></script>
-    <script src="../src/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script> 	
+	<script type="module" src="./assets/js/pages/white_board.js"></script>
 </body>
-
 </html>

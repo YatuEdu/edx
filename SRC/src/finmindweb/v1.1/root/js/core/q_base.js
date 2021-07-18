@@ -1,7 +1,8 @@
 class UserQuestionBase {
 	/**
 		qInfo is an object coming from finMind server:
-		{attr_id, question_text, attr_type, iv1, iv2, sv1, sv2, dv1, dv2}
+		{block_id, attr_id, attr_name, attr_type, attr_label, attr_question, sequence_id,
+		 iv1, iv2, dv1, dv2, sv1, sv2, sv3, sv4, sv5, }
 	**/
 	#qInfo;
 	
@@ -45,14 +46,29 @@ class UserQuestionBase {
 		return this.#qInfo.attr_id;
 	}
 	
+	// property getter for question name 
+	get name() {
+		return this.#qInfo.attr_name;
+	}
+	
+	// property getter for question label 
+	get label() {
+		return this.#qInfo.attr_label;
+	}
+	
 	// property getter for question text 
 	get question() {
-		return this.#qInfo.question_text;
+		return this.#qInfo.attr_question;
 	}
 	
 	// property getter for question type 
 	get type() {
 		return this.this.#qInfo.attr_type;
+	}
+	
+	// get XML element for parent control if I am serving as a sub-control
+	get xmlElement() {
+		throw new Error('signature: sub-class-should-overload-this');
 	}
 	
 	// get display html 
@@ -62,7 +78,7 @@ class UserQuestionBase {
 	
 	// get xml for service
 	get serverXML() {
-		throw new Error('displayHtml: sub-class-should-overload-this');
+		throw new Error('serverXML: sub-class-should-overload-this');
 	}
 }
 

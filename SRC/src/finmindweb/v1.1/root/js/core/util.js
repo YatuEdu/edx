@@ -44,6 +44,61 @@ class StringUtil {
 		const digits = comaSeparatedArray.split(',');
 		return digits.map(s => parseInt(s));
 	}
+	
+	/********************************************************
+	*	Convert  integer into , seperated thousands
+	*	
+	*	For example， 10000 ->10,000
+	*
+	*********************************************************/	
+	static intToNumberWithCommas(x) {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	/********************************************************
+	*	Convert  integer representation with coma back to integer
+	*
+	*	
+	*	For example， 10000 <- 10,000
+	*
+	*********************************************************/	
+	static strWithCommasToInteger(s) {
+		const num = s.replace(new RegExp(',', 'g'), '');
+		return parseInt(num, 10);
+	}
+	
+	/********************************************************
+	*	Convert  integer representation to SSN representation:
+	*	
+	*	For example， 345678900 => 345-67-8900
+	*
+	*********************************************************/	
+	static formatSocialSecurity(str){
+		let ssnDisplay = str.replace(/\D/g, '');
+		ssnDisplay = ssnDisplay.replace(/^(\d{3})/, '$1-');
+		ssnDisplay = ssnDisplay.replace(/-(\d{2})/, '-$1-');
+		ssnDisplay = ssnDisplay.replace(/(\d)-(\d{4}).*/, '$1-$2');
+		return ssnDisplay;
+	}
+	
+		/********************************************************
+	*	Convert  integer representation to USA/Canada phone number
+	*	
+	*	For example， 2064454455 => 206-445-4455
+	*
+	*********************************************************/	
+	static formatUSPhoneNumber(str){
+		let ssnDisplay = str.replace(/\D/g, '');
+		ssnDisplay = ssnDisplay.replace(/^(\d{3})/, '$1-');
+		ssnDisplay = ssnDisplay.replace(/-(\d{3})/, '-$1-');
+		ssnDisplay = ssnDisplay.replace(/(\d)-(\d{4}).*/, '$1-$2');
+		return ssnDisplay;
+	}
+
+	static convertToSSN(s) {
+		const num = s.replace(new RegExp(',', 'g'), '');
+		return parseInt(num, 10);
+	}
 }
 
 export { TimeUtil, StringUtil };

@@ -6,8 +6,14 @@ import {UserDateQuestion}			from './q_date.js'
 import {UserDropdownSelection}      from './q_dropDown.js'
 import {UserEnumRadioWithText} 		from './q_enum_with_text.js'
 import {UserTextQuestion}			from './q_text.js'
+import {UserNameQuestion}			from './q_name.js'
+import {UserAdressQuestion}			from './q_address.js'
+import {UserDecimalQuestionText}	from './q_decimal.js'
+import {UserFormatterText}			from './q_formatter_text.js'
+import {UserCompositeControl}		from './q_composite_control.js'
 import {Net}          				from './net.js';
 import {MetaDataManager}			from './metaDataManager.js'
+import {StringUtil}		  			from './util.js';
 
 /**
 	Container that holds dynamically generated HTML input controls
@@ -64,9 +70,12 @@ class ApplicationQAndAManager {
 		let htmlStr = '';
 		for(let i = 0; i < this.#quesionList.length; ++i) {
 			const q = this.#quesionList[i];
+			
+			// do not show question text starting with * (reserved for slilent question)
+			const question = q.attr_question ? q.attr_question : '';
 			htmlStr +=  q_template_question
-						.replace('{q_id}', q.id)
-						.replace('{q_text}', q.question)
+						.replace('{q_id}', q.attr_id)
+						.replace('{q_text}', question)
 						.replace('{choice_html}', q.displayHtml);
 		}	
 		
@@ -94,8 +103,8 @@ class ApplicationQAndAManager {
 		// SORT THE QUESTION BY ORDER ID
 		const qListSorted = qList.sort( (q1, q2) => 
 		{
-			if (q1.order_id === q2.order_id) return 0;
-			if (q1.order_id < q2.order_id) return -1;
+			if (q1.sequence_id === q2.sequence_id) return 0;
+			if (q1.sequence_id < q2.sequence_id) return -1;
 			return 1;
 		});
 											
@@ -134,13 +143,20 @@ class ApplicationQAndAManager {
 			case 1:
 				qObj = new UserIntegerQuestionText(qInfo, 1, 80); 
 				break;
+				
 			case 2:
-				qObj = new UserTextQuestion(qInfo); 
+				qObj = this.createTextField_private(qInfo); 
 				break;
+				
 			case 3:
 			case 4:
 				qObj = new UserIntegerPairQuestion(qInfo, 1, 100, 1, 100); 
 				break;
+				
+			case 5: // decimal
+				qObj = new UserDecimalQuestionText(qInfo); 
+				break;
+				
 			case 11:
 				qObj = new UserDateQuestion(qInfo); 
 				break;
@@ -159,7 +175,13 @@ class ApplicationQAndAManager {
 				break;
 				
 			case 14:
+			case 26:
 				qObj = new UserDropdownSelection(qInfo, enumMap.get(qInfo.attr_type));
+				break;
+			
+			case 24:
+				// create composition control
+				qObj = this.createComposition_private(qInfo); 
 				break;
 				
 			case 18:
@@ -168,13 +190,92 @@ class ApplicationQAndAManager {
 				break;
 				
 			case 20:
-				qObj = new UserEnumRadioWithText(qInfo, enumMap.get(qInfo.attr_type));
+			case 25:
+				qObj = new UserEnumRadioWithText(
+								qInfo, 
+								enumMap.get(qInfo.attr_type), 
+								MetaDataManager.enumYesValueMap.get(qInfo.attr_type),
+								"Unknown");
 				break;
-				
+			
+			case 21:
+				qObj = new UserNameQuestion(qInfo);
+				break;
+			
+			case 22:
+				qObj = new UserAdressQuestion(qInfo);
+				break;
+					
 			default:
 				throw new Error("Invalid attr_type");
 		}
 		return qObj;
+	}
+	
+	/*
+		Find out the text field type by question text and create different regex for
+		text validation purpose;
+	*/
+	createTextField_private(qInfo) {
+		let regex = null;
+		let formatter = null;
+		let numberOnly = false;
+		
+		if (qInfo.attr_name ==='app_email') {
+			// email regex
+			regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		} 
+		else if (qInfo.attr_name ==='app_phone') {
+			// us phone number regex
+			regex = /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/;
+			formatter = StringUtil.formatUSPhoneNumber;
+			numberOnly = true;
+		}
+		else if (qInfo.attr_name ==='app_ssn') {
+			// us ssn regex
+			regex = /^\d{3}-?\d{2}-?\d{4}$/;
+			formatter = StringUtil.formatSocialSecurity;
+			numberOnly = true;
+		}
+		else {
+			// reg for everything
+			regex = MetaDataManager.regForEverything;
+		}
+		
+		if (!formatter) {
+			return new UserTextQuestion(qInfo, regex);
+		}
+		
+		// formatter text input
+		return new UserFormatterText(qInfo, numberOnly, regex, formatter);
+	}
+	
+	/**
+		A composition control consists of two or more instances of defined 'UserQuestionBase' object
+	**/
+	createComposition_private(qInfo) {
+		if (qInfo.attr_name ==='app_driver_lic') {
+			const components = [];
+			const labels = qInfo.attr_label.split('*');
+			
+			// create lic text input:
+			//		partial qinfo contains label is enough because it is a sub-control
+			const subqInfo = {attr_id: qInfo.attr_id, attr_label: labels[0], sv1: qInfo.sv1};
+			const regex = MetaDataManager.regForEverything;
+			const com1 = new UserTextQuestion(subqInfo, regex);
+			components.push(com1);
+			
+			
+			// create state drop down list:
+			//		partial qinfo contains label is enough because it is a sub-control
+			const STATE_ENUM_ID = 26;
+			const subqInfo2 = {attr_id: qInfo.attr_id, attr_label: labels[1], sv1: qInfo.sv2};
+			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID));
+			components.push(com2);
+			
+			// now create composite control
+			return new UserCompositeControl(qInfo, components);
+		} 
 	}
 }
 

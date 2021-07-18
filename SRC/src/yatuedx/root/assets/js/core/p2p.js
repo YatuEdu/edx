@@ -6,161 +6,177 @@ import {uiMan} from '../core/uiManager.js';
 	This class manages both login and sigup workflow
 **/
 class PeerTalk {
+	#DEFAULT_CHANNEL;
 	#credMan;
 	#userName;
+	#signaling_socket;
+	#local_media_stream;
+	#local_current_stream;
+	#peer_media_elements;
+	#local_media_tag;
+	#local_audio_track;
+	#local_video_track;
+	#peers;
 	
     constructor(credMan) {
 		this.#credMan = credMan;
 		this.init();
 	}
 	
+	join_chat_channel(channel, userdata) {
+		this.#signaling_socket.emit('join', {"channel": channel, "userdata": userdata}, res => {});
+	}
+	
+	part_chat_channel(channel) {
+		this.#signaling_socket.emit('part', channel);
+	}
+	
+	/** 
+		* When we join a group, our signaling server will send out 'addPeer' events to each pair
+		* of users in the group (creating a fully-connected graph of users, ie if there are 6 people
+		* in the channel you will connect directly to the other 5, so there will be a total of 15 
+		* connections in the network). 
+	*/
+	onAddPeer(config) {
+		const 
+		= this;
+		
+		console.log('Signaling server said to add peer:', config);
+		const peer_id = config.peer_id;
+		if (peer_id in peers) {
+			/* This could happen if the user joins multiple channels where the other peer is also in. */
+			console.log("Already connected to peer ", peer_id);
+			return;
+		}
+		const peer_connection = new RTCPeerConnection(
+			{"iceServers": ICE_SERVERS},
+			{"optional": [{"DtlsSrtpKeyAgreement": true}]} /* this will no longer be needed by chrome
+															* eventually (supposedly), but is necessary 
+															* for now to get firefox to talk to chrome */
+		);
+		peers[peer_id] = peer_connection;
+
+		peer_connection.onicecandidate = function(event) {
+			if (event.candidate) {
+				signaling_socket.emit('relayICECandidate', {
+					'peer_id': peer_id, 
+					'ice_candidate': {
+						'sdpMLineIndex': event.candidate.sdpMLineIndex,
+						'candidate': event.candidate.candidate
+					}
+				});
+			}
+		}
+		peer_connection.onaddstream = function(event) {
+			console.log("onAddStream", event);
+			var remote_media = document.getElementById(peer_id);
+			if (remote_media == null) {
+				remote_media = USE_VIDEO ? $("<video id='"+peer_id+"' autoplay playsinline>") : $("<audio>");
+				remote_media.attr("autoplay", "autoplay");
+				if (MUTE_AUDIO_BY_DEFAULT) {
+					remote_media.attr("muted", "true");
+				}
+				remote_media.attr("controls", "");
+				var remote_media_box = $("<div class='mediaBox'>");
+				remote_media_box.append(remote_media);
+				peer_media_elements[peer_id] = remote_media_box;
+				$('body').append(remote_media_box);
+				attachMediaStream(remote_media[0], event.stream);
+			} else {
+				attachMediaStream(remote_media, event.stream);
+			}
+
+		}
+
+		/* Add our local stream */
+		peer_connection.addStream(local_current_stream);
+
+		/* Only one side of the peer connection should create the
+		 * offer, the signaling server picks one to be the offerer. 
+		 * The other user will get a 'sessionDescription' event and will
+		 * create an offer, then send back an answer 'sessionDescription' to us
+		 */
+		if (config.should_create_offer) {
+			console.log("Creating RTC offer to ", peer_id);
+			peer_connection.createOffer(
+				function (local_description) { 
+					console.log("Local offer description is: ", local_description);
+					peer_connection.setLocalDescription(local_description,
+						function() { 
+							signaling_socket.emit('relaySessionDescription', 
+								{'peer_id': peer_id, 'session_description': local_description});
+							console.log("Offer setLocalDescription succeeded", peer_id); 
+						},
+						function() { Alert("Offer setLocalDescription failed!"); }
+					);
+				},
+				function (error) {
+					console.log("Error sending offer: ", error);
+				});
+		}
+	}
+
 	init() {
+		console.log("Connecting to signaling server");
+        const token = localStorage.getItem("token");
+		console.log('token ', token);
+
+		 /* our socket.io connection to our webserver */
+		this.#signaling_socket = io(SIGNALING_SERVER, {query:`token=${token}`});
+		
+            var local_media_stream = null; /* our own microphone / webcam */
+            var local_current_stream = null; // 本地当前展示的视频流 摄像头或共享屏幕
+        this.#peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
+        this.#peer_media_elements = {};  /* keep track of our <video>/<audio> tags, indexed by peer_id */
+            var local_media_tag = null;
+            var local_audio_track = null;  // 本地录音音轨
+            var local_video_track = null; // 本地录像视频轨
 		// Polyfill in Firefox.
 		// See https://blog.mozilla.org/webrtc/getdisplaymedia-now-available-in-adapter-js/
 		if (adapter.browserDetails.browser == 'firefox') {
 			  adapter.browserShim.shimGetDisplayMedia(window, 'screen');
 		}
+             
+        const url = decodeURI(window.location.href);
+        const argsIndex = url .split("?group=");
+        const group = argsIndex[1];
+		if (group == null) {
+			alert('参数错误，请重新进入');
+			return;
+		}
+		console.log('group ', group);
 
-            var signaling_socket = null;   /* our socket.io connection to our webserver */
-            var local_media_stream = null; /* our own microphone / webcam */
-            var local_current_stream = null; // 本地当前展示的视频流 摄像头或共享屏幕
-            var peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
-            var peer_media_elements = {};  /* keep track of our <video>/<audio> tags, indexed by peer_id */
-            var local_media_tag = null;
-            var local_audio_track = null;  // 本地录音音轨
-            var local_video_track = null; // 本地录像视频轨
+        this.#DEFAULT_CHANNEL = group;
+		
+		const self t= this;
+		this.#signaling_socket.on('connect', function() {
+			console.log("Connected to signaling server");
+			setup_local_media(function() {
+				/* once the user has given us access to their
+				 * microphone/camcorder, join the channel and start peering up */
+				join_chat_channel(self.#DEFAULT_CHANNEL, {'whatever-you-want-here': 'stuff'});
+			});
+		});
+                
+		this.#signaling_socket.on('disconnect', function() {
+			console.log("Disconnected from signaling server");
+			/* Tear down all of our peer connections and remove all the
+			 * media divs when we disconnect */
+			for (peer_id in self.#peer_media_elements) {
+				self.#peer_media_elements[peer_id].remove();
+			}
+			for (peer_id in self.#peers) {
+				self.#peers[peer_id].close();
+			}
 
-            function init() {
-                console.log("Connecting to signaling server");
-                var token = localStorage.getItem("token");
+			self.#peers = [];
+			self.#peer_media_elements = [];
+		});
+		
+		// handling peer joining the group
+		signaling_socket.on('addPeer', this.onAddPeer.bind(this));
 
-                var url = decodeURI(window.location.href);
-                var argsIndex = url .split("?group=");
-                var group = argsIndex[1];
-                if (group == null) {
-                    alert('参数错误，请重新进入');
-                    return;
-                }
-
-                DEFAULT_CHANNEL = group;
-
-                signaling_socket = io(SIGNALING_SERVER, {query:"token="+token});
-				console.log('token ', token);
-				console.log('group ', group);
-
-                signaling_socket.on('connect', function() {
-                    console.log("Connected to signaling server");
-                    setup_local_media(function() {
-                        /* once the user has given us access to their
-                         * microphone/camcorder, join the channel and start peering up */
-                        join_chat_channel(DEFAULT_CHANNEL, {'whatever-you-want-here': 'stuff'});
-                    });
-                });
-                signaling_socket.on('disconnect', function() {
-                    console.log("Disconnected from signaling server");
-                    /* Tear down all of our peer connections and remove all the
-                     * media divs when we disconnect */
-                    for (peer_id in peer_media_elements) {
-                        peer_media_elements[peer_id].remove();
-                    }
-                    for (peer_id in peers) {
-                        peers[peer_id].close();
-                    }
-
-                    peers = {};
-                    peer_media_elements = {};
-                });
-                function join_chat_channel(channel, userdata) {
-                    signaling_socket.emit('join', {"channel": channel, "userdata": userdata}, res => {});
-                }
-                function part_chat_channel(channel) {
-                    signaling_socket.emit('part', channel);
-                }
-
-
-                /** 
-                * When we join a group, our signaling server will send out 'addPeer' events to each pair
-                * of users in the group (creating a fully-connected graph of users, ie if there are 6 people
-                * in the channel you will connect directly to the other 5, so there will be a total of 15 
-                * connections in the network). 
-                */
-                signaling_socket.on('addPeer', function(config) {
-                    console.log('Signaling server said to add peer:', config);
-                    var peer_id = config.peer_id;
-                    if (peer_id in peers) {
-                        /* This could happen if the user joins multiple channels where the other peer is also in. */
-                        console.log("Already connected to peer ", peer_id);
-                        return;
-                    }
-                    var peer_connection = new RTCPeerConnection(
-                        {"iceServers": ICE_SERVERS},
-                        {"optional": [{"DtlsSrtpKeyAgreement": true}]} /* this will no longer be needed by chrome
-                                                                        * eventually (supposedly), but is necessary 
-                                                                        * for now to get firefox to talk to chrome */
-                    );
-                    peers[peer_id] = peer_connection;
-
-                    peer_connection.onicecandidate = function(event) {
-                        if (event.candidate) {
-                            signaling_socket.emit('relayICECandidate', {
-                                'peer_id': peer_id, 
-                                'ice_candidate': {
-                                    'sdpMLineIndex': event.candidate.sdpMLineIndex,
-                                    'candidate': event.candidate.candidate
-                                }
-                            });
-                        }
-                    }
-                    peer_connection.onaddstream = function(event) {
-                        console.log("onAddStream", event);
-                        var remote_media = document.getElementById(peer_id);
-                        if (remote_media == null) {
-                            remote_media = USE_VIDEO ? $("<video id='"+peer_id+"' autoplay playsinline>") : $("<audio>");
-                            remote_media.attr("autoplay", "autoplay");
-                            if (MUTE_AUDIO_BY_DEFAULT) {
-                                remote_media.attr("muted", "true");
-                            }
-                            remote_media.attr("controls", "");
-                            var remote_media_box = $("<div class='mediaBox'>");
-                            remote_media_box.append(remote_media);
-                            peer_media_elements[peer_id] = remote_media_box;
-                            $('body').append(remote_media_box);
-                            attachMediaStream(remote_media[0], event.stream);
-                        } else {
-                            attachMediaStream(remote_media, event.stream);
-                        }
-
-                    }
-
-                    /* Add our local stream */
-                    peer_connection.addStream(local_current_stream);
-
-                    /* Only one side of the peer connection should create the
-                     * offer, the signaling server picks one to be the offerer. 
-                     * The other user will get a 'sessionDescription' event and will
-                     * create an offer, then send back an answer 'sessionDescription' to us
-                     */
-                    if (config.should_create_offer) {
-                        console.log("Creating RTC offer to ", peer_id);
-                        peer_connection.createOffer(
-                            function (local_description) { 
-                                console.log("Local offer description is: ", local_description);
-                                peer_connection.setLocalDescription(local_description,
-                                    function() { 
-                                        signaling_socket.emit('relaySessionDescription', 
-                                            {'peer_id': peer_id, 'session_description': local_description});
-                                        console.log("Offer setLocalDescription succeeded", peer_id); 
-                                    },
-                                    function() { Alert("Offer setLocalDescription failed!"); }
-                                );
-                            },
-                            function (error) {
-                                console.log("Error sending offer: ", error);
-                            });
-                    }
-                });
-
-
+		
                 /** 
                  * Peers exchange session descriptions which contains information
                  * about their audio / video settings and that sort of stuff. First
@@ -416,7 +432,7 @@ class PeerTalk {
                     console.log("Local offer description is: ", local_description);
                     peer.setLocalDescription(local_description,
                         function() {
-                            signaling_socket.emit('relaySessionDescription',
+                            this.#signaling_socket.emit('relaySessionDescription',
                                 {'peer_id': peer_id, 'session_description': local_description});
                             console.log("Offer setLocalDescription succeeded", peer_id);
                         },

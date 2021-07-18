@@ -5,6 +5,7 @@ const replacementForClass = '{clss}';
 const replacementForName = '{nm}';
 const replacementForValue = '{vl}';
 const replacementForId = '{id}';
+const replacementForLabel = '{lb}';
 
 const q_template_enum2 = `
 <label class="radio-button-field-3 w-radio">
@@ -23,10 +24,10 @@ const q_template_enum = `
 `;
 
 const q_template_enum_text = `
-<p id="div_with_text_{id}" style="display:none;">
- 	<span class="radio-button-label-2 w-form-label">Please add more details:</span>
-	<textarea  class="q_a_text" rows="5" id="radio_with_text_{id}" spellcheck="true" />
-</p>
+<div id="div_with_text_{id}">
+	<label>{lb}</label>
+	<input type="text" id="tx_addtional_text_input_{id}" class="fm_text_input" data-seq="1" value="" maxlength="32"/>
+</div>
 `;
 
 	
@@ -35,12 +36,14 @@ class UserEnumRadioWithText extends UserQuestionBase {
     _enumValues; 
 	_value;
 	_value2;
+	_yesValue;
 	
-    constructor(qInfo, enumValues){  
+    constructor(qInfo, enumValues, yesValue){  
         super(qInfo);  
         this._enumValues = enumValues; 
 		this._value = qInfo.sv1;
 		this._value2 = qInfo.sv2;
+		this._yesValue = yesValue;
 		
 		// cameral case
 		if (this._value) {
@@ -97,8 +100,9 @@ class UserEnumRadioWithText extends UserQuestionBase {
 	setTextDisplay() {
 		const txtField = `#${this.textId}`;
 		const textDiv = `#${this.textDivId}`;
+		
 		// if value is the first, show text are, or hide text area
-		if (this._value === this._enumValues[0]){
+		if (this._value === this._yesValue){
 			// display text
 			$(textDiv).show();
 			$(txtField).val(this._value2);
@@ -145,7 +149,7 @@ class UserEnumRadioWithText extends UserQuestionBase {
 	
 	// get text id
 	get textId() {
-		return `radio_with_text_${this.id}`;
+		return `tx_addtional_text_input_${this.id}`;
 	}
 	
 	// get text div id
@@ -168,7 +172,8 @@ class UserEnumRadioWithText extends UserQuestionBase {
 		}
 		// text box for extra text input
 		htmlStr += q_template_enum_text
-									.replace(new RegExp(replacementForId, 'g'), this.id);
+									.replace(new RegExp(replacementForId, 'g'), this.id)
+									.replace(replacementForLabel, this.label);
 		return htmlStr; 
 	}
 	

@@ -1,30 +1,32 @@
 import {UserQuestionBase} from './q_base.js';
 import {StringUtil} from './util.js';
 
-const replacementForClass = '{clss}';
-const replacementForName = '{nm}';
+const replacementForLabel = '{lb}';
 const replacementForValue = '{vl}';
 const replacementForId = '{id}';
 
 const q_template_text = `
-<p>
-	<textarea class="q_a_text" rows="5" id="text_area_{id}" spellcheck="true" />
-</p>
+<div>
+		<label>{lb}</label>
+		<input type="text" id="tx_field_{id}" class="fm_text_input" data-seq="1" value="{vl}" maxlength="32"/>
+</div>
 `;
 
 class UserTextQuestion extends UserQuestionBase {  
-    _length; 
+    _name;
+	_regex; 
 	_value;
 	
-    constructor(qInfo){  
+    constructor(qInfo, regex){  
         super(qInfo);  
-		this._value = qInfo.sv1;
+		this._value = qInfo.sv1 != null ? qInfo.sv1 : '';
+		this._regex = regex;
     }  
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
-		if (this._value) {
+		if (this._value && this._regex.test(this._value)) {
 			return true;
 		}
 		return false;
@@ -36,18 +38,32 @@ class UserTextQuestion extends UserQuestionBase {
 		const self = this;
 		//when text edit is done, set the value ffrom the text field:
 		const selector = `#${this.myId}`;
-		$(selector).blur(function() {
-			self.setValue($(selector).val());
+		$(selector).blur(function(e) {
+			e.preventDefault();
+			const newVal = $(selector).val();
+			
+			// if it does not conform with the regex, alert and not set
+			if (newVal && ! self._regex.test(newVal)) {
+				alert(`Invalid ${self.label} value`);
+				return;
+			}
+			self.setValue(newVal);
 		});
 	}
 	
 	// Setting the enum value from the UI when handling the
 	// selection change event
 	setValue(obj) {
-		this._value = obj;
-		if (typeof obj !== 'string' || !this.onValidating()) {
+		if (typeof obj !== 'string') {
 			throw new Error('invalid value for question: ' + this.id);
 		}
+		this._value = obj.trim();
+	
+	}
+	
+	// get XML element for parent control if I am serving as a sub-control
+	get xmlElement() {
+		return {tag: 'strv', obj: this._value};
 	}
 	
 	// This method can be called when we need to serialize the question / answer
@@ -68,13 +84,15 @@ class UserTextQuestion extends UserQuestionBase {
 	
 	// get radio class 
 	get myId() {
-		return `text_area_${this.id}`;;
+		return `tx_field_${this.id}`;;
 	}
 	
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {
 		let htmlStr = q_template_text
-								   .replace(new RegExp(replacementForId, 'g'),this.id);	
+								.replace(replacementForId, this.id)
+								.replace(replacementForLabel, this.label)
+								.replace(replacementForValue, this._value);
 		
 		return htmlStr; 
 	}

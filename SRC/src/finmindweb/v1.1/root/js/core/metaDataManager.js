@@ -1,8 +1,15 @@
 import {Net}          	from './net.js';
 
+/*
+ Some known regex
+ */
+ 
+ const reg_for_everything = /.*/gim;
+ 
 /**
 	Enum strings.  TODO: generate them from finMind API
 **/
+const drop_down_none_selection = '----------';
 const enumValueForSex =  ['Male', 'Female', 'Other' ];
 const enumValueForMarriage =  ['Single', 'Married', 'Divorced', 'Widowed' ];
 const enumExerciseFrequency =  ['Never', 'Rarely', 'Sometimes', 'Often' ];
@@ -21,6 +28,7 @@ const intention =  [
 	'I want to know more about product from Insurer List'
 	];
 const enumYesNo =  ['Yes', 'No'];
+const enumUsCitizenOrNot =  ['US Citizen', 'US Green-card holder', 'None of the above'];
 const enumCoverageAmount =  [
 '300K',
 '400K',
@@ -54,6 +62,38 @@ const enumImminentEvent =
 			 "Want to consider adding children's term rider.",
 			];
 
+const stateList =  [
+drop_down_none_selection,
+'Alabama',
+'Alaska',
+'Arizona',
+'Arkansas',
+'California',
+'Colorado',
+'Connecticut',
+'Delaware',
+'Oregon',
+'Washionton'
+];
+
+const enumMilServices= [
+	'Army',
+	'Air Force',
+	'Coast Guard',
+	'Marine Corps',
+	'Navy',
+	'Space Force',
+];
+
+const enumAvocation= [
+	'Skydiving or Parachuting',
+	'Underwater and Scuba Diving',
+	'Gliding (Kite or Other), or Flying Ultra-Light Aircraft',
+	'Motor Racing on land or water',
+	'Ballooning',
+	'Mountain Climbing',
+	];
+	
 // TODO: obtain this from server 
 const enumMap = new Map([
     [ 6, enumValueForSex ],  			// enum type for sex
@@ -70,7 +110,16 @@ const enumMap = new Map([
 	[ 18, enumImminentEvent],  			// enum type for emerneng events
 	[ 19, intention],					// enum type for issurance purpose
 	[ 20, enumYesNo],  					// enum type for yes no question with extra text area
+	[ 25, enumUsCitizenOrNot],			
+	[ 26, stateList],					// enum for US STATE LIST
+	[ 27, enumMilServices],				// enum for military services
+	[ 28, enumAvocation],				// enum for avocation
   ]);
+
+const enumYesValueMap = new Map([
+	[20, 'Yes'],
+	[25, 'US Green-card holder'],
+]);
 
 const attrList =  [
 	{id: 1, question_text: 'Insured gender',	type: 6,	cat: 1},
@@ -87,7 +136,27 @@ const attrList =  [
 	{id: 1024, question_text: 'Thank you for choosing permanent life insurance. Please check all insurance needs that apply in order for our agent to assist you better?',	type: 19,	cat: 2},
 ];
 
+const attrNameList =  {
+	email: 'app_email',
+	name:  'app_name',
+	address: 'app_address',
+};
+
 class MetaDataManager {
+	/**
+		get drop_down_none_selection
+	**/
+	static get dropDownNoneSelection() {
+		return drop_down_none_selection;
+	}
+	
+	/**
+		get Reg_For_Everything
+	**/
+	static get regForEverything() {
+		return reg_for_everything;
+	}
+	
 	/**
 		get enumMap
 	**/
@@ -96,11 +165,26 @@ class MetaDataManager {
 	}
 	
 	/**
+		get enumYesValueMap
+	**/
+	static get enumYesValueMap() {
+		return enumYesValueMap;
+	}
+	
+	/*
+	  get attr name
+	  */
+	static get attrNames() {
+		return attrNameList;
+	}
+	
+	/**
 		get All supported attributes
 	**/	
 	static get attrList() {
 		return attrList;
 	}
+	
 }
 
 export { MetaDataManager };
