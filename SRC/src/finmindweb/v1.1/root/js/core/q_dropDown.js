@@ -7,12 +7,15 @@ const replacementForValue = '{vl}';
 const replacementForName = '{nm}';
 const replacementForOptionBody = '{opt_body}';
 const replacementForLabel = '{lb}';
+const replacementFordDivId = '{divid}';
 
 const select_option_html_template = `
+<div id="{divid}">
 <label>{lb}</label>
 <select id="select_option_{id}">
 	{opt_body}
 </select>
+</div>
 `;
 
 const select_option_item_template = `
@@ -23,11 +26,10 @@ class UserDropdownSelection extends UserQuestionBase {
     _enumValues; 
 	_value;
 	
-    constructor(qInfo, enumValues){  
-        super(qInfo);  
+    constructor(qInfo, enumValues, childId){  
+        super(qInfo, childId);  
         this._enumValues = enumValues; 
-		this._value = qInfo.sv1;
-		
+		this._value = qInfo.sv1;		
     }  
 	
 	// Method for validating the result value upon moving away 
@@ -84,9 +86,10 @@ class UserDropdownSelection extends UserQuestionBase {
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {	
 		let selStr = select_option_html_template
-									.replace(replacementForId, this.id)
-									.replace(replacementForLabel, this.label);
-									
+									.replace(new RegExp(replacementForId, 'g'), this.id)
+									.replace(replacementForLabel, this.label)
+									.replace(replacementFordDivId, `${this.wrapperDivId}`);
+		
 		let optionStr = "";
 		for(let i = 0; i < this._enumValues.length; i++) {
 			const theValue = this._enumValues[i];

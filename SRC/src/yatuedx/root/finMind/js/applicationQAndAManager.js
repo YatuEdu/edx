@@ -3,6 +3,7 @@ import {UserEnumQuestionCheckbox} 	from './q_enum_checkbox.js'
 import {UserIntegerQuestionText} 	from './q_integer.js'
 import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
 import {UserDateQuestion}			from './q_date.js'
+import {UserCompositeControl}		from './q_composite_control.js'
 import {Net}          				from './net.js';
 import {MetaDataManager}			from './metaDataManager.js'
 

@@ -7,17 +7,24 @@ const replacementForValue3 = '{val3}';
 const replacementForId = '{id}';
 
 const q_template_fst_mid_lst_name = `
+	<div class="row g-0 px-3 px-md-0">
+		<div class="col-5 col-md-3">		
+			<label for="first_name">First name</label>
+			<input type="text" id="first_name_{id}" class="user_name_input" data-seq="1" value="{val1}" maxlength="50"/>
+		</div>
 	
-		<label for="first_name">First name</label>
-		<input type="text" id="first_name_{id}" class="user_name_input" data-seq="1" value="{val1}" maxlength="32"/>
+		<div class="col-5 col-md-3">
+			<label for="middle_name">Middle name</label>
+			<input type="text" id="middle_name_{id}" class="user_name_input" data-seq="1" value="{val2}" maxlength="50"/>
+		</div>
+	</div>
 	
-	
-		<label for="middle_name">Middle name</label>
-		<input type="text" id="middle_name_{id}" class="user_name_input" data-seq="1" value="{val2}" maxlength="32"/>
-	
-	
-		<label for="last_name">Last name</label>
-		<input type="text" id="last_name_{id}" class="user_name_input" data-seq="1" value="{val3}" maxlength="32"/>
+	<div class="row g-0 px-3 px-md-0">
+		<div class="col-5 col-md-3">		
+			<label for="last_name">Last name</label>
+			<input type="text" id="last_name_{id}" class="user_name_input" data-seq="1" value="{val3}" maxlength="50"/>
+		</div>
+	</div>`;
 `;	
 
 class UserNameQuestion extends UserQuestionBase {  

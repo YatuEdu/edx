@@ -3,17 +3,20 @@ import {StringUtil}		  from './util.js';
 
 const replacementForId = '{id}';
 const replacementForLabel = '{lb}';
+const replacementFordDivId = '{divid}';
 
 const q_template_text_input2 = `
-<div id="div_with_text_{id}">
+<div id="{divid}">
 	<label>{lb}</label>
 	<input id="tx_formatter_input_{id}" type="text" class="fm_text_input" value=""/>
 </div>
 `;
 
 const q_template_text_input = `
+<div id="{divid}">
 <label>{lb}</label>
 <input id="tx_formatter_input_{id}" type="text" class="fm_text_input" value=""/>
+</div>
 `;
 
 class UserFormatterText extends UserQuestionBase {  
@@ -22,8 +25,8 @@ class UserFormatterText extends UserQuestionBase {
 	_formatter;
 	_numberOnly;
 	
-    constructor(qInfo, numberOnly, regex, formatter){ 	
-        super(qInfo);
+    constructor(qInfo, numberOnly, regex, formatter, childId){ 	
+        super(qInfo, childId);
 		
 		// set the existing vlaue
 		this._value = qInfo.sv1;
@@ -126,7 +129,8 @@ class UserFormatterText extends UserQuestionBase {
 		const clssStr= this.uiClass;
 		const htmlStr = q_template_text_input
 							.replace(new RegExp(replacementForId, 'g'), this.id)
-							.replace(replacementForLabel, this.label);
+							.replace(replacementForLabel, this.label)
+							.replace(replacementFordDivId, `${this.wrapperDivId}`);
 		return htmlStr; 
 	}
 	

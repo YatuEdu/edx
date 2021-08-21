@@ -71,7 +71,13 @@ const Test_Data = [
 			iv1: null, iv2: null, dv1:null, dv2:null, sv1: '', sv2: '', 
 			sv3: null, sv4: null, sv5: null
 		},
-	
+					// birth-country-state
+		{	
+			block_id: 11, attr_id: 9, attr_name: 'app_country_of_birth', attr_type: 30, 
+			attr_label: 'Country of birth*State', attr_question: '', sequence_id: 3,
+			iv1: null, iv2: null, dv1:null, dv2:null, sv1: '', sv2: '', 
+			sv3: null, sv4: null, sv5: null
+		},
 	],
 ];
 
@@ -112,6 +118,11 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 		// decide if I am logged in or not
 		//const loggedIn = await this.credMan.hasLoggedIn();
 		//await this.startAplicationPipeline(loggedIn);
+		
+		// test columbus application
+		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+		const appId = 89898990;
+		this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);
 	}
 	
 	handleTest(e) {

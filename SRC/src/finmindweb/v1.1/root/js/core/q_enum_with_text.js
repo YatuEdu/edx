@@ -38,8 +38,8 @@ class UserEnumRadioWithText extends UserQuestionBase {
 	_value2;
 	_yesValue;
 	
-    constructor(qInfo, enumValues, yesValue){  
-        super(qInfo);  
+    constructor(qInfo, enumValues, yesValue, childId){  
+        super(qInfo, childId);  
         this._enumValues = enumValues; 
 		this._value = qInfo.sv1;
 		this._value2 = qInfo.sv2;

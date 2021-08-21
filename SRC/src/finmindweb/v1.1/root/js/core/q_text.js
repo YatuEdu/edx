@@ -4,9 +4,10 @@ import {StringUtil} from './util.js';
 const replacementForLabel = '{lb}';
 const replacementForValue = '{vl}';
 const replacementForId = '{id}';
+const replacementFordDivId = '{divid}';
 
 const q_template_text = `
-<div>
+<div id="{divid}>
 		<label>{lb}</label>
 		<input type="text" id="tx_field_{id}" class="fm_text_input" data-seq="1" value="{vl}" maxlength="32"/>
 </div>
@@ -17,8 +18,8 @@ class UserTextQuestion extends UserQuestionBase {
 	_regex; 
 	_value;
 	
-    constructor(qInfo, regex){  
-        super(qInfo);  
+    constructor(qInfo, regex, childId){  
+        super(qInfo, childId);  
 		this._value = qInfo.sv1 != null ? qInfo.sv1 : '';
 		this._regex = regex;
     }  
@@ -92,7 +93,8 @@ class UserTextQuestion extends UserQuestionBase {
 		let htmlStr = q_template_text
 								.replace(replacementForId, this.id)
 								.replace(replacementForLabel, this.label)
-								.replace(replacementForValue, this._value);
+								.replace(replacementForValue, this._value)
+								.replace(replacementFordDivId, `${this.wrapperDivId}`);
 		
 		return htmlStr; 
 	}

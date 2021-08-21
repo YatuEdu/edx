@@ -6,11 +6,24 @@ class UserQuestionBase {
 	**/
 	#qInfo;
 	
+	// defined if it is a sub-component of a composite control
+	#childId;  
+	
 	/**
 		public methods
 	**/
-    constructor(qInfo) {
+	
+	//*********************************************************************************************
+	//
+	// class constructor
+	// parameters:
+	//	qInfo   - json representation of an application question
+	//	childId - if this control is part of a composite control, a child id is given by its parent
+	//			  otherwise it is not used.
+	//**********************************************************************************************
+    constructor(qInfo, childId) {
 		this.#qInfo = qInfo;
+		this.#childId = childId;
 	}
 	
 	// virtual method for hooking up event handler to handleEvent
@@ -22,6 +35,35 @@ class UserQuestionBase {
 	// This method can be called after the UI is rendered to display its
 	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
+	}
+	
+	
+	// GET my parent div id when it is part of a composite control.
+	// For this prperty to be valid, #childId has to be set before this
+	// property is used.  
+	get wrapperDivId() {
+		return `fm_component_div_for_${this.id}_${this.#childId}`;
+	}
+	
+	// SHOW the control (wrapped by a div)
+	show() {
+		this.showOrHide(true);
+	}
+	
+	// HIDE the control (wrapped by a div)
+	hide() {
+		this.showOrHide(false);
+	}
+	
+	// SHOW or HIDE the control (wrapped by a div)
+	showOrHide(display) {
+		const selector = `#${this.wrapperDivId}`;
+		if (display) {
+			$(selector).show();
+		}
+		else {
+			$(selector).hide()
+		}
 	}
 	
 	// This method can be called when we need to serialize the question / answer

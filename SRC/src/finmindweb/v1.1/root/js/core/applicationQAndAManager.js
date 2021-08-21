@@ -1,35 +1,28 @@
-import {UserEnumQuestionRadio} 		from './q_enum.js'
-import {UserEnumQuestionCheckbox} 	from './q_enum_checkbox.js'
-import {UserIntegerQuestionText} 	from './q_integer.js'
-import {UserIntegerPairQuestion}   	from './q_integer_pair.js'
-import {UserDateQuestion}			from './q_date.js'
-import {UserDropdownSelection}      from './q_dropDown.js'
-import {UserEnumRadioWithText} 		from './q_enum_with_text.js'
-import {UserTextQuestion}			from './q_text.js'
-import {UserNameQuestion}			from './q_name.js'
-import {UserAdressQuestion}			from './q_address.js'
-import {UserDecimalQuestionText}	from './q_decimal.js'
-import {UserFormatterText}			from './q_formatter_text.js'
-import {UserCompositeControl}		from './q_composite_control.js'
-import {Net}          				from './net.js';
-import {MetaDataManager}			from './metaDataManager.js'
-import {StringUtil}		  			from './util.js';
+import {UserEnumQuestionRadio} 					from './q_enum.js'
+import {UserEnumQuestionCheckbox} 				from './q_enum_checkbox.js'
+import {UserIntegerQuestionText} 				from './q_integer.js'
+import {UserIntegerPairQuestion}   				from './q_integer_pair.js'
+import {UserDateQuestion}						from './q_date.js'
+import {UserDropdownSelection}      			from './q_dropDown.js'
+import {UserEnumRadioWithText} 					from './q_enum_with_text.js'
+import {UserTextQuestion}						from './q_text.js'
+import {UserNameQuestion}						from './q_name.js'
+import {UserAdressQuestion}						from './q_address.js'
+import {UserDecimalQuestionText}				from './q_decimal.js'
+import {UserFormatterText}						from './q_formatter_text.js'
+import {UserCompositeControl}					from './q_composite_control.js'
+import {UserCompositeControlWithTwoDropdowns} 	from './q_composite_control_with_two_dropdowns.js'
+import {Net}          							from './net.js';
+import {MetaDataManager}						from './metaDataManager.js'
+import {StringUtil}		  						from './util.js';
 
 /**
 	Container that holds dynamically generated HTML input controls
 **/
-const q_template_questionOld = `
-	<div class="row py-5">
-		<div class='col-sm-10 col-lg-10 py-10'>
-			<div id="card_div_{q_id}"  class="group-card">
-				<div class="card h-100">
-					<div class="card-body text-left">
-						<h3 class="mb-0 font-weight-bold">{q_text}</h3>
-						{choice_html}
-					</div>
-				</div>
-			</div>
-		</div>
+const q_template_question = `
+	<div class="row g-0 px-3 px-md-0">
+	<h3 class="mb-0 font-weight-bold">{q_text}</h3>
+	{choice_html}
 	</div>`;
 
 
@@ -180,6 +173,7 @@ class ApplicationQAndAManager {
 				break;
 			
 			case 24:
+			case 30:
 				// create composition control
 				qObj = this.createComposition_private(qInfo); 
 				break;
@@ -254,6 +248,7 @@ class ApplicationQAndAManager {
 		A composition control consists of two or more instances of defined 'UserQuestionBase' object
 	**/
 	createComposition_private(qInfo) {
+		// composite control for driver lic - state
 		if (qInfo.attr_name ==='app_driver_lic') {
 			const components = [];
 			const labels = qInfo.attr_label.split('*');
@@ -270,12 +265,38 @@ class ApplicationQAndAManager {
 			//		partial qinfo contains label is enough because it is a sub-control
 			const STATE_ENUM_ID = 26;
 			const subqInfo2 = {attr_id: qInfo.attr_id, attr_label: labels[1], sv1: qInfo.sv2};
-			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID));
+			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID), true);
 			components.push(com2);
 			
 			// now create composite control
 			return new UserCompositeControl(qInfo, components);
 		} 
+		
+		// composite control for birth contry - state if us
+		if (qInfo.attr_name ==='app_country_of_birth') {
+			const components = [];
+			const labels = qInfo.attr_label.split('*');
+			
+			// create lic text input:
+			//		partial qinfo contains label is enough because it is a sub-control
+			const subqInfo = {attr_id: qInfo.attr_id, attr_label: labels[0], sv1: qInfo.sv1};
+			const regex = MetaDataManager.regForEverything;
+			const COUNTRY_ENUM_ID = 30;
+			const com1 = new UserDropdownSelection(subqInfo, enumMap.get(COUNTRY_ENUM_ID), 0);
+			components.push(com1);
+			
+			
+			// create state drop down list:
+			//		partial qinfo contains label is enough because it is a sub-control
+			
+			const subqInfo2 = {attr_id: qInfo.attr_id, attr_label: labels[1], sv1: qInfo.sv2};
+			const STATE_ENUM_ID = 26;
+			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID), 1);
+			components.push(com2);
+			
+			// now create composite control
+			return new UserCompositeControlWithTwoDropdowns(qInfo, components, 'United States');
+		}
 	}
 }
 

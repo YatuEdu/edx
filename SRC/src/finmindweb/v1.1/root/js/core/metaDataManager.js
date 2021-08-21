@@ -76,6 +76,23 @@ drop_down_none_selection,
 'Washionton'
 ];
 
+const countryList =  [
+drop_down_none_selection,
+'United States',
+'Afghanistan',
+'Canada',
+'China',
+'France',
+'Israel',
+'Russia',
+'South Africa',
+'South Korea',
+'Taiwan',
+'Thailand',
+'United Kingdom',
+
+];
+
 const enumMilServices= [
 	'Army',
 	'Air Force',
@@ -114,6 +131,7 @@ const enumMap = new Map([
 	[ 26, stateList],					// enum for US STATE LIST
 	[ 27, enumMilServices],				// enum for military services
 	[ 28, enumAvocation],				// enum for avocation
+	[ 30, countryList],					// enum for country
   ]);
 
 const enumYesValueMap = new Map([
