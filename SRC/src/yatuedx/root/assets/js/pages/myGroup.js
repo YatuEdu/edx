@@ -72,7 +72,7 @@ class MyGroupPageHandler {
 	
 		// go to chat page
 		const groupId = $(this).attr('data-grp-id');
-		window.location.href =  `./legacy/chat.html??group=${groupId}`                       //`./videoChat.html`;
+		window.location.href =  `./legacy/videoChat.html?group=${groupId}`                       //`./videoChat.html`;
 
 		// `./legacy/chat.html??group=${groupId}`;
 	}

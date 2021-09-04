@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>video chat room!</title>
+
+    <style>
+        html, body { 
+            background-color: #333;
+            display: flex;
+        }
+        video {
+            width:  320px;
+            height:  240px;
+            border:  1px solid black;
+            display: flex;
+            align-items: center; /*垂直居中*/
+            justify-content: center; /*水平居中*/
+            flex-direction: column;
+        }
+        #textbox {width:320px; height:230px;display: flex;flex-direction: column;}
+        #textTarget{width:60px;}
+
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+    </div>
+    <div>
+        <textarea id="textbox"></textarea>
+        <select id="textTarget">
+            <option value ="all">all</option>
+        </select>
+        <input id='tosend'></input>
+        <button id="sendMsgButton">发送</button>
+        <button id="startShareButton" disabled>共享</button>
+    </div>
+    
+
+    <script src="../assets/js/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/js/popper.js/dist/umd/popper.min.js"></script>
+    <script src="../assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./adapter-latest.js"></script>
+    <script src="./socket.io.min.js"></script>
+    <script type="module" src="../assets/js/pages/videoChat.js"></script>
+    
+</body>
+
+</html>
