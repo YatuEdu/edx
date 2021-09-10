@@ -121,14 +121,25 @@
 					<span class="ms-5">
 						<img src="img/ico-joinus-producer.svg" style="width: 1.5rem;">
 						<b class="ms-1 me-2">Producer</b>
-						<a href="" class="fw-bold">Find a FinMind Producer</a>
+						<span class="fs-7 text-body text-black-50 me-2">Waiting for producer to accept</span>
+						<a href="#" class="fw-bold" >Cancel</a>
+					</span>
+					<span class="alert alert-info alert-dismissible fade show m-0 fs-8 py-0 px-3 ms-5 lh-1 d-flex align-items-center border-0 bg-primary bg-opacity-10" role="alert">
+						<img src="img/ico-alert-info.svg" class="me-2">
+						A notification has been sent to the producer
+						<button type="button" class="btn-close p-0 position-relative ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
 					</span>
 				</div>
 				<div>
-					<a class="btn btn-outline-primary fw-bold" href="#" role="button">Cancel Application</a>
-					<a class="btn btn-primary fw-bold ms-3" href="#" role="button">Notify Producer</a>
+					<a class="btn btn-outline-primary fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#CancelApplication">Cancel Application</a>
+					<a class="btn btn-secondary fw-bold ms-3 disabled" href="#" aria-disabled="true">Notify Producer</a>
 				</div>
 			</div>
+			
+			
+			
+			
+			
 			
 			<div class="card-body p-0">
 				<div class="row h-100 g-0">
@@ -138,94 +149,13 @@
 								<img src="img/ico-folders.svg" class="me-3">Uploaded Files
 							</div>
 							<div class="card-body p-0 overflow-auto" style="height: 0;">
-								<ul class="list-group list-group-flush list-group-files mx-3">
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-pdf.svg" class="ico-file">
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">user-journey-01.pdf</h6>
-												<span class="fs-8">2 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												604KB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" class="ico-file">
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Stock Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												2.2GB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" class="ico-file">
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												1.46MB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" class="ico-file">
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="d-flex">
-											<a href="" class="me-2"><img src="img/ico-file-refresh.svg" ></a>
-											<span class="fs-8 border p-1 rounded fw-bold px-2 border-danger text-danger">Error</span>
-											
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-jpg.svg" class="ico-file">
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">7 days ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												929KB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-								</ul>
+								<div class="text-center px-3">
+									<div class="py-5 mt-5 mx-2">
+										<img src="img/bg-files-empty.png" class="img-fluid">
+									</div>
+									<h6>Ouhh… it’s empty in here.</h6>
+									<p class="fs-7 text-body text-opacity-50 mt-3">All the files you upload from the chat and application will be shown here. :)</p>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -233,26 +163,43 @@
 						<div class="card h-100 border-0 rounded-0">
 							<div class="card-body px-0 overflow-auto" style="height: 0;">
 								<div class="row g-0 justify-content-center">
-									<div class="col-11 pt-3">
-										<div class="nav-back">
-											<a href="" class="text-body text-opacity-50 text-decoration-none">Back</a>
-										</div>
-									</div>
-									<div class="col-6">
-										<h5 class="text-center mb-5">
-											Bank Account
+									<div class="col-6 pt-3">
+										<h5 class="text-center">
+											Welcome to Columbus Life’s application
 										</h5>
+										<p class="text-center fs-7 mb-5">
+											Great! You are starting a life insurance application. Simply follow the process from here.
+										</p>
 										<div class="mb-4">
-											<label for="BankName" class="form-label">Bank Name</label>
-											<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											<label for="ProductName" class="form-label">Product Name</label>
+											<select class="form-select form-control-lg">
+												<option selected>Please select</option>
+											</select>
 										</div>
 										<div class="mb-4">
-											<label for="RountingNo" class="form-label">Rounting No</label>
-											<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											<label for="CoverageAmount" class="form-label">Total face amount</label>
+											<select class="form-select form-control-lg">
+												<option selected>Please select</option>
+											</select>
 										</div>
 										<div class="mb-4">
-											<label for="AccountNo" class="form-label">Account No</label>
-											<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											<label for="Premium" class="form-label">Premium</label>
+											<div class="input-group mb-3">
+												<span class="input-group-text bg-transparent">&#36;</span>
+												<input type="number" class="form-control form-control-lg border-start-0 ps-1" placeholder="Please enter">
+											</div>
+										</div>
+										<div class="mb-4">
+											<label for="PayMode" class="form-label">Pay Mode</label>
+											<select class="form-select form-control-lg">
+												<option selected>Please select</option>
+											</select>
+										</div>
+										<div class="mb-4">
+											<label for="PayYears" class="form-label">Pay Years</label>
+											<select class="form-select form-control-lg">
+												<option selected>Please select</option>
+											</select>
 										</div>
 									</div>
 								</div>
@@ -273,7 +220,7 @@
 							<div class="card-body overflow-auto" style="height: 0;" id="chat-list-scroll-area">
 								<div class="chat-list">
 									<div class="text-center fs-8 text-body text-opacity-50">
-										Yesterday 20:06
+										4:32 PM
 									</div>
 									<div class="chat-left d-flex align-items-start my-3">
 										<div class="chat-avatar rounded-pill overflow-hidden me-2">
@@ -282,83 +229,11 @@
 										<div class="chat-msg">
 											<h6 class="fs-8 text-body text-opacity-50 mb-1">FinMind Assistant</h6>
 											<article class="bg-primary fs-7 text-white">
-												It’s ok to dream a little
+												Hi, there. How can I help you?
 											</article>
 										</div>
 									</div>
-									<div class="chat-right d-flex align-items-start justify-content-end my-3">
-										<div class="chat-msg">
-											<h6 class="fs-8 text-end text-body text-opacity-50 mb-1">Client Name</h6>
-											<div class="d-flex align-items-center">
-												<article class="bg-white fs-7 text-body text-opacity-75 order-3">
-													They know you’re here
-												</article>
-												<!-- <span class="mx-2 order-2">
-													<img src="img/ico-exclamation.svg">
-												</span>
-												<a href="" class="order-1">
-													<img src="img/ico-refresh.svg">
-												</a> -->
-											</div>
-										</div>
-									</div>
-									<div class="chat-left d-flex align-items-start my-3">
-										<div class="chat-avatar rounded-pill overflow-hidden me-2">
-											<img src="img/avatar-demo.jpeg" class="img-fluid">
-										</div>
-										<div class="chat-msg">
-											<h6 class="fs-8 text-body text-opacity-50 mb-1">FinMind Assistant</h6>
-											<article class="bg-primary fs-7 text-white">
-												It’s ok to dream a little
-											</article>
-										</div>
-									</div>
-									<div class="chat-left d-flex align-items-start my-3">
-										<div class="chat-avatar rounded-pill overflow-hidden me-2">
-											<img src="img/avatar-demo.jpeg" class="img-fluid">
-										</div>
-										<div class="chat-msg">
-											<h6 class="fs-8 text-body text-opacity-50 mb-1">FinMind Assistant</h6>
-											<article class="bg-primary fs-7 text-white">
-												It’s ok to dream a little
-											</article>
-										</div>
-									</div>
-									<div class="chat-left d-flex align-items-start my-3">
-										<div class="chat-avatar rounded-pill overflow-hidden me-2">
-											<img src="img/avatar-demo.jpeg" class="img-fluid">
-										</div>
-										<div class="chat-msg">
-											<h6 class="fs-8 text-body text-opacity-50 mb-1">FinMind Assistant</h6>
-											<article class="bg-primary fs-7 text-white">
-												It’s ok to dream a little
-											</article>
-										</div>
-									</div>
-									<div class="chat-right d-flex align-items-start justify-content-end my-3">
-										<div class="chat-msg">
-											<h6 class="fs-8 text-end text-body text-opacity-50 mb-1">Client Name</h6>
-											<div class="d-flex align-items-center">
-												<article class="bg-white fs-7 text-body text-opacity-75 order-3">
-													<div class="d-flex">
-														<div class="me-3">
-															<h6 class="fs-7">user-journey-01.pdf</h6>
-															<span class="fs-8 text-body text-opacity-50">12.8MB</span>
-														</div>
-														<div>
-															<img src="img/ico-file-pdf.svg" style="width: 2rem;">
-														</div>
-													</div>
-												</article>
-												<!-- <span class="mx-2 order-2">
-													<svg width="16" height="16" viewbox="0 0 16 16">
-														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#E8E7EA" fill="none"></circle>
-														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#176DE4" fill="none" transform="rotate(-90,8,8)" stroke-dasharray="29 44"></circle>
-													</svg>
-												</span> -->
-											</div>
-										</div>
-									</div>
+									
 								</div>
 							</div>
 							<div class="card-footer bg-transparent d-flex">
@@ -380,7 +255,49 @@
 </div>
 
 
+<!-- Find a FinMind Producer -->
+<div class="modal fade" id="FindProducerModal" tabindex="-1" aria-labelledby="FindProducerModal" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center">
+				<h5 class="modal-title pt-4">Find a FinMind Producer</h5>
+			</div>
+			<div class="modal-body px-5 py-3">
+				<div>
+					<label for="Email" class="form-label">Email</label>
+					<input type="email" class="form-control form-control-lg" placeholder="Please enter producer email address">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
 
+<!-- cancel application -->
+<div class="modal fade" id="CancelApplication" tabindex="-1" aria-labelledby="CancelApplication" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center">
+				<h5 class="modal-title pt-4">Sure to cancel your application?</h5>
+			</div>
+			<div class="modal-body px-3 py-0">
+				<p class="text-center text-body text-opacity-75">
+					Once cancelled all profiles, messages and chat logs will no longer exist.
+				</p>
+				<div class="mx-5 px-5">
+					<img src="img/bg-questions.png" class="img-fluid">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 

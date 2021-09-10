@@ -233,75 +233,89 @@
 						<div class="card h-100 border-0 rounded-0">
 							<div class="card-body px-0 overflow-auto" style="height: 0;">
 								<div class="row g-0 justify-content-center">
-									<div class="col-6 pt-3">
+									<div class="col-11 pt-3">
+										<div class="nav-back">
+											<a href="" class="text-body text-opacity-50 text-decoration-none">Back</a>
+										</div>
+									</div>
+									<div class="col-6">
 										<h5 class="text-center mb-5">
-											Insured Information
+											Existing Insurance
 										</h5>
-										<div class="row mb-4">
+									</div>
+									<div class="col-10">
+										<div class="row gx-5 gy-4 bg-white shadow my-4 p-4 position-relative">
 											<div class="col-4">
-												<label for="FirstName" class="form-label">First Name*</label>
-												<input type="text" class="form-control form-control-lg" id="FirstName" placeholder="John">
+												<label for="CompanyName" class="form-label">Company Name</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
 											</div>
 											<div class="col-4">
-												<label for="MiddleName" class="form-label">Middle Name</label>
-												<input type="text" class="form-control form-control-lg" id="MiddleName" placeholder="Willam">
+												<label for="PolicyNumber" class="form-label">Policy Number</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
 											</div>
 											<div class="col-4">
-												<label for="LastName" class="form-label">Last Name*</label>
-												<input type="text" class="form-control form-control-lg" id="LastName" placeholder="Cooper">
+												<label for="Replaced" class="form-label">Replaced</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
 											</div>
 										</div>
+										<div class="row gx-5 gy-4 bg-white shadow my-5 p-4 position-relative">
+											<div class="text-end position-absolute top-0 end-0 translate-middle-y">
+												<a href="" class="btn btn-danger btn-sm py-0 rounded-pill d-inline-flex">
+													<img src="img/ico-delete-btn.svg" class="me-1">
+													Delete
+												</a>
+											</div>
+											<div class="col-4">
+												<label for="CompanyName" class="form-label">Company Name</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+											<div class="col-4">
+												<label for="PolicyNumber" class="form-label">Policy Number</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+											<div class="col-4">
+												<label for="Replaced" class="form-label">Replaced</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+										</div>
+										<div class="row gx-5 gy-4 bg-white shadow my-5 p-4 position-relative">
+											<div class="text-end position-absolute top-0 end-0 translate-middle-y">
+												<a href="" class="btn btn-danger btn-sm py-0 rounded-pill d-inline-flex">
+													<img src="img/ico-delete-btn.svg" class="me-1">
+													Delete
+												</a>
+												<a href="" class="btn btn-success btn-sm py-0 rounded-pill d-inline-flex ms-3">
+													<img src="img/ico-add-btn.svg" class="me-1">
+													Add New
+												</a>
+											</div>
+											<div class="col-4">
+												<label for="CompanyName" class="form-label">Company Name</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+											<div class="col-4">
+												<label for="PolicyNumber" class="form-label">Policy Number</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+											<div class="col-4">
+												<label for="Replaced" class="form-label">Replaced</label>
+												<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+											</div>
+										</div>
+									</div>
+									<div class="col-auto">
 										<div class="mb-4">
-											<label for="Birthday" class="form-label">Birthday</label>
-											<input type="date" class="form-control form-control-lg"/>
-										</div>
-										<div class="mb-4">
-											<label for="ProductName" class="form-label">Relationship to the applicant</label>
-											<select class="form-select form-control-lg">
-												<option selected>Please select</option>
-												<option>Self</option>
-												<option>Child</option>
-												<option>Parent</option>
-												<option>Spouse</option>
-											</select>
-										</div>
-										<div class="mb-4">
-											<label for="address" class="form-label">Home Address</label>
-											<input type="text" class="form-control form-control-lg" placeholder="Please enter home address">
-											<input type="text" class="form-control form-control-lg mt-2" placeholder="Please enter home address">
-										</div>
-										<div class="row mb-4">
-											<div class="col-4">
-												<label for="City" class="form-label">City</label>
-												<input type="text" class="form-control form-control-lg" placeholder="City">
+											<p class="form-label mb-4">
+												Do you want to replace it with this application?
+											</p>
+											<div class="form-check form-check-inline me-5">
+											  <input class="form-check-input" type="radio" name="" id="" value="" checked>
+											  <label class="form-check-label" for="">Yes</label>
 											</div>
-											<div class="col-4">
-												<label for="State" class="form-label">State</label>
-												<input type="text" class="form-control form-control-lg" placeholder="State">
+											<div class="form-check form-check-inline ms-5">
+											  <input class="form-check-input" type="radio" name="" id="" value="">
+											  <label class="form-check-label" for="">No</label>
 											</div>
-											<div class="col-4">
-												<label for="ZIP Code" class="form-label">Zip Code</label>
-												<input type="text" class="form-control form-control-lg" placeholder="Zip Code">
-											</div>
-										</div>
-										<div class="mb-4">
-											<label for="Phonenumber" class="form-label">Phone</label>
-											<div class="input-group d-flex">
-												<span class="input-group-text bg-transparent border-end-0 pe-1 ps-3">
-													<img src="img/ico-flag-usa.svg" >
-												</span>
-												<select class="form-select border-start-0 border-end-0 flex-grow-0 w-auto">
-													<option selected>+1</option>
-													<option value="1">+2</option>
-													<option value="2">+3</option>
-													<option value="3">+4</option>
-												</select>
-												<input type="text" class="border-start-0 form-control form-control-lg" placeholder="123 456 7890">
-											</div>
-										</div>
-										<div class="mb-4">
-											<label for="Email" class="form-label">Email</label>
-											<input type="email" class="form-control form-control-lg" placeholder="Enter Email">
 										</div>
 									</div>
 								</div>
@@ -342,12 +356,12 @@
 												<article class="bg-white fs-7 text-body text-opacity-75 order-3">
 													They know you’re here
 												</article>
-												<span class="mx-2 order-2">
+												<!-- <span class="mx-2 order-2">
 													<img src="img/ico-exclamation.svg">
 												</span>
 												<a href="" class="order-1">
 													<img src="img/ico-refresh.svg">
-												</a>
+												</a> -->
 											</div>
 										</div>
 									</div>
@@ -399,12 +413,12 @@
 														</div>
 													</div>
 												</article>
-												<span class="mx-2 order-2">
+												<!-- <span class="mx-2 order-2">
 													<svg width="16" height="16" viewbox="0 0 16 16">
 														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#E8E7EA" fill="none"></circle>
 														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#176DE4" fill="none" transform="rotate(-90,8,8)" stroke-dasharray="29 44"></circle>
 													</svg>
-												</span>
+												</span> -->
 											</div>
 										</div>
 									</div>

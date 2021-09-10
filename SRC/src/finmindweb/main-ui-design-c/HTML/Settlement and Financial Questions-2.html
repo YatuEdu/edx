@@ -202,7 +202,9 @@
 											</div>
 										</div>
 										<div class="d-flex">
-											<a href="" class="me-2"><img src="img/ico-file-refresh.svg" ></a>
+											<a href="" class="me-2">
+												<img src="img/ico-file-refresh.svg" >
+											</a>
 											<span class="fs-8 border p-1 rounded fw-bold px-2 border-danger text-danger">Error</span>
 											
 										</div>
@@ -233,76 +235,87 @@
 						<div class="card h-100 border-0 rounded-0">
 							<div class="card-body px-0 overflow-auto" style="height: 0;">
 								<div class="row g-0 justify-content-center">
-									<div class="col-6 pt-3">
-										<h5 class="text-center mb-5">
-											Insured Information
+									<div class="col-11 pt-3">
+										<div class="nav-back">
+											<a href="" class="text-body text-opacity-50 text-decoration-none">Back</a>
+										</div>
+									</div>
+									<div class="col-6">
+										<h5 class="text-center mb-3">
+											Settlement and Financial Questions
 										</h5>
-										<div class="row mb-4">
-											<div class="col-4">
-												<label for="FirstName" class="form-label">First Name*</label>
-												<input type="text" class="form-control form-control-lg" id="FirstName" placeholder="John">
-											</div>
-											<div class="col-4">
-												<label for="MiddleName" class="form-label">Middle Name</label>
-												<input type="text" class="form-control form-control-lg" id="MiddleName" placeholder="Willam">
-											</div>
-											<div class="col-4">
-												<label for="LastName" class="form-label">Last Name*</label>
-												<input type="text" class="form-control form-control-lg" id="LastName" placeholder="Cooper">
-											</div>
+										<div class="text-center mb-5">
+											<span class="alert alert-secondary alert-dismissible fade show m-0 fs-7 py-1 px-3 d-inline-block align-items-center border-0 fw-bold text-body text-opacity-50 bg-secondary bg-opacity-10" role="alert">
+												<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+													<circle cx="7" cy="7" r="7" fill="#8B93A8"/>
+													<path d="M6.32748 2.625L6.54442 9.0195H7.44112L7.67252 2.625H6.32748ZM6.99277 9.91375C6.7469 9.91375 6.54442 9.975 6.37087 10.122C6.19731 10.2568 6.125 10.4282 6.125 10.6365C6.125 10.8448 6.19731 11.0163 6.37087 11.1633C6.54442 11.298 6.7469 11.3715 6.99277 11.3715C7.23864 11.3715 7.45558 11.298 7.62913 11.1633C7.78822 11.0285 7.875 10.857 7.875 10.6365C7.875 10.4282 7.78822 10.2568 7.62913 10.122C7.45558 9.975 7.23864 9.91375 6.99277 9.91375Z" fill="white"/>
+												</svg>
+												All attachments must be in PDF format
+											</span>
 										</div>
-										<div class="mb-4">
-											<label for="Birthday" class="form-label">Birthday</label>
-											<input type="date" class="form-control form-control-lg"/>
-										</div>
-										<div class="mb-4">
-											<label for="ProductName" class="form-label">Relationship to the applicant</label>
-											<select class="form-select form-control-lg">
-												<option selected>Please select</option>
-												<option>Self</option>
-												<option>Child</option>
-												<option>Parent</option>
-												<option>Spouse</option>
-											</select>
-										</div>
-										<div class="mb-4">
-											<label for="address" class="form-label">Home Address</label>
-											<input type="text" class="form-control form-control-lg" placeholder="Please enter home address">
-											<input type="text" class="form-control form-control-lg mt-2" placeholder="Please enter home address">
-										</div>
-										<div class="row mb-4">
-											<div class="col-4">
-												<label for="City" class="form-label">City</label>
-												<input type="text" class="form-control form-control-lg" placeholder="City">
-											</div>
-											<div class="col-4">
-												<label for="State" class="form-label">State</label>
-												<input type="text" class="form-control form-control-lg" placeholder="State">
-											</div>
-											<div class="col-4">
-												<label for="ZIP Code" class="form-label">Zip Code</label>
-												<input type="text" class="form-control form-control-lg" placeholder="Zip Code">
+										<h6 class="mb-3">A copy of voided check</h6>
+										<div class="upload-drag-area p-4 mb-4 rounded-3 text-center">
+											<input type="file" class="d-none">
+											<img src="img/ico-upload-file.svg">
+											<div class="fs-7 fw-bold text-body text-opacity-50">
+												<a href="" class="text-primary text-decoration-none">Browse</a>, or Drag& Drop your file here
 											</div>
 										</div>
-										<div class="mb-4">
-											<label for="Phonenumber" class="form-label">Phone</label>
-											<div class="input-group d-flex">
-												<span class="input-group-text bg-transparent border-end-0 pe-1 ps-3">
-													<img src="img/ico-flag-usa.svg" >
-												</span>
-												<select class="form-select border-start-0 border-end-0 flex-grow-0 w-auto">
-													<option selected>+1</option>
-													<option value="1">+2</option>
-													<option value="2">+3</option>
-													<option value="3">+4</option>
-												</select>
-												<input type="text" class="border-start-0 form-control form-control-lg" placeholder="123 456 7890">
+										<h6 class="mb-3">A copy of driver license</h6>
+										<div class="upload-drag-area p-4 mb-4 rounded-3 text-center">
+											<input type="file" class="d-none">
+											<img src="img/ico-upload-file.svg">
+											<div class="fs-7 fw-bold text-body text-opacity-50">
+												<a href="" class="text-primary text-decoration-none">Browse</a>, or Drag& Drop your file here
 											</div>
 										</div>
-										<div class="mb-4">
-											<label for="Email" class="form-label">Email</label>
-											<input type="email" class="form-control form-control-lg" placeholder="Enter Email">
+										<h6 class="mb-3">A copy of green card</h6>
+										<div class="upload-drag-area p-4 mb-4 rounded-3 text-center">
+											<input type="file" class="d-none">
+											<img src="img/ico-upload-file.svg">
+											<div class="fs-7 fw-bold text-body text-opacity-50">
+												<a href="" class="text-primary text-decoration-none">Browse</a>, or Drag& Drop your file here
+											</div>
 										</div>
+										
+										<div class="upload-drag-area p-4 mb-4 rounded-3 text-center d-flex align-items-center justify-content-between">
+											<input type="file" class="d-none">
+											<img src="img/ico-file-pdf.svg">
+											<div class="flex-grow-1 mx-3">
+												<div class="d-flex justify-content-between fs-7 fw-bold mb-1">
+													<b class="text-body text-opacity-50">Project_v01</b>
+													<span class="text-body text-opacity-25">100%</span>
+												</div>
+												<div class="progress" style="height: 6px;">
+												  <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+												</div>
+											</div>
+											<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<circle cx="18" cy="18" r="18" fill="#39C86A"/>
+												<path d="M12 17.5L16.1464 21.6464C16.3417 21.8417 16.6583 21.8417 16.8536 21.6464L25 13.5" stroke="white" stroke-width="3" stroke-linecap="round"/>
+											</svg>
+										</div>
+										
+										
+										<div class="upload-drag-area p-4 mb-4 rounded-3 text-center d-flex align-items-center justify-content-between">
+											<input type="file" class="d-none">
+											<img src="img/ico-file-pdf.svg">
+											<div class="flex-grow-1 mx-3">
+												<div class="d-flex justify-content-between fs-7 fw-bold mb-1">
+													<b class="text-body text-opacity-50">Project_v01</b>
+													<span class="text-danger">error</span>
+												</div>
+												<div class="progress" style="height: 6px;">
+												  <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+												</div>
+											</div>
+											<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<circle cx="18" cy="18" r="18" fill="#FF5722"/>
+												<path d="M18.019 22.9712C17.2566 22.9712 16.639 22.3881 16.639 21.6689C16.639 21.6689 15.7892 12.2991 15.7881 9.16449C15.7877 8.23711 16.7871 7.59961 18.0193 7.59961C19.1691 7.59961 20.2052 8.18161 20.2052 9.13749C20.2052 12.3227 19.3993 21.6689 19.3993 21.6689C19.399 22.3881 18.781 22.9712 18.019 22.9712Z" fill="white"/>
+												<path d="M16.1162 26.5254C16.1162 27.0227 16.3138 27.4996 16.6654 27.8512C17.017 28.2028 17.4939 28.4004 17.9912 28.4004C18.4885 28.4004 18.9654 28.2028 19.317 27.8512C19.6687 27.4996 19.8662 27.0227 19.8662 26.5254C19.8662 26.0281 19.6687 25.5512 19.317 25.1996C18.9654 24.8479 18.4885 24.6504 17.9912 24.6504C17.4939 24.6504 17.017 24.8479 16.6654 25.1996C16.3138 25.5512 16.1162 26.0281 16.1162 26.5254Z" fill="white"/>
+											</svg>
+										</div>
+										
 									</div>
 								</div>
 							</div>
@@ -342,12 +355,12 @@
 												<article class="bg-white fs-7 text-body text-opacity-75 order-3">
 													They know you’re here
 												</article>
-												<span class="mx-2 order-2">
+												<!-- <span class="mx-2 order-2">
 													<img src="img/ico-exclamation.svg">
 												</span>
 												<a href="" class="order-1">
 													<img src="img/ico-refresh.svg">
-												</a>
+												</a> -->
 											</div>
 										</div>
 									</div>
@@ -399,12 +412,12 @@
 														</div>
 													</div>
 												</article>
-												<span class="mx-2 order-2">
+												<!-- <span class="mx-2 order-2">
 													<svg width="16" height="16" viewbox="0 0 16 16">
 														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#E8E7EA" fill="none"></circle>
 														<circle cx="8" cy="8" r="7" stroke-width="2" stroke="#176DE4" fill="none" transform="rotate(-90,8,8)" stroke-dasharray="29 44"></circle>
 													</svg>
-												</span>
+												</span> -->
 											</div>
 										</div>
 									</div>
