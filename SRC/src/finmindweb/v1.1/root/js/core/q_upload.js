@@ -56,8 +56,9 @@ class FileUpload extends UserQuestionBase {
 	_applicationKey;
 	_pipelineKey;
 	_conversationKey;
+	_fileName;
 	
-    constructor(credMan, label, applicationKey, pipelineKey, conversationKey) {
+    constructor(credMan, label, applicationKey, pipelineKey, conversationKey, fileName) {
 		super({});
 		this.#credMan = credMan;
 		// label 上传什么文件的提示
@@ -66,8 +67,9 @@ class FileUpload extends UserQuestionBase {
 		this._pipelineKey = pipelineKey;
 		this._conversationKey = conversationKey;
 		this._id = Math.floor(Math.random() * 1000000);
+		this._fileName = fileName;
 
-    } 
+    }
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
@@ -140,7 +142,7 @@ class FileUpload extends UserQuestionBase {
 			this.refreshProgress(0, false, 'File size not meet the requirements');
 		} else {
 			this.refreshProgress(0, true, '');
-			let ret = await this.sendFileNameToServerBeforeUpload(file.name);
+			let ret = await this.sendFileNameToServerBeforeUpload(this._fileName);
 			if (ret.code==null || ret.code==0) {
 				let resUrl = ret.data.url;
 				if (window.FileReader) {
@@ -163,8 +165,8 @@ class FileUpload extends UserQuestionBase {
 						console.log("try send to url:\n" + resUrl);
 						xhreq.open("PUT", resUrl, true);
 
-						//xhreq.setRequestHeader("Content-Type", "application/octet-stream"); //流类型 ok
-						xhreq.setRequestHeader("Content-Type", "application/pdf"); //pdf类型 ok
+						xhreq.setRequestHeader("Content-Type", "application/octet-stream"); //流类型 ok
+						//xhreq.setRequestHeader("Content-Type", "application/pdf"); //pdf类型 ok
 					//	xhreq.setRequestHeader("Content-Length", file.size);     //文件大小
 						xhreq.setRequestHeader("uploadfile_name", encodeURI(file.name)); //兼容中文
 						xhreq.send(fReader.result);
