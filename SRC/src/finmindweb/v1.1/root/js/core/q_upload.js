@@ -142,7 +142,10 @@ class FileUpload extends UserQuestionBase {
 			this.refreshProgress(0, false, 'File size not meet the requirements');
 		} else {
 			this.refreshProgress(0, true, '');
-			let ret = await this.sendFileNameToServerBeforeUpload(this._fileName);
+			let fileName = this._fileName;
+			if (fileName==null || fileName=='')
+				fileName = file.name;
+			let ret = await this.sendFileNameToServerBeforeUpload(fileName);
 			if (ret.code==null || ret.code==0) {
 				let resUrl = ret.data.url;
 				if (window.FileReader) {
