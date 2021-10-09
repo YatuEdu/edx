@@ -1,11 +1,19 @@
-import {UserTextQuestion}		from './q_text.js'
-import {UserFormatterText}		from './q_formatter_text.js'
-import {UserDropdownSelection}  from './q_dropDown.js'
-import {UserCompositeControl}	from './q_composite_control.js'
-import {UserBeneficiaryControl}	from './q_beneficiary.js'
-import {MetaDataManager}		from './metaDataManager.js'
-import {StringUtil}		  		from './util.js';
+import {UserTextQuestion}					   	from './q_text.js'
+import {UserFormatterText}					   	from './q_formatter_text.js'
+import {UserIntegerQuestionText} 				from './q_integer.js'
+import {UserDropdownSelection}  			   	from './q_dropDown.js'
+import {UserCompositeControl}				   	from './q_composite_control.js'
+import {UserBeneficiaryControl}				   	from './q_beneficiary.js'
+import {UserCompositeControlWithTwoDropdowns}  	from './q_composite_control_with_two_dropdowns.js'
+import {InsuranceInfoComponentDynList}			from './q_insuranceInfo_component_dyn_list.js'
+import {MetaDataManager}						from './metaDataManager.js'
+import {StringUtil}		  						from './util.js';
+import {Net}          							from './net.js';
+import {credMan}      							from './credManFinMind.js'
 
+const DEFAULT_NO_BENEFICIARY = 3;
+const DEFAULT_NO_CONTINGENT_BENEFICIARY = 1;
+	
 /*
 	COMPONENT FACTORY FOR text field control
 */
@@ -71,7 +79,7 @@ class UIComponentFactory {
 			//		partial qinfo contains label is enough because it is a sub-control
 			const STATE_ENUM_ID = 26;
 			const subqInfo2 = {attr_id: qInfo.attr_id, attr_label: labels[1], sv1: qInfo.sv2};
-			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID), true);
+			const com2 = new UserDropdownSelection(subqInfo2, MetaDataManager.enumMap.get(STATE_ENUM_ID), true);
 			components.push(com2);
 			
 			// now create composite control
@@ -87,7 +95,7 @@ class UIComponentFactory {
 			const subqInfo = {attr_id: qInfo.attr_id, attr_label: labels[0], sv1: qInfo.sv1};
 			const regex = MetaDataManager.regForEverything;
 			const COUNTRY_ENUM_ID = 30;
-			const com1 = new UserDropdownSelection(subqInfo, enumMap.get(COUNTRY_ENUM_ID), 0);
+			const com1 = new UserDropdownSelection(subqInfo, MetaDataManager.enumMap.get(COUNTRY_ENUM_ID), 0);
 			components.push(com1);
 			
 			
@@ -97,7 +105,7 @@ class UIComponentFactory {
 			//       append an extra index number at the end (_2)
 			const subqInfo2 = {attr_id: qInfo.attr_id + "_2", attr_label: labels[1], sv1: qInfo.sv2};
 			const STATE_ENUM_ID = 26;
-			const com2 = new UserDropdownSelection(subqInfo2, enumMap.get(STATE_ENUM_ID), 1);
+			const com2 = new UserDropdownSelection(subqInfo2, MetaDataManager.enumMap.get(STATE_ENUM_ID), 1);
 			components.push(com2);
 			
 			// now create composite control
@@ -111,7 +119,7 @@ class UIComponentFactory {
 			// create empolyer input:
 			//		partial qinfo contains label is enough because it is a sub-control
 			const subqInfo = {attr_id: qInfo.attr_id, attr_label: labels[0], sv1: qInfo.sv1};
-			const regex = MetaDataManager.regForEverything;
+			const regex = null;
 			const com1 = new UserTextQuestion(subqInfo, regex);
 			components.push(com1);
 			
@@ -137,8 +145,7 @@ class UIComponentFactory {
 			const subqInfo = {attr_id: qInfo.attr_id, attr_label: labels[0], sv1: qInfo.sv1};
 			const regex =null;
 			const com1 = new UserTextQuestion(subqInfo, regex);
-			components.push(com1);
-			
+			components.push(com1);		
 			
 			// create duty:
 			//		partial qinfo contains label is enough because it is a sub-control
@@ -156,11 +163,32 @@ class UIComponentFactory {
 	/*
 		Create beneficary complex control 
 	*/
-	static createBeneficiaryControl(appId, qInfo) {
-		//TODO: get benificary info from server
+	
+	static async createBeneficiaryControl(appId, qInfo, isContingent) {
 		
+		// get benificary info from server
+		let beneficiaryList = null;
+		let minimum = 1;
+		let defaultNo = DEFAULT_NO_BENEFICIARY;
+		if (isContingent) {
+			minimum = 0;
+			defaultNo = DEFAULT_NO_CONTINGENT_BENEFICIARY;
+			beneficiaryList = await Net.getContingentBeneficiaryInfo(appId, credMan.credential.token);
+		}
+		else {
+			beneficiaryList = await Net.getBeneficiaryInfo(appId, credMan.credential.token);
+		}
 		// 
-		return new UserBeneficiaryControl(qInfo, null);
+		return new UserBeneficiaryControl(qInfo, beneficiaryList.data, defaultNo, minimum);
+	}
+	
+	/*
+		Create Existing Isurance Composite Control
+	*/
+	static async createExistingIsuranceControl(appId, qInfo) {
+		// get benificary info from server
+		const insList = await Net.getEixstingInsuranceInfo(appId, credMan.credential.token);
+		return new InsuranceInfoComponentDynList(qInfo, insList.data, 1, 0, ['Name', 'Policy Number', 'Replace', 'Action']);
 	}
 }
 

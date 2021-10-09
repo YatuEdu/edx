@@ -128,6 +128,14 @@ const enumImmigrationVisaType = [
 'Other',
 ];
 
+const enumInsCompanies = [
+'Columbus',
+'New York Life',
+'Trans Pacific',
+'Other',
+];
+
+
 // TODO: obtain this from server 
 const enumMap = new Map([
     [ 6, enumValueForSex ],  			// enum type for sex
@@ -153,6 +161,7 @@ const enumMap = new Map([
 	[ 31, countryList],					// enum for country
 	[ 32, enumImmigrationVisaType],		// enum for immigration visa type
 	[ 50, enumBeneficiaryRelationship],	// enum for beneficiary relationship
+	[ 60, enumInsCompanies],			// enum for insurance companies
   ]);
 
 const enumYesValueMap = new Map([
@@ -214,7 +223,7 @@ class MetaDataManager {
 		get REG_FOR_EMAIL
 	**/
 	static get regForeEmail() {
-		return REG_FOR_EMAIL = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;;
+		return REG_FOR_EMAIL;
 	}
 	
 	/**

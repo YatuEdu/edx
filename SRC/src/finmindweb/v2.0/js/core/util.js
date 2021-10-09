@@ -4,11 +4,30 @@ class TimeUtil {
 	static MINUTE = 'min';
 	static SECOND = 'sec';
 	static MM = 'mm';
+	static ONE_DAY = 1000 * 60 * 60 * 24;
 	
 	static diffMinutes(dt1, dt2) 
 	{
 		const diff =(dt2 - dt1) / 60000;
 		return Math.abs(Math.round(diff));
+	}
+	
+	static diffDays(dt1, dt2) {
+		return  Math.round ( (dt2 - dt1) / TimeUtil.ONE_DAY );
+	}
+
+	static getTimeString(dt) {
+		return dt.toTimeString().split(' ')[0];
+	}
+	
+	static getTimeStringWithoutSeconds(dt) {
+		const ts =  TimeUtil.getTimeString(dt);
+		const secindx = ts.lastIndexOf(":");
+		return ts.substring(0, secindx);
+	}
+	
+	static getDateString(dt) {
+		return dt.toDateString();
 	}
 }
 
@@ -101,4 +120,10 @@ class StringUtil {
 	}
 }
 
-export { TimeUtil, StringUtil };
+class ArrayUtil {
+	static isEmpty(a) {
+		return !a || a.length == 0;
+	}
+}
+
+export { TimeUtil, StringUtil, ArrayUtil };

@@ -10,12 +10,18 @@ const replacementForLabel = '{lb}';
 const replacementFordDivId = '{divid}';
 
 const select_option_html_template = `
-<div id="{divid}">
-<label>{lb}</label>
-<select id="select_option_{id}">
+<div class="mb-4" id="{divid}">
+  <label class="form-label">{lb}</label>
+  <select class="form-select form-control-lg" id="select_option_{id}">
+	{opt_body}
+  </select>
+</div>
+`;
+
+const select_option_html_template_no_label_no_div = `
+<select class="form-select form-control-lg" id="select_option_{id}">
 	{opt_body}
 </select>
-</div>
 `;
 
 const select_option_item_template = `
@@ -25,11 +31,13 @@ const select_option_item_template = `
 class UserDropdownSelection extends UserQuestionBase {  
     _enumValues; 
 	_value;
+	_noLable;
 	
-    constructor(qInfo, enumValues, childId){  
+    constructor(qInfo, enumValues, childId, noLabel){  
         super(qInfo, childId);  
         this._enumValues = enumValues; 
-		this._value = qInfo.sv1;		
+		this._value = qInfo.sv1;
+		this._noLable = noLabel;
     }  
 	
 	// Method for validating the result value upon moving away 
@@ -91,7 +99,8 @@ class UserDropdownSelection extends UserQuestionBase {
 	
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {	
-		let selStr = select_option_html_template
+		let template = this._noLable ? select_option_html_template_no_label_no_div : select_option_html_template ;	
+		let selStr = template
 									.replace(new RegExp(replacementForId, 'g'), this.id)
 									.replace(replacementForLabel, this.label)
 									.replace(replacementFordDivId, `${this.wrapperDivId}`);

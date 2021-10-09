@@ -5,22 +5,18 @@ const replacementForClass = '{clss}';
 const replacementForName = '{nm}';
 const replacementForValue = '{vl}';
 const replacementForId = '{id}';
+const replacementForRadio = '{radio}';
 
 const q_template_enum_group = `
-<div class="row g-0 px-3 px-md-0">
-	<div class="col-10 col-md-10">
-		<input type="radio" data-name="Radio 5" name="{nm}" value="{vl}">
-		<span class="radio-button-label-2 w-form-label">{vl}</span>
-	</div>
+<div class="mb-4">
+	{radio}
 </div>
 `;
 
 const q_template_enum = `
-<div class="row g-0 px-3 px-md-0">
-	<div class="col-10 col-md-10">
-		<input type="radio" data-name="Radio 5" name="{nm}" value="{vl}">
-		<span class="radio-button-label-2 w-form-label">{vl}</span>
-	</div>
+<div class="form-check form-check-inline me-5">
+	<input class="form-check-input" type="radio" name="{nm}" id="" value="{vl}">
+	<label class="form-check-label" for="">{vl}</label>
 </div>
 `;
 
@@ -106,16 +102,18 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 	get displayHtml() {
 		const clssStr= this.radioClass;
 		const name = this.radioName;	
-		let htmlStr = "";
+		let radioStr = "";
 		for(let i = 0; i < this._enumValues.length; i++) {
 			const theValue = this._enumValues[i];
-			htmlStr += q_template_enum.replace(replacementForClass, clssStr)
+			radioStr += q_template_enum.replace(replacementForClass, clssStr)
 								   .replace(replacementForName, name)
 								   .replace(replacementForId, this.id)
 								   .replace(new RegExp(replacementForValue, 'g'),theValue);	
 		}
 		
-		return htmlStr; 
+		const htmlStr =  q_template_enum_group
+									.replace(replacementForRadio, radioStr);
+		return htmlStr;
 	}
 	
 	// get question in xml format for saving to API server

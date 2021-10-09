@@ -1,5 +1,16 @@
 import {sysConstants} from './sysConst.js'
 
+const API_FOR_BENEFICIARY_INFO = 2021819;
+const API_FOR_CONTINGENT_BENEFICIARY_INFO = 2021821;
+const API_FOR_FILE_UPLOAD = 2021818;
+const API_FOR_MESSAGE_RETRIEVAL = 2021823;
+const API_FOR_MESSAGE_SENDING = 2021824;
+
+const FILE_UPLOAD_OP = 1;
+const FILE_LIST_OP = 2;
+const FILE_DOWNLOAD_OP = 3;
+const FILE_DELETE_OP = 4;
+
 class Net {
 	/**
 		FinMind API for user-login
@@ -65,10 +76,39 @@ class Net {
 	}
 	
 	/**
+		FinMind API for getting app beneficiary 
+	**/	
+	static async getBeneficiaryInfo(appId, token) {
+		const req = Net.composeRequestDataForAppBeneficiaryInfo_private(appId, token, API_FOR_BENEFICIARY_INFO);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+		FinMind API for getting app CONTINGENT beneficiary INFO
+	**/	
+	static async getContingentBeneficiaryInfo(appId, token) {
+		const req = Net.composeRequestDataForAppBeneficiaryInfo_private(appId, token, API_FOR_CONTINGENT_BENEFICIARY_INFO);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	
+	
+	/**
+		FinMind API for getting app existing isurance
+	**/	
+	static async getEixstingInsuranceInfo(appId, token) {
+		const req = Net.composeRequestDataForAppEixstingInsuranceInfo_private(appId, token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		FinMind API for saving a block of user-questions-answerws
 	**/	
-	static async saveBlockQuestions(appId, blckId, questions, createNewBlock, token) {
-		const req = Net.composeRequestDataForSavingUserQuestionBlock_private(appId, blckId, questions, createNewBlock, token);
+	static async saveBlockQuestions(appId, blckId, questions, token) {
+		const req = Net.composeRequestDataForSavingUserQuestionBlock_private(appId, blckId, questions, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -111,6 +151,38 @@ class Net {
 	}
 	
 	/**
+	 *  API for file uploading, deletion, and listing service
+	 *	operation:
+	 *     1 upload
+	 *     2 list
+	 *     3 download
+	 *     4 delete
+	 */
+	static async fileUpload(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
+		const req = Net.composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, FILE_UPLOAD_OP);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+		
+	/**
+		FinMind API for getting all messages 
+	**/	
+	static async getMessages(appId, token) {
+		const req = Net.composeRequestDataForGetMessages_private(appId, token, API_FOR_MESSAGE_RETRIEVAL);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+		FinMind API for sending a message 
+	**/	
+	static async sendMessages(appId, type, msg, token) {
+		const req = Net.composeRequestDataForSendingMessages_private(appId, token, type, msg, API_FOR_MESSAGE_SENDING);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
 		compose finMind API request for starting to apply for a product
 	**/
 	static composeRequestDataForStartAplication_private(prodId, token){
@@ -124,11 +196,53 @@ class Net {
 				applicantRelationShip: 0
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	static composeRequestDataForGetMessages_private(applicationId, t, apiId) {
+		const requestData = {
+			header: {
+				token: t,
+				api_id: apiId
+			},
+			data: {
+				appId: applicationId
+			}
 		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	static composeRequestDataForSendingMessages_private(applicationId, t, type, msgText, apiId) {
+		const requestData = {
+			header: {
+				token: t,
+				api_id: apiId
+			},
+			data: {
+				appId: applicationId,
+				msgType: type,
+				msg: msgText
+			}
+		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	static composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, op) {
+		const requestData = {
+			header: {
+				token: t,
+				api_id: API_FOR_FILE_UPLOAD
+			},
+			data: {
+				pipelineKey: pipleLineKey,
+				applicationKey: appKey,
+				conversationKey: conversationKey,
+				fileName: uploadFileName,
+				operationType: op
+			}
+		};
+		
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	/**
@@ -144,11 +258,39 @@ class Net {
 				appId: appId,
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	/**
+		compose finMind API request for app-beneficiary
+	**/
+	static composeRequestDataForAppBeneficiaryInfo_private(appId, token, apiId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: apiId
+			},
+			data: {					
+				appId: appId,
+			}
 		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	/**
+		compose finMind API request for app-existing insurance
+	**/
+	static composeRequestDataForAppEixstingInsuranceInfo_private(appId, token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021822
+			},
+			data: {					
+				appId: appId,
+			}
+		};
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	/*
@@ -165,11 +307,7 @@ class Net {
 				pwh: sha256(sha256(userPassword))
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(loginData),
-		};
+		return Net.composePostRequestFromData_private(loginData);
 	}
 	
 	/**
@@ -191,11 +329,7 @@ class Net {
 				pwh: sha256(sha256(userPassword))
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(loginData),
-		};
+		return Net.composePostRequestFromData_private(loginData);
 	}
 	
 	/**
@@ -211,11 +345,7 @@ class Net {
 			data: {					
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(loginData),
-		};
+		return Net.composePostRequestFromData_private(loginData);
 	}
 	
 	/**
@@ -232,11 +362,7 @@ class Net {
 			data: {}					
 		};
 			
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(queryData),
-		};
+		return Net.composePostRequestFromData_private(queryData);
 	}
 	
 	/**
@@ -252,17 +378,13 @@ class Net {
 				blockId: blckId,
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
-		};
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	/**
 		finMind request forming for saving user questions API
 	**/
-	static composeRequestDataForSavingUserQuestionBlock_private(aid, bid, questionsXml, createNewBlock, token) {
+	static composeRequestDataForSavingUserQuestionBlock_private(aid, bid, questionsXml, token) {
 		const requestData = {
 			header: {
 				token: token,
@@ -272,14 +394,9 @@ class Net {
 				appId: aid,
 				blockId: bid,
 				qAndA: questionsXml,
-				createNewBlock: createNewBlock ? "1" : "0",
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
-		};
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	/**
@@ -296,11 +413,7 @@ class Net {
 				currentBlockId: blckId,
 			}
 		};
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
-		};
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	static composeRequestDataForGetPremiumQuote_private(xml, token) {
@@ -329,13 +442,9 @@ class Net {
 				</quoteRequest> 
 				*/
 			}
-		}
-		;
-		return {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
 		};
+		
+		return Net.composePostRequestFromData_private(requestData);
 	}
 	
 	/**
@@ -352,10 +461,17 @@ class Net {
 				conditionXML: xml,
 			}
 		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	/**
+		forming request data for finMind API calls
+	**/
+	static composePostRequestFromData_private(data) {
 		return {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
+			body: JSON.stringify(data),
 		};
 	}
 	

@@ -6,11 +6,9 @@ const replacementForLabel = '{lb}';
 const replacementFordDivId = '{divid}';
 
 const q_template_text_input = `
-<div class="row g-0 px-3 px-md-0">
- <div class="col-10 col-md-10">
-  <label>{lb}</label>
-  <input id="tx_formatter_input_{id}" type="text" class="fm_text_input" value=""/>
- </div>
+<div class="mb-4">
+  <label  class="form-label" >{lb}</label>
+  <input id="tx_formatter_input_{id}" type="text" class="form-control form-control-lg" value=""/>
 </div>
 `;
 

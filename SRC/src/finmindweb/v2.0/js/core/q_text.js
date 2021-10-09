@@ -7,11 +7,9 @@ const replacementForId = '{id}';
 const replacementFordDivId = '{divid}';
 
 const q_template_text = `
-<div class="row g-0 px-3 px-md-0">
- <div class="col-10 col-md-10">
-		<label>{lb}</label>
-		<input type="text" id="tx_field_{id}" class="fm_text_input" data-seq="1" value="{vl}" maxlength="32"/>
- </div>
+<div class="mb-4">
+  <label for="ExistingInsurance" class="form-label">{lb}</label>
+  <input type="text" id="tx_field_{id}" class="form-control form-control-lg" placeholder="Please enter" value="{vl}">
 </div>
 `;
 

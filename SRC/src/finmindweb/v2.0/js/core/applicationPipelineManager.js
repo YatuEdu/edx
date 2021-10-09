@@ -20,13 +20,12 @@ class ApplicationPipelineManager extends PipelineManager {
 	/**
 		To save all the answered questions to finMind service
 	**/
-	async v_save(t, duplicateBlock) {
+	async v_save(t) {
 		const qXML = this.prot_formQuestionsXml();
 		return await Net.saveBlockQuestions(
 							this._appId, 
 							this._qAndAManager.blockId, 
-							qXML,
-							duplicateBlock,							
+							qXML,						
 							t);
 	}
 }

@@ -10,7 +10,7 @@ const replacementForRadio = '{radio}';
 const replacementForText = '{txt}';
 
 const q_template_enum_text_group = `
-<div class="row g-0 px-3 px-md-0">
+<div class="mb-4">
 	{radio}
 </div>
 <div class="row g-0 px-3 px-md-0">

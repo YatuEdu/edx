@@ -75,7 +75,7 @@ class PipelineManager {
 			return resp;
 		}
 		
-		return this.prv_composeUserQustionHtml(resp.data);
+		return await this.prv_composeUserQustionHtml(resp.data);
 	}
 	
 	/**
@@ -125,7 +125,7 @@ class PipelineManager {
 	/**
 		Validate and then save all the answered questions to finMind service
 	**/
-	async validateAndSaveCurrentBlock(token, duplicateBlock) {
+	async validateAndSaveCurrentBlock(token) {
 		// nothing to save, return true (so taht we csn feth data from server)
 		if (this._qAndAManager == null) {
 			return true;
@@ -146,7 +146,7 @@ class PipelineManager {
 		}
 		
 		// now save the questions to DB
-		const resp = await this.v_save(token, duplicateBlock);
+		const resp = await this.v_save(token);
 		if (resp && resp.err) {
 			alert(resp.err);
 			return false;
@@ -176,13 +176,13 @@ class PipelineManager {
 		Form question/answer UI by dynamically generate HTML block based
 		on the questions obtained from server.
 	**/
-	prv_composeUserQustionHtml(qList, fromCachedBlock) {
+	async prv_composeUserQustionHtml(qList, fromCachedBlock) {
 		// mrege with session-stored wizard list if any
 		const qMap = this.prot_deserialize();
 		if (qMap != null && qMap.size > 0) {
 			this.prv_mergeQlist(qList, qMap);
 		}
-		return this._qAndAManager.getUserQustionHtml(qList);
+		return await this._qAndAManager.getUserQustionHtml(qList);
 	}
 	
 	/**

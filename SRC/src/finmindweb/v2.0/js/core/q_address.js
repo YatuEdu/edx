@@ -14,7 +14,7 @@ const replacementForStates = '{states}';
 const replacementForStateSelect = '{state_selects}';
 
 const state_select_html_template = `
-<select id="select_state_{id}">
+<select class="form-select form-control-lg" id="select_state_{id}">
 	{states}
 </select>
 `;
@@ -24,24 +24,24 @@ const state_option_item_template = `
 `;
 
 const q_template_text = `
-<div class="row g-0 px-3 px-md-0">
-	<div class="col-5 col-md-5">	
-		<label for="address">Adress</label>
-		<input type="text" id="address_{id}" class="user_name_input" data-seq="1" value="{addr}" maxlength="32"/>
-	</div>
-	<div class="col-5 col-md-5">
-		<label for="city">City</label>
-		<input type="text" id="city_{id}" class="user_name_input" data-seq="1" value="{cty}" maxlength="32"/>	
+<div class="row mb-4">
+	<div class="col">	
+		<label class="form-label" for="address">Adress</label>
+		<input type="text" id="address_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{addr}" maxlength="32"/>
 	</div>
 </div>
-<div class="row g-0 px-3 px-md-0">
-	<div class="col-5 col-md-5">
-		<label for="state">State</label>
+<div class="row mb-4">
+	<div class="col">
+		<label class="form-label" for="city">City</label>
+		<input type="text" id="city_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{cty}" maxlength="32"/>	
+	</div>
+	<div class="col">
+		<label class="form-label" for="state">State</label>
 		{state_selects}
 	</div>
-	<div class="col-5 col-md-5">	
-		<label for="Zip code">ZipCode</label>
-		<input type="text" id="zip_{id}" class="user_name_input" data-seq="1" value="{zp}" maxlength="32"/>
+	<div class="col">	
+		<label class="form-label"  for="Zip code">ZipCode</label>
+		<input type="text" id="zip_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{zp}" maxlength="32"/>
 	</div>
 </div>`;
 

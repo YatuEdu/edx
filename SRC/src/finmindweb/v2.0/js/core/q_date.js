@@ -6,11 +6,9 @@ const replacementForValue = '{vl}';
 const replacementForLabel = '{lb}';
 
 const q_template_date = `
-<div class="row g-0 px-3 px-md-0">
-	<div class="col-10 col-md-10">
-	    <label>{lb}</label>
-		<input type="date" name="dob" value="{vl}" class="{clss}">
-	</div>
+<div class="mb-4">
+	<label for="IssueDate" class="form-label">{lb}</label>
+	<input type="date"  name="dob" value="{vl}" class="form-control form-control-lg {clss}">
 </div>
 `;
 

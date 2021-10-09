@@ -6,6 +6,7 @@ import {ApplicationPipelineManager} from '../core/applicationPipelineManager.js'
 import {WizardPipelineManager} 		from '../core/wizardPipelineManager.js';
 import {HomeAndWizardHeader} 		from './../pages/header.js';
 import {ApplicationQAndAManager}	from '../core/applicationQAndAManager.js'
+import { MessagingPanel } 			from '../core/messagingPanel.js'
 
 // test data
 const Test_Data = [
@@ -90,7 +91,23 @@ const Test_Data = [
 			iv1: null, iv2: null, dv1:null, dv2:null, sv1: '', sv2: '', 
 			sv3: null, sv4: null, sv5: null
 		},
-	]		
+	],
+	[
+		/* TEST CASE 4: existing isurance control  */
+		{	
+			block_id: 1470, attr_id: 1470, attr_name: 'Existing Insurance', attr_type: 52, 
+			attr_label: '', attr_question: 'Existing Insurance', sequence_id: 0,
+			iv1: null, iv2: null, dv1:null, dv2:null, sv1: '', sv2: '', 
+			sv3: null, sv4: null, sv5: null
+		},
+		/* TEST CASE 4: file upload control  */
+		{	
+			block_id: 2200, attr_id: 2200, attr_name: 'Existing Insurance', attr_type: 200, 
+			attr_label: 'Upload Your Passport Image File', attr_question: 'File Attachment', sequence_id: 1,
+			iv1: null, iv2: null, dv1:null, dv2:null, sv1: '', sv2: '', 
+			sv3: null, sv4: null, sv5: null
+		},
+	]			
 ];
 
 /**
@@ -99,6 +116,7 @@ const Test_Data = [
 class QuestionAnswerTester extends HomeAndWizardHeader {
 	#applicationMan;
 	#currentBlockIsDynamic;
+	#messagingPanel;
 	
     constructor(credMan) {
 		super(credMan); 
@@ -115,15 +133,15 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 		// when 'Next button' is clicked
 		$('#fm_wz_next_block_button2').click(this.handleNextQuestionBlock.bind(this));
 		
-		// when 'more' button is clickec
-		$('#fm_wz_duplicate_block_button').click(this.handleDuplicateBlock.bind(this));
-		
 		// when 'Back' or '<' button is clicked
 		$('#fm_wz_prev_block_button').click(this.handlePrevQuestionBlock.bind(this));
 		$('#fm_wz_prev_block_button2').click(this.handlePrevQuestionBlock.bind(this));
 		
+		// send a chat message to server
+		$('#fm_div_chats_send').click(this.handleChatSend.bind(this));
 		
 		// start testing
+		
 		$('#fm_wz_test_button').click(this.handleTest.bind(this));
 		
 		// start validating and saving
@@ -141,13 +159,22 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
 		const appId = 89898990;
 		this.#applicationMan =  new ApplicationPipelineManager(sessionStore, appId);
+		
+		// fill messages
+		this.#messagingPanel = new MessagingPanel(100, appId);
+		
+		const msgHtml = await this.#messagingPanel.getMessages();
+		if (msgHtml) {
+			$('#fm_div_chats').append(msgHtml);
+		}
+		
 	}
 	
-	handleTest(e) {
+	async handleTest(e) {
 		e.preventDefault();
 		const testCase = $('#test_case_select').val();
 		this.qAndAManager = new ApplicationQAndAManager();
-		const qHtml = this.qAndAManager.getUserQustionHtml(Test_Data[testCase]);
+		const qHtml = await this.qAndAManager.getUserQustionHtml(Test_Data[testCase]);
 		// then set the html for all the questions of the block
 		$('#user_question_block').html(qHtml);
 		this.hookUpEvents(this.qAndAManager);
@@ -183,6 +210,18 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 		// now hook up all the input elements event handlers for 
 		inputElements.forEach(e => e.onChangeEvent());
 	}
+	
+	async handleChatSend(e) {
+		e.preventDefault();
+		const msg = $('#fm_div_chats_msg_textarea').val();
+		if (msg) {
+			const msgHtml = await this.#messagingPanel.sendMsg(1, msg);
+			if (msgHtml) {
+				$('#fm_div_chats').append(msgHtml);
+			}
+		}
+	}
+	
 	/**
 		Start the application wizard (or pipeline) by getting data for initial block.
 	**/
@@ -240,7 +279,7 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 	//
 	async handleNextQuestionBlock(e) {
 		e.preventDefault();
-		await this.handleNextQuestionBlockInternal(false);
+		await this.handleNextQuestionBlockInternal();
 	}
 	
 	// When user clicks 'more', we need to call
@@ -257,10 +296,10 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 	//		2) save the questions to server
 	//		3) populate the next block questions or conclude
 	//
-	async handleNextQuestionBlockInternal(duplicateBlock) {
+	async handleNextQuestionBlockInternal() {
 		// validate and save the current block of question answers
 		const canMove = 
-		   await this.#applicationMan.validateAndSaveCurrentBlock(this.credMan.credential.token, duplicateBlock);
+		   await this.#applicationMan.validateAndSaveCurrentBlock(this.credMan.credential.token);
 		
 		// get next block of questions
 		if (canMove) {

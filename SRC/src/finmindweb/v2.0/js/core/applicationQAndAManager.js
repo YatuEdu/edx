@@ -10,6 +10,7 @@ import {UserNameQuestion}						from './q_name.js'
 import {UserAdressQuestion}						from './q_address.js'
 import {UserDecimalQuestionText}				from './q_decimal.js'
 import {UserCompositeControlWithTwoDropdowns} 	from './q_composite_control_with_two_dropdowns.js'
+import {FileUpload}								from './q_upload.js'
 import {Net}          							from './net.js';
 import {MetaDataManager}						from './metaDataManager.js'
 import {UIComponentFactory}						from './componentFactory.js';
@@ -25,10 +26,13 @@ const q_template_question_block = `
 const q_template_question = `
 <div class="row g-0 px-3 px-md-0">
   <div class="col-10 col-md-10">
-	<h3 class="mb-0 font-weight-bold">{q_text}</h3>
+	<label class="form-label">{q_text}</label>
   </div>
 </div>
 {q_html}`;
+
+const ATTR_FOR_INCOME = 1402;
+const ATTR_FOR_NETWORTH =  1403;
 
 const replacementForQText = '{q_text}';
 const replacementForQHtml = '{q_html}';
@@ -81,7 +85,7 @@ class ApplicationQAndAManager {
 		Form question/answer UI by dynamically generate HTML block based
 		on the questions obtained from server.
 	**/
-	getUserQustionHtml(qList) {
+	async getUserQustionHtml(qList) {
 		// from finMind API
 		if (!qList || 
 			 qList.length == 0 || 
@@ -106,7 +110,7 @@ class ApplicationQAndAManager {
 		// and make each question forms its onw html div element:
 		this.#quesionList = [];
 		for(let i = 0; i < qListSorted.length; ++i) {
-			const q = this.prv_createQuestion(qListSorted[i]);
+			const q = await this.prv_createQuestion(qListSorted[i]);
 			this.#quesionList.push(q);
 		}	
 		
@@ -130,12 +134,12 @@ class ApplicationQAndAManager {
 		To create question class instance by json format from
 		service API Calls
 	**/
-	prv_createQuestion(qInfo) {
+	async prv_createQuestion(qInfo) {
 		let qObj = null;
 		
 		switch(qInfo.attr_type) {
 			case 1:
-				qObj = new UserIntegerQuestionText(qInfo, 1, 10000000); 
+				qObj = this.createIntegerField(qInfo); 
 				break;
 				
 			case 2:
@@ -207,7 +211,19 @@ class ApplicationQAndAManager {
 				break;
 			
 			case 50:
-				qObj = this.createBeneficiaryControl(this.#appId, qInfo);
+				qObj = await this.createBeneficiaryControl(this.#appId, qInfo, false);
+				break;
+				
+			case 51:
+				qObj = await this.createBeneficiaryControl(this.#appId, qInfo, true);
+				break;
+				
+			case 52:
+				qObj = await this.createExistingIsuranceControl(this.#appId, qInfo);
+				break;
+				
+			case 200:
+				qObj = await this.createFileuploadControl(this.#appId, qInfo);
 				break;
 				
 			default:
@@ -219,8 +235,22 @@ class ApplicationQAndAManager {
 	/*
 		Create beneficiary composite control
 	*/
-	createBeneficiaryControl(appId, qInfo) {
-		return UIComponentFactory.createBeneficiaryControl(appId, qInfo);
+	async createBeneficiaryControl(appId, qInfo, isContingent) {
+		return await UIComponentFactory.createBeneficiaryControl(appId, qInfo, isContingent);
+	}
+	
+	/*
+		Create Existing Isurance Composite Control
+	*/
+	async createExistingIsuranceControl(appId, qInfo) {
+		return await UIComponentFactory.createExistingIsuranceControl(appId, qInfo);
+	}
+	
+	/*
+		Create file upload control
+	 */
+	async createFileuploadControl(appId, qInfo) {
+		return await new FileUpload(qInfo, appId, appId, appId);
 	}
 	
 	/*
@@ -229,6 +259,23 @@ class ApplicationQAndAManager {
 	*/
 	createTextField(qInfo) {
 		return UIComponentFactory.createTextField(qInfo);
+	}
+	
+	/*
+		Create integer field by types, some have icons associated with it or $ sign prepended
+		
+	*/
+	createIntegerField(qInfo) {
+		let isUSD = false;
+		switch (qInfo.attr_id) {
+			case ATTR_FOR_INCOME:
+			case ATTR_FOR_NETWORTH:
+				isUSD = true;
+				break;
+			default:
+				break;
+		}
+		return new UserIntegerQuestionText(qInfo, 0, 0, isUSD);
 	}
 	
 	/**

@@ -4,39 +4,21 @@ import {UserBeneficiaryComponent} 	from './q_beneficiary_component.js'
 
 const replacementForComponents = '{components_html}';
 
-const DEFAULT_NO_BENEFICIARY = 5;
 const MAX_NO_BENEFICIARY = 20;
 const DEFAULT_BENEFICIARY_RELATION = 'Child';
 const DEFAULT_BENEFICIARY_PCT =  20;
 const MAX_BENEFICIARY_PCT =  100;
 
 const q_template_beneficiaries_list = `
-<div class="row g-0 px-3 px-md-0">
-  <div class="col">
-	<label>Name</label>
-  </div>
-  <div class="col">
-	<label>Relationship</label>
-  </div>
-  <div class="col">
-	<label>Date of Birth</label>
-  </div>
-  <div class="col">
-	<label>SSN</label>
-  </div>
-  <div class="col">
-	<label>Percent</label>
-  </div>
-  <div class="col">
-	<label>Action</label>
-  </div>
-</div>
 <div id="fm_wz_div_bene_components_container">
 {components_html}
 </div>
 <div class="row g-0 px-3 px-md-0">
   <div class="col">
-	<button id="fm_wz_btn_add_more">Add more</button>
+	<a id="fm_wz_btn_add_more" class="btn btn-success btn-sm py-0 rounded-pill d-inline-flex ms-3">
+	  <img src="img/ico-add-btn.svg" class="me-1">
+		Add New
+	</a>
   </div>
   <div class="col">
 	<label>Number of beneficiaries to add</label>
@@ -49,21 +31,27 @@ const q_template_beneficiaries_list = `
 class UserBeneficiaryControl extends UserQuestionBase {  
     _beneficiaryList;			// list of current beneficiaries
 	_beneficiaryControlList;	// list of current beneficiaries
-	
-    constructor(qInfo, beneficiaryList){  
+	#defaultNoOfBeneficiary;
+	#minimumNoOfBeneficiary;
+	 
+    constructor(qInfo, beneficiaryList, defaultNoOfBeneficiary, minimum){  
         super(qInfo);  
+		this.#defaultNoOfBeneficiary = defaultNoOfBeneficiary;
+		this.#minimumNoOfBeneficiary = minimum;
 		this._beneficiaryList  = beneficiaryList ? beneficiaryList : [];
 		this._beneficiaryControlList = [];
 		const len = this._beneficiaryList.length;
 		
 		// add control for existing beneficiaries
+		let canRemove =  false;
 		for (let i = 0; i < len; i++) {
-			const component = new UserBeneficiaryComponent(this._beneficiaryList[i], qInfo.attr_id, i);
+			const component = new UserBeneficiaryComponent(this._beneficiaryList[i], qInfo.attr_id, i, canRemove);
+			canRemove = true;
 			this._beneficiaryControlList.push(component);
 		}
 		// add more if needed
-		if (DEFAULT_NO_BENEFICIARY > len) {
-			this.addMoreBeneficiaryComponents(DEFAULT_NO_BENEFICIARY - len);
+		if (len === 0) {
+			this.addMoreBeneficiaryComponents(this.#defaultNoOfBeneficiary);
 		}
     }  
 	
@@ -77,6 +65,14 @@ class UserBeneficiaryControl extends UserQuestionBase {
 		const leftPct = MAX_BENEFICIARY_PCT - existingPct;
 		const eachPct = leftPct > 0 ? leftPct / noBeneficiary : 0;
 		const existingCompNo = this._beneficiaryControlList.length;
+		
+		// for beneficiary, there need to be at least one
+		// for contingent beneficiary, there is no minimum restriction
+		let canRemove = false;
+		if (this.#minimumNoOfBeneficiary == 0 || existingCompNo > 0 ) {
+			canRemove = true;
+		}
+			
 		for (let i = 0; i < noBeneficiary; i++) {
 			const beneficiary = {name: '', 
 					relation: DEFAULT_BENEFICIARY_RELATION,
@@ -85,7 +81,8 @@ class UserBeneficiaryControl extends UserQuestionBase {
 					pct: eachPct,
 			};
 			
-			const component = new UserBeneficiaryComponent(beneficiary, this.qInfo.attr_id, existingCompNo+i);
+			const component = new UserBeneficiaryComponent(beneficiary, this.qInfo.attr_id, existingCompNo+i, canRemove);
+			canRemove = true;
 			this._beneficiaryControlList.push(component);
 			
 			// also add to output list if provides
@@ -97,7 +94,7 @@ class UserBeneficiaryControl extends UserQuestionBase {
 	
 	getPCT() {
 		let pct = 0;
-		this._beneficiaryControlList.forEach( b => pct += b._pct);
+		this._beneficiaryControlList.forEach( b => pct += b.pct);
 		return pct;
 	}
 	
@@ -137,12 +134,18 @@ class UserBeneficiaryControl extends UserQuestionBase {
 	// from the page.
 	onValidating() {
 		let ret = true;
-		for (let i = 0; i < _beneficiaryControlList.length; i++) {
-			if (!_beneficiaryControlList.onValidating()) { 
-				ret = false;
+		for (let i = 0; i < this._beneficiaryControlList.length; i++) {
+			if (!this._beneficiaryControlList[i].onValidating()) { 
+				alert('Missing data!');
+				return false;
 			}
 		}
-		return this.getPCT() == MAX_BENEFICIARY_PCT;
+		if (this.#minimumNoOfBeneficiary > 0 && this.getPCT() !== MAX_BENEFICIARY_PCT ) {
+			alert('Total percentage should be 100');
+			return false;
+		}
+		
+		return true;
 	}
 	
 	// Method for hooking up event handler to handle individule conment events
@@ -169,8 +172,8 @@ class UserBeneficiaryControl extends UserQuestionBase {
 	// Handle removal for one beneficiary
 	handleRemove(e) {
 		// cannot remove the last one
-		if (this._beneficiaryControlList.length < 2) {
-			alert("You need at least one beneficiary");
+		if (this._beneficiaryControlList.length <= this.#minimumNoOfBeneficiary) {
+			alert("You need at least " + this.#minimumNoOfBeneficiary + " beneficiary");
 			return;
 		}
 		
@@ -228,14 +231,23 @@ class UserBeneficiaryControl extends UserQuestionBase {
 	get serverXML() {
 		const tagCounterMap = {};
 		let ret =
-`<list>
-<id>${this.id}</id>`;	
+			`<qa>
+			<id>${this.id}</id>
+			<list>`;	
 
 		// get elements for all beneficiaries
-		this._beneficiaryControlList.forEach(
-			c => ret += c.serverXML
-		);
-		ret += '</list>';
+		if (this._beneficiaryControlList.length > 0) {
+			// append sub-element nodes
+			this._beneficiaryControlList.forEach(
+				c => ret += c.serverXML
+			);
+		}
+		else {
+			// empty sub-elements
+			ret += '<e/>';
+		}
+		
+		ret += '</list></qa>';
 		return ret;
 	}
 }  
