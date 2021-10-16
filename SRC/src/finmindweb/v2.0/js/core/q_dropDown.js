@@ -36,13 +36,18 @@ class UserDropdownSelection extends UserQuestionBase {
     constructor(qInfo, enumValues, childId, noLabel){  
         super(qInfo, childId);  
         this._enumValues = enumValues; 
-		this._value = qInfo.sv1;
+		this._value = qInfo.sv1 ? qInfo.sv1 : this._enumValues[0];
 		this._noLable = noLabel;
     }  
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
+		// no need for validation is it is not visible
+		if (!this.visible) {
+			return true;
+		}
+		
 		if (this._value && this._value.indexOf(MetaDataManager.dropDownNoneSelection) == -1) {
 			return true;
 		}

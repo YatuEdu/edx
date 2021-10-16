@@ -34,11 +34,13 @@ class PipelineManager {
 		// Obtain the list for every newly appended input elements
 		const inputElements = this._qAndAManager.currentQuestions;
 		
+		// now hook up all the input elements event handlers for 
+		inputElements.forEach(e => e.onChangeEvent());
+		
 		// now set the input value (or selection) if any
 		inputElements.forEach(e => e.setDisplayValue());
 		
-		// now hook up all the input elements event handlers for 
-		inputElements.forEach(e => e.onChangeEvent());
+		
 	}
 	
 	/**

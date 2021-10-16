@@ -8,6 +8,8 @@ const sysConstants = {
 	// tokn valid minutes
 	FINMIND_TOKEN_VALID_IN_MIN: 59,
 	
+	// Max upload file sizeToContent
+	MAX_FILE_SIZE:	40 * 1024 * 1024,
 };
 
 const stringConstants = {

@@ -223,7 +223,7 @@ class ApplicationQAndAManager {
 				break;
 				
 			case 200:
-				qObj = await this.createFileuploadControl(this.#appId, qInfo);
+				qObj = await this.createFileuploadControl(qInfo, this.#appId);
 				break;
 				
 			default:
@@ -249,8 +249,8 @@ class ApplicationQAndAManager {
 	/*
 		Create file upload control
 	 */
-	async createFileuploadControl(appId, qInfo) {
-		return await new FileUpload(qInfo, appId, appId, appId);
+	async createFileuploadControl(qInfo, appId) {
+		return await new FileUpload(qInfo, appId);
 	}
 	
 	/*

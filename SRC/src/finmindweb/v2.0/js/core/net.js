@@ -2,7 +2,7 @@ import {sysConstants} from './sysConst.js'
 
 const API_FOR_BENEFICIARY_INFO = 2021819;
 const API_FOR_CONTINGENT_BENEFICIARY_INFO = 2021821;
-const API_FOR_FILE_UPLOAD = 2021818;
+const API_FOR_FILE_UPLOAD = 2021818; 
 const API_FOR_MESSAGE_RETRIEVAL = 2021823;
 const API_FOR_MESSAGE_SENDING = 2021824;
 
@@ -10,6 +10,8 @@ const FILE_UPLOAD_OP = 1;
 const FILE_LIST_OP = 2;
 const FILE_DOWNLOAD_OP = 3;
 const FILE_DELETE_OP = 4;
+
+const EMPTY_FILE_NAME = '';
 
 class Net {
 	/**
@@ -151,7 +153,7 @@ class Net {
 	}
 	
 	/**
-	 *  API for file uploading, deletion, and listing service
+	 *  API for file uploading
 	 *	operation:
 	 *     1 upload
 	 *     2 list
@@ -159,7 +161,65 @@ class Net {
 	 *     4 delete
 	 */
 	static async fileUpload(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
-		const req = Net.composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, FILE_UPLOAD_OP);
+		const req = Net.composeRequestDataForFileOperation_private(
+						t, uploadFileName, 
+						pipleLineKey, appKey,
+						conversationKey, 
+						FILE_UPLOAD_OP);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+	 *  API for file listing
+	 *	operation:
+	 *     1 upload
+	 *     2 list
+	 *     3 download
+	 *     4 delete
+	 */
+	static async getUploadedFiles(t, pipleLineKey, appKey, conversationKey) {
+		const req = Net.composeRequestDataForFileOperation_private(
+						t, EMPTY_FILE_NAME, 
+						pipleLineKey, appKey, 
+						conversationKey, 
+						FILE_LIST_OP);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+	 *  API for file removal
+	 *	operation:
+	 *     1 upload
+	 *     2 list
+	 *     3 download
+	 *     4 delete
+	 */
+	static async deleteUploadedFiles(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
+		const req = Net.composeRequestDataForFileOperation_private(
+						t, uploadFileName, 
+						pipleLineKey, appKey, 
+						conversationKey, 
+						FILE_DELETE_OP);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+	 *  API for file downloading
+	 *	operation:
+	 *     1 upload
+	 *     2 list
+	 *     3 download
+	 *     4 delete
+	 */
+	static async downloadUploadedFiles(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
+		const req = Net.composeRequestDataForFileOperation_private(
+						t, uploadFileName, 
+						pipleLineKey, appKey, 
+						conversationKey, 
+						FILE_DOWNLOAD_OP);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}

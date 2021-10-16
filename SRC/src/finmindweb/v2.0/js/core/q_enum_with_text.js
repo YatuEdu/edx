@@ -10,24 +10,24 @@ const replacementForRadio = '{radio}';
 const replacementForText = '{txt}';
 
 const q_template_enum_text_group = `
-<div class="mb-4">
+<div class="mb-4 enum_with_text">
 	{radio}
 </div>
-<div class="row g-0 px-3 px-md-0">
+<div class="mb-4">
 	{txt}
 </div>
 `;
 
 const q_template_enum = `
-<div class="col">
-	<input type="radio" data-name="Radio 5" name="{nm}" value="{vl}">
-	<span class="radio-button-label-2 w-form-label">{vl}</span>
+<div class="form-check form-check-inline me-5">
+	<input class="form-check-input" type="radio" data-name="Radio 5" name="{nm}" value="{vl}">
+	<label class="form-check-label" for="">{vl}</label>
 </div>`;
 
 const q_template_enum_text = `
 <div class="col" id="div_with_text_{id}">
-	<label>{lb}</label>
-	<input type="text" id="tx_addtional_text_input_{id}" class="fm_text_input" data-seq="1" value="" maxlength="32"/>
+	<label for="enum_text" class="form-label">{lb}</label>
+	<input type="text" id="tx_addtional_text_input_{id}" class="form-control form-control-lg" data-seq="1" value="" maxlength="32"/>
 </div>
 `;
 

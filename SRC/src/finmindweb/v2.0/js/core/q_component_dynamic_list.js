@@ -16,22 +16,18 @@ const  q_template_header =`
  
   
 const q_template_component_list = `
-<div class="row g-0 px-3 px-md-0">
-{headers}
-</div>
-<div id="fm_wz_div_component_list">
-{components_html}
+<div class="row gx-5 gy-4 bg-white shadow my-5 p-4 position-relative" id="fm_wz_div_component_list">
+   {components_html}
 </div>
 <div class="row g-0 px-3 px-md-0">
   <div class="col">
-	<button id="fm_wz_btn_add_more">Add more</button>
+	<a id="fm_wz_btn_add_more" class="btn btn-success btn-sm py-0 rounded-pill d-inline-flex ms-3">
+		<img src="img/ico-add-btn.svg" class="me-1">
+		Add New
+	</a>											
   </div>
-  <div class="col">
-	<label>Number of beneficiaries to add</label>
-    <input id="fm_wz_int_more" type="number" size="3" min="1"  max="10" step="1" value="1"/>
-  </div>
- </div>
-</div>`;
+</div>
+`;
 
 class ComponentListControl extends UserQuestionBase {  
  	#elementControlList;	// list of current components
@@ -118,7 +114,7 @@ class ComponentListControl extends UserQuestionBase {
 			return;
 		}
 		const outList = [];
-		const noAdd = $('#fm_wz_int_more').val();
+		const noAdd = 1;
 		this.addMoreComponents(noAdd, outList);
 		
 		// display newly added components:
@@ -221,12 +217,6 @@ class ComponentListControl extends UserQuestionBase {
 	get displayHtml() {
 		let blockHtml ='';
 		let headersHtml ='';
-		// get header labels
-		for (let i = 0; i < this.v_numberOfHeaders; i++ ) {
-			const header = this.v_getHeaderLable(i);
-			headersHtml += q_template_header
-								.replace(replacementForHeaderLabel,header); 
-		}
 		
 		// combine sub-control html into an entire HTML
 		for (let i = 0; i < this.#elementControlList.length; i++ ) {
@@ -234,7 +224,6 @@ class ComponentListControl extends UserQuestionBase {
 								.displayHtml;
 		}
 		let htmlStr = q_template_component_list
-								.replace(replacementForHeaders, headersHtml)
 								.replace(replacementForComponents,blockHtml);
 		
 		return htmlStr; 

@@ -9,6 +9,9 @@ class UserQuestionBase {
 	// defined if it is a sub-component of a composite control
 	#childId;  
 	
+	// show or hide
+	#visible;  
+	
 	/**
 		public methods
 	**/
@@ -24,6 +27,7 @@ class UserQuestionBase {
     constructor(qInfo, childId) {
 		this.#qInfo = qInfo;
 		this.#childId = childId;
+		this.#visible = true;
 	}
 	
 	// virtual method for hooking up event handler to handleEvent
@@ -55,14 +59,21 @@ class UserQuestionBase {
 		this.showOrHide(false);
 	}
 	
+	// is showing?
+	get visible() {
+		return this.#visible;
+	}
+	
 	// SHOW or HIDE the control (wrapped by a div)
 	showOrHide(display) {
 		const selector = `#${this.wrapperDivId}`;
 		if (display) {
 			$(selector).show();
+			this.#visible = true;
 		}
 		else {
-			$(selector).hide()
+			$(selector).hide();
+			this.#visible = false;
 		}
 	}
 	
@@ -85,6 +96,13 @@ class UserQuestionBase {
 	
 	// property getter for question id 
 	get id() {
+		let id = '';
+		if (this.#childId) {
+			id = `${this.#qInfo.attr_id}_${this.#childId}`;
+		}
+		else {
+			id = this.#qInfo.attr_id;
+		}
 		return this.#qInfo.attr_id;
 	}
 	

@@ -11,22 +11,41 @@ const replacementForInsElement  = '{rel_option_ins_company}';
 const replacementForReplaceElement  = '{rel_option_replace}';
 const replacementForPolNoElement  = '{polno}';
 const replacementForInsNameElement  = '{insname}';
+const replacementForDelBtn = '{del-btn}';
+const replacementForId = '{id}';
+
 const INSNAME = 1;
 const POLICY = 2;
 const REPLACE = 3;
 const YES = 'Yes';
 const NO = 'No';
 
+const q_template_delete_button = `
+<div class="text-end position-absolute top-0 end-0 translate-middle-y">
+	<a id="fm_wz_btn_remove_element_{id}" 
+	   class="btn btn-danger btn-sm py-0 rounded-pill d-inline-flex fm_wz_btn_clss_remove_one_component">
+		<img src="img/ico-delete-btn.svg" class="me-1">
+		Delete
+	</a>
+</div>`;
+
+
 const q_templete_dyn_list_column = `
-<div class="col">
-  <input type="text" id="{sbelemidn}" class="fm_text_input" value="{insname}" size="16" maxlength="32"/>
+<div id="dynlist_element_row_{id}" class="row gx-5 gy-4 bg-white shadow my-4 p-4 position-relative">
+  {del-btn}
+ <div class="col-4">
+  <label for="CompanyName" class="form-label">Company Name</label>
+  <input type="text" id="{sbelemidn}" class="form-control form-control-lg" placeholder="Please enter" value="{insname}" size="16" maxlength="32"/>
  </div>
- <div class="col">
-	<input type="text" id="{sbelemidp}" class="fm_text_input" value="{polno}" size="16" maxlength="32"/>
+ <div class="col-4">
+    <label for="PolicyNumber" class="form-label">Policy Number</label>
+	<input type="text" id="{sbelemidp}" class="form-control form-control-lg" placeholder="Please enter" value="{polno}" size="16" maxlength="32"/>
  </div>
- <div class="col">
+ <div class="col-4">
+  <label for="Replaced" class="form-label">Replaced</label>
   {rel_option_replace}
  </div>
+</div>
  `;
  
 class InsuranceInfoComponent extends DynamicListElement {  
@@ -45,7 +64,7 @@ class InsuranceInfoComponent extends DynamicListElement {
 		const id3 = this.subElementId(REPLACE);
 		const replaceStr = insData.replace? YES : NO;
 		const replaceInfo = {attr_id: id3, attr_name: "ssn", attr_label: "", sv1: replaceStr};
-		this.#replace = new UserDropdownSelection(replaceInfo, MetaDataManager.enumMap.get(YESNO_ENUM_ID), 0);
+		this.#replace = new UserDropdownSelection(replaceInfo, MetaDataManager.enumMap.get(YESNO_ENUM_ID), 0, true);
 	}	
 	
 	/*
@@ -53,7 +72,11 @@ class InsuranceInfoComponent extends DynamicListElement {
 	*/
 	
 	v_getHtml() {
+		let del = q_template_delete_button
+					.replace(replacementForId,this.controlId);
+		
 		return q_templete_dyn_list_column
+					.replace(replacementForDelBtn, del)
 					.replace(replacementForSubElementIdName, this.subElementId(INSNAME))
 					.replace(replacementForSubElementIdPolicy, this.subElementId(POLICY))
 					.replace(replacementForReplaceElement, this.#replace.displayHtml)
@@ -117,7 +140,7 @@ class InsuranceInfoComponent extends DynamicListElement {
 	set policyNo(pn) {
 		this.#policyNo = pn;
 	}
-	
+
 	// get the components in xml format for sending to finMind 
 	// API server
 	get serverXML() {

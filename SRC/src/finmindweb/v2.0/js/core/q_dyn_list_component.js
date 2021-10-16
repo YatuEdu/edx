@@ -7,9 +7,6 @@ const REMOVE_BTN_CLASS = 'fm_wz_btn_clss_remove_one_component';
 const q_templete_dyn_list_column = `
 <div id="dynlist_element_row_{id}" class="row g-0 px-3 px-md-0">
 	{elem_clmn_html}
-  <div class="col">
-	<button id="fm_wz_btn_clss_remove_element_{id}" class="{rmbtnclss}">R</button>
-  </div>
 </div>
 `;
 
@@ -52,7 +49,7 @@ class DynamicListElement {
 	}
 	
 	get removeButtonId() {
-		return `fm_wz_btn_clss_remove_element_${this.controlId}`;
+		return `fm_wz_btn_remove_element_${this.controlId}`;
 	}
 	
 	get rowId() {

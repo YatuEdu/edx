@@ -7,6 +7,7 @@ import {WizardPipelineManager} 		from '../core/wizardPipelineManager.js';
 import {HomeAndWizardHeader} 		from './../pages/header.js';
 import {ApplicationQAndAManager}	from '../core/applicationQAndAManager.js'
 import { MessagingPanel } 			from '../core/messagingPanel.js'
+import {UploadedFileListPanel}		from '../core/fileListPanel.js';
 
 // test data
 const Test_Data = [
@@ -117,6 +118,7 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 	#applicationMan;
 	#currentBlockIsDynamic;
 	#messagingPanel;
+	#filePanel;
 	
     constructor(credMan) {
 		super(credMan); 
@@ -139,6 +141,9 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 		
 		// send a chat message to server
 		$('#fm_div_chats_send').click(this.handleChatSend.bind(this));
+		
+		// upload a file to server
+		$('#fm_div_chats_file_upload').click(this.handleFileUpload.bind(this));
 		
 		// start testing
 		
@@ -168,6 +173,15 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 			$('#fm_div_chats').append(msgHtml);
 		}
 		
+		// fill uploaded files
+		this.#filePanel = new UploadedFileListPanel(appId);
+		
+		const flHtml = await this.#filePanel.getUploadedFiles();
+		if (flHtml) {
+			$('#fm_ul_uploaded_files').html(flHtml);
+		}	
+		// hook up file delete and download events handler
+		this.#filePanel.changeEvent();
 	}
 	
 	async handleTest(e) {
@@ -220,6 +234,10 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 				$('#fm_div_chats').append(msgHtml);
 			}
 		}
+	}
+	
+	async handleFileUpload(e) {
+		e.preventDefault();
 	}
 	
 	/**

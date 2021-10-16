@@ -1,11 +1,11 @@
-import {UserQuestionBase} from './q_base.js';
-import {StringUtil} from './util.js';
-import {MetaDataManager} from './metaDataManager.js';
-import {credMan} from '../core/credManFinMind.js';
-import {Net} from '../core/net.js';
-import {sysConstants} from '../core/sysConst.js';
+import {UserQuestionBase} 	from './q_base.js';
+import {StringUtil} 		from './util.js';
+import {MetaDataManager} 	from './metaDataManager.js';
+import {FileUploadUtil} 	from './fileUploadUtil.js'
 
 const replacementForId = '{id}';
+const replacementForLabel = '{lb}';
+const replacementForFileList = '{f_upld_lst}';
 
 const q_resultIconSuccess = `
 <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,179 +22,153 @@ const q_resultIconFailed = `
 </svg>
 `;
 
-const q_template_text = `
-<h6 id="label{id}" class="mb-3"></h6>
-<div id="fileArea" class="upload-drag-area p-4 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
-	<input type="file" id="fileInput{id}" name="upfile" class="d-none">
+const q_template_for_all_files = `
+<div id="file_uplod_list_{id}">
+	{f_upld_lst}
+</div>`
+;
+const q_template_for_one_file = 
+`<h6 class="mb-3">{lb}</h6>
+<div id="file_area_{id}" class="upload-drag-area p-4 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
+	<input type="file" id="fileInput_{id}" name="upfile" class="d-none">
 	<img src="images/ico-upload-file.svg">
-	<div id="uploadButton{id}" class="fs-7 fw-bold text-body text-opacity-50">
+	<div id="upload_button_{id}" class="fs-7 fw-bold text-body text-opacity-50">
 		<a href="#" class="text-primary text-decoration-none">Browse</a>, or Drag& Drop your file here
 	</div>
 </div>
-<div id=progress{id}>
-	<div class="upload-drag-area p-4 mb-4 rounded-3 text-center d-flex align-items-center justify-content-between">
-	<img src="images/ico-file-pdf.svg">
+<div id=progress_div_{id}>
+  <div class="upload-drag-area p-4 mb-4 rounded-3 text-center d-flex align-items-center justify-content-between">
+    <img src="images/ico-file-pdf.svg">
 	<div class="flex-grow-1 mx-3">
 		<div class="d-flex justify-content-between fs-7 fw-bold mb-1">
-			<b id="fileName{id}" class="text-body text-opacity-50"></b>
-			<span id=progressNum{id} class="text-body text-opacity-25">100%</span>
+			<b id="fileName_{id}" class="text-body text-opacity-50"></b>
+			<span id=progress_num_{id} class="text-body text-opacity-25">100%</span>
 		</div>
 		<div class="progress" style="height: 6px;">
-		<div id=progressBar{id} class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+		<div id=progress_bar_{id} class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
 		</div>
 	</div>
-	<div id="resultIcon{id}">
+	<div id="progress_result_icon_{id}">
 	</div>
+  </div>
 </div>
-</div>
-`;
+`
+;
 
 class FileUpload extends UserQuestionBase {  
-	#credMan;
-	_id;
-	_label;
-	_applicationKey;
-	_pipelineKey;
-	_conversationKey;
-	
-    constructor(credMan, label, applicationKey, pipelineKey, conversationKey) {
-		super({});
-		this.#credMan = credMan;
-		// label 上传什么文件的提示
-		this._label = label;
-		this._applicationKey = applicationKey;
-		this._pipelineKey = pipelineKey;
-		this._conversationKey = conversationKey;
-		this._id = Math.floor(Math.random() * 1000000);
 
+	#applicationId;
+	#resultMap;
+	 
+    constructor(qInfo, applicationId) {
+		super(qInfo);
+		
+		// label 上传什么文件的提示
+		this.#applicationId = applicationId;
+		this.#resultMap = new Map();
     } 
 	
 	// Method for validating the result value upon moving away 
 	// from the page.
 	onValidating() {
-		if (this._value) {
-			return true;
+		const labels = this.label.split('*');
+		let i = 0;
+		for(; i < labels.length; i++) {
+			if (!this.#resultMap.get(i)) {
+				alert(`${labels[i]} not uploaded.`);
+				return false;
+			}
 		}
-		return false;
+		return true;
+	}
+	
+	getFileInputSelector(indx) {
+		return `#fileInput_${this.getIdPostfix(indx)}`;
+	}
+	
+	getUploadButtonSelector(indx) {
+		return `#upload_button_${this.getIdPostfix(indx)}`;
+	}
+	
+	getFileAreaSelector(indx) {
+		return `#file_area_${this.getIdPostfix(indx)}`;
+	}
+	
+	getProgressDivSelector(indx) {
+		return `#progress_div_${this.getIdPostfix(indx)}`;
+	}
+	
+	getProgressNumSelector(indx) {
+		return `#progress_num_${this.getIdPostfix(indx)}`;	
+	}
+	
+	getProgressBarSelector(indx) {
+		return `#progress_bar_${this.getIdPostfix(indx)}`;
+	}
+	
+	getProgressResultIconSelector(indx) {
+		return `#progress_result_icon_${this.getIdPostfix(indx)}`;
+	}
+	
+	getIdPostfix(indx) {
+		return `${this.qInfo.attr_id}_file${indx}`;
+	}
+	
+	/*
+		Generate anornymous event handlers for all the file buttons
+		within the file button array for our applicaion. Each callback
+		is a closure with all the information for showing progress and result.
+		
+		parameters:
+			fileInput 	- the file input control
+			indx		- id of the file input within the array
+	*/
+	createFileInputCallback(fileInput, fileDesignatedName, indx) {
+		const self = this;
+		const uploader = fileInput[0];
+		return async () => {
+			const refresh = (p, r, m) => self.refreshProgress(indx, p, r, m);
+			self.#resultMap.set(indx, false);
+			return await FileUploadUtil.handleUploadFile(uploader, fileDesignatedName, refresh, self.#applicationId);
+		}
 	}
 	
 	// Method for hooking up event handler to handle RADIO 
 	// selectioon change event
 	onChangeEvent() {
-		const self = this;
-		const fileLabel = `#label${this._id}`;
-		$(fileLabel).text(this._label);
-		const fileName = `#fileName${this._id}`;
-		$(fileName).html(this._label);
-		const fileInput = `#fileInput${this._id}`;
-		const uploadButton = `#uploadButton${this._id}`;
-		const fileArea = `#fileArea`;
-		let box = $(fileArea)[0];
-		const progress = `#progress${this._id}`;
-		$(progress).hide();
+		// create callback hanldes for all file input controls we have
+		// for this file list control
+		const labels = this.label.split('*');
+		for(let indx = 0; indx < labels.length; indx++) {	
+			const fileInputSelector = this.getFileInputSelector(indx);
+			const uploadButtonSelector = this.getUploadButtonSelector(indx);
+			const progressBar = this.getProgressBarSelector(indx);
+			
+			$(progressBar).hide();
 
-		$(uploadButton).click(e => {
-			$(fileInput).click();
-		});
+			$(uploadButtonSelector).click(e => {
+				$(fileInputSelector).click();
+			});
+			
+			// hook up the main event handler for uploadng the a file when file button is clicked
+			const fn = this.normalizeFileName(labels[indx]);
+			$(fileInputSelector).change(this.createFileInputCallback($(fileInputSelector), fn, indx));
+		}
+	}
 
-		$(fileInput).change(() => {
-			self.handleUploadFile($(fileInput)[0]);
-		});
-
-		$(function() { 
-			//阻止浏览器默认行。 
-			$(document).on({ 
-				dragleave:function(e){ //拖离 
-					e.preventDefault(); 
-				}, 
-				drop:function(e){  //拖后放 
-					e.preventDefault(); 
-				}, 
-				dragenter:function(e){ //拖进 
-					e.preventDefault(); 
-				}, 
-				dragover:function(e){ //拖来拖去 
-					e.preventDefault(); 
-				} 
-			}); 
-		}); 
+	refreshProgress(indx, progress, result, resultMsg) {
+		const progressDiv = this.getProgressDivSelector(indx);
+		const progressNum = this.getProgressNumSelector(indx);
+		const progressBar = this.getProgressBarSelector(indx);
+		const resultIcon = this.getProgressResultIconSelector(indx);
 		
-		box.addEventListener("drop",function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			let fileList = e.dataTransfer.files; //获取文件对象
-			if (fileList.length != 1) {
-				return false;
-			}
-			$(fileInput)[0].files=fileList;
-			self.handleUploadFile($(fileInput)[0]);
-		}, false);
-	}
-
-	async handleUploadFile(fileInput) {
-		if (fileInput.value == "") {
-			return;
-		}
-		let file = fileInput.files[0];
-		if (file.size <= 0 || file.size > (40 * 1024 * 1024)) {
-			this.refreshProgress(0, false, 'File size not meet the requirements');
-		} else {
-			this.refreshProgress(0, true, '');
-			let ret = await this.sendFileNameToServerBeforeUpload(file.name);
-			if (ret.code==null || ret.code==0) {
-				let resUrl = ret.data.url;
-				if (window.FileReader) {
-					var fReader = new FileReader();
-					var xhreq = this.createHttpRequest();
-					let self = this;
-					xhreq.onreadystatechange = function () {
-						if (xhreq.readyState == 4) {
-							if (xhreq.status == 200) {
-								self.refreshProgress(100, true, '');
-							} else {
-								var responseData = xhreq.responseText;
-								this.refreshProgress(0, false, responseData);
-								$(fileInput).val("");
-							}
-						}
-					}
-					fReader.onload = function (e) {
-						//xhreq.open("PUT","https://fdwebinsst-bkt1.s3.us-west-2.amazonaws.com/themiscellaneous/%E4%B8%ADpdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210524T060904Z&X-Amz-SignedHeaders=host&X-Amz-Expires=900&X-Amz-Credential=AKIA3O77ERYBPO3YO7XO%2F20210524%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=3bb3238522ae7b4feadc48aaf56e036d719df7b4cc0652abba9573fa5436dc34",true);
-						console.log("try send to url:\n" + resUrl);
-						xhreq.open("PUT", resUrl, true);
-
-						//xhreq.setRequestHeader("Content-Type", "application/octet-stream"); //流类型 ok
-						xhreq.setRequestHeader("Content-Type", "application/pdf"); //pdf类型 ok
-					//	xhreq.setRequestHeader("Content-Length", file.size);     //文件大小
-						xhreq.setRequestHeader("uploadfile_name", encodeURI(file.name)); //兼容中文
-						xhreq.send(fReader.result);
-					}
-					fReader.onprogress = function (e) {
-						//	uploadProgress.value = e.loaded*100/e.total;
-						console.log("progress: " + e.loaded*100/e.total);
-						self.refreshProgress(Math.round(e.loaded*100/e.total), true, '');
-					}
-					fReader.readAsArrayBuffer(file);
-				}
-			} else {
-				this.refreshProgress(0, false, ret.err);
-				$(fileInput).val("");
-			}
-		}
-
-
-	}
-
-	refreshProgress(progress, result, resultMsg) {
-		const progressDiv = `#progress${this._id}`;
-		const progressNum = `#progressNum${this._id}`;
-		const progressBar = `#progressBar${this._id}`;
 		$(progressNum).html(progress+'%');
 		$(progressBar).css("width", progress+"%");
-		const resultIcon = `#resultIcon${this._id}`;
+		
 		if (result==true) {
 			if (progress==100) {
 				$(resultIcon).html(q_resultIconSuccess);
+				this.#resultMap.set(indx, true);
 			} else {
 				$(resultIcon).html('');
 			}
@@ -217,7 +191,18 @@ class FileUpload extends UserQuestionBase {
 	
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {
-		let htmlStr = q_template_text.replace(new RegExp(replacementForId, 'g') ,this._id);
+		let uploadOne = '';
+
+		const labels = this.label.split('*');
+		for(let i = 0; i < labels.length; i++) {
+			const id = this.getIdPostfix(i);
+			uploadOne += q_template_for_one_file
+							.replace(new RegExp(replacementForId, 'g'), id)
+							.replace(replacementForLabel, labels[i]);
+		};
+		const htmlStr = q_template_for_all_files
+							.replace(new RegExp(replacementForId, 'g') ,this.id)
+							.replace(replacementForFileList, uploadOne);
 		return htmlStr;
 	}
 	
@@ -227,52 +212,13 @@ class FileUpload extends UserQuestionBase {
 		return ret;
 	}
 
-	/**
-	 * 1 upload, 2 list, 3 download, 4 delete
-	 */
-	async sendFileNameToServerBeforeUpload(uploadFileName) {
-		const requestData = {
-			header: {
-				token: this.#credMan.credential.token,
-				api_id: 2021818
-			},
-			data: {
-				pipelineKey: this._pipelineKey,
-				applicationKey: this._applicationKey,
-				conversationKey: this._conversationKey,
-				fileName: uploadFileName,
-				operationType: 1
-			}
-		};
-		const requestBody =  {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
-		};
-		const res = await Net.remoteCall(sysConstants.FINMIND_PORT, requestBody);
-		return res;
+	/*
+		Remove spaces within the file name and replace it with _
+	*/
+	normalizeFileName(fn) {
+		return fn.replace(new RegExp(' ', 'g'), '_');
 	}
-
-	createHttpRequest() {
-		var xmlHttp = null;
-		try {
-			// Firefox, Opera 8.0+, Safari
-			xmlHttp = new XMLHttpRequest();
-		} catch (e) {
-			// Internet Explorer
-			try {
-				xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
-			} catch (e) {
-				try {
-					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-				} catch (e) {
-					alert("您的浏览器不支持AJAX！");
-				}
-			}
-		}
-		return xmlHttp;
-	}
-
+	
 }  
 
 export { FileUpload };

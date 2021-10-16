@@ -138,93 +138,7 @@
 								<img src="img/ico-folders.svg" class="me-3">Uploaded Files
 							</div>
 							<div class="card-body p-0 overflow-auto" style="height: 0;">
-								<ul class="list-group list-group-flush list-group-files mx-3">
-									<li class="list-group-item justify-content-between align-items-center d-flex px-2">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-pdf.svg" >
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">user-journey-01.pdf</h6>
-												<span class="fs-8">2 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												604KB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" >
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Stock Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												2.2GB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" >
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												1.46MB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-zip.svg" >
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">3 min ago</span>
-											</div>
-										</div>
-										<div class="d-flex">
-											<a href="" class="me-2"><img src="img/ico-file-refresh.svg" ></a>
-											<span class="fs-8 border p-1 rounded fw-bold px-2 border-danger text-danger">Error</span>
-											
-										</div>
-									</li>
-									<li class="list-group-item justify-content-between align-items-center d-flex px-1">
-										<div class="d-flex align-items-start">
-											<img src="img/ico-file-jpg.svg" >
-											<div class="ms-3 me-2">
-												<h6 class="fs-7 mb-0">Optimised Photos</h6>
-												<span class="fs-8">7 days ago</span>
-											</div>
-										</div>
-										<div class="position-relative">
-											<b class="fs-8 border p-1 rounded fw-bold px-2">
-												929KB
-											</b>
-											<aside class="position-absolute end-0 top-50 translate-middle-y">
-												<a href="" class="btn-file-delete" title="Delete"></a>
-												<a href="" class="btn-file-download ms-2" title="Download"></a>
-											</aside>
-										</div>
-									</li>
+								<ul id="fm_ul_uploaded_files" class="list-group list-group-flush list-group-files mx-3">	
 								</ul>
 							</div>
 						</div>
@@ -267,7 +181,7 @@
 								</div>
 							</div>
 							<div class="card-footer bg-transparent d-flex">
-								<a href="" class="flex-shrink-0 mt-1">
+								<a href="#" id="fm_div_chats_file_upload" class="flex-shrink-0 mt-1">
 									<img src="img/ico-chat-upload.svg">
 								</a>
 								<div class="flex-grow-1 px-2">
