@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet"/>
+<title>FinMind</title>
+</head>
+<body>
+
+<nav id="fm-globalnav" class="navbar navbar-expand-lg fixed-top bg-white">
+	<div class="container">
+		<a class="navbar-brand p-0 m-0" href="index.html"><img src="img/logo.svg" class="img-fluid"></a>
+		<button class="navbar-toggler bg-primary navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="navbar-nav justify-content-center flex-grow-1">
+				<li class="nav-item px-2">
+					<a class="nav-link" href="index.html">Home</a>
+				</li>
+				<li class="nav-item px-2 dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarInsurance" data-bs-toggle="dropdown"  href="#">Insurance</a>
+					<div class="dropdown-menu dropdown-lg-menu w-100 rounded-0 border-0 px-0 px-lg-4"> 
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-lg-3 g-0">
+									<a href="Insurance.html" class="dropdown-item fm-globalnav-dropdown-item d-block text-wrap my-2">
+										<h6 class="fw-bold">Insurance-101</h6>
+										<p class="mb-0 fs-7">Beautiful & creative websites that help your business exceed the competition.</p>
+									</a>
+								</div>
+								<div class="col-lg-3 g-0">
+									<a href="" class="dropdown-item fm-globalnav-dropdown-item d-block text-wrap my-2">
+										<h6 class="fw-bold">Tax</h6>
+										<p class="mb-0 fs-7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+									</a>
+								</div>
+								<div class="col-lg-3 g-0">
+									<a href="" class="dropdown-item fm-globalnav-dropdown-item d-block text-wrap my-2">
+										<h6 class="fw-bold">For Immigrants</h6>
+										<p class="mb-0 fs-7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+									</a>
+								</div>
+								<div class="col-lg-3 g-0">
+									<a href="" class="dropdown-item fm-globalnav-dropdown-item d-block text-wrap my-2">
+										<h6 class="fw-bold">Senior Life</h6>
+										<p class="mb-0 fs-7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+									</a>
+								</div>
+								<div class="col-lg-3 g-0">
+									<a href="" class="dropdown-item fm-globalnav-dropdown-item d-block text-wrap my-2">
+										<h6 class="fw-bold">FAQ</h6>
+										<p class="mb-0 fs-7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				<li class="nav-item px-2">
+					<a class="nav-link" href="#">Products</a>
+				</li>
+				<li class="nav-item px-2">
+					<a class="nav-link active" href="#">Events</a>
+				</li>
+				<li class="nav-item px-2">
+					<a class="nav-link" href="#">About Us</a>
+				</li>
+			</ul>
+			<div class="dropdown position-relative me-4">
+				<a href="" class="position-relative" data-bs-toggle="dropdown">
+					<svg width="20" height="22" viewBox="0 0 20 22" xmlns="http://www.w3.org/2000/svg"><path d="M16 7A6 6 0 1 0 4 7c0 7-3 9-3 9h18s-3-2-3-9zm-4.27 13a1.999 1.999 0 0 1-3.46 0" stroke="#000" stroke-width="2" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<span class="position-absolute top-0 end-0 p-1 rounded-circle" style="transform: translate(-20%,-20%);background: #f00;"></span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+				</ul>
+			</div>
+			<div class="dropdown position-relative">
+				<a href="#" class="fs-6p fw-bold text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">Pete Cooper</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">Account</a></li>
+					<li><a class="dropdown-item" href="#">Settings</a></li>
+					<li><a class="dropdown-item" href="#">Sign out</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<div class="container my-4">
+	<div class="row justify-content-center mb-5">
+		<div class="col-12 text-center mb-4">
+			<h2 class="pb-0 mb-0">My Profile</h2>
+			<div class="text-end" style="margin-top: -1.5rem">
+				<a href="" class="fs-7 fw-bold">Change to Producer Account</a>
+			</div>
+		</div>
+	</div>
+	<div class="row justify-content-around">
+		<div class="col-5">
+			<div class="row mb-4">
+				<div class="col-4">
+					<label for="FirstName" class="form-label">First Name*</label>
+					<input type="text" class="form-control form-control-lg" id="FirstName" placeholder="John">
+				</div>
+				<div class="col-4">
+					<label for="MiddleName" class="form-label">Middle Name</label>
+					<input type="text" class="form-control form-control-lg" id="MiddleName" placeholder="Willam">
+				</div>
+				<div class="col-4">
+					<label for="LastName" class="form-label">Last Name*</label>
+					<input type="text" class="form-control form-control-lg" id="LastName" placeholder="Cooper">
+				</div>
+			</div>
+			<div class="mb-4">
+				<label for="DateofBirth" class="form-label">Date of Birth</label>
+				<div class="input-group">
+					<input type="text" class="form-control form-control-lg border-end-0" id="DateofBirth" placeholder="Please select"/>
+					<span class="input-group-text bg-transparent">
+						<svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3.004H2a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1v-20a1 1 0 0 0-1-1zM18 1.004v4M6 1.004v4M1 9.004h22" stroke="#1F1534" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</span>
+				</div>
+			</div>
+			<div class="mb-4">
+				<label for="Gender" class="form-label">Gender</label>
+				<select class="form-select form-control-lg">
+					<option selected="">Please select</option>
+				</select>
+			</div>
+			<div class="mb-4">
+				<label for="" class="form-label">Home Address</label>
+				<input type="text" class="form-control form-control-lg" placeholder="Please enter home address">
+				<input type="text" class="form-control form-control-lg mt-2" placeholder="Please enter home address">
+			</div>
+			<div class="row mb-4">
+				<div class="col-4">
+					<label for="City" class="form-label">City</label>
+					<input type="text" class="form-control form-control-lg" placeholder="City">
+				</div>
+				<div class="col-4">
+					<label for="State" class="form-label">State</label>
+					<input type="text" class="form-control form-control-lg" placeholder="State">
+				</div>
+				<div class="col-4">
+					<label for="ZIP Code" class="form-label">Zip Code</label>
+					<input type="text" class="form-control form-control-lg" placeholder="Zip Code">
+				</div>
+			</div>
+			<div class="mb-4">
+				<label for="Phone" class="form-label">Phone</label>
+				<input type="tel" class="form-control form-control-lg" placeholder="Enter Phone">
+			</div>
+			<div class="mb-4">
+				<label for="Email" class="form-label">Email</label>
+				<input type="email" class="form-control form-control-lg" placeholder="Enter Email">
+			</div>
+		</div>
+		<div class="col-5">
+			<div class="mb-4">
+				<label for="LicenseCurrentState" class="form-label">License Current State</label>
+				<div class="mt-2">
+					<span class="event-status py-2 px-4 fs-7 status-warning">
+						New License Under Review
+					</span>
+					<span class="event-status py-2 px-4 fs-7 status-info">
+						License in Use
+					</span>
+					<span class="event-status py-2 px-4 fs-7 status-danger">
+						License Update is Rejected
+					</span>
+					<span class="event-status py-2 px-4 fs-7 status-danger">
+						License Expired
+					</span>
+					<span class="event-status py-2 px-4 fs-7 status-danger">
+						License is Invalid
+					</span>
+				</div>
+			</div>
+			<div class="mb-4">
+				<label for="LicenseIssueState" class="form-label">License Issue State</label>
+				<select class="form-select form-control-lg">
+					<option selected="">Please select</option>
+				</select>
+			</div>
+			<div class="mb-4">
+				<label for="ExpireDate" class="form-label">Expire Date</label>
+				<div class="input-group">
+					<input type="text" class="form-control form-control-lg border-end-0" id="ExpireDate" placeholder="Please select"/>
+					<span class="input-group-text bg-transparent">
+						<svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3.004H2a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1v-20a1 1 0 0 0-1-1zM18 1.004v4M6 1.004v4M1 9.004h22" stroke="#1F1534" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</span>
+				</div>
+			</div>
+			<div class="mb-4">
+				<label for="LicenseNumber" class="form-label">License Number</label>
+				<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+			</div>
+		</div>
+		
+		<div class="col-12 col-lg-5">
+			<div class="row g-0 mt-5">
+				<div class="col-4">
+					<button type="button" class="btn btn-outline-secondary w-100">Cancel</button>
+				</div>
+				<div class="col-4 ms-auto">
+					<button type="button" class="btn btn-primary w-100">Confirm</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+<script src="js/laydate/laydate.js"></script>
+<script>
+	laydate.render({
+	  elem: '#DateofBirth'
+	  ,lang: 'en'
+	});
+	laydate.render({
+	  elem: '#ExpireDate'
+	  ,lang: 'en'
+	});
+</script>
+
+</body>
+</html>
