@@ -12,6 +12,13 @@ const q_template_date = `
 </div>
 `;
 
+const q_template_date_ro = `
+<div class="mb-4">
+	<label for="IssueDate" class="form-label">{lb}</label>
+	<span class="form-control form-control-lg">{vl}</span>
+</div>
+`;
+
 const ourDateFormat = 'MM/DD/YYYY';
 const dateFormat = [
     moment.ISO_8601,
@@ -93,7 +100,7 @@ class UserDateQuestion extends UserQuestionBase {
 		return moment(this._dateStr).format('YYYY-MM-DD');
 	}
 	
-	// get display html for the entire enum group in form of radio buttons
+	// get display html for the date control UI
 	get displayHtml() {
 		let htmlDateFormat = this.dateFromat;
 		
@@ -102,6 +109,13 @@ class UserDateQuestion extends UserQuestionBase {
 							.replace(replacementForValue, htmlDateFormat)
 							.replace(replacementForLabel, this.label);
 		return htmlStr; 
+	}
+	
+	// get read-only display html for the date control UI
+	get displayHtmlReadOnly() {
+		return	q_template_date_ro
+									.replace(replacementForLabel, this.label)
+									.replace(replacementForValue,this.dateFromat);
 	}
 	
 	// get the question in xml format for saving to API server

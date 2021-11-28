@@ -3,8 +3,11 @@ import {LocalStoreAccess} from './localStorage.js';
 import {Net} from './net.js';
 import {TimeUtil} from './util.js'
 
+const ROLE_AGENT = 'agent';
+const ROLE_ADMIN = 'admin';
+
 class CredentialManager {
-	#userCredInfo = {name: '', token: '', email: '', creationTime: null};
+	#userCredInfo = {name: '', token: '', email: '', creationTime: null, role: ''};
 	#authError;
 	#store;
 	
@@ -39,7 +42,7 @@ class CredentialManager {
 		}
 		else {
 			// got result in data:
-			this.update_cred({name: userName, token: ret.data[0].token, email: ''});
+			this.update_cred({name: userName, token: ret.data[0].token, email: '', role: ret.data[0].role});
 		}
 		return this.#authError;
 	}
@@ -100,7 +103,16 @@ class CredentialManager {
 		return this.#authError;
 	}
 	
+	// Is the principal agent?
+	get isAgent() {
+		return this.#userCredInfo.role === ROLE_AGENT;
+	}
 	
+	// Is the principal admin?
+	get isAdmin() {
+		return this.#userCredInfo.role === ROLE_ADMIN;
+	}
+		
 	/**
 		private methods
 	 **/

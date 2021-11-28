@@ -81,11 +81,25 @@ class ApplicationQAndAManager {
 		return htmlForBlock;
 	}
 	
-	/**
-		Form question/answer UI by dynamically generate HTML block based
-		on the questions obtained from server.
-	**/
-	async getUserQustionHtml(qList) {
+	getAnQHtmlDisplay() {
+		// form the question block HTML by enumerating each question
+		// and make each question forms its onw html div element:
+		let htmlForBlock = '' ;
+		let htmlStrForQuestions = '';
+		for(let i = 0; i < this.#quesionList.length; ++i) {
+			const q = this.#quesionList[i];
+			htmlStrForQuestions +=  q_template_question
+						.replace(replacementForQText, q.qInfo.attr_question)
+						.replace(replacementForQHtml, q.displayHtmlReadOnly);
+		}	
+		htmlForBlock = q_template_question_block
+						.replace(replacementForQHtmlBlock, htmlStrForQuestions);
+						
+		// return the html string to outer methods
+		return htmlForBlock;
+	}
+	
+	async setUserQuestionsFromServerData(qList) {
 		// from finMind API
 		if (!qList || 
 			 qList.length == 0 || 
@@ -101,9 +115,7 @@ class ApplicationQAndAManager {
 		// SORT THE QUESTION BY ORDER ID
 		const qListSorted = qList.sort( (q1, q2) => 
 		{
-			if (q1.sequence_id === q2.sequence_id) return 0;
-			if (q1.sequence_id < q2.sequence_id) return -1;
-			return 1;
+			return q1.sequence_id - q2.sequence_id;
 		});
 											
 		// form the question block HTML by enumerating each question
@@ -113,9 +125,40 @@ class ApplicationQAndAManager {
 			const q = await this.prv_createQuestion(qListSorted[i]);
 			this.#quesionList.push(q);
 		}	
+	}
+	
+	/**
+		Form question/answer UI by dynamically generate HTML block based
+		on the questions obtained from server.
+	**/
+	async getUserQustionHtml(qList) {
+		await this.setUserQuestionsFromServerData(qList);
+		
+		// No data 
+		if (this.#blockId ==0 ) {
+			return null;
+		}
 		
 		// return the html string to outer methods
 		return this.getUserQustionHtmlInternal();
+	}
+	
+	/**
+		Form question/answer UI by dynamically generate HTML block based
+		on the questions obtained from server.
+		This method only displays static Q/A info, not the UI for data entering.
+		
+	**/
+	async getUserQustionDisplay(qList) {
+		await this.setUserQuestionsFromServerData(qList);
+		
+		// No data 
+		if (this.#blockId ==0 ) {
+			return null;
+		}
+		
+		// return the html string to outer methods
+		return this.getAnQHtmlDisplay();
 	}
 	
 	/**

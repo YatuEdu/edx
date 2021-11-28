@@ -186,12 +186,41 @@ class QuestionAnswerTester extends HomeAndWizardHeader {
 	
 	async handleTest(e) {
 		e.preventDefault();
+		const html = await this.showAllBlocQuestionAnswers();
+		$('#user_question_block').html(html);
+		
+		/*
 		const testCase = $('#test_case_select').val();
 		this.qAndAManager = new ApplicationQAndAManager();
 		const qHtml = await this.qAndAManager.getUserQustionHtml(Test_Data[testCase]);
 		// then set the html for all the questions of the block
 		$('#user_question_block').html(qHtml);
 		this.hookUpEvents(this.qAndAManager);
+		*/
+		
+	}
+	
+	async showAllBlocQuestionAnswers() {
+		const appId = 89898990;
+		const t = this.credMan.credential.token;
+		const blocks = await Net.getAppPipelineBlocks(appId, t);
+		// get all the answers from blocks and save then to QA Manger
+		const managerList = [];
+		let html = '';
+		if (blocks && blocks.data.length > 0) {
+			for(let i = 0; i < blocks.data.length; i++) {
+				const blockId =  blocks.data[i].block_id;
+				
+				// get qestion / answer for this block
+				const qaLst =  await Net.getQAForBlockOfApp(appId, blockId, t);
+				const man = new ApplicationQAndAManager(appId);
+				
+				// get the static QA display (w/o interactin elements)
+				const qDisplay = await man.getUserQustionDisplay(qaLst.data);
+				html += qDisplay;
+			}
+		}
+		return html;
 	}
 	
 	handleTest2(e) {

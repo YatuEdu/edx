@@ -9,6 +9,7 @@ const RELATIONSHIP_ENUM_ID =  50;
 const replacementForId = '{id}';
 const replacementForName = '{nm}';
 const replacementForRelationship = '{rel_option}';
+const replacementForRelationshipValue = '{rel}';
 const replacementForDob = '{dob}';
 const replacementForSSN = '{ssn}';
 const replacementForPct = '{pct}';
@@ -55,6 +56,30 @@ const q_templete_beneficiary_component = `
 </div>
 `;
 
+const q_templete_beneficiary_component_ro = `
+<div class="row gx-5 gy-4 bg-white shadow my-4 p-4 position-relative">
+  <div class="col-4">
+    <label for="Name" class="form-label">Name</label>
+	<span class="form-control form-control-lg">{nm}</span>
+  </div>
+  <div class="col-4">
+   <label for="Relationship" class="form-label">Relationship</label>
+   <span class="form-control form-control-lg">{rel}</span>
+  </div>
+  <div class="col-4">
+    <label for="Dateofbirth" class="form-label">Date of birth</label>
+	<span class="form-control form-control-lg">{dob}</span>
+  </div>
+  <div class="col-4">
+    <label for="SSN" class="form-label">SSN</label>
+	<span class="form-control form-control-lg">{ssn}</span>
+  </div>
+  <div class="col-4">
+    <label for="Percent" class="form-label">Percent</label>
+	<span class="form-control form-control-lg">{pct}</span>
+  </div>
+</div>
+`;
 class UserBeneficiaryComponent {
 	_attrId;
 	_componentId;
@@ -172,6 +197,16 @@ class UserBeneficiaryComponent {
 							.replace(replacementForSSN, this._ssn.value)
 							.replace(replacementForPct, this._pct);	
 		return htmlStr; 
+	}
+	
+	// get read-only display html for the beneficiaries
+	get displayHtmlReadOnly() {
+		return q_templete_beneficiary_component_ro
+							.replace(replacementForName, this._name)
+							.replace(replacementForRelationshipValue, this._relation.value)
+							.replace(replacementForDob, this._dob.value)
+							.replace(replacementForSSN, this._ssn.value)
+							.replace(replacementForPct, this._pct);	
 	}
 	
 	// This method is called after the UI is rendered to display its

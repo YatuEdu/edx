@@ -21,6 +21,22 @@ const q_template_fst_mid_lst_name = `
 			<input type="text" id="last_name_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{val3}" maxlength="20"/>
 		</div>
 	</div>`;
+	
+const q_template_fst_mid_lst_name_ro = `
+	<div class="row mb-4">
+		<div class="col">		
+			<label class="form-label" for="first_name">First name</label>
+			<span class="form-control form-control-lg">{val1}</span>
+		</div>
+		<div class="col">
+			<label class="form-label" for="middle_name">Middle name</label>
+			<span class="form-control form-control-lg">{val2}</span>
+		</div>	
+		<div class="col">		
+			<label class="form-label" for="last_name">Last name</label>
+			<span class="form-control form-control-lg">{val3}</span>
+		</div>	
+	</div>`;
 
 
 class UserNameQuestion extends UserQuestionBase {  
@@ -136,6 +152,14 @@ class UserNameQuestion extends UserQuestionBase {
 								   .replace(replacementForValue3, this._last);	
 		
 		return htmlStr; 
+	}
+	
+	// get read-only display html for the name composition control
+	get displayHtmlReadOnly() {
+		return	q_template_fst_mid_lst_name_ro
+									.replace(replacementForValue1, this._first)
+									.replace(replacementForValue2, this._middle)
+									.replace(replacementForValue3, this._last);
 	}
 	
 	// get question in xml format for saving to API server

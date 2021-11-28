@@ -45,6 +45,28 @@ const q_template_text = `
 	</div>
 </div>`;
 
+const q_template_text_ro = `
+<div class="row mb-4">
+	<div class="col">	
+		<label class="form-label" for="address">Adress:</label>
+		<span class="form-control form-control-lg">{addr}</span>
+	</div>
+</div>
+<div class="row mb-4">
+	<div class="col">
+		<label class="form-label" for="city">City:</label>
+		<span class="form-control form-control-lg">{cty}</span>
+	</div>
+	<div class="col">
+		<label class="form-label" for="state">State</label>
+		<span class="form-control form-control-lg">{st}</span>
+	</div>
+	<div class="col">	
+		<label class="form-label"  for="Zip code">ZipCode</label>
+		<span class="form-control form-control-lg">{zp}</span>
+	</div>
+</div>`;
+
 class UserAdressQuestion extends UserQuestionBase {  
 	_address;
 	_city;
@@ -185,7 +207,7 @@ class UserAdressQuestion extends UserQuestionBase {
 		return `zip_${this.id}`;
 	}
 	
-	// get display html for the entire enum group in form of radio buttons
+	// get display html for the address combination
 	get displayHtml() {
 		const stateList  = MetaDataManager.enumMap.get(26); // todo: use const variable
 		let stateOptions = '';
@@ -205,6 +227,18 @@ class UserAdressQuestion extends UserQuestionBase {
 											.replace(replacementForCity, this._city)
 											.replace(replacementForZip, this._zip)
 											.replace(replacementForStateSelect,stateSelect)
+		
+		return htmlStr; 
+	}
+	
+	// get read-only display html for the address combination
+	get displayHtmlReadOnly() {
+		let htmlStr = q_template_text_ro
+											.replace(new RegExp(replacementForId, 'g') ,this.id)
+											.replace(replacementForAddr, this._address)
+											.replace(replacementForCity, this._city)
+											.replace(replacementForZip,  this._zip)
+											.replace(replacementForSt,   this._state)
 		
 		return htmlStr; 
 	}

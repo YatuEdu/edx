@@ -48,10 +48,28 @@ const q_templete_dyn_list_column = `
 </div>
  `;
  
+ const q_templete_dyn_list_column_ro = `
+<div id="dynlist_element_row_{id}" class="row gx-5 gy-4 bg-white shadow my-4 p-4 position-relative">
+ <div class="col-4">
+   <label for="CompanyName" class="form-label">Company Name</label>
+   <span class="form-control form-control-lg">{insname}</span>
+ </div>
+ <div class="col-4">
+    <label for="PolicyNumber" class="form-label">Policy Number</label>
+	<span class="form-control form-control-lg">{polno}</span>
+ </div>
+ <div class="col-4">
+  <label for="Replaced" class="form-label">Replaced</label>
+  <span class="form-control form-control-lg">{rel_option_replace}</span>
+ </div>
+</div>
+ `;
+ 
 class InsuranceInfoComponent extends DynamicListElement {  
 	#name;
 	#policyNo;
 	#replace;
+	#replaceStr;
 	
 	 constructor(insData, attrId, compId){  
         super(attrId, compId); 
@@ -80,6 +98,15 @@ class InsuranceInfoComponent extends DynamicListElement {
 					.replace(replacementForSubElementIdName, this.subElementId(INSNAME))
 					.replace(replacementForSubElementIdPolicy, this.subElementId(POLICY))
 					.replace(replacementForReplaceElement, this.#replace.displayHtml)
+					.replace(replacementForInsNameElement, this.#name)
+					.replace(replacementForPolNoElement, this.#policyNo);
+	}
+	
+	v_getHtmlReadOnly() {
+		return q_templete_dyn_list_column_ro
+					.replace(replacementForSubElementIdName, this.subElementId(INSNAME))
+					.replace(replacementForSubElementIdPolicy, this.subElementId(POLICY))
+					.replace(replacementForReplaceElement, this.#replace.value)
 					.replace(replacementForInsNameElement, this.#name)
 					.replace(replacementForPolNoElement, this.#policyNo);
 	}

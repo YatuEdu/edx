@@ -28,6 +28,13 @@ const select_option_item_template = `
 <option value="{nm}">{vl}</option>
 `;
 
+const q_template_selection_ro = `
+<div class="form-check form-check-inline me-5">
+	<label class="form-label">{lb}</label>
+	<span class="form-control form-control-lg">{vl}</span>
+</div>
+`;
+
 class UserDropdownSelection extends UserQuestionBase {  
     _enumValues; 
 	_value;
@@ -120,6 +127,13 @@ class UserDropdownSelection extends UserQuestionBase {
 		}
 		selStr = selStr.replace(replacementForOptionBody, optionStr);
 		return selStr; 
+	}
+	
+	// get read-only display html for the drop-down selectioon
+	get displayHtmlReadOnly() {
+		return	q_template_selection_ro
+									.replace(replacementForLabel, this.label)
+									.replace(replacementForValue,this._value);
 	}
 	
 	// This method can be called when we need to serialize the question / answer

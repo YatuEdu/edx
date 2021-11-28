@@ -27,6 +27,10 @@ const q_template_beneficiaries_list = `
  </div>
 </div>`;
 
+const q_template_beneficiaries_list_ro = `
+<div id="fm_wz_div_bene_components_container">
+{components_html}
+</div>`;
 
 class UserBeneficiaryControl extends UserQuestionBase {  
     _beneficiaryList;			// list of current beneficiaries
@@ -217,6 +221,27 @@ class UserBeneficiaryControl extends UserQuestionBase {
 		}
 		let htmlStr = q_template_beneficiaries_list
 									.replace(replacementForComponents,blockHtml);
+		
+		return htmlStr; 
+	}
+	
+	/// get read-only display html for the beneficiary list
+	get displayHtmlReadOnly() {
+		let blockHtml ='';
+		let htmlStr = '';
+		// combine sub-control html into an entire HTML
+		for (let i = 0; i < this._beneficiaryControlList.length; i++ ) {
+			blockHtml += this._beneficiaryControlList[i]
+								.displayHtmlReadOnly;
+		}
+		if (blockHtml) {
+			htmlStr = q_template_beneficiaries_list_ro
+										.replace(replacementForComponents, blockHtml);
+		}
+		else {
+			htmlStr = q_template_beneficiaries_list_ro
+										.replace(replacementForComponents, 'None');
+		}
 		
 		return htmlStr; 
 	}

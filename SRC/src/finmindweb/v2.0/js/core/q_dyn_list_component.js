@@ -10,6 +10,13 @@ const q_templete_dyn_list_column = `
 </div>
 `;
 
+const q_templete_dyn_list_column_ro= `
+<div class="row g-0 px-3 px-md-0">
+	{elem_clmn_html}
+</div>
+`;
+
+
 class DynamicListElement {
 	_attrId;
 	_componentId;
@@ -60,14 +67,21 @@ class DynamicListElement {
 		return `sub_element_${n}_${this.controlId}`;
 	}
 	
-	// get display html for the entire enum group in form of radio buttons
+	// get display html for dynamic list
 	get displayHtml() {
 		const htmlStr = q_templete_dyn_list_column
 							.replace(new RegExp(replacementForId, 'g'),this.controlId)
 							.replace(replacementForRemoveBtnClass, REMOVE_BTN_CLASS)
 							.replace(replacementForElementColumn, this.v_getHtml());
 		return htmlStr; 
-	}	
+	}
+	
+	// get read-only display html for dynamic list
+	get displayHtmlReadOnly() {
+		const htmlStr = q_templete_dyn_list_column_ro
+							.replace(replacementForElementColumn, this.v_getHtmlReadOnly());
+		return htmlStr; 
+	}
 }
 
 

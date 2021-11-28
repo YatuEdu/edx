@@ -88,7 +88,7 @@ class UserCompositeControl extends UserQuestionBase {
 		return `fm_comp_div_${this.id}_${index}`;
 	}
 	
-	// get display html for the entire enum group in form of radio buttons
+	// get display html for the copomsite control
 	get displayHtml() {
 		let componentHtml ='';
 		// combine sub-control html into an entire HTML
@@ -103,6 +103,20 @@ class UserCompositeControl extends UserQuestionBase {
 		return htmlStr; 
 	}
 	
+	// get read-only display html for the copomsite control
+	get displayHtmlReadOnly() {
+		let componentHtml ='';
+		// combine sub-control html into an entire HTML
+		for (let i = 0; i < this._components.length; i++ ) {
+			componentHtml += this._components[i]
+									.displayHtmlReadOnly;
+		}
+		let htmlStr = q_template_components
+									.replace(replacementForId, this.id)
+									.replace(replacementForComponents,componentHtml);
+		
+		return htmlStr; 
+	}
 	// get the div id
 	get myId() {
 		return `fm_composite_${this.id}`;

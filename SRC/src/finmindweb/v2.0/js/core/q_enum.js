@@ -20,6 +20,11 @@ const q_template_enum = `
 </div>
 `;
 
+const q_template_enum_ro = `
+<div class="form-check form-check-inline me-5">
+	<span class="form-control form-control-lg">{vl}</span>
+</div>
+`;
 
 class UserEnumQuestionRadio extends UserQuestionBase {  
     _enumValues; 
@@ -114,6 +119,12 @@ class UserEnumQuestionRadio extends UserQuestionBase {
 		const htmlStr =  q_template_enum_group
 									.replace(replacementForRadio, radioStr);
 		return htmlStr;
+	}
+	
+	// get read-only display html for the address combination
+	get displayHtmlReadOnly() {
+		return	q_template_enum_ro
+									.replace(replacementForValue,this._value);
 	}
 	
 	// get question in xml format for saving to API server

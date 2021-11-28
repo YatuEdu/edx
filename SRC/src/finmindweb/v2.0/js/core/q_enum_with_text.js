@@ -31,6 +31,18 @@ const q_template_enum_text = `
 </div>
 `;
 
+const q_template_enum_ro = `
+<div class="form-check form-check-inline me-5">
+	<label class="form-check-label" for="">{vl}</label>
+</div>`;
+
+const q_template_enum_text_ro = `
+<div class="col"">
+	<label for="enum_text" class="form-label">{lb}</label>
+	<label class="form-check-label" for="">{vl}</label>
+</div>
+`;
+
 	
 
 class UserEnumRadioWithText extends UserQuestionBase {  
@@ -158,7 +170,7 @@ class UserEnumRadioWithText extends UserQuestionBase {
 		return `div_with_text_${this.id}`;
 	}
 	
-	// get display html for the entire enum group in form of radio buttons
+	// get display html for the entire control
 	get displayHtml() {
 		const clssStr= this.radioClass;
 		const name = this.radioName;	
@@ -181,6 +193,20 @@ class UserEnumRadioWithText extends UserQuestionBase {
 									.replace(replacementForText, htmlText);
 		
 		return htmlRadioAndText; 
+	}
+	
+	// get read-only display html for the entire control
+	get displayHtmlReadOnly() {
+		// if value is the first, show text are, or hide text area
+		const enumStr = q_template_enum_ro
+						.replace(replacementForValue, this._value);
+		let extrText = '';			
+		if (this._value === this._yesValue){
+			extrText = q_template_enum_text_ro
+						.replace(replacementForLabel, this.label)
+						.replace(replacementForValue, this._value2);
+		}
+		return	enumStr + extrText;
 	}
 	
 	// get question in xml format for saving to API server

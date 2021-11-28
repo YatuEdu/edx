@@ -3,12 +3,20 @@ import {StringUtil}		  from './util.js';
 
 const replacementForId = '{id}';
 const replacementForLabel = '{lb}';
+const replacementForValue = '{vl}';
 const replacementFordDivId = '{divid}';
 
 const q_template_decimal_input = `
 <div id="{divid}>
 	<label>{lb}</label>
 	<input id="tx_number_input_{id}" type="text" class="fm_text_input" value=""/>
+</div>
+`;
+
+const q_template_decimal_ro = `
+<div>
+	<label>{lb}</label>
+	<span class="form-control form-control-lg">{vl}</span>
 </div>
 `;
 
@@ -106,7 +114,7 @@ class UserDecimalQuestionText extends UserQuestionBase {
 		}
 	}
 	
-	// get display html for the entire component with label and text input
+	// get display html for the control
 	get displayHtml() {
 		const clssStr= this.uiClass;
 		const htmlStr = q_template_decimal_input
@@ -114,6 +122,13 @@ class UserDecimalQuestionText extends UserQuestionBase {
 							.replace(replacementForLabel, this.textLabel)
 							.replace(replacementFordDivId, `${this.wrapperDivId}`);
 		return htmlStr; 
+	}
+	
+	// get read-only display html for the control
+	get displayHtmlReadOnly() {
+		return	q_template_decimal_ro
+							.replace(replacementForLabel, this.textLabel)
+							.replace(replacementForValue,this._value);
 	}
 	
 	// get the question in xml format for saving to API server

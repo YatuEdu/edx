@@ -4,11 +4,19 @@ import {StringUtil}		  from './util.js';
 const replacementForId = '{id}';
 const replacementForLabel = '{lb}';
 const replacementFordDivId = '{divid}';
+const replacementForValue = '{vl}';
 
 const q_template_text_input = `
 <div class="mb-4">
   <label  class="form-label" >{lb}</label>
   <input id="tx_formatter_input_{id}" type="text" class="form-control form-control-lg" value=""/>
+</div>
+`;
+
+const q_template_text_ro = `
+<div class="mb-4">
+  <label  class="form-label" >{lb}</label>
+  <span class="form-control form-control-lg">{vl}</span>
 </div>
 `;
 
@@ -130,6 +138,13 @@ class UserFormatterText extends UserQuestionBase {
 							.replace(replacementForLabel, this.label)
 							.replace(replacementFordDivId, `${this.wrapperDivId}`);
 		return htmlStr; 
+	}
+	
+	// get read-only display html for the address combination
+	get displayHtmlReadOnly() {
+		return	q_template_text_ro
+							.replace(replacementForLabel, this.label)
+							.replace(replacementForValue,this._value);
 	}
 	
 	// get the question in xml format for saving to API server

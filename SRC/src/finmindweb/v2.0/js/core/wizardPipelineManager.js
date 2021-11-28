@@ -22,7 +22,7 @@ class WizardPipelineManager extends PipelineManager {
 			const resp = await Net.getWizardQuestions(this.#productId, blckId);
 			
 			// if no data returns, meaning we have reached the end og the block,
-			// now call API to get code
+			// now call API to get quote
 			if (resp.data[0].block_id === -1) {
 				resp.quote = await this.getQuote();
 			}

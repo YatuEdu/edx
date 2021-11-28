@@ -5,6 +5,8 @@ const API_FOR_CONTINGENT_BENEFICIARY_INFO = 2021821;
 const API_FOR_FILE_UPLOAD = 2021818; 
 const API_FOR_MESSAGE_RETRIEVAL = 2021823;
 const API_FOR_MESSAGE_SENDING = 2021824;
+const API_FOR_PIPELINE_BLOCKS = 2021829;
+const API_FOR_GETTING_QA_IN_BLOCK = 2021830;
 
 const FILE_UPLOAD_OP = 1;
 const FILE_LIST_OP = 2;
@@ -95,13 +97,31 @@ class Net {
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
 	
-	
-	
 	/**
 		FinMind API for getting app existing isurance
 	**/	
 	static async getEixstingInsuranceInfo(appId, token) {
 		const req = Net.composeRequestDataForAppEixstingInsuranceInfo_private(appId, token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+		FinMind API for getting all block ids for all the answered questions 
+		for an application for a given user
+	**/	
+	static async getAppPipelineBlocks(appId, token) {
+		const req = Net.composeRequestDataForAppPipelineBlocks_private(appId, token);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	/**
+		FinMind API for getting all the answered questions 
+		for a given pipeline block of an application for a given user
+	**/	
+	static async getQAForBlockOfApp(appId, blockId, token) {
+		const req = Net.composeRequestDataForGettingQAForABlock_private(appId, blockId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -336,6 +356,38 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
+	
+	static composeRequestDataForAppPipelineBlocks_private(appId, token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: API_FOR_PIPELINE_BLOCKS
+			},
+			data: {					
+				appId: appId,
+			}
+		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	/*
+		Compose request for API: API_FOR_GETTING_QA_IN_BLOCK to get all questions/answers
+		for a given block.
+	*/
+	static composeRequestDataForGettingQAForABlock_private(appId, blockId, token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: API_FOR_GETTING_QA_IN_BLOCK
+			},
+			data: {					
+				appId: appId,
+				currentBlockId: blockId
+			}
+		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
 	
 	/**
 		compose finMind API request for app-existing insurance

@@ -13,6 +13,13 @@ const q_template_text = `
 </div>
 `;
 
+const q_template_text_ro = `
+<div class="mb-4">
+  <label for="ExistingInsurance" class="form-label">{lb}</label>
+  <span class="form-control form-control-lg">{vl}</span>
+ </div>
+`;
+
 class UserTextQuestion extends UserQuestionBase {  
     _name;
 	_regex; 
@@ -105,6 +112,14 @@ class UserTextQuestion extends UserQuestionBase {
 		return htmlStr; 
 	}
 	
+	// get read-only display html for the address combination
+	get displayHtmlReadOnly() {
+		let htmlStr = q_template_text_ro
+								.replace(replacementForLabel, this.label)
+								.replace(replacementForValue, this._value);
+		
+		return htmlStr; 
+	}
 	// get question in xml format for saving to API server
 	get serverXML() {
 		let ret ='';
