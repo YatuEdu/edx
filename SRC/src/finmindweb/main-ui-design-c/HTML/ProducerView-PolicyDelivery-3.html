@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet" />
+<title>FinMind</title>
+<style>
+.tooltip .tooltip-arrow{
+	display: block;
+	}
+.tooltip .tooltip-inner {
+	color: #fff;
+	background-color: #000!important;
+	font-family: 'Mulish';
+	font-weight: 400;
+	border: 0;
+	border-radius: 0.25rem;
+	padding: 0.5rem 0.75rem;
+	text-align: center;
+	line-height: 1.25;
+	max-width: none;
+	font-size: 0.75rem;
+}
+</style>
+</head>
+<body>
+
+<nav id="fm-globalnav" class="navbar navbar-expand-lg fixed-top bg-white">
+	<div class="container">
+		<a class="navbar-brand p-0 m-0" href="index.html"><img src="img/logo.svg" class="img-fluid"></a>
+		<button class="navbar-toggler bg-primary navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="navbar-nav justify-content-center flex-grow-1">
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="index.html">Home</a>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarInsurance" data-bs-toggle="dropdown"  href="#">Insurance</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7"> 
+						<li>
+							<a href="Insurance.html" class="dropdown-item rounded-3">Insurance-101</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">FAQ</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Tax</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">For Immigrants</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Senior Life</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarProducts" data-bs-toggle="dropdown"  href="#">Products</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Insurance Companies <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Hottest Products</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarEvents" data-bs-toggle="dropdown"  href="#">Events</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Events <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Youtube Channel</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Library</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="FAQ.html">FAQ</a>
+				</li>
+				<li class="nav-item mx-lg-3"\>
+					<a class="nav-link show" href="#">Feedback</a>
+				</li>
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="#">Contact Us</a>
+				</li>
+			</ul>
+			<a class="btn btn-primary fw-bold px-4 rounded-pill" href="Login.html">
+				Sign In
+			</a>
+		</div>
+	</div>
+</nav>
+
+<div class="card position-fixed start-0 end-0 bottom-0 border-0 rounded-0 px-3 pb-3" style="top: 6rem;background: #F6F7FC;">
+	
+	<div class="d-flex justify-content-center align-items-center p-4">
+		<div class="d-flex align-items-center mx-1">
+			<span class="bg-primary text-white fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;">
+				1
+			</span>
+			<b class="mx-2">Collect more info</b>
+			<span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
+		</div>
+		<div class="d-flex align-items-center mx-1">
+			<span class="bg-primary text-white fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;">
+				2
+			</span>
+			<b class="mx-2">Underwriting</b>
+			<span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
+		</div>
+		<div class="d-flex align-items-center mx-1">
+			<span class="bg-primary text-white fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;">
+				3
+			</span>
+			<b class="mx-2 text-body text-black-50">Paramedical Exam</b>
+			<span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
+		</div>
+		<div class="d-flex align-items-center mx-1">
+			<span class="bg-primary text-white fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;">
+				4
+			</span>
+			<b class="mx-2 text-body text-black-50">Policy Delivery</b>
+		</div>
+	</div>
+	
+	<div class="card-body bg-white m-0 p-0">
+		<div class="card h-100 border-0 rounded-0">
+			
+			<div class="card-header bg-transparent d-flex justify-content-between align-items-center p-3">
+				<div class="d-flex align-content-center">
+					<span>
+						<img src="img/ico-joinus-customer.svg" style="width: 1.5rem;">
+						<b class="ms-11 me-2">Client</b>
+					</span>
+					<span class="ms-2">
+						<a href="" class="fw-bold" data-bs-toggle="modal" data-bs-target="#AssignYourClient">Assign this application to a client</a>
+					</span>
+					<!-- <span class="alert alert-info alert-dismissible fade show m-0 fs-8 py-0 px-3 ms-5 lh-1 d-flex align-items-center border-0 bg-primary bg-opacity-10" role="alert">
+						<img src="img/ico-alert-info.svg" class="me-2">
+						Notification sent successfully, waiting for customer input.
+						<button type="button" class="btn-close p-0 position-relative ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+					</span> -->
+				</div>
+				
+				<div class="producer-actions d-flex align-items-center">
+					<!-- <span class="alert alert-danger alert-dismissible fade show m-0 fs-8 p-1 me-3 lh-1 d-flex align-items-center border-0 bg-danger bg-opacity-10 text-danger" role="alert">
+						Wait for customer input
+					</span> -->
+					<div class="dropdown">
+						<a class="dropdown-toggle" href="#" id="AllActions" data-bs-toggle="dropdown">
+							<span class="d-flex justify-content-center align-items-center rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View all actions">
+								<img src="img/ico-producer-actions.svg" class="img-fluid">
+							</span>
+						</a>
+						<ul class="dropdown-menu fs-7 rounded-1 p-0 dropdown-menu-end" aria-labelledby="AllActions">
+							<li><a class="dropdown-item py-2" href="#">Create new pipeline</a></li>
+							<li><a class="dropdown-item py-2" href="#">Clone this pipeline</a></li>
+							<li><a class="dropdown-item py-2" href="#">Add step in the ende</a></li>
+						</ul>
+					</div>
+					<div class="dropdown ms-2">
+						<a class="dropdown-toggle" href="#" id="AllSettings" data-bs-toggle="dropdown">
+							<span class="d-flex justify-content-center align-items-center rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View all settings">
+								<img src="img/ico-producer-settings.svg" class="img-fluid">
+							</span>
+						</a>
+						<ul class="dropdown-menu fs-7 rounded-1 p-0 dropdown-menu-end" aria-labelledby="AllSettings">
+							<li><a class="dropdown-item py-2" href="#">Set stage complete</a></li>
+							<li><a class="dropdown-item py-2" href="#">Set wait for customer</a></li>
+						</ul>
+					</div>
+					<a href="" class="dropdown-toggle ms-1">
+						<span class="d-flex justify-content-center align-items-center rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View all Summary">
+							<img src="img/ico-producer-summary.svg" class="img-fluid">
+						</span>
+					</a>
+					<a href="" class="dropdown-toggle ms-1">
+						<span class="d-flex justify-content-center align-items-center rounded-circle" data-bs-toggle="tooltip" data-bs-placement="left" title="View all Customer">
+							<img src="img/ico-producer-notify.svg" class="img-fluid">
+						</span>
+					</a>
+				</div>
+			</div>
+			
+			
+			
+			<div class="card-body p-0">
+				<div class="row h-100 g-0">
+					<div class="col-2 border-end">
+						<div class="card h-100 border-0 rounded-0">
+							<div class="card-header bg-transparent p-3 fw-bold border-bottom-0">
+								<img src="img/ico-folders.svg" class="me-3">Uploaded Files
+							</div>
+							<div class="card-body p-0 overflow-auto" style="height: 0;">
+								<div class="text-center px-3">
+									<div class="py-5 mt-5 mx-2">
+										<img src="img/bg-files-empty.png" class="img-fluid">
+									</div>
+									<h6>Ouhh… it’s empty in here.</h6>
+									<p class="fs-7 text-start text-body text-opacity-50 mt-3">
+										All the files the customer upload from the chat and application will be shown here. :)
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-7 border-end">
+						<div class="card h-100 border-0 rounded-0">
+							<div class="card-body px-0 overflow-auto" style="height: 0;">
+								<div class="row g-0 justify-content-center">
+									<div class="col-11 pt-3">
+										<div class="nav-back">
+											<a href="" class="text-body text-opacity-50 text-decoration-none">Back</a>
+										</div>
+									</div>
+									<div class="col-6">
+										<h5 class="text-center">
+											Policy Delivery
+										</h5>
+										<div class="fs-7 mt-6">
+											<label class="form-label">The result of the application:</label>
+											<select class="form-select form-control-lg">
+												<option>Please select</option>
+												<option>Approved</option>
+												<option selected="">Rejected</option>
+												<option>Table rated</option>
+											</select>
+											<p class="mt-4 lh-lg text-body text-opacity-75">
+												Here are the list of tasks when the application is rejected.<br />
+												1.   Notify the client that the application has been rejected.<br />
+												2.  Help client to find new product.<br />
+												3.  Set this state as complete.<br />
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer bg-transparent text-center border-0 py-5 px-0">
+								<button class="btn btn-primary btn-xl w-50" type="submit">
+									Comfirm
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="col-3">
+						<div class="card h-100 border-0 rounded-0">
+							<div class="card-header bg-transparent p-3 fw-bold">
+								<img src="img/ico-chats.svg" class="me-3">
+								Chat
+							</div>
+							<div class="card-body overflow-auto" style="height: 0;" id="chat-list-scroll-area">
+								<div class="chat-list">
+									<div class="text-center fs-8 text-body text-opacity-50">
+										4:32 PM
+									</div>
+									<div class="chat-left d-flex align-items-start my-3">
+										<div class="chat-avatar rounded-pill overflow-hidden me-2">
+											<img src="img/avatar-demo.jpeg" class="img-fluid">
+										</div>
+										<div class="chat-msg">
+											<h6 class="fs-8 text-body text-opacity-50 mb-1">FinMind Assistant</h6>
+											<article class="bg-primary fs-7 text-white">
+												Hi, there. How can I help you?
+											</article>
+										</div>
+									</div>
+									
+								</div>
+							</div>
+							<div class="card-footer bg-transparent d-flex">
+								<a href="" class="flex-shrink-0 mt-1">
+									<img src="img/ico-chat-upload.svg">
+								</a>
+								<div class="flex-grow-1 px-2">
+									<textarea class="form-control border-0" placeholder="Type a message here" rows="2"></textarea>
+								</div>
+								<a href="" class="chat-send rounded-circle flex-shrink-0 position-relative"></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Assign your client -->
+<div class="modal fade" id="AssignYourClient" tabindex="-1" aria-labelledby="AssignYourClient" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0">
+				<h5 class="modal-title pt-4">Assign your client</h5>
+			</div>
+			<div class="modal-body px-5 py-3">
+				<div>
+					<label for="Email" class="form-label">Email</label>
+					<input type="email" class="form-control form-control-lg" placeholder="Please enter client email address">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between border-0">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	var ele = document.getElementById('chat-list-scroll-area');
+	ele.scrollTop = ele.scrollHeight;
+</script>
+
+<script type="text/javascript">
+	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+	var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+	  return new bootstrap.Tooltip(tooltipTriggerEl)
+	})
+</script>
+
+</body>
+</html>

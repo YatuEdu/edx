@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet" />
+<title>FinMind</title>
+</head>
+<body>
+
+<nav id="fm-globalnav" class="navbar navbar-expand-lg fixed-top bg-white">
+	<div class="container">
+		<a class="navbar-brand p-0 m-0" href="index.html"><img src="img/logo.svg" class="img-fluid"></a>
+		<button class="navbar-toggler bg-primary navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="navbar-nav justify-content-center flex-grow-1">
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="index.html">Home</a>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarInsurance" data-bs-toggle="dropdown"  href="#">Insurance</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7"> 
+						<li>
+							<a href="Insurance.html" class="dropdown-item rounded-3">Insurance-101</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">FAQ</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Tax</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">For Immigrants</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Senior Life</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarProducts" data-bs-toggle="dropdown"  href="#">Products</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Insurance Companies <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Hottest Products</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarEvents" data-bs-toggle="dropdown"  href="#">Events</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Events <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Youtube Channel</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Library</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarAboutUs" data-bs-toggle="dropdown"  href="#">About Us</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Why Join Us</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">People</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<div class="dropdown position-relative me-4">
+				<a href="" class="position-relative" data-bs-toggle="dropdown">
+					<svg width="20" height="22" viewBox="0 0 20 22" xmlns="http://www.w3.org/2000/svg"><path d="M16 7A6 6 0 1 0 4 7c0 7-3 9-3 9h18s-3-2-3-9zm-4.27 13a1.999 1.999 0 0 1-3.46 0" stroke="#000" stroke-width="2" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<span class="position-absolute top-0 end-0 p-1 rounded-circle" style="transform: translate(-20%,-20%);background: #f00;"></span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+				</ul>
+			</div>
+			<div class="dropdown position-relative">
+				<a href="#" class="fs-6p fw-bold text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">Pete Cooper</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">Account</a></li>
+					<li><a class="dropdown-item" href="#">Settings</a></li>
+					<li><a class="dropdown-item" href="#">Sign out</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
+	<div class="row h-100 g-0">
+		<div class="col-2 bg-white">
+			<div class="events-sidebar">
+				<ul class="list-unstyled px-2 py-3">
+					<li class="my-2">
+						<div class="px-3 text-body text-opacity-50 fs-8 pb-2">Me</div>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.118 5.312L10.585.963c-.362-.21-.809-.21-1.172 0L1.88 5.313v8.698c0 .419.224.805.586 1.015L10 19.375l7.533-4.35c.363-.209.586-.595.586-1.014V5.312zm-8.12 3.965L3.755 5.673l6.244-3.606 6.245 3.606-6.246 3.604zm.626 1.084l6.244-3.605v7.209l-6.244 3.604v-7.208zm-1.25 0L3.13 6.755v7.21l6.245 3.604v-7.208z" fill="#1F232E"/></svg>My Applications
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>My Insurance Policies
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.75 10a8.75 8.75 0 1 0-17.5 0 8.75 8.75 0 0 0 17.5 0zM5.125 15.7a7.47 7.47 0 0 0 4.513 1.791L10 17.5a7.467 7.467 0 0 0 4.84-1.77l.086-.079-.01-.042a2.502 2.502 0 0 0-2.225-1.852l-.192-.007h-5a2.508 2.508 0 0 0-2.394 1.757l-.038.142.058.051zm7.374-3.2a3.75 3.75 0 0 1 3.39 2.144 7.5 7.5 0 1 0-11.78 0A3.75 3.75 0 0 1 7.5 12.5h5zM10 3.75a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5zM10 5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" fill="#1F232E" opacity=".9"/></svg>My Profile
+						</a>
+					</li>
+					<li class="my-2">
+						<div class="px-3 text-body text-opacity-50 fs-8 pt-4 pb-2">Client Management</div>
+					</li>
+					<li class="my-2">
+						<a href="" class="active">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 4.375c1.68 0 3.258.442 4.622 1.217l-.922.922a8.125 8.125 0 0 0-11.82 6.944l-.005.292H.625A9.375 9.375 0 0 1 10 4.375zm8.125 9.375a8.09 8.09 0 0 0-.89-3.7l.923-.923a9.325 9.325 0 0 1 1.212 4.32l.005.303h-1.25zm.271-7.513l-.884-.884-7.954 7.955.883.884 7.955-7.955z" fill="#1F232E"/></svg>Admin Dashboard
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><g fill="#1F232E" fill-rule="nonzero"><path d="M10 7.187a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm0 1.25a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM15.312 8.438a5.305 5.305 0 0 1 4.25 2.125.625.625 0 0 1-1 .75 4.056 4.056 0 0 0-3.25-1.625.625.625 0 0 1 0-1.25zM4.688 8.438a.625.625 0 0 1-.001 1.25 4.055 4.055 0 0 0-3.25 1.624.625.625 0 0 1-1-.749 5.305 5.305 0 0 1 4.25-2.125z"/><path d="M10 13.437a5.627 5.627 0 0 1 5.059 3.164.625.625 0 1 1-1.124.547 4.377 4.377 0 0 0-7.87 0 .625.625 0 0 1-1.125-.547A5.627 5.627 0 0 1 10 13.437zM3.721 3.59a3.125 3.125 0 0 1 4.036 2.385.625.625 0 1 1-1.228.235A1.875 1.875 0 1 0 4.51 8.429l.177.008a.625.625 0 0 1 0 1.25 3.125 3.125 0 0 1-.966-6.097zM14.535 3.535a3.125 3.125 0 1 1 .777 6.153.625.625 0 1 1 0-1.25A1.875 1.875 0 1 0 13.47 6.21a.625.625 0 1 1-1.228-.234 3.125 3.125 0 0 1 2.293-2.44z"/></g></svg>Clients
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.118 5.312L10.585.963c-.362-.21-.809-.21-1.172 0L1.88 5.313v8.698c0 .419.224.805.586 1.015L10 19.375l7.533-4.35c.363-.209.586-.595.586-1.014V5.312zm-8.12 3.965L3.755 5.673l6.244-3.606 6.245 3.606-6.246 3.604zm.626 1.084l6.244-3.605v7.209l-6.244 3.604v-7.208zm-1.25 0L3.13 6.755v7.21l6.245 3.604v-7.208z" fill="#1F232E"/></svg>Applications
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>Insurance Policies
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.316 2.916a1.245 1.245 0 0 0-.81-.364h-.148a1.245 1.245 0 0 0-.81.364l-2.21 2.21 3.536 3.535 2.21-2.21a1.25 1.25 0 0 0 0-1.767l-1.768-1.768zM10.454 6.01l3.536 3.535L6.035 17.5H2.5v-3.535l7.954-7.955zm0 1.768l-6.706 6.705v1.767h1.769l6.705-6.705-1.768-1.767zM14.432 3.8l-1.326 1.325 1.767 1.768L16.2 5.568 14.432 3.8zm-1.933 9.95h5V15h-5v-1.25zm-2.5 2.5h7.5v1.25H10v-1.25z" fill="#1F232E"/></svg>Pipeline Editor
+						</a>
+					</li>
+				</ul>
+			</div>
+		
+		</div>
+		<div class="col-10 bg-white" style="border: 11px solid #FAFCFF;">
+			<div class="card h-100 border-0 rounded-0">
+				<div class="card-header d-flex align-items-center bg-white p-4 border-0">
+					<h5 class="m-0">Dashboard</h5>
+					<div class="ms-auto d-flex align-items-center">
+						<ul class="nav nav-pills fs-8 me-3 rounded-1" id="M-Y" role="tablist" style="border:1px solid rgba(31, 21, 52, 0.2);">
+							<li class="nav-item" role="presentation">
+								<a class="nav-link py-1 px-2 rounded-1 active" id="" data-bs-toggle="pill" href="#" role="tab" aria-selected="true">1M</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a class="nav-link py-1 px-2 rounded-1" id="" data-bs-toggle="pill" href="#" role="tab" aria-selected="false">1Y</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a class="nav-link py-1 px-2 rounded-1" id="" data-bs-toggle="pill" href="#" role="tab" aria-selected="false">10Y</a>
+							</li>
+						</ul>
+						<div class="input-group w-auto">
+							<input type="text" class="form-control form-control-sm border-end-0" style="width: 4.75rem;border-color: rgba(31, 21, 52, 0.2);" id="ChartDate" lay-key="1" value="2021-11">
+							<span class="input-group-text bg-transparent" style="border-color: rgba(31, 21, 52, 0.2);">
+								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M1.5 2.784c0-.433.351-.784.784-.784h7.433c.432 0 .783.35.783.784v7.432c0 .433-.35.784-.783.784H2.284a.784.784 0 0 1-.784-.784V2.784z" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 1v2M4 1v2M1.5 5h9" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round"/></svg>
+							</span>
+						</div>
+						<div class="mx-4">
+							<span class="text-secondary">Updated at: </span>2021-06-18 08:24:59
+						</div>
+						<button type="button" class="btn text-primary" id="event-export-btn">
+							<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.01 6.232h3v-3" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.111 4.11a5.5 5.5 0 0 1 7.778 0l2.122 2.122M4.99 9.768h-3v3" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.889 11.89a5.498 5.498 0 0 1-7.778 0L1.989 9.767" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/></svg>
+							Refresh
+						</button>
+					</div>
+				</div>
+				<div class="card-body px-4 py-0 position-relative overflow-auto" style="height: 0;">
+					<div class="row py-1">
+						<div class="col-6">
+							<div class="position-relative">
+								<div id="Chart-CreatedApplications" class="w-100 shadow-sm" style="height: 330px;"></div>
+								<div class="position-absolute fw-bold" style="top: 15px;left: 15px;font-size: 13px;">
+									Created Applications
+									<span  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Created Applications">
+										<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M6 11.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10z" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 4.5v2" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="6" cy="8.5" rx=".5" ry=".5" fill="#1F1534" fill-opacity=".5"/></svg>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="position-relative">
+								<div id="Chart-CompletedApplications" class="w-100 shadow-sm" style="height: 330px;"></div>
+								<div class="position-absolute fw-bold" style="top: 15px;left: 15px;font-size: 13px;">
+									Completed Applications
+									<span  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Completed Applications">
+										<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M6 11.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10z" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 4.5v2" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="6" cy="8.5" rx=".5" ry=".5" fill="#1F1534" fill-opacity=".5"/></svg>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 pt-4">
+							<div class="position-relative">
+								<div id="Chart-TotalAmountofMoney" class="w-100 shadow-sm" style="height: 330px;"></div>
+								<div class="position-absolute fw-bold" style="top: 15px;left: 15px;font-size: 13px;">
+									Total Amount of Money
+									<span  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Total Amount of Money">
+										<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M6 11.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10z" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 4.5v2" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="6" cy="8.5" rx=".5" ry=".5" fill="#1F1534" fill-opacity=".5"/></svg>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+<script src="js/laydate/laydate.js"></script>
+<script>
+	laydate.render({
+	  elem: '#ChartDate'
+	  ,lang: 'en'
+	  ,type: 'month'
+	});
+</script>
+
+<script type="text/javascript">
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById('Chart-CreatedApplications'));
+
+      // 指定图表的配置项和数据
+      option = {
+      		   tooltip: {
+      		      trigger: 'axis',
+      				  formatter:'<span style="font-size:10px;color:rgba(60, 60, 67, 0.6);">May 2021</span><br /><span style="color:rgba(29, 37, 79, 1);font-size:14px;font-weight:700;">{c} Application</span><br /><span style="font-size:12px;color:rgba(60, 60, 67, 0.6);">{b} May</span>' ,
+      		    },
+      			grid: {
+      				left: 40,
+      				right: 20,
+      				bottom: 40,
+      			},
+      			legend:{
+      				show: true,
+      				top: 10,
+      				right: 10,
+      				
+      			},
+        xAxis: {
+      			//type: 'time',
+      			boundaryGap: false,
+      			axisTick: {
+      				  show: false,
+      			},
+      			axisLine: {
+      				  show: false
+      				},
+      			axisLabel: {
+      				  color: "rgba(31, 21, 52, 0.5)",
+      				  //formatter: '{dd}',
+      				},
+      			axisPointer: {
+      				  type: "line",
+      				  lineStyle: {
+      					color: "#458FF6",
+      					}
+      				},
+          data: ['1','2','3','4', '5','6','7','8','9', '10','11', '12','13','14','15','16','17','18','19', '20','21','22','23','24','25','26','27','28','29','30']
+        },
+        yAxis: {
+      			axisLabel: {
+      			      color: "rgba(31, 21, 52, 0.5)"
+      			    },
+      		},
+        series: [
+      			{
+      				name: "Selected Month",
+      				data: [5, 16, 23, 13, 28, 21, 14,22,13,15,26,31,34,30,39,38,41,40,26,35,18,23,24,25,26,27,29,30,39,42],
+      				type: 'line',
+      				smooth: true,
+      				symbol: "circle",
+      				symbolSize: 10,
+      				showSymbol: false,
+      				itemStyle: {
+      					color: "rgba(56, 133, 240, 1)",
+      					borderColor: "rgba(255,255,255, 1)",
+      					borderWidth: 2.69,
+      					},
+      				lineStyle: {
+      					normal: {
+      					  color: '#458FF6',
+      					  width: 3,
+      					}
+      				},
+      			  areaStyle: {
+      			    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      				  {
+      					offset: 0,
+      					color: 'rgba(23, 109, 228, 0.31)'
+      				  },
+      				  {
+      					offset: 1,
+      					color: 'rgba(23, 109, 228, 0.03)'
+      					}
+      				])
+      			    
+      			  }
+      			},
+          {
+      		name: "Provisions Month",
+            data: [10, 22, 28, 23, 19,12,23,28,25,26,24,29,40,43,49,44,47,23,39,27,44,22,13,15,26,31,34,30,33,22],
+            type: 'line',
+      			smooth: true,
+      			symbol: "none",
+      				itemStyle: {
+      					color: "rgba(69, 143, 246, 0.1)",
+      				},
+      			lineStyle: {
+      					normal: {
+      					  color: 'rgba(69, 143, 246, 0.1)',
+      					  width: 3,
+      					}
+      			},	
+            areaStyle: {
+      				opacity: 0,
+      			}
+          }
+          
+        ]
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+	  
+	  
+	  
+    </script>
+
+<script type="text/javascript">
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById('Chart-CompletedApplications'));
+
+      // 指定图表的配置项和数据
+      option = {
+      		   tooltip: {
+      		      trigger: 'axis',
+      				  formatter:'<span style="font-size:10px;color:rgba(60, 60, 67, 0.6);">May 2021</span><br /><span style="color:rgba(29, 37, 79, 1);font-size:14px;font-weight:700;">{c} Application</span><br /><span style="font-size:12px;color:rgba(60, 60, 67, 0.6);">{b} May</span>' ,
+      		    },
+      			grid: {
+      				left: 40,
+      				right: 20,
+      				bottom: 40,
+      			},
+      			legend:{
+      				show: true,
+      				top: 10,
+      				right: 10,
+      				
+      			},
+        xAxis: {
+      			//type: 'time',
+      			boundaryGap: false,
+      			axisTick: {
+      				  show: false,
+      			},
+      			axisLine: {
+      				  show: false
+      				},
+      			axisLabel: {
+      				  color: "rgba(31, 21, 52, 0.5)",
+      				  //formatter: '{dd}',
+      				},
+      			axisPointer: {
+      				  type: "line",
+      				  lineStyle: {
+      					color: "#458FF6",
+      					}
+      				},
+          data: ['1','2','3','4', '5','6','7','8','9', '10','11', '12','13','14','15','16','17','18','19', '20','21','22','23','24','25','26','27','28','29','30']
+        },
+        yAxis: {
+      			axisLabel: {
+      			      color: "rgba(31, 21, 52, 0.5)"
+      			    },
+      		},
+        series: [
+      			{
+      				name: "Selected Month",
+      				data: [5, 16, 23, 13, 28, 21, 14,22,13,15,26,31,34,30,39,38,41,40,26,35,18,23,24,25,26,27,29,30,39,42],
+      				type: 'line',
+      				smooth: true,
+      				symbol: "circle",
+      				symbolSize: 10,
+      				showSymbol: false,
+      				itemStyle: {
+      					color: "rgba(56, 133, 240, 1)",
+      					borderColor: "rgba(255,255,255, 1)",
+      					borderWidth: 2.69,
+      					},
+      				lineStyle: {
+      					normal: {
+      					  color: '#458FF6',
+      					  width: 3,
+      					}
+      				},
+      			  areaStyle: {
+      			    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      				  {
+      					offset: 0,
+      					color: 'rgba(23, 109, 228, 0.31)'
+      				  },
+      				  {
+      					offset: 1,
+      					color: 'rgba(23, 109, 228, 0.03)'
+      					}
+      				])
+      			    
+      			  }
+      			},
+          {
+      		name: "Provisions Month",
+            data: [10, 22, 28, 23, 19,12,23,28,25,26,24,29,40,43,49,44,47,23,39,27,44,22,13,15,26,31,34,30,33,22],
+            type: 'line',
+      			smooth: true,
+      			symbol: "none",
+      				itemStyle: {
+      					color: "rgba(69, 143, 246, 0.1)",
+      				},
+      			lineStyle: {
+      					normal: {
+      					  color: 'rgba(69, 143, 246, 0.1)',
+      					  width: 3,
+      					}
+      			},	
+            areaStyle: {
+      				opacity: 0,
+      			}
+          }
+          
+        ]
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+	  
+	  
+	  
+</script>
+
+<script type="text/javascript">
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById('Chart-TotalAmountofMoney'));
+
+      // 指定图表的配置项和数据
+      option = {
+      		   tooltip: {
+      		      trigger: 'axis',
+				  formatter:'<span style="font-size:10px;color:rgba(60, 60, 67, 0.6);">May 2021</span><br /><span style="color:rgba(29, 37, 79, 1);font-size:14px;font-weight:700;">{c} USD</span><br /><span style="font-size:12px;color:rgba(60, 60, 67, 0.6);">{b} May</span>' ,
+      		    },
+      			grid: {
+      				left: 40,
+      				right: 20,
+      				bottom: 40,
+      			},
+      			legend:{
+      				show: true,
+      				top: 10,
+      				right: 10,
+      				
+      			},
+        xAxis: {
+			//type: 'time',
+			boundaryGap: false,
+			axisTick: {
+				  show: false,
+			},
+			axisLine: {
+				  show: false
+				},
+			axisLabel: {
+				  color: "rgba(31, 21, 52, 0.5)",
+				  //formatter: '{dd}',
+				},
+			axisPointer: {
+				  type: "line",
+				  lineStyle: {
+					color: "#458FF6",
+					}
+				},
+          data: ['1','2','3','4', '5','6','7','8','9', '10','11', '12','13','14','15','16','17','18','19', '20','21','22','23','24','25','26','27','28','29','30']
+        },
+        yAxis: {
+      			axisLabel: {
+      			      color: "rgba(31, 21, 52, 0.5)"
+      			    },
+      		},
+        series: [
+			{
+				name: "Selected Month",
+				data: [5, 16, 23, 13, 28, 21, 14,22,13,15,26,31,34,30,39,38,41,40,26,35,18,23,24,25,26,27,29,30,39,42],
+				type: 'line',
+				smooth: true,
+				symbol: "circle",
+				symbolSize: 10,
+				showSymbol: false,
+				itemStyle: {
+					color: "rgba(56, 133, 240, 1)",
+					borderColor: "rgba(255,255,255, 1)",
+					borderWidth: 2.69,
+					},
+				lineStyle: {
+					normal: {
+					  color: '#458FF6',
+					  width: 3,
+					}
+				},
+			  areaStyle: {
+			    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+				  {
+					offset: 0,
+					color: 'rgba(23, 109, 228, 0.31)'
+				  },
+				  {
+					offset: 1,
+					color: 'rgba(23, 109, 228, 0.03)'
+					}
+				])
+			    
+			  }
+			},
+          {
+      		name: "Provisions Month",
+            data: [10, 22, 28, 23, 19,12,23,28,25,26,24,29,40,43,49,44,47,23,39,27,44,22,13,15,26,31,34,30,33,22],
+            type: 'line',
+      			smooth: true,
+      			symbol: "none",
+				itemStyle: {
+					color: "rgba(69, 143, 246, 0.1)",
+				},
+      			lineStyle: {
+					normal: {
+					  color: 'rgba(69, 143, 246, 0.1)',
+					  width: 3,
+					}
+      			},	
+            areaStyle: {
+      				opacity: 0,
+      			}
+          }
+          
+        ]
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+	  
+		  
+</script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet" />
+<title>FinMind</title>
+</head>
+<body>
+
+<nav id="fm-globalnav" class="navbar navbar-expand-lg fixed-top bg-white">
+	<div class="container">
+		<a class="navbar-brand p-0 m-0" href="index.html"><img src="img/logo.svg" class="img-fluid"></a>
+		<button class="navbar-toggler bg-primary navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="navbar-nav justify-content-center flex-grow-1">
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="index.html">Home</a>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarInsurance" data-bs-toggle="dropdown"  href="#">Insurance</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7"> 
+						<li>
+							<a href="Insurance.html" class="dropdown-item rounded-3">Insurance-101</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">FAQ</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Tax</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">For Immigrants</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Senior Life</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarProducts" data-bs-toggle="dropdown"  href="#">Products</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Insurance Companies <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Hottest Products</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarEvents" data-bs-toggle="dropdown"  href="#">Events</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Events <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Youtube Channel</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Library</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarAboutUs" data-bs-toggle="dropdown"  href="#">About Us</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Why Join Us</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">People</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<div class="dropdown position-relative me-4">
+				<a href="" class="position-relative" data-bs-toggle="dropdown">
+					<svg width="20" height="22" viewBox="0 0 20 22" xmlns="http://www.w3.org/2000/svg"><path d="M16 7A6 6 0 1 0 4 7c0 7-3 9-3 9h18s-3-2-3-9zm-4.27 13a1.999 1.999 0 0 1-3.46 0" stroke="#000" stroke-width="2" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<span class="position-absolute top-0 end-0 p-1 rounded-circle" style="transform: translate(-20%,-20%);background: #f00;"></span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+					<li><a class="dropdown-item" href="#">notification</a></li>
+				</ul>
+			</div>
+			<div class="dropdown position-relative">
+				<a href="#" class="fs-6p fw-bold text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">Pete Cooper</a>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#">Account</a></li>
+					<li><a class="dropdown-item" href="#">Settings</a></li>
+					<li><a class="dropdown-item" href="#">Sign out</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
+	<div class="row h-100 g-0">
+		<div class="col-2 bg-white position-relative">
+			<div class="events-sidebar">
+				<ul class="list-unstyled px-2 py-3">
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.118 5.312L10.585.963c-.362-.21-.809-.21-1.172 0L1.88 5.313v8.698c0 .419.224.805.586 1.015L10 19.375l7.533-4.35c.363-.209.586-.595.586-1.014V5.312zm-8.12 3.965L3.755 5.673l6.244-3.606 6.245 3.606-6.246 3.604zm.626 1.084l6.244-3.605v7.209l-6.244 3.604v-7.208zm-1.25 0L3.13 6.755v7.21l6.245 3.604v-7.208z" fill="#1F232E"/></svg>My Applications
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>My Insurance Policies
+						</a>
+					</li>
+					<li class="my-2">
+						<a href="" class="active">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.75 10a8.75 8.75 0 1 0-17.5 0 8.75 8.75 0 0 0 17.5 0zM5.125 15.7a7.47 7.47 0 0 0 4.513 1.791L10 17.5a7.467 7.467 0 0 0 4.84-1.77l.086-.079-.01-.042a2.502 2.502 0 0 0-2.225-1.852l-.192-.007h-5a2.508 2.508 0 0 0-2.394 1.757l-.038.142.058.051zm7.374-3.2a3.75 3.75 0 0 1 3.39 2.144 7.5 7.5 0 1 0-11.78 0A3.75 3.75 0 0 1 7.5 12.5h5zM10 3.75a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5zM10 5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" fill="#1F232E" opacity=".9"/></svg>My Profile
+						</a>
+					</li>
+				</ul>
+			</div>		
+			<div class="position-absolute bottom-0 w-100 text-center translate-middle-y pb-1">
+				<a href="#" class="fs-8" data-bs-toggle="modal" data-bs-target="#ProducerLicenseInformation">Change to Producer Account</a>
+			</div>
+		</div>
+		<div class="col-10 bg-white" style="border: 11px solid #FAFCFF;">
+			<div class="card h-100 border-0 rounded-0">
+				<div class="card-header d-flex align-items-center bg-white p-4 border-0">
+					<h5 class="m-0">My Profile</h5>
+					<div class="ms-auto d-flex align-items-center">
+						<a href="" class="me-4" data-bs-toggle="modal" data-bs-target="#ProducerLicenseInformation">Change to Producer Account</a>
+						<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
+							Cancel
+						</button>
+						<button type="button" class="btn btn-primary ms-2" style="width: 5.125rem;">
+							Save
+						</button>
+					</div>
+				</div>
+				<div class="card-body p-0 position-relative overflow-auto" style="height: 0;">
+					
+					<div class="row g-0 justify-content-center">
+						<div class="col-10">
+							<div class="row g-0 justify-content-between">
+								<div class="col-5">
+									<div class="row mb-4">
+										<div class="col-4">
+											<label for="FirstName" class="form-label">First Name*</label>
+											<input type="text" class="form-control form-control-lg" value="John">
+										</div>
+										<div class="col-4">
+											<label for="MiddleName" class="form-label">Middle Name</label>
+											<input type="text" class="form-control form-control-lg" value="Willam">
+										</div>
+										<div class="col-4">
+											<label for="LastName" class="form-label">Last Name*</label>
+											<input type="text" class="form-control form-control-lg" value="Cooper">
+										</div>
+									</div>
+									<div class="mb-4">
+										<label for="DateofBirth" class="form-label">Date of Birth</label>
+										<div class="input-group">
+											<input type="text" class="form-control form-control-lg border-end-0" id="DateofBirth" value="1999-09-09"/>
+											<span class="input-group-text bg-transparent">
+												<svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3.004H2a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1v-20a1 1 0 0 0-1-1zM18 1.004v4M6 1.004v4M1 9.004h22" stroke="#1F1534" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+											</span>
+										</div>
+									</div>
+									<div class="mb-4">
+										<label for="Gender" class="form-label">Gender</label>
+										<select class="form-select form-control-lg">
+											<option selected="">Male</option>
+										</select>
+									</div>
+									<div class="mb-4">
+										<label for="" class="form-label">Home Address</label>
+										<input type="text" class="form-control form-control-lg" value="home address line 1">
+										<input type="text" class="form-control form-control-lg mt-2" value="home address line 2">
+									</div>
+									<div class="row mb-4">
+										<div class="col-4">
+											<label for="City" class="form-label">City</label>
+											<input type="text" class="form-control form-control-lg" value="Los Angeles">
+										</div>
+										<div class="col-4">
+											<label for="State" class="form-label">State</label>
+											<input type="text" class="form-control form-control-lg" value="CA">
+										</div>
+										<div class="col-4">
+											<label for="ZIP Code" class="form-label">Zip Code</label>
+											<input type="text" class="form-control form-control-lg" value="50000">
+										</div>
+									</div>
+									
+								</div>
+								<div class="col-5">
+									<div class="mb-4">
+										<label for="Phone" class="form-label">Phone</label>
+										<input type="tel" class="form-control form-control-lg" value="123-456-7890">
+									</div>
+									<div class="mb-4">
+										<label for="Email" class="form-label">Email</label>
+										<input type="email" class="form-control form-control-lg" value="petecooper@123.com">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+								
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+<!-- ProducerLicenseInformation -->
+<div class="modal fade" id="ProducerLicenseInformation" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 580px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Producer License Information</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body px-4">
+				<div class="row justify-content-center mt-3">
+					<div class="col-10">
+						<div class="mb-4">
+							<label for="LicenseIssueState" class="form-label">License Issue State</label>
+							<select class="form-select form-control-lg">
+								<option selected="">Please select</option>
+							</select>
+						</div>
+						<div class="mb-4">
+							<label for="ExpireDate" class="form-label">Expire Date</label>
+							<div class="input-group">
+								<input type="text" class="form-control form-control-lg border-end-0" id="ExpireDate" placeholder="Please select"/>
+								<span class="input-group-text bg-transparent">
+									<svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3.004H2a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1v-20a1 1 0 0 0-1-1zM18 1.004v4M6 1.004v4M1 9.004h22" stroke="#1F1534" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+								</span>
+							</div>
+						</div>
+						<div class="mb-4">
+							<label for="LicenseNumber" class="form-label">License Number</label>
+							<input type="text" class="form-control form-control-lg" placeholder="Please enter">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" style="min-width: 5.125rem;">Submit</button>
+				<button type="button" class="btn btn-outline-secondary ms-3" data-bs-dismiss="modal" style="min-width: 5.125rem;">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+<script src="js/laydate/laydate.js"></script>
+
+<script>
+	laydate.render({
+	  elem: '#DateofBirth'
+	  ,lang: 'en'
+	});
+	laydate.render({
+	  elem: '#ExpireDate'
+	  ,lang: 'en'
+	});
+</script>
+
+
+</body>
+</html>

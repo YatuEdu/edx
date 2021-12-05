@@ -69,7 +69,7 @@
 					<a class="nav-link" href="#">About Us</a>
 				</li>
 			</ul>
-			<a class="btn btn-primary fw-bold px-3 rounded-pill" href="Login.html">
+			<a class="btn btn-primary fw-bold px-4 rounded-pill" href="Login.html">
 				Sign In
 			</a>
 		</div>
@@ -121,12 +121,12 @@
 					<span class="ms-5">
 						<img src="img/ico-joinus-producer.svg" style="width: 1.5rem;">
 						<b class="ms-1 me-2">Producer</b>
-						<a href="" class="fw-bold">Find a FinMind Producer</a>
+						<a href="" class="fw-bold" data-bs-toggle="modal" data-bs-target="#FindProducerModal">Find a FinMind Producer</a>
 					</span>
 				</div>
 				<div>
-					<a class="btn btn-outline-primary fw-bold" href="#" role="button">Cancel Application</a>
-					<a class="btn btn-primary fw-bold ms-3" href="#" role="button">Notify Producer</a>
+					<a class="btn btn-outline-primary fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#CancelApplication">Cancel Application</a>
+					<a class="btn btn-primary fw-bold ms-3" href="#" data-bs-toggle="modal" data-bs-target="#declined">Notify Producer</a>
 				</div>
 			</div>
 			
@@ -396,7 +396,72 @@
 </div>
 
 
+<!-- Find a FinMind Producer -->
+<div class="modal fade" id="FindProducerModal" tabindex="-1" aria-labelledby="FindProducerModal" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0">
+				<h5 class="modal-title pt-4">Find a FinMind Producer</h5>
+			</div>
+			<div class="modal-body px-5 py-3">
+				<div>
+					<label for="Email" class="form-label">Email</label>
+					<input type="email" class="form-control form-control-lg" placeholder="Please enter producer email address">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between border-0">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
 
+<!-- cancel application -->
+<div class="modal fade" id="CancelApplication" tabindex="-1" aria-labelledby="CancelApplication" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0">
+				<h5 class="modal-title pt-4">Sure to cancel your application?</h5>
+			</div>
+			<div class="modal-body px-3 py-0">
+				<p class="text-center text-body text-opacity-75">
+					Once cancelled all profiles, messages and chat logs will no longer exist.
+				</p>
+				<div class="mx-5 px-5">
+					<img src="img/bg-questions.png" class="img-fluid">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between border-0">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- The producer you invited declined -->
+<div class="modal fade" id="declined" tabindex="-1" aria-labelledby="declined" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0">
+				<h5 class="modal-title pt-4">The producer you invited declined</h5>
+			</div>
+			<div class="modal-body px-3 py-0">
+				<p class="text-center text-body text-opacity-75">
+					Please try to find a new FinMind producer. :)
+				</p>
+				<div class="mx-5 px-5">
+					<img src="img/wizardsorry.png" class="img-fluid">
+				</div>
+			</div>
+			<div class="modal-footer p-5 justify-content-between border-0">
+				<button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn fw-bold btn-primary m-0">Refind</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 
