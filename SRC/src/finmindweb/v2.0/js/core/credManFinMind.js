@@ -53,8 +53,7 @@ class CredentialManager {
 		this.private_clear();
 
 		// remote call to sign up
-		const ret = await Net.signUp(userFirstName, userMiddleName, userLastName, email, userPassword);
-		return ret.err;
+		return await Net.signUp(userFirstName, userMiddleName, userLastName, email, userPassword);
 	}
 	
 	// call remote auth server to sign-out user

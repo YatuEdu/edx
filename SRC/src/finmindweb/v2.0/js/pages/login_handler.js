@@ -1,6 +1,9 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
 
+const SIGNUP_PATH="./register.html";
+const USER_APPLICATION_PATH="../user/myApplication.html";
+
 /**
 	This class manages both login and sigup workflow
 **/
@@ -16,8 +19,8 @@ class LoginPageHandler {
 	
 	// hook up events
 	init() {
-		$( "#fm_auth_button" ).click(this.handleLogin.bind(this));
-		$( "#signup_button" ).click(this.handleGotoSignup);
+		$( "#fm_login_button" ).click(this.handleLogin.bind(this));
+		$( "#fm_signup_link" ).click(this.handleGotoSignup);
 		$( "#fm_email" ).focusout(this.validateInput)
 		$( "#fm_password" ).focusout(this.validateInput);
 	}
@@ -38,7 +41,7 @@ class LoginPageHandler {
 	
 	// go to sign up page
 	handleGotoSignup() {
-		window.location.href = "./register.html";
+		window.location.href = SIGNUP_PATH;
 	}
 	
 	// signin submit request to server
@@ -60,7 +63,7 @@ class LoginPageHandler {
 		await this.#credMan.authenticate(email, pw);
 		if (!this.#credMan.lastError) {
 			// go to my page
-			window.location.href = "../index.html";
+			window.location.href = USER_APPLICATION_PATH;
 		}
 		else {
 			// dispaly error message

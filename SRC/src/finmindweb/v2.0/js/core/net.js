@@ -7,6 +7,8 @@ const API_FOR_MESSAGE_RETRIEVAL = 2021823;
 const API_FOR_MESSAGE_SENDING = 2021824;
 const API_FOR_PIPELINE_BLOCKS = 2021829;
 const API_FOR_GETTING_QA_IN_BLOCK = 2021830;
+const API_FOR_SIGN_IN_WITH_EMAIL = 2021830;
+const API_FOR_SIGN_IN_WITH_NAME = 202102;
 
 const FILE_UPLOAD_OP = 1;
 const FILE_LIST_OP = 2;
@@ -21,6 +23,12 @@ class Net {
 	**/
 	static async login(userName, userPassword) {
 		const req = Net.composeRequestDataForLogin_private(userName, userPassword);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
+	static async loginWithEmail(email, userPassword) {
+		const req = Net.composeRequestDataForLoginWithEmail_private(email, userPassword);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -412,7 +420,7 @@ class Net {
 		const loginData = {
 			header: {
 				token: "",
-				api_id: 202102
+				api_id: API_FOR_SIGN_IN_WITH_NAME
 			},
 			data: {					
 				name: userName,
@@ -421,6 +429,24 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(loginData);
 	}
+	
+	/*
+		finMind API request format for Login (with email) API
+	*/
+	static composeRequestDataForLoginWithEmail_private(email, userPassword) {
+		const loginData = {
+			header: {
+				token: "",
+				api_id: API_FOR_SIGN_IN_WITH_EMAIL
+			},
+			data: {					
+				name: email,
+				pwh: sha256(sha256(userPassword))
+			}
+		};
+		return Net.composePostRequestFromData_private(loginData);
+	}
+	
 	
 	/**
 		Yatu API for user-sign up and register for Yatu service

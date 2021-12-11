@@ -23,6 +23,8 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 	async init() {
 	
 		// when 'Start' button is clicked
+		$('#fm_start_pipeline').click(this.handleNextQuestionBlock.bind(this));
+		
 		$('#fm_wz_next_block_button').click(this.handleNextQuestionBlock.bind(this));
 		
 		// when 'Next button' is clicked

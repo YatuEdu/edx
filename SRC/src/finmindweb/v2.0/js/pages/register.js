@@ -1,6 +1,9 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
 
+const LOGIN_PATH="login.html";
+const ERR_DUPLICATE_USER = 400010;
+const ERR_DUPLICATE_USER_MSG = 'This email is already rigistered!';
 /**
 	This class manages  sigup workflow
 **/
@@ -79,13 +82,14 @@ class RegisterPageHandler {
 
 		// async call to register
 		const resp = await this.#credMan.signUp(fname, mname, lname, email, pw);
-		if (!this.#credMan.lastError) {
+		if (resp.code === 0) {
 			// go to my page
-			window.location.href = "../sign/sign-in.html";
+			window.location.href = LOGIN_PATH;
 		}
 		else {
+			//const msg = "email is in use error"; // to do, return error message from server
 			// dispaly error message
-			$(e.target).after( `<p style="color:red;">${this.#credMan.lastError}</p>` ); 
+			$(e.target).after( `<p style="color:red;">${resp.code}</p>` ); 
 		}
 	}
 }

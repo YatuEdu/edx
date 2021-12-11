@@ -1,7 +1,8 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
 
-
+const SIGNUP_PATH="./prelogin/join.html";
+const SIGNIN_PATH="./prelogin/login.html";
 /**
 	This class manages both login and sigup workflow
 **/
@@ -65,7 +66,7 @@ class IndexPageHandler {
 	handleLogin(e) {
 		e.preventDefault();
 		// go to login page
-		window.location.href = "./sign/sign-in.html";
+		window.location.href = SIGNIN_PATH; 
 	}
 	
 	// going to account page
