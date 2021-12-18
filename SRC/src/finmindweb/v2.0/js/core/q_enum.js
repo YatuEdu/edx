@@ -16,7 +16,7 @@ const q_template_enum_group = `
 const q_template_enum = `
 <div class="form-check form-check-inline me-5">
 	<input class="form-check-input" type="radio" name="{nm}" id="" value="{vl}">
-	<label class="form-check-label" for="">{vl}</label>
+	<label class="form-label fs-6p" for="">{vl}</label>
 </div>
 `;
 

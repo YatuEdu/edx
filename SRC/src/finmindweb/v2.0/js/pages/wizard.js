@@ -51,7 +51,8 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 		// if not logged in, start wizard pipeline
 		if (!loggedIn) {
 			//TODO: GET prod ID for wizard
-			this.#applicationMan =  new WizardPipelineManager(sessionStore, 1001); 
+			const pid = 89898991;
+			this.#applicationMan =  new WizardPipelineManager(sessionStore, pid); 
 		}
 		else {
 			// Start a new application for product 1:
@@ -89,7 +90,7 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 		const res = await Net.startAplication(pid, this.credMan.credential.token);
 		if (res.err) {
 			alert(res.err);
-			retun;
+			return;
 		}
 		return res.data[0].applicationId;
 	}
@@ -100,7 +101,7 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 	//
 	async handleNextQuestionBlock(e) {
 		e.preventDefault();
-		await handleNextQuestionBlockInternal(false);
+		await this.handleNextQuestionBlockInternal(false);
 	}
 	
 	// When user clicks 'more', we need to call
@@ -158,7 +159,7 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 			else {
 				// first set the block header and subtitle
 				const blockInfo = await Net.getBlockInfo(this.#applicationMan.blockId);
-				$('#fm_wz_block_name').html(blockInfo.blockName);
+				$('#fm_wz_block_name').text(blockInfo.blockName);
 				$('#fm_wz_block_description').html(blockInfo.blockDescription);
 				
 				// then set the html for all the questions of the block

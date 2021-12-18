@@ -3,6 +3,9 @@ import {credMan} from '../core/credManFinMind.js'
 
 const SIGNUP_PATH="./prelogin/join.html";
 const SIGNIN_PATH="./prelogin/login.html";
+const WIZARD_PATH="./prelogin/wizard.html";
+const PIPELINE_PATH="";
+
 /**
 	This class manages both login and sigup workflow
 **/
@@ -17,8 +20,6 @@ class IndexPageHandler {
 	
 	// hook up events
 	async init() {
-		// get all the translatable elemnts
-		
 		// decide if I am logged in or not
 		const loggedIn = await this.#credMan.hasLoggedIn();
 
@@ -26,10 +27,14 @@ class IndexPageHandler {
 		let btnTxt = '';
 		if (!loggedIn) {
 			this.initUnsignedIn();
+			// handle wizard
+			$('#fm_start_pipeline').click(this.handleStartPipeline.bind(this));
 		}
 		else {
 			this.initSignedIn();
 		}
+		
+		
 	}
 	
 	/*
@@ -56,7 +61,7 @@ class IndexPageHandler {
 		const btnTxt = "Sign in";
 		$( "#index_login_or_logout" ).click(this.handleLogin.bind(this));
 		
-		// fix nav bar authenticated user onky items
+		// fix nav bar authenticated user only items
 		$( ".for-authenticated-only" ).hide();
 		
 		$( "#index_login_or_logout" ).text(btnTxt);
@@ -77,6 +82,13 @@ class IndexPageHandler {
 		this.#credMan.signOut();
 		this.initUnsignedIn();
 	}
+	
+	handleStartPipeline(e) {
+		e.preventDefault();
+		
+		// go to wizard page
+		window.location.href = WIZARD_PATH; 
+	};
 }
 
 let indexPageHandler = null;

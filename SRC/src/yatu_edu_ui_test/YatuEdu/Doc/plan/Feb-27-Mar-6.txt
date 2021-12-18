@@ -1,0 +1,14 @@
+1） server token management
+   -- 1. five minutes window?
+   -- 2. consective usage length: unlimited
+   -- 3. no usage length: 10 minutes
+   -- 4. logout to invalidate the token
+   -- 5. log in return to user: token, email, name
+   -- 6: token api: 
+       1) isValidateToken(token) -> returns: true / false
+       2) logout(token) -> returns ok
+	       pay attention to DoS attack
+	   3) login(n, pw) OR (EMAIL, PW)
+	   
+   2) how to make PPT STYLE Content?
+   3) HOW TO SAVE TEXT AS BINARY INTO SQL DB
