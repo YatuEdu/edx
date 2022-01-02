@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <title>Yatu Classroom</title>
+    <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
+    <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
+    <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
+	<link rel="stylesheet" href="assets/css/class_room.css"/>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container">
+                <a class="navbar-brand" href="index.html"><img src="assets/images/yatu.png" class="img-fluid"
+                        alt="Yatu Edu"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#unplugNavbar"
+                    aria-controls="demoNavbar6" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="unplugNavbar">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <form class="form-inline">
+                            <button class="btn btn-danger">Leave</button>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="my-5">
+            <div class="container">   
+				<div class="row my-5">
+					<textarea id="yt_coding_board" 
+							  spellcheck="false"
+							  value=""
+							  rows="20">
+					</textarea>
+                </div>
+				<div class="row my-5">
+					<a id="yt_test_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
+						Test
+					</a>
+				</div>
+            </div>
+        </article>
+        <div class="container">
+            <section class="blog-post-widget py-4">
+                <div class="container">
+                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">White-board</h5>
+                        <form  class="pb-5 border-bottom">
+                            <div class="row">
+                                <div class="form-group col-12 mb-4">
+                                    <textarea name="comment" id="ta_white_board" spellcheck-"false" 
+									class="form-control" rows="15"></textarea>
+                                </div>
+                            </div>
+                          
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <button id="bt_white_board_run" class="btn btn-danger">Run</button>
+									<button id="bt_white_board_send" class="btn btn-danger">Send</button>
+									<button id="bt_white_board_clear" class="btn btn-danger">Clear board</button>
+                                </div>
+                            </div>
+							<div class="row">
+                                <div class="form-group col-12 mb-4">
+                                    <textarea name="comment" id="ta_console" spellcheck="false" class="form-control" rows="15"></textarea>
+                                </div>
+                            </div>
+							<div class="row">
+                                <div class="col-12 text-center">
+									<button id="bt_console_clear" class="btn btn-danger">Clear output</button>
+                                </div>
+                            </div>
+                        </form>
+                </div>
+            </section>
+        </div>
+        <section class="up-subscribe border-top">
+            <div class="container">
+              
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="up-common-footer">
+        <div class="container">
+            <p class="text-center mb-0"><a href="index.html" class="footer-brand"><img
+                        src="assets/images/logo-white.svg" class="img-fluid" alt="Unplug UI" width="102"></a></p>
+            <nav class="nav justify-content-center flex-column flex-sm-row text-center">
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="index.html" class="nav-link">Why Unplug?</a>
+                <a href="about.html" class="nav-link">About Us</a>
+                <a href="contact.html" class="nav-link">Contact Us</a>
+            </nav>
+            <nav class="nav footer-social-nav justify-content-center">
+                <a href="#" class="nav-link social-link-facebook"> <i class="mdi mdi-facebook"></i> </a>
+                <a href="#" class="nav-link social-link-twitter"> <i class="mdi mdi-twitter"></i> </a>
+                <a href="#" class="nav-link social-link-behance"> <i class="mdi mdi-behance"></i> </a>
+                <a href="#" class="nav-link social-link-dribbble"> <i class="mdi mdi-dribbble"></i> </a>
+            </nav>
+            <p class="footer-text text-center">©2019 This page is protected by BootstrapDash and is subject to the
+                Google Privacy Policy and Terms of Service.</p>
+        </div>
+    </footer>
+    <script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script> 	
+	<script type="module" src="./assets/js/pages/jsClassRoomTeacher.js"></script>
+</body>
+</html>

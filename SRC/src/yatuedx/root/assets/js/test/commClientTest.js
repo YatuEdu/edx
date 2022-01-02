@@ -11,7 +11,7 @@ $(document).ready(function () {
         $("#startBtn").prop('disabled', true);
         let name = $("#name").val();
         let room = $("#room").val();
-        commClient = new CommClient('wss://rtc.4thspace.cn/websocket', 'aasdfa', name, room);
+        commClient = new CommClient('wss://rtc.4thspace.cn/websocket', 'aasdfa', name, room);  // aasdfa IS TOKEN
         // commClient = new CommClient('ws://localhost:7070/websocket', 'aasdfa', name, room);
 
         commClient.onReady = () => {

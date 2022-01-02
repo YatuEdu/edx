@@ -1,4 +1,5 @@
 import {DisplayBoard} 	from './displayBoard.js';
+import {PTCC_COMMANDS}  from '../command/programmingClassCommand.js'
 
 const REPLACE_FOR_BODY = '{bdy}';
 const REPLACE_FOR_LINE = '{ln}';
@@ -201,24 +202,55 @@ class StateFactory {
 }
 
 class DisplayBoardForCoding extends DisplayBoard { 
-	#formatter;
+	#view;
 	
-	constructor(formatter) {
-		super(); 
-		this.#formatter = formatter;
-		this.init();
+	constructor(roomName, view) {
+		super(roomName); 
+		this.#view = view;
+		this.initUI();
 	}
 	
 	/**
 		Initialize the EVENT handler for the UI
 	**/
-	init() {
+	initUI() {
 		$('#yt_test_board').click(this.handleTest.bind(this));	
 	}
 	
 	/*
 	*/
 	handleTest() {
+	}
+	
+	/*
+		execute command from classroom
+	*/
+	v_execute(cmdObject) {
+		// direct the command to UI
+		let sendToUi = true;
+		switch(cmdObject.id) {
+			case PTCC_COMMANDS.PTC_CODE_RUN:
+				// run code
+				break;
+			
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
+				this.dsiplayCode(cmdObject);
+				break;
+				
+			default:
+				sendToUi = false
+				break;
+		}
+	}
+	
+	/**
+		Display formatted code samples on UI (VIEW)
+	 **/
+	dsiplayCode(cmdObject) {
+		// send a new command to UI
+		const html = this.refresh(cmdObject.data[0]);
+		const uiCmd = {id: cmdObject.id, data: [ html ] }
+		this.#view.v_execute(uiCmd);
 	}
 	
 	/*

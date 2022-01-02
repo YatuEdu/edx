@@ -1,13 +1,11 @@
 import {sysConstants, languageConstants} from '../core/sysConst.js'
-import {credMan} from '../core/credential.js'
+import {credMan} from '../core/credMan.js'
 import {uiMan} from '../core/uiManager.js';
 
 /**
-	This class manages both login and sigup workflow
+	This class handles JS Code runner board
 **/
-class WhiteboardHandler {
-
-	
+class JSHostBoardHandler {
     constructor(credMan) {
 		this.init();
 	}
@@ -87,10 +85,10 @@ class WhiteboardHandler {
 	}
 }
 
-let whiteboardHandler = null;
+let jsHostBoardHandler = null;
 
 // A $( document ).ready() block.
 $( document ).ready(function() {
     console.log( "index page ready!" );
-	whiteboardHandler = new WhiteboardHandler(credMan);
+	jsHostBoardHandler = new JSHostBoardHandler(credMan);
 });

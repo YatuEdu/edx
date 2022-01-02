@@ -1,11 +1,13 @@
-import {sysConstants, languageConstants} from './sysConst.js'
-import {TimeUtil} from './util.js'
-import {LocalStoreAccess} from './localStore.js';
-import {uiMan} from './uiManager.js';
+import {sysConstants} from './sysConst.js'
+import {LocalStoreAccess} from './localStorage.js';
 import {Net} from './net.js';
+import {TimeUtil} from './util.js'
+
+const ROLE_AGENT = 'agent';
+const ROLE_ADMIN = 'admin';
 
 class CredentialManager {
-	#userCredInfo = {name: '', token: '', email: '', creationTime: null};
+	#userCredInfo = {name: '', token: '', email: '', creationTime: null, role: ''};
 	#authError;
 	#store;
 	
@@ -40,19 +42,30 @@ class CredentialManager {
 		}
 		else {
 			// got result in data:
-			this.update_cred({name: userName, token: ret.data[0].token, email: ''});
+			this.update_cred({name: userName, token: ret.data[0].token, email: '', role: ret.data[0].role});
 		}
 		return this.#authError;
 	}
 	
 	// call remote auth server to sign in a user
-	async signUp(userName, email, userPassword) {
+	async signUp(userFirstName, userMiddleName, userLastName, email, userPassword) {
 		// clear previous auth info before new login request
 		this.private_clear();
 
 		// remote call to sign up
-		const ret = await Net.signUp(userName, email, userPassword);
-		return ret.err;
+		return await Net.signUp(userFirstName, userMiddleName, userLastName, email, userPassword);
+	}
+	
+	// call remote auth server to sign-out user
+	async signOut() {
+		// remote call to sign out if we are signed-in
+		if (this.#userCredInfo.token) {
+			const ret = await Net.signOut(this.#userCredInfo.token);
+			if (!ret.err) {
+				// clear previous auth info before new login request
+				this.private_clear();
+			}
+		}
 	}
 	
 	// test if we have a valid token
@@ -62,7 +75,7 @@ class CredentialManager {
 		if (t) {
 			// yatu token still valid?
 			const diff = TimeUtil.diffMinutes(tt, Date.now());
-			if (diff < sysConstants.YATU_TOKEN_VALID_IN_MIN) {
+			if (diff < sysConstants.FINMIND_TOKEN_VALID_IN_MIN) {
 				return true;
 			}
 			
@@ -89,7 +102,16 @@ class CredentialManager {
 		return this.#authError;
 	}
 	
+	// Is the principal agent?
+	get isAgent() {
+		return this.#userCredInfo.role === ROLE_AGENT;
+	}
 	
+	// Is the principal admin?
+	get isAdmin() {
+		return this.#userCredInfo.role === ROLE_ADMIN;
+	}
+		
 	/**
 		private methods
 	 **/
@@ -111,6 +133,6 @@ class CredentialManager {
 	
 }
 
-const store = new LocalStoreAccess(sysConstants.YATU_CRED_STORE_KEY);
+const store = new LocalStoreAccess(sysConstants.FINMIND_CRED_STORE_KEY);
 const credMan = new CredentialManager(store);
 export { credMan };

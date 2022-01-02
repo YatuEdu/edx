@@ -1,5 +1,5 @@
 import {sysConstants, languageConstants} from '../core/sysConst.js'
-import {credMan} from '../core/credential.js'
+import {credMan} from '../core/credMan.js'
 import {uiMan} from '../core/uiManager.js';
 
 /**

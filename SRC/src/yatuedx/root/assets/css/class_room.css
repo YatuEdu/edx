@@ -1,0 +1,112 @@
+.blob-num {
+    width: 1%;
+    min-width: 50px;
+    padding-right: 10px;
+    padding-left: 10px;
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-size: 14px;
+    line-height: 30px;
+    color: #000000;
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: top;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+	background: #C0C0C0;
+}
+
+.blob-code {
+	width: 70%;
+    position: relative;
+    padding-right: 10px;
+    padding-left: 10px;
+    line-height: 30px;
+    vertical-align: top;
+	font-size: 14px;
+}
+
+.blob-comment {
+	width: 29%;
+	min-width: 150px;
+    position: relative;
+    padding-right: 10px;
+    padding-left: 10px;
+    line-height: 30px;
+    vertical-align: top;
+	font-size: 14px;
+}
+
+.js-k {
+	color: #0000FF;
+}
+
+.js-d {
+	color: #A9A9A9;
+}
+
+.js-nk {
+	color: #000000;
+}
+
+.displayCode {
+    background: #ffffff;
+}
+
+.displayComment {
+	background: #C9C9C9;
+	color: #FF0000
+}
+
+.displayCodeHi {
+    background: #00FF00;
+}
+
+button, input, textarea, select {
+    outline: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    color: #3b3b3b;
+    font-family: inherit;
+    font-size: inherit;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0.2em 0.4em;
+    width: 100%;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #d4d4d4;
+    background: #fff;
+}
+
+textarea {
+    height: 10em;
+    vertical-align: top;
+    overflow: auto;
+	border-right: #646464 ;
+    border-top: #646464;
+    border-left: #646464;
+    border-bottom: #646464;
+    width:100%;
+	color: #ffffff;
+    background: #000000;
+}
+
+table {
+	width: 100%;
+}
+
+thead, tbody { display: block; }
+
+tbody {
+    height: 500px;       /* Just for the demo          */
+    overflow-y: auto;    /* Trigger vertical scroll    */
+    overflow-x: hidden;  /* Hide the horizontal scroll */
+}
