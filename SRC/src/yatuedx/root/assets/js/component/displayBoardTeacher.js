@@ -23,6 +23,16 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		this._commClient.sendPublicMsg(cmd.str);
 	}
 	
+	/**
+		Run code sample we swent prior to this command on student's board remotely
+		for all students who are attending the class
+	 **/
+	runCode() {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CODE_RUN, null);
+		this._commClient.sendPublicMsg(cmd.str);
+	}
+	
+	
 	// {cmd: hi, p1: hello} -> stringfy jason
 	refresh(coomandObj ) {
 		this._textLines = textLines; 

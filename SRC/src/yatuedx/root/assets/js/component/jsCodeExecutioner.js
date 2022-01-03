@@ -1,36 +1,22 @@
 import {sysConstants, languageConstants} from '../core/sysConst.js'
-import {credMan} from '../core/credMan.js'
 import {uiMan} from '../core/uiManager.js';
+
+var var_consoleId = '';
 
 /**
 	This class handles JS Code runner board
 **/
 class JSCodeExecutioner {
-	#consoleId;
 	
-    constructor(credMan, consoleId) {
-		this.#consoleId = `#${consoleId}`;
-	}
-	
-	// hook up events
-	async init() {
-		// get all the translatable elemnts
-
-		// hook up event handleRun
-		
-		/*
-		$("#bt_white_board_run").click(this.handleRun.bind(this));
-		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
-		$("#bt_console_clear").click(this.handleClearConsole.bind(this));
-		$("#bt_white_board_send").click(this.handleSend.bind(this));
-		*/
+    constructor(consoleId) {
+		var_consoleId = consoleId; 
 	}
 	
 	/*
 		Run program on the board.
 	 */
 	executeCode(srcTxt) {
-			this.runJSCode_prv(srcTxt);
+		this.runJSCode_prv(srcTxt);
 	}
 	
 	/*
@@ -49,7 +35,7 @@ class JSCodeExecutioner {
 				this.print_prv(e);
 			}
 		} 
-		console.log(`exe code: ${src}`);
+		//console.log(`exe code: ${src}`);
 	}
 	
 	/*
@@ -57,9 +43,10 @@ class JSCodeExecutioner {
 	 */
 	print_prv(msg) {
         //  append message to console
-        const oldTxt = $(this.#consoleId).val();
+		const id = var_consoleId;
+        const oldTxt = $(`#${id}`).val();
         const printTex = `${oldTxt} ${msg}`;
-        $(this.#consoleId).val(printTex);
+        $(`#${id}`).val(printTex);
     }
 }
 

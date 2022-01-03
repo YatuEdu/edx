@@ -5,10 +5,25 @@ const lineTemplete ='';
 
 class DisplayBoard extends CommunicationSpace {  
 	_textLines;
+	_originalText;
+	_formatedText;
 	
 	constructor(roomName) {
 		super(roomName); 
+		this._originalText = '';
 		this._textLines = [];
+	}
+	
+	get textLines () {
+		return this._textLines;
+	}
+	
+	get originalText () {
+		return this._originalText;
+	}
+	
+	get formatedText () {
+		return this._formatedText;
 	}
 	
 	/**
@@ -17,14 +32,18 @@ class DisplayBoard extends CommunicationSpace {
 		Notice that the child class objedct uses overriden v_composeHtml to 
 		get the HTML for displying the formated code sample.
 	 **/
-	refresh(textLines) {
-		if (textLines) {
-			this._textLines = textLines[0].split("\n");
-			return this.v_composeHtml();
+	refresh(originalText) {
+		if (originalText) {
+			this._originalText = originalText;
+			this._textLines  = originalText.split("\n");
+			this._formatedText = this.v_composeHtml();
 		}
 		return '';
 	}
 	
+	/**
+		Child class can format the original text however it needs
+	 **/
 	v_composeHtml() {
 		throw new Error('v_html: sub-class-should-overload-this');
 	}

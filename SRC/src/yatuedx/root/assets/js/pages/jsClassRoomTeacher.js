@@ -39,7 +39,8 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		$("#yt_coding_board").keydown(this.handleTab);
 		
 		// hook up event handleRun
-		$("#yt_test_board").click(this.handleSendCode.bind(this));
+		$("#yt_sync_board").click(this.handleSendCode.bind(this));
+		$("#yt_run_code_on_student_board").click(this.handleRunCode.bind(this));
 		
 		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
 		$("#bt_console_clear").click(this.handleClearConsole.bind(this));
@@ -50,8 +51,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Send code sample to students
 	**/
 	handleSendCode(e) {
+		e.preventDefault(); 
 		const codeStr = $("#yt_coding_board").val();
 		this.#displayBoardTeacher.sendCode(codeStr);
+	}
+	
+	/**
+		Run code sample on students board
+	**/
+	handleRunCode(e) {
+		e.preventDefault(); 
+		this.#displayBoardTeacher.runCode();
 	}
 	
 	/**

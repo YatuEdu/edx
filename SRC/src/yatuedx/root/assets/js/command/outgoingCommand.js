@@ -30,7 +30,7 @@ class OutgoingCommand {
 	get str() {
 		const cmd = {
 			id: this.#id,
-			data: [this.#data],
+			data: this.#data,
 		}
 		return JSON.stringify(cmd)
 	}

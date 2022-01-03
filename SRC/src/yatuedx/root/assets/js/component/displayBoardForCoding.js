@@ -231,6 +231,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 		switch(cmdObject.id) {
 			case PTCC_COMMANDS.PTC_CODE_RUN:
 				// run code
+				this.runCode(cmdObject);
 				break;
 			
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
@@ -247,9 +248,23 @@ class DisplayBoardForCoding extends DisplayBoard {
 		Display formatted code samples on UI (VIEW)
 	 **/
 	dsiplayCode(cmdObject) {
-		// send a new command to UI
-		const html = this.refresh(cmdObject.data[0]);
-		const uiCmd = {id: cmdObject.id, data: [ html ] }
+		// save the code in our buffer
+		const codeText = cmdObject.data[0];
+		
+		// format the code
+		this.refresh(codeText);
+		
+		// send a "refresh" command to UI
+		const uiCmd = {id: cmdObject.id, data: [ this.formatedText ] }
+		this.#view.v_execute(uiCmd);
+	}
+	
+	/**
+		Run code samples on UI (VIEW)
+	 **/
+	runCode(cmdObject) {	
+		// send an "execute" command to UI
+		const uiCmd = {id: cmdObject.id, data: [ this.originalText ] }
 		this.#view.v_execute(uiCmd);
 	}
 	
