@@ -1,8 +1,8 @@
 import {sysConstants, languageConstants} from '../core/sysConst.js'
-import {credMan}                         from '../core/credential.js'
+import {credMan}                         from '../core/credMan.js'
 import {uiMan}                           from '../core/uiManager.js';
 import {Net}                             from '../core/net.js';
-import {getGroupCardHtml}				 from '../dynamic/groupCard.js';
+import {getGroupCardHtml}				 from '../component/groupCard.js';
 import {StringUtil}						 from '../core/util.js';
 
 /**
@@ -26,11 +26,16 @@ class MyGroupPageHandler {
 	}	
 	
 	async retrieveMyGroups(t) {
-		const ret = await Net.getMyGroup(t);
+		const ret = await Net.groupMemberGetMyGroups(t);
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
 				const g = ret.data[i];
-				const  {buttonId, html} = getGroupCardHtml({id: g.secId, name: g.name, type: 102});
+				const  {buttonId, html} = getGroupCardHtml(
+							{id: g.id, 
+							 name: g.name, 
+							 type: g.type, 
+							 hasLiveSession: g.session_is_live
+							});
 				$(".myGroupRow").append(html);
 				
 				// still a valid member?

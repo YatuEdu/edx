@@ -1,10 +1,10 @@
-import { sysConstants, languageConstants } from '../core/sysConst.js'
-import { credMan } from '../core/credential.js'
-import { uiMan } from '../core/uiManager.js';
-import { Net } from '../core/net.js';
-import { getGroupCardHtml } from '../dynamic/groupCard.js';
-import { StringUtil } from '../core/util.js';
-import {Peer} from '../core/peer.js';
+import { sysConstants, languageConstants } 	from '../core/sysConst.js'
+import { credMan } 							from '../core/credMan.js'
+import { uiMan } 							from '../core/uiManager.js';
+import { Net }              				from '../core/net.js';
+import { getGroupCardHtml } 				from '../dynamic/groupCard.js';
+import { StringUtil } 						from '../core/util.js';
+import {Peer} 								from '../core/peer.js';
 
 const SIGNALING_SERVER = "/";
 const USE_VIDEO = true;
