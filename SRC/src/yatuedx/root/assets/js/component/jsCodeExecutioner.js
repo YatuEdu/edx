@@ -1,15 +1,14 @@
 import {sysConstants, languageConstants} from '../core/sysConst.js'
 import {uiMan} from '../core/uiManager.js';
 
-var var_consoleId = '';
-
 /**
 	This class handles JS Code runner board
 **/
 class JSCodeExecutioner {
+	#consoleId;
 	
     constructor(consoleId) {
-		var_consoleId = consoleId; 
+		this.#consoleId = consoleId; 
 	}
 	
 	/*
@@ -25,8 +24,8 @@ class JSCodeExecutioner {
 	runJSCode_prv(src) {
 		if (src) {
 			try {
-				const func = new Function('print', src);
-				const res = func(this.print_prv);
+				const func = new Function('print_line', 'print', src);
+				const res = func(this.printLine_prv.bind(this), this.print_prv.bind(this));
 				if (res) {
 					this.print_prv(res);
 				}
@@ -39,14 +38,33 @@ class JSCodeExecutioner {
 	}
 	
 	/*
+		append message text to console in a new line
+	 */
+	printLine_prv(msg) {
+		const id = `#${this.#consoleId}`;
+		const oldTxt = $(id).val();
+		if (oldTxt) {
+			msg = '\n' + msg;
+		}
+		//printResult(msg);
+		this.print_prv(msg);
+	}
+	
+	/*
 		append message text to console.
 	 */
 	print_prv(msg) {
-        //  append message to console
-		const id = var_consoleId;
-        const oldTxt = $(`#${id}`).val();
-        const printTex = `${oldTxt} ${msg}`;
-        $(`#${id}`).val(printTex);
+		//  append message to console
+		const id = `#${this.#consoleId}`;
+		const oldTxt = $(id).val();
+		let printTex = '';
+		if (oldTxt) {
+			printTex = `${oldTxt}  ${msg}`;
+		}
+		else {
+			printTex = `${msg}`;
+		}
+		$(id).val(printTex);
     }
 }
 

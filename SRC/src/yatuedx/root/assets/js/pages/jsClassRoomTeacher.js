@@ -1,4 +1,4 @@
-import {sysConstants, languageConstants} 	from '../core/sysConst.js'
+import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
 import {uiMan} 								from '../core/uiManager.js';
 import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
@@ -7,6 +7,8 @@ import {ProgrammingClassCommandUI}			from '../command/programmingClassCommandUI.
 import {IncomingCommand}					from '../command/incomingCommand.js'
 
 const TAB_STRING = "\t";
+const MODE_CHANGE_CONTROL = '#yt_switch_mode';
+const MODE_ATTR = 'mode';
 
 /**
 	This class handles JS Code runner board
@@ -35,11 +37,19 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const clssName = 'JS 101 Test';
 		this.#displayBoardTeacher = new DisplayBoardTeacher(clssName, this);
 		
+		// set mode to teaching mode
+		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READ_ONLY);
+		
 		// accept tab and insert \t
 		$("#yt_coding_board").keydown(this.handleTab);
 		
-		// hook up event handleRun
+		// hook up event 'send code sample'
 		$("#yt_sync_board").click(this.handleSendCode.bind(this));
+		
+		// hook up event 'run code sample'
+		$(MODE_CHANGE_CONTROL).click(this.handleModeChange.bind(this));
+		
+		// hook up event 'change class mode'
 		$("#yt_run_code_on_student_board").click(this.handleRunCode.bind(this));
 		
 		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
@@ -62,6 +72,50 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	handleRunCode(e) {
 		e.preventDefault(); 
 		this.#displayBoardTeacher.runCode();
+	}
+	
+	/**
+		Change class mode for all the attending students
+	**/	
+	handleModeChange(e) {
+		e.preventDefault(); 
+		const m = this.setMode();
+		// send the command to peers
+		this.#displayBoardTeacher.setMode(m);
+	}
+	
+	/**
+		Set students board mode
+	**/
+	setMode() {
+		// current mode:
+		let m = $(MODE_CHANGE_CONTROL).data(MODE_ATTR); 
+		const {btnText, newMode} = this.priv_changeMode(m);
+		$(MODE_CHANGE_CONTROL).data(MODE_ATTR, newMode); 
+		$(MODE_CHANGE_CONTROL).text(btnText);
+		return newMode;
+	}
+	
+	/**
+		Mode switching
+	**/
+	priv_changeMode(m) {
+		const mode =  parseInt(m, 10);
+		let obj = {};
+		if ( mode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			obj = {
+				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
+				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE
+			};
+		}
+		else if (mode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+			obj ={
+				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
+				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY
+			};
+			
+		}
+		return obj;
 	}
 	
 	/**

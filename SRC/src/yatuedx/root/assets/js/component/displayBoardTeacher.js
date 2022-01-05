@@ -32,6 +32,13 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		this._commClient.sendPublicMsg(cmd.str);
 	}
 	
+	/**
+		Change class mode for all the attending students
+	**/	
+	setMode(m) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CLASSROOM_SWITCH_MODE, m);
+		this._commClient.sendPublicMsg(cmd.str);
+	}
 	
 	// {cmd: hi, p1: hello} -> stringfy jason
 	refresh(coomandObj ) {

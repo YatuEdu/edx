@@ -9,6 +9,9 @@ const sysConstants = {
 	// token valid time winodw
 	YATU_TOKEN_VALID_IN_MIN: 10,
 	
+	// default board rows
+	YATU_DEFAULT_BOARD_ROWS: 10,
+	
 	// UI STATES
 	STATE_LANG_EN: 0,
 	STATE_LANG_CN: 1,
@@ -17,6 +20,13 @@ const sysConstants = {
 	SIGNIN_NAME_NEEDED: "login_page_name_not_empty",
 	SIGNIN_PW_NEEDED: "login_page_pw_not_be_empty",
 	SERVER_UNEXPECTED_ERR: "yatu_unexpected",
+};
+
+const sysConstStrings = {
+	EMPTY: '',
+	UNKNOWN: 'UNKNOWN',
+	SWITCH_TO_LEARNING: 'Change to learning mode (current mode: exercise)',
+	SWITCH_TO_EXERCISE: 'Change to exercise mode (current mode: learning)',
 };
 
 const languageConstants = {
@@ -37,4 +47,4 @@ const languageConstants = {
 	SERVER_ERROR_WITH_RESPONSE: "ge_une_res",  	// generic error: unexpected service error
 };
 
-export {sysConstants, languageConstants};
+export {sysConstants, sysConstStrings, languageConstants};

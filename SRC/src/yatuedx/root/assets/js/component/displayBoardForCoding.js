@@ -229,6 +229,11 @@ class DisplayBoardForCoding extends DisplayBoard {
 		// direct the command to UI
 		let sendToUi = true;
 		switch(cmdObject.id) {
+			// set board mode to readonly or not
+			case PTCC_COMMANDS.PTC_CLASSROOM_SWITCH_MODE:
+				this.setClassMode(cmdObject);
+				break;
+				
 			case PTCC_COMMANDS.PTC_CODE_RUN:
 				// run code
 				this.runCode(cmdObject);
@@ -266,6 +271,13 @@ class DisplayBoardForCoding extends DisplayBoard {
 		// send an "execute" command to UI
 		const uiCmd = {id: cmdObject.id, data: [ this.originalText ] }
 		this.#view.v_execute(uiCmd);
+	}
+	
+	/**
+		Set class room mode to "readonly" or "readwrite"
+	 **/
+	setClassMode(cmdObject) {
+		this.#view.v_execute(cmdObject);
 	}
 	
 	/*
