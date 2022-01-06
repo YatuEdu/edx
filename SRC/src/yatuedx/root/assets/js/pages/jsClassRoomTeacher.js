@@ -3,12 +3,13 @@ import {credMan} 							from '../core/credMan.js'
 import {uiMan} 								from '../core/uiManager.js';
 import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
-import {ProgrammingClassCommandUI}			from '../command/programmingClassCommandUI.js'
+import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 
-const TAB_STRING = "\t";
-const MODE_CHANGE_CONTROL = '#yt_switch_mode';
-const MODE_ATTR = 'mode';
+const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
+const TA_RESULT_CONSOLE = "yt_result_console";
+const BTN_SYNC_BOARD = "yt_btn_sync_board"; 
+const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
 
 /**
 	This class handles JS Code runner board
@@ -17,7 +18,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
 	
     constructor(credMan) {
-		super();
+		super(credMan, TA_RESULT_CONSOLE);
 		this.init();
 	}
 	
@@ -41,13 +42,13 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READ_ONLY);
 		
 		// accept tab and insert \t
-		$("#yt_coding_board").keydown(this.handleTab);
+		$(this.codeInputTextArea).keydown(this.handleTab);
 		
 		// hook up event 'send code sample'
-		$("#yt_sync_board").click(this.handleSendCode.bind(this));
+		$(this.syncBoardButton).click(this.handleSendCode.bind(this));
 		
 		// hook up event 'run code sample'
-		$(MODE_CHANGE_CONTROL).click(this.handleModeChange.bind(this));
+		$(this.modeChangeButton).click(this.handleModeChange.bind(this));
 		
 		// hook up event 'change class mode'
 		$("#yt_run_code_on_student_board").click(this.handleRunCode.bind(this));
@@ -62,7 +63,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/
 	handleSendCode(e) {
 		e.preventDefault(); 
-		const codeStr = $("#yt_coding_board").val();
+		const codeStr = $(this.codeInputTextArea).val();
 		this.#displayBoardTeacher.sendCode(codeStr);
 	}
 	
@@ -71,6 +72,12 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/
 	handleRunCode(e) {
 		e.preventDefault(); 
+		
+		// run code locally first
+		const codeStr = $(this.codeInputTextArea).val();
+		this._jsCodeExecutioner.executeCode(codeStr);
+		
+		// run code for each student second
 		this.#displayBoardTeacher.runCode();
 	}
 	
@@ -89,10 +96,10 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/
 	setMode() {
 		// current mode:
-		let m = $(MODE_CHANGE_CONTROL).data(MODE_ATTR); 
+		let m = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
 		const {btnText, newMode} = this.priv_changeMode(m);
-		$(MODE_CHANGE_CONTROL).data(MODE_ATTR, newMode); 
-		$(MODE_CHANGE_CONTROL).text(btnText);
+		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
+		$(this.modeChangeButton).text(btnText);
 		return newMode;
 	}
 	
@@ -104,37 +111,18 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		let obj = {};
 		if ( mode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
 			obj = {
-				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
+				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
 				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE
 			};
 		}
 		else if (mode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
 			obj ={
-				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
+				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
 				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY
 			};
 			
 		}
 		return obj;
-	}
-	
-	/**
-		Hnandle tab by insertng \t
-	**/
-	handleTab(e) {
-		if(e.which===9){ 
-			const start = this.selectionStart;
-			const end = this.selectionEnd;
-			const val = this.value;
-			const selected = val.substring(start, end);
-			const re = /^/gm;
-			this.value = val.substring(0, start) + selected.replace(re, TAB_STRING) + val.substring(end);
-			//Keep the cursor in the right index
-			this.selectionStart=start+1;
-			this.selectionEnd=start+1; 
-			e.stopPropagation();
-			e.preventDefault(); 			
-		}
 	}
 	
 	/*
@@ -199,6 +187,31 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		} 
 		console.log(`exe code: ${src}`);
 	}
+	
+	/*
+		properties for accessingh ui components for jquery
+	 */
+	 
+	// result console
+	get resultConsoleControl() {
+		return `#${TA_RESULT_CONSOLE}`;
+	}
+	
+	// CODE INPUT TEXT Area
+	get codeInputTextArea() {
+		return `#${TA_CODE_INPUT_CONSOLE}`;
+	}
+	
+	// button for syncing code
+	get syncBoardButton() {
+		return `#${BTN_SYNC_BOARD}`;
+	}
+	
+	// button for SWITCHING mode
+	get modeChangeButton() {
+		return `#${BTN_MODE_CHANGE}`;
+	}
+	
 }
 
 let jsClassRoomTeacher = null;

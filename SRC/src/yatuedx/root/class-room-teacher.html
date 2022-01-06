@@ -39,16 +39,27 @@
     <main>
         <article class="my-5">
             <div class="container">   
-				<div class="row my-5">
-					<textarea id="yt_coding_board" 
-							  spellcheck="false"
-							  value=""
-							  rows="20">
-					</textarea>
+				<div class="row mb-4">
+					<div class="col">
+						<textarea class="board"
+								  id="yt_coding_board" 
+								  spellcheck="false"
+								  value=""
+								  rows="20">
+						</textarea>
+					</div>
+					<div class="col">
+						<textarea class="board"
+								  id="yt_result_console" 
+								  spellcheck="false"
+								  value=""
+								  rows="20">
+						</textarea>
+					</div>
                 </div>
-				<div class="row my-5">
+				<div class="row mb-4">
 					<div class="col-3 text-center">
-						<a id="yt_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
+						<a id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
 							Sync with Audience
 						</a>
 					</div>
@@ -58,7 +69,7 @@
 						</a>
 					</div>
 					<div class="col-6 text-center">
-						<a id="yt_switch_mode" data-mode="0" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
+						<a id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
 						</a>
 					</div>
 				</div>

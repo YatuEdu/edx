@@ -1,3 +1,6 @@
+import {credMan} 		from '../core/credMan.js'
+import {AuthPage} 		from '../core/authPage.js'
+
 // PTC = prgramming-teaching command 
 // PTCP = prgramming-teaching command parameter
 // GM = general message
@@ -21,20 +24,6 @@ const PTCC_COMMANDS = {
 	PTC_CLASSROOM_SWITCH_MODE:			300,
 	PTC_CLASSROOM_END:					301,
 };
-
-class ProgrammingClassCommandUI {
-	
-	constructor() {
-	}
-	
-	/**
-		Execute a command encapsulated by command string (cmd)
-	**/
-	v_execute(cmd) {
-		throw new Error('v_execute: sub-class-should-overload-this');
-	}
-}
-
 
 
 export { PTCC_COMMANDS };

@@ -27,6 +27,9 @@ const sysConstStrings = {
 	UNKNOWN: 'UNKNOWN',
 	SWITCH_TO_LEARNING: 'Change to learning mode (current mode: exercise)',
 	SWITCH_TO_EXERCISE: 'Change to exercise mode (current mode: learning)',
+	
+	ATTR_MODE: 'mode',
+	TAB_STRING: '\t',
 };
 
 const languageConstants = {

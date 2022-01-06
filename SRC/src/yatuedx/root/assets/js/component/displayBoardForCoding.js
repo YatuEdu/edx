@@ -41,6 +41,7 @@ const WORD_TEMPLATE =
 `;
 
 const KEY_CLASS = 'js-k';
+const KEY_CLASS_YATU = 'js-yt';
 const DELIMITER_CLASS = 'js-d';
 const NON_KEY_CLASS = 'js-nk';
 const TAB_CLASS = 'tab';
@@ -60,6 +61,8 @@ const MAP_JS_KEYWORD = new Map([
 	[ 'break', KEY_CLASS ],
 	[ 'continue', KEY_CLASS ],
 	[ 'return', KEY_CLASS ],
+	[ 'say', KEY_CLASS_YATU ],
+	[ 'shout', KEY_CLASS_YATU ],
 	[ 'default', KEY_CLASS ],
 	[ '{', DELIMITER_CLASS ],
 	[ '}', DELIMITER_CLASS ],

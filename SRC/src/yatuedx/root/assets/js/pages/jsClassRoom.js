@@ -1,13 +1,11 @@
-import {sysConstants, sysConstStrings} 	from '../core/sysConst.js'
+import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
 import {uiMan} 								from '../core/uiManager.js';
 import {DisplayBoardForCoding}				from '../component/displayBoardForCoding.js'
 import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
-import {ProgrammingClassCommandUI}			from '../command/programmingClassCommandUI.js'
+import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
-
-const TAB_STRING = "\t";
 
 const YT_CONSOLE_ID 						= "yt_console";
 const YT_CODE_BOARD_ID 						= "yt_code_board";
@@ -31,10 +29,9 @@ const HIDDEN_BOARD_TEMPLATE = `
 class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	#displayBoardForCoding;
-	#jsCodeExecutioner;
 	
     constructor(credMan) {
-		super();
+		super(credMan, YT_CONSOLE_ID);
 		this.init();
 	}
 	
@@ -76,14 +73,20 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	runCodeFrom(codeText) {
 		// first clear the output console
 		$(this.resultConsoleControl).val(sysConstStrings.EMPTY);
-		this.#jsCodeExecutioner.executeCode(codeText);
+		this._jsCodeExecutioner.executeCode(codeText);
 	}
 	
 	/**
 		Set class room mode to "readonly" or "readwrite"
 	 **/
-	setClassMode(ro) {
-		if (ro === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+	setClassMode(newMode) {
+		const currentMode = $(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE);
+		if (currentMode === newMode) {
+			// mode already set;
+			return;
+		}
+		
+		if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
 			// result console readonly
 			$(this.resultConsoleControl).attr('readonly', true);
 			$(this.resultConsoleControl).addClass('input-disabled');
@@ -93,7 +96,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.runCodeButton).hide(); 
 			$(this.clearResultButton).hide();
 		}
-		else if (ro === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+		else if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
 			// result console read and write
 			$(this.resultConsoleControl).attr('readonly', false);
 			$(this.resultConsoleControl).removeClass('input-disabled');
@@ -105,7 +108,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			// show run code and clear consol buttons
 			$(this.runCodeButton).show(); 
 			$(this.clearResultButton).show();
+			
+			// accept tab and insert \t when tab key is hit by user
+			// note that we do not want to bind this handler the "this" class
+			$(this.codeInputTextArea).keydown(this.handleTab);
 		}
+		
+		// remember the mode in UI
+		$(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE, newMode);
 	}
 		
 	// hook up events
@@ -115,13 +125,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
-		
-		// accept tab and insert \t when tab key is hit by user
-		// note that we do not want to bind this handler the "this" class
-		$(this.codeInputTextArea).keydown(this.handleTab);
-		
-		// initializing code executioner
-		this.#jsCodeExecutioner =  new JSCodeExecutioner(YT_CONSOLE_ID);
 		
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
@@ -160,26 +163,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		e.preventDefault(); 
 		//obtain coding from local "exercise board"
 		const codeStr = $(this.codeInputTextArea).val();
-		this.#jsCodeExecutioner.executeCode(codeStr);
-	}
-	
-	/**
-		Hnandle tab by insertng \t
-	**/
-	handleTab(e) {
-		if(e.which===9){ 
-			const start = this.selectionStart;
-			const end = this.selectionEnd;
-			const val = this.value;
-			const selected = val.substring(start, end);
-			const re = /^/gm;
-			this.value = val.substring(0, start) + selected.replace(re, TAB_STRING) + val.substring(end);
-			//Keep the cursor in the right index
-			this.selectionStart=start+1;
-			this.selectionEnd=start+1; 
-			e.stopPropagation();
-			e.preventDefault(); 			
-		}
+		this._jsCodeExecutioner.executeCode(codeStr);
 	}
 	
 	/*
