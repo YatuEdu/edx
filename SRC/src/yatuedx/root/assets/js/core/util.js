@@ -49,4 +49,19 @@ class StringUtil {
 	}
 }
 
-export { TimeUtil, StringUtil };
+class PageUtil {
+
+	static getUrlParameterMap() {
+		const sPageURL = window.location.search.substring(1);
+		const sURLVariables = sPageURL.split('&');
+		const paramMap = new Map();
+		// enumerate the URL params to find our target
+		for (let i = 0; i < sURLVariables.length; i++) {
+			const sParameterName = sURLVariables[i].split('=');
+			const val = typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+			paramMap.set(sParameterName[0], val);
+		}
+		return paramMap;
+};}
+
+export { TimeUtil, StringUtil, PageUtil};

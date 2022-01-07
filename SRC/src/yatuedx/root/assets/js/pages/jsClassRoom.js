@@ -6,6 +6,7 @@ import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
+import {PageUtil}							from '../core/util.js';
 
 const YT_CONSOLE_ID 						= "yt_console";
 const YT_CODE_BOARD_ID 						= "yt_code_board";
@@ -33,6 +34,29 @@ class JSClassRoom extends ProgrammingClassCommandUI {
     constructor(credMan) {
 		super(credMan, YT_CONSOLE_ID);
 		this.init();
+	}
+	
+	// hook up events
+	async init() {
+		//const clssName = 'JS 101 Test'; // TODO: fetch class name from URL:
+		const paramMap = PageUtil.getUrlParameterMap();
+		const clssName = paramMap.get(sysConstants.UPN_GROUP);
+		this.#displayBoardForCoding = new DisplayBoardForCoding(clssName, this);
+		
+		// error handling code herer
+			// if err goto errpage
+		
+		// upon initialization, student board is in "exercise" mode
+		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
+		
+		// hook up event handleRun  to run code locally in learning "exercise mode"
+		$(this.runCodeButton).click(this.handleRun.bind(this));
+		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
+			
+		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
+	
+		$("#bt_white_board_send").click(this.handleSend.bind(this));
+		
 	}
 	
 	/**
@@ -65,6 +89,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	displayCodeSample(codeHtml) {
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY);
 		$(this.codeDisplayOrInputAreaDiv).html(codeHtml);
+		this.prv_clearConsole();
 	}
 	
 	/**
@@ -72,7 +97,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	**/
 	runCodeFrom(codeText) {
 		// first clear the output console
-		$(this.resultConsoleControl).val(sysConstStrings.EMPTY);
+		this.prv_clearConsole();
+		// then run the new code from teacher
 		this._jsCodeExecutioner.executeCode(codeText);
 	}
 	
@@ -118,24 +144,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE, newMode);
 	}
 		
-	// hook up events
-	async init() {
-		const clssName = 'JS 101 Test'; // TODO: fetch class name from URL:
-		this.#displayBoardForCoding = new DisplayBoardForCoding(clssName, this);
-		
-		// upon initialization, student board is in "exercise" mode
-		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
-		
-		// hook up event handleRun  to run code locally in learning "exercise mode"
-		$(this.runCodeButton).click(this.handleRun.bind(this));
-		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-			
-		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
-	
-		$("#bt_white_board_send").click(this.handleSend.bind(this));
-		
-	}
-	
 	get resultConsoleControl() {
 		return `#${YT_CONSOLE_ID}`;
 	}
@@ -179,6 +187,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	 */
 	handleClearConsole(e) {
 		e.preventDefault();
+		this.prv_clearConsole();
+	}
+	
+	prv_clearConsole() {
 		$(this.resultConsoleControl).val(sysConstStrings.EMPTY);
 	}
 	

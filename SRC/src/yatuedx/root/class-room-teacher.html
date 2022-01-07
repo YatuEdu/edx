@@ -38,9 +38,15 @@
 
     <main>
         <article class="my-5">
-            <div class="container">   
+            <div class="container"> 
+				<div class="row mb-4">			
+					<div class="col-7 text-center">
+						<button id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+						</button>
+					</div>
+				</div>	
 				<div class="row mb-4">
-					<div class="col">
+					<div class="col-7">
 						<textarea class="board"
 								  id="yt_coding_board" 
 								  spellcheck="false"
@@ -48,7 +54,7 @@
 								  rows="20">
 						</textarea>
 					</div>
-					<div class="col">
+					<div class="col-5">
 						<textarea class="board"
 								  id="yt_result_console" 
 								  spellcheck="false"
@@ -58,20 +64,27 @@
 					</div>
                 </div>
 				<div class="row mb-4">
-					<div class="col-3 text-center">
-						<a id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
-							Sync with Audience
-						</a>
+					<div class="col-2 text-center">
+						<button id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+							Sync Boards
+						</button>
 					</div>
 					<div class="col-3 text-center">
-						<a id="yt_run_code_on_student_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
-							Run code
-						</a>
+						<button id="yt_btn_erase_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+							Erase Boards
+						</button>
 					</div>
-					<div class="col-6 text-center">
-						<a id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" href="#">
-						</a>
+					<div class="col-2 text-center">
+						<button id="yt_btn_run_code_on_student_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+							Run Code
+						</button>
 					</div>
+					<div class="col-5 text-center">
+						<button id="yt_btn_erase_result" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+							Erase Result
+						</button>
+					</div>
+					
 				</div>
             </div>
         </article>

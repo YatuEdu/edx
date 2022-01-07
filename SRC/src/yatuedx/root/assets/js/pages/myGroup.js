@@ -1,9 +1,9 @@
-import {sysConstants, languageConstants} from '../core/sysConst.js'
+import {sysConstants, languageConstants, groupTypeConstants} from '../core/sysConst.js'
 import {credMan}                         from '../core/credMan.js'
 import {uiMan}                           from '../core/uiManager.js';
 import {Net}                             from '../core/net.js';
 import {getGroupCardHtml}				 from '../component/groupCard.js';
-import {StringUtil}						 from '../core/util.js';
+import {StringUtil, PageUtil}			 from '../core/util.js';
 
 /**
 	This class manages both login and sigup workflow
@@ -34,6 +34,7 @@ class MyGroupPageHandler {
 							{id: g.id, 
 							 name: g.name, 
 							 type: g.type, 
+							 owner: g.owner.trim(),
 							 hasLiveSession: g.session_is_live
 							});
 				$(".myGroupRow").append(html);
@@ -74,10 +75,29 @@ class MyGroupPageHandler {
 	**/
 	handleEntering(e) {
 		e.preventDefault();
-	
-		// go to chat page
 		const groupId = $(this).attr('data-grp-id');
-		window.location.href =  `./legacy/videoChat.html?group=${groupId}`                       //`./videoChat.html`;
+		const groupName = $(this).attr('data-grp-name');
+		// go to class room
+		const groupType = $(this).attr('data-grp-type');
+		const groupOwner = $(this).attr('data-grp-owner');
+		
+		if (groupType == groupTypeConstants.GPT_EDU_JSP) {
+			if ( (credMan.credential.role === sysConstants.YATU_ROLE_TEACHER || 
+				  credMan.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
+				  credMan.credential.name === groupOwner ) {
+				// go to class room as teacher
+				window.location.href =  `./class-room-teacher.html?group=${groupName}`;
+			}
+			else {
+				// go to class room as student
+				window.location.href =  `./class-room.html?group=${groupName}`;				
+			}
+		}
+		else {
+			// go to chat page
+			window.location.href =  `./legacy/videoChat.html?group=${groupId}`; 
+		}
+								   //`./videoChat.html`;
 
 		// `./legacy/chat.html??group=${groupId}`;
 	}

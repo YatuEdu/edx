@@ -12,6 +12,13 @@ const sysConstants = {
 	// default board rows
 	YATU_DEFAULT_BOARD_ROWS: 10,
 	
+	// role names
+	YATU_ROLE_TEACHER: 'teacher',
+	YATU_ROLE_ADMIN: 'admin',
+	
+	// URL param name:
+	UPN_GROUP: 		'group',
+	
 	// UI STATES
 	STATE_LANG_EN: 0,
 	STATE_LANG_CN: 1,
@@ -25,8 +32,8 @@ const sysConstants = {
 const sysConstStrings = {
 	EMPTY: '',
 	UNKNOWN: 'UNKNOWN',
-	SWITCH_TO_LEARNING: 'Change to learning mode (current mode: exercise)',
-	SWITCH_TO_EXERCISE: 'Change to exercise mode (current mode: learning)',
+	SWITCH_TO_LEARNING: 'Change classroom mode to learning (current mode: exercise)',
+	SWITCH_TO_EXERCISE: 'Change classroom mode to exercise (current mode: learning)',
 	
 	ATTR_MODE: 'mode',
 	TAB_STRING: '\t',
@@ -50,4 +57,10 @@ const languageConstants = {
 	SERVER_ERROR_WITH_RESPONSE: "ge_une_res",  	// generic error: unexpected service error
 };
 
-export {sysConstants, sysConstStrings, languageConstants};
+const groupTypeConstants = {
+	// known group types:
+	GPT_EDU_JSP: 10,
+};
+
+	
+export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants};

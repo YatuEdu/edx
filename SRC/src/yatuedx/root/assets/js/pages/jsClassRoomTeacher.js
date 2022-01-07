@@ -5,12 +5,16 @@ import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
+import {PageUtil}							from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE = "yt_result_console";
 const BTN_SYNC_BOARD = "yt_btn_sync_board"; 
 const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
-
+const BTN_ERASE_BOARD  = 'yt_btn_erase_board';
+const BTN_ERASE_RESULT = "yt_btn_erase_result";
+const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
+ 
 /**
 	This class handles JS Code runner board
 **/
@@ -35,7 +39,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
-		const clssName = 'JS 101 Test';
+		const paramMap = PageUtil.getUrlParameterMap();
+		const clssName = paramMap.get(sysConstants.UPN_GROUP);
+		//const clssName = 'JS 101 Test';
 		this.#displayBoardTeacher = new DisplayBoardTeacher(clssName, this);
 		
 		// set mode to teaching mode
@@ -51,11 +57,10 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		$(this.modeChangeButton).click(this.handleModeChange.bind(this));
 		
 		// hook up event 'change class mode'
-		$("#yt_run_code_on_student_board").click(this.handleRunCode.bind(this));
+		$(this.runCodeButton).click(this.handleRunCode.bind(this));
 		
-		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
-		$("#bt_console_clear").click(this.handleClearConsole.bind(this));
-		$("#bt_white_board_send").click(this.handleSend.bind(this));
+		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
+		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
 	}
 	
 	/**
@@ -128,17 +133,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	/*
 		Clear program from the board.
 	 */
-	handleClearBoard(e) {
+	handleEraseBoard(e) {
 		e.preventDefault();
-		$("#ta_white_board").val('');
+		$(this.codeInputTextArea).val('');
 	}
 	
 	/*
 		Clear text from the output console.
 	 */
-	handleClearConsole(e) {
+	handleEraseResult(e) {
 		e.preventDefault();
-		$("#ta_console").val('');
+		$(this.resultConsoleControl).val('');
 	}
 	
 	/*
@@ -148,44 +153,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault();
 		const srcTxt = $("#ta_white_board").val();
 		this.runJSCode_prv(srcTxt);
-	}
-	
-	/*
-		Send program to the group.
-	 */
-	handleSend(e) {
-		e.preventDefault();
-		const srcTxt = $("#ta_white_board").val();
-		this.print_prv("sending ...");
-	}
-	
-	/*
-		append message text to console.
-	 */
-	print_prv(msg) {
-        //  append message to console
-        const oldTxt = $("#ta_console").val();
-        const printTex = `${oldTxt} ${msg}`;
-        $("#ta_console").val(printTex);
-    }
-	
-	/*
-		Run js code 
-	 */
-	runJSCode_prv(src) {
-		if (src) {
-			try {
-				const func = new Function('print', src);
-				const res = func(this.print_prv);
-				if (res) {
-					this.print_prv(res);
-				}
-			}
-			catch (e) {
-				this.print_prv(e);
-			}
-		} 
-		console.log(`exe code: ${src}`);
 	}
 	
 	/*
@@ -207,11 +174,25 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${BTN_SYNC_BOARD}`;
 	}
 	
+	// button for erasing text from board
+	get eraseBoardButton() {
+		return `#${BTN_ERASE_BOARD}`;
+	}
+	
+	// button for RUN code
+	get runCodeButton() {
+		return `#${BTN_RUN_CODE}`;
+	}
+	
 	// button for SWITCHING mode
 	get modeChangeButton() {
 		return `#${BTN_MODE_CHANGE}`;
 	}
 	
+	// button for SWITCHING mode
+	get eraseResultButton() {
+		return `#${BTN_ERASE_RESULT}`;
+	}
 }
 
 let jsClassRoomTeacher = null;
