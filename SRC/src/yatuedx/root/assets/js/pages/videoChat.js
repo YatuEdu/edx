@@ -6,8 +6,8 @@ import { getGroupCardHtml } 				from '../dynamic/groupCard.js';
 import { StringUtil } 						from '../core/util.js';
 import {Peer} 								from '../core/peer.js';
 
-// const SIGNALING_SERVER = "/";
-const SIGNALING_SERVER = "ws://localhost:8084/";
+const SIGNALING_SERVER = "/";
+// const SIGNALING_SERVER = "ws://localhost:8084/";
 const USE_VIDEO = true;
 const MUTE_AUDIO_BY_DEFAULT = false;
 const MEDIA_BOX_MINE = `
