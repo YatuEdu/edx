@@ -14,9 +14,14 @@ export class CommClient extends Socket {
     // 准备就绪回调
     onReady() {}
 
+    // 收到私密消息回调
     onPrivateMsg(fromUser, msg) {}
+    // 收到公共消息回调
     onPublicMsg(fromUser, msg) {}
+    // 收到RTC通信消息回调
+    onRtcMsg(fromUser, msg) {}
 
+    // 发送私密消息
     sendPrivateMsg(toUser, msg) {
         let obj = {
             type: 'msgPrivate',
@@ -30,6 +35,7 @@ export class CommClient extends Socket {
         super.send(data);
     }
 
+    // 发送公共消息
     sendPublicMsg(msg) {
         let obj = {
             type: 'msgPublic',
@@ -42,6 +48,7 @@ export class CommClient extends Socket {
         super.send(data);
     }
 
+    // 获取用户列表
     getUserList() {
         let obj = {
             type: 'userList',
@@ -52,12 +59,27 @@ export class CommClient extends Socket {
         super.send(data);
     }
 
+    sendRtcMsg(toUser, msg) {
+        let obj = {
+            type: 'msgRtc',
+            data: {
+                from: this.#name,
+                to: toUser,
+                content: msg
+            }
+        };
+        let data = JSON.stringify(obj);
+        super.send(data);
+    }
+
     #name;
+    room;
 
     constructor(url, token, name, room) {
         let urlFinal = url + "?token="+token+"&room="+room+"&user="+name;
         super(urlFinal);
         this.#name = name;
+        this.room = room;
     }
 
     onOpen(e) {
@@ -74,7 +96,7 @@ export class CommClient extends Socket {
     }
 
     onMessage(msg) {
-        console.log('onMessage ' + msg);
+        // console.log('onMessage ' + msg);
         let obj = JSON.parse(msg);
         let type = obj.type;
         let data = obj.data;
@@ -94,6 +116,9 @@ export class CommClient extends Socket {
                 break;
             case 'userList':
                 this.onUserList(data);
+                break;
+            case 'msgRtc':
+                this.onRtcMsg(data.from, data.content);
                 break;
         }
     }
