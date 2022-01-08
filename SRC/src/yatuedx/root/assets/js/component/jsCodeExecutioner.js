@@ -24,7 +24,7 @@ class JSCodeExecutioner {
 	runJSCode_prv(src) {
 		if (src) {
 			try {
-				const func = new Function('shout', 'say', src);
+				const func = new Function('print', 'printx', src);
 				const res = func(this.printLine_prv.bind(this), this.print_prv.bind(this));
 				if (res) {
 					this.print_prv(res);

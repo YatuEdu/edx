@@ -4,7 +4,7 @@
     padding-right: 10px;
     padding-left: 10px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 14px;
+    font-size: 24px;
     line-height: 30px;
     color: #000000;
     text-align: right;
@@ -23,7 +23,10 @@
     padding-left: 10px;
     line-height: 30px;
     vertical-align: top;
-	font-size: 14px;
+	font-family: 'Merriweather';
+    font-weight: 700;
+	font-size: 24px;
+	line-height: 30px;
 }
 
 .blob-comment {
@@ -70,6 +73,10 @@
     height: 500px !important;       /* Just for the demo          */
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 700;
+	font-size: 24px;
+    line-height: 1.5;
 }
 
 button, input, textarea, select {

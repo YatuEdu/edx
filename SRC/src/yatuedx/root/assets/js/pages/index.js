@@ -29,8 +29,7 @@ class IndexPageHandler {
 		let btnTxt = '';
 		if (!this.#loggedIn) {
 			// fix nav bar red button
-			//btnTxt = uiMan.getText(languageConstants.SIGNIN);
-			btnTxt = "登录/注册";
+			btnTxt = uiMan.getText(languageConstants.SIGNIN);
 			$( "#index_login_or_account" ).click(this.handleLogin);
 			
 			// fix nav bar authenticated user onky items

@@ -2,7 +2,7 @@ import {languageConstants} from './sysConst.js'
 
 const translationMapEn = 
 	new Map([
-			 [languageConstants.SIGNIN, 'Login'],
+			 [languageConstants.SIGNIN, 'Log In / Sign Up'],
 			 [languageConstants.ACCOUNT, 'My Account'],
 			 [languageConstants.HOME_LINK, "Home (en)"],
 			 [languageConstants.PAGE_LINK, "Pages (en)"],				
