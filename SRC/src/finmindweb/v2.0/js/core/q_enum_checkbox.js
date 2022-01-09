@@ -109,9 +109,10 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 	serialize() {
 		this.qInfo.sv1 = this.getSerializedValue();
 	}
+	
 	getSerializedValue() {
 		let sv = '';
-		for(let i = 0; i < this._value.lenght; i++) {
+		for(let i = 0; i < this._value.length; i++) {
 			if (i > 0) {
 				sv += ',';
 			}
@@ -132,8 +133,8 @@ class UserEnumQuestionCheckbox extends UserQuestionBase {
 		for(var i = 0; i < checkboxes.length; i++) {
 			const target = checkboxes[i];
 			const inxStr = $(target).attr("data-indx");
-			const index = parseInt(inxStr, 10);
-			if (this._value.includes(index)) {
+			//const index = parseInt(inxStr, 10);
+			if (this._value.includes(inxStr)) {
 				$(target).prop('checked', true);
 			}
 			else {

@@ -28,6 +28,26 @@ class PipelineManager {
 	}		
 	
 	/**
+		Block Id and Block Info are obtained by different API at slightly diferent time.
+		Hence we need a method to set it from outside.
+	**/
+	setBlockInfo(blockName, blockDescription) {
+		this._qAndAManager.blockName = blockName;
+		this._qAndAManager.blockDescription = blockDescription;
+	}
+	
+	/**
+		Block Id and Block Info are obtained by different API at slightly diferent time.
+		Hence we need a method to set it from outside.
+	**/
+	getBlockInfo() {
+		return {
+			blockName: 			this._qAndAManager.blockName,
+			blockDescription: 	this._qAndAManager.blockDescription
+		};
+	}
+	
+	/**
 		Dynamically generated html input controls hooking up event handler
 	**/
 	hookUpEvents() {
@@ -38,9 +58,7 @@ class PipelineManager {
 		inputElements.forEach(e => e.onChangeEvent());
 		
 		// now set the input value (or selection) if any
-		inputElements.forEach(e => e.setDisplayValue());
-		
-		
+		inputElements.forEach(e => e.setDisplayValue());	
 	}
 	
 	/**
@@ -121,7 +139,10 @@ class PipelineManager {
 		this._qAndAManager = this._qAndAManagerHIstoryList[prevIndex];
 		
 		// get html
-		return this._qAndAManager.getUserQustionHtmlInternal();
+		return { name: 			this._qAndAManager.blockName,
+				 description:	this._qAndAManager.blockDescription,
+				 html:		 	this._qAndAManager.getUserQustionHtmlInternal()
+		};
 	}
 	
 	/**

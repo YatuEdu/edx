@@ -133,19 +133,22 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 	populatePreviousQuestionBlock() {
 		//const appId =  999; 
 		if (this.#applicationMan.canGotoPreviousBlock()) {
-			const qHtml = this.#applicationMan.previousBlock();
-			if (qHtml) {
-				$('#user_question_block').html(qHtml);
-				
+			const {name, description, html} = this.#applicationMan.previousBlock();
+			if (html) {
+				$('#fm_wz_block_name').text(name);
+				$('#fm_wz_block_description').html(description);
+				$('#user_question_block').html(html);
 				this.#applicationMan.hookUpEvents();
 				return;
 			}
 		}
 		
 		// no more blocks
+		/*
 		alert ('no more questions to answer');
 		$('#user_question_block').html('');
 		$('#fm_wz_next_block_button').text('Start');
+		*/
 	}
 	
 	// Get next blck of questions from finMind and dispolay it
@@ -161,6 +164,7 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 				const blockInfo = await Net.getBlockInfo(this.#applicationMan.blockId);
 				$('#fm_wz_block_name').text(blockInfo.blockName);
 				$('#fm_wz_block_description').html(blockInfo.blockDescription);
+				this.#applicationMan.setBlockInfo(blockInfo.blockName, blockInfo.blockDescription);
 				
 				// then set the html for all the questions of the block
 				$('#user_question_block').html(qHtml);

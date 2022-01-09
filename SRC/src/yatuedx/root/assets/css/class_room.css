@@ -17,7 +17,7 @@
 }
 
 .blob-code {
-	width: 70%;
+	width: 90%;
     position: relative;
     padding-right: 10px;
     padding-left: 10px;
@@ -30,7 +30,7 @@
 }
 
 .blob-comment {
-	width: 29%;
+	width: 10%;
 	min-width: 150px;
     position: relative;
     padding-right: 10px;
@@ -61,7 +61,7 @@
 }
 
 .displayComment {
-	background: #C9C9C9;
+	background: #ffffff;
 	color: #FF0000
 }
 

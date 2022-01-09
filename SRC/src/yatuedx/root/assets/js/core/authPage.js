@@ -15,7 +15,7 @@ class AuthPage {
 	 async authCheck() {
 		const loggedIn = await credMan.hasLoggedIn();
 		if (!loggedIn) {
-			// go to login page
+			// go to login page (todo: append target url): extract the file name
 			window.location.href = "./login.html";
 			return false;
 		}

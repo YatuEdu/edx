@@ -42,6 +42,8 @@ const enumMap = MetaDataManager.enumMap;
 
 class ApplicationQAndAManager {
 	#blockId;
+	#blockName;
+	#blockDescription;
 	#quesionList;
 	#appId;
 	
@@ -59,6 +61,22 @@ class ApplicationQAndAManager {
 		return this.#quesionList;
 	}
 
+	get blockName() {
+		return this.#blockName;
+	}
+	
+	set blockName(bn) {
+		this.#blockName = bn;
+	}
+	
+	get blockDescription() {
+		return this.#blockDescription;
+	}
+	
+	set blockDescription(bd) {
+		this.#blockDescription = bd;
+	}
+	
 	/**
 		Form question/answer UI by dynamically generate HTML block based
 		on the questions ALREADY in the object (obtained from server before).
@@ -231,7 +249,7 @@ class ApplicationQAndAManager {
 				qObj = this.createCompositionControl(qInfo); 
 				break;
 				
-			case 18:
+			case 34:
 			case 19:
 				qObj = new UserEnumQuestionCheckbox(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
@@ -270,7 +288,7 @@ class ApplicationQAndAManager {
 				break;
 				
 			default:
-				throw new Error("Invalid attr_type");
+				throw new Error("Invalid attr_type:" + qInfo.attr_type);
 		}
 		return qObj;
 	}

@@ -58,12 +58,12 @@ const enumBeneficiaryRelationship = ['Child', 'Spouse', 'Parent', 'Other'];
 const enumImminentEvent = 
 			['Want to consider living benefit option', 
 			 'Take or plan to take any of high-risk activities such as skydiving, scuba diving, car racing, hang gliding, ultralight flying, cave exploration, and etc.', 
-			 'A member of, or plan on joining any branch of, the Armed Forces or reserve military unit.',
-			 'Want to consider adding accidental death benefits as rider.',
+			 'A member of, or plan on joining any branch of, the Armed Forces or reserve military unit',
+			 'Want to consider adding accidental death benefits as rider',
 			 'Want to consider adding chronicle illness benefits as rider',
-			 'Want to consider adding critical medical/injuries/disability benefits as rider.',
-			 'Want to consider adding terminal illness benefits as rider.',
-			 "Want to consider adding children's term rider.",
+			 'Want to consider adding critical medical/injuries/disability benefits as rider',
+			 'Want to consider adding terminal illness benefits as rider',
+			 "Want to consider adding children's term rider",
 			];
 
 const stateList =  [
@@ -149,7 +149,7 @@ const enumMap = new Map([
 	[ 15, enumCoverageType],  			// enum type for coverage type
 	[ 16, enumTermCoverageYears],  		// enum type for term coverage years
 	[ 17, enumApplicantRelationship],  	// enum type for applicant relationship
-	[ 18, enumImminentEvent],  			// enum type for emerneng events
+	[ 34, enumImminentEvent],  			// enum type for emerneng events
 	[ 19, intention],					// enum type for issurance purpose
 	[ 20, enumYesNo],  					// enum type for yes no question with extra text area
 	[ 25, enumUsCitizenOrNot],			
