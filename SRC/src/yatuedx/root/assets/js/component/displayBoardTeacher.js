@@ -2,8 +2,10 @@ import {CommunicationSpace} 	from './communicationSpace.js';
 import {PTCC_COMMANDS}			from '../command/programmingClassCommand.js'
 import {OutgoingCommand}		from '../command/outgoingCommand.js'
 
-const lineNoTemplate = '';
-const lineTemplete ='';
+const VIDEO_TEMPLATE = `
+<
+<video class="yt_video" id="yt_vido_{pid}" autoplay playsinline>"`;
+
 
 class DisplayBoardTeacher extends CommunicationSpace {  
 	_textLines;
