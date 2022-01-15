@@ -872,7 +872,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
 
 @media screen and (min-width: 991px) {
 	body{
-		padding-top: 6rem;
+		padding-top: 1rem;
 	}
 	#fm-globalnav{
 		padding: 0;
@@ -899,7 +899,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
 
 @media screen and (max-width: 991px) {
 	body{
-		padding-top: 3.5625rem;
+		padding-top: 1.5625rem;
 	}
 	.insurance-banner::before{
 		height: 50vw;

@@ -36,65 +36,67 @@
 
     <main>
         <article class="my-5">
-            <div class="container"> 
+			<section>
 				<div class="row mb-4">
-					<div class="col">
-						<div id="yt_video_area" class="yt_video_area"></div>	
+					<div class="col-2">
+						<div id="yt_video_area" class="yt_video_area">
+						</div>	
+					</div>
+					<div class="col-10">
+						<div class="row mb-4">			
+							<div class="col-2 text-center">
+								<button id="yt_btn_erase_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+									Erase Boards
+								</button>
+							</div>
+							<div class="col-6 text-center">
+								<button id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+								</button>
+							</div>
+						</div>	
+						<div class="row mb-4">
+							<div class="col-8">
+								<textarea class="input-board"
+										  id="yt_coding_board" 
+										  spellcheck="false"
+										  value=""
+										  rows="20">
+								</textarea>
+							</div>
+							<div class="col-4">
+								<textarea class="output-board"
+										  id="yt_result_console" 
+										  spellcheck="false"
+										  value=""
+										  rows="20">
+								</textarea>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col-2 text-center">
+								<button id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+									Sync Boards
+								</button>
+							</div>
+							<div class="col-2 text-center">
+								<button id="yt_btn_run_code_on_student_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+									Run Code
+								</button>
+							</div>
+							<div class="col-2 text-center">
+								<button id="yt_btn_erase_result" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
+									Erase Result
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="row mb-4">			
-					<div class="col-2 text-center">
-						<button id="yt_btn_erase_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-							Erase Boards
-						</button>
-					</div>
-					<div class="col-6 text-center">
-						<button id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-						</button>
-					</div>
-				</div>	
-				<div class="row mb-4">
-					<div class="col-8">
-						<textarea class="board"
-								  id="yt_coding_board" 
-								  spellcheck="false"
-								  value=""
-								  rows="20">
-						</textarea>
-					</div>
-					<div class="col-4">
-						<textarea class="board"
-								  id="yt_result_console" 
-								  spellcheck="false"
-								  value=""
-								  rows="20">
-						</textarea>
-					</div>
-                </div>
-				<div class="row mb-4">
-					<div class="col-2 text-center">
-						<button id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-							Sync Boards
-						</button>
-					</div>
-					<div class="col-2 text-center">
-						<button id="yt_btn_run_code_on_student_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-							Run Code
-						</button>
-					</div>
-					<div class="col-2 text-center">
-						<button id="yt_btn_erase_result" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-							Erase Result
-						</button>
-					</div>
-					
-				</div>
-            </div>
+            </section>
         </article>
         <div class="container">
             <section class="blog-post-widget py-4">
                 <div class="container">
-                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">White-board</h5>
+                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">Post message</h5>
                         <form  class="pb-5 border-bottom">
                             <div class="row">
                                 <div class="form-group col-12 mb-4">
@@ -104,31 +106,14 @@
                             </div>
                           
                             <div class="row">
-                                <div class="col-12 text-center">
-                                    <button id="bt_white_board_run" class="btn btn-danger">Run</button>
+                                <div class="col-2 text-center">
 									<button id="bt_white_board_send" class="btn btn-danger">Send</button>
-									<button id="bt_white_board_clear" class="btn btn-danger">Clear board</button>
-                                </div>
-                            </div>
-							<div class="row">
-                                <div class="form-group col-12 mb-4">
-                                    <textarea name="comment" id="ta_console" spellcheck="false" class="form-control" rows="15"></textarea>
-                                </div>
-                            </div>
-							<div class="row">
-                                <div class="col-12 text-center">
-									<button id="bt_console_clear" class="btn btn-danger">Clear output</button>
                                 </div>
                             </div>
                         </form>
                 </div>
             </section>
         </div>
-        <section class="up-subscribe border-top">
-            <div class="container">
-              
-            </div>
-        </section>
         
     </main>
 
@@ -148,8 +133,6 @@
                 <a href="#" class="nav-link social-link-behance"> <i class="mdi mdi-behance"></i> </a>
                 <a href="#" class="nav-link social-link-dribbble"> <i class="mdi mdi-dribbble"></i> </a>
             </nav>
-            <p class="footer-text text-center">©2019 This page is protected by BootstrapDash and is subject to the
-                Google Privacy Policy and Terms of Service.</p>
         </div>
     </footer>
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>

@@ -42,48 +42,45 @@
         <article>
 			<section>
 				<div class="row mb-4">
-					<div class="col">
-						<div id="yt_video_area"></div>	
+					<div class="col-2">
+						<div id="yt_video_area" class="yt_video_area">
+						</div>	
 					</div>
-				</div>
-				<div class="row mb-4">
-					<div class="col">
-						<h6 id="yt_right_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Result Board</h6>
-					</div>
-				</div>
-				<div class="row mb-4">
-					<div class="col">
-						<h6 id="yt_left_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Code Board</h6>	
-					</div>
-					<div class="col">
-						<h6 id="yt_right_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Result Board</h6>
-					</div>
-				</div>
-				<div class="row mb-4">
-					<div class="col board">
-						<div id="yt_div_code_display_or_input_area" data-mode="-1">
-							White Board Content ....
+					<div class="col-10">
+						<div class="row mb-4">
+							<div class="col-9">
+								<h6 id="yt_left_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Code Board</h6>	
+							</div>
+							<div class="col-3">
+								<h6 id="yt_right_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Result Board</h6>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col-9">
+								<div id="yt_div_code_display_or_input_area" data-mode="-1">
+									White Board Content ....
+								</div>
+							</div>
+							<div class="col-3">
+								<textarea class="output-board"
+										  id="yt_console" 
+										  spellcheck="false" 
+										  rows="20"></textarea>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col-4 text-center">
+								<button id="yt_btn_run_code_from_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
+									Run Code
+								</button>
+							</div>
+							<div class="col-4 text-center">
+								<button id="yt_btn_clear_result" data-mode="0" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
+									Erase Result
+								</button>
+							</div>	
 						</div>
 					</div>
-					<div class="col">
-						<textarea class="board"
-							      id="yt_console" 
-								  spellcheck="false" 
-								  rows="20"></textarea>
-					</div>
-				</div>
-				<div class="row mb-4">
-					<div class="col-3 text-center">
-						<button id="yt_btn_run_code_from_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
-							Run Code
-						</button>
-					</div>
-					<div class="col-3 text-center">
-						<button id="yt_btn_clear_result" data-mode="0" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
-							Erase Result
-						</button>
-					</div>	
-				</div>
 			</section>
         </article>
     </main>

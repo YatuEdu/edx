@@ -19,7 +19,7 @@ const REPLACE_CBID = '{cbid}';
 const REPLACE_RN = '{rn}';
 
 const HIDDEN_BOARD_TEMPLATE = `
-<textarea class="board"
+<textarea class="input-board"
 		  id="{cbid}" 
 		  spellcheck="false"
 		  placeholder="ype your code herer...."

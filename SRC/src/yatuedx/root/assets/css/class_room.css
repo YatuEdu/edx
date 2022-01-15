@@ -69,8 +69,8 @@
     background: #00FF00;
 }
 
-.board {
-    height: 500px !important;       /* Just for the demo          */
+.input-board {
+    height: 600px !important;       
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -79,8 +79,22 @@
     line-height: 1.5;
 }
 
+.output-board {
+	width: 95%;
+    height: 600px !important;       
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 700;
+	font-size: 24px;
+    line-height: 1.5;
+	background: #CCCFBC !important;
+	color: #0000FF;
+}
+
+
 .yt_video_area {
-	width: 15%;
+	width: 95%;
 }
 
 .yt_video {

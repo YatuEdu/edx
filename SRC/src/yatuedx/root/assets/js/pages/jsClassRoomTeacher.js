@@ -62,6 +62,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
 		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
+		
+		// close the viedo (if any) when closing the window
+		window.unload = this.handleLeaving.bind(this);
 	}
 	
 	/**
@@ -158,6 +161,14 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault();
 		const srcTxt = $("#ta_white_board").val();
 		this.runJSCode_prv(srcTxt);
+	}
+	
+	/*
+		Closing the video sharing upon closing the window
+	 */
+	handleLeaving(e) {
+		e.preventDefault();
+		this.#displayBoardTeacher.closeWinodw();
 	}
 	
 	/*

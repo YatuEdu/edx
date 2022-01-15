@@ -213,6 +213,13 @@ class CommunicationSpace {
 	}
 	
 	/**	
+		Handle the event when the user closing this window: close the videom/ausio sharing
+	**/	
+	closeWinodw() {
+		this.handleUserLeaving(credMan.credential.name);
+	}
+	
+	/**	
 		Handle the event that represents the reveiving of a user list for all the users
 		that are currently joined.
 	**/
