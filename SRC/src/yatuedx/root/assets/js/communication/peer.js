@@ -35,7 +35,7 @@ export class Peer {
         );
 
         // 注册处理函数
-        this.#peerConnection.oniceCandidate = e => this.onIceCandidate(e);
+        this.#peerConnection.onicecandidate = e => this.onIceCandidate(e);
         this.#peerConnection.ontrack = e => this.onTrack(e.track);
 
         /* Add our local stream */
