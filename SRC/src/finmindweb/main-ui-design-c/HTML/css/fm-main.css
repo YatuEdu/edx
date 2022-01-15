@@ -247,12 +247,21 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
 	width: 2.5625rem;
 	padding: 0;
 }
+.navbar-nav .dropdown-toggle::after{
+	display: none;
+}
 .fm-globalnav-dropdown .dropdown-item .badge{
 	background-color: rgba(247, 86, 86, 0.12);
 	color: rgba(247, 86, 86, 1);
 }
 .dropdown-toggle::after{
-	display: none;
+	border: none;
+	width: 11px;
+	height: 6px;
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 0.5rem;
+	background: url("data:image/svg+xml,%3Csvg width='11' height='6' viewBox='0 0 11 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.333 1l4 3.619 4-3.619' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center 100%;
 }
 #index-top .tab-content figure{
 	height: 100%;
