@@ -1,10 +1,8 @@
 const sysConstants = {
+	// system resources
 	YATU_CRED_STORE_KEY: "yatu_cred_8838",
 	YATU_AUTH_URL: "https://rtc.4thspace.cn/bfwk-privilege-management",
 	YATU_SOCKET_URL: "wss://rtc.4thspace.cn/websocket",
-	
-	// TODO: REMOVE THIS AFTER FinMind is moved to AWS
-	FINMIND_PORT: "http://8.135.100.85:6010/bfwk-finmind",
 	
 	// token valid time winodw
 	YATU_TOKEN_VALID_IN_MIN: 10,

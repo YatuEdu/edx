@@ -7,20 +7,15 @@ const ICE_SERVERS = [
     }
 ];
 
-export class PeerNew {
+export class Peer {
 
-    onTrack(track) {
-        console.log("onTrack", track);
-        // this.#mediaStream.addTrack(event.track);
-        // this.#displayElement[0].srcObject = this.#mediaStream;
-    }
-
-    #peerConnection; // RTCPeerConnection对象
+    #peerConnection; 
     #user;
     #commClient;
     #shouldCreateOffer;
     #localAudioTrack;
     #localVideoTrack;
+	
     // #mediaStream;
 
     constructor(commClient, user, shouldCreateOffer, localAudioTrack, localVideoTrack) {
@@ -35,12 +30,12 @@ export class PeerNew {
         this.#peerConnection = new RTCPeerConnection(
             { "iceServers": ICE_SERVERS },
             { "optional": [{ "DtlsSrtpKeyAgreement": true }] } /* this will no longer be needed by chrome
-                                                            * eventually (supposedly), but is necessary
-                                                            * for now to get firefox to talk to chrome */
+																* eventually (supposedly), but is necessary
+																* for now to get firefox to talk to chrome */
         );
 
         // 注册处理函数
-        this.#peerConnection.onicecandidate = e => this.onIcecandidate(e);
+        this.#peerConnection.oniceCandidate = e => this.onIceCandidate(e);
         this.#peerConnection.ontrack = e => this.onTrack(e.track);
 
         /* Add our local stream */
@@ -73,7 +68,13 @@ export class PeerNew {
         }
     }
 
-    onIcecandidate(event) {
+	onTrack(track) {
+        console.log("onTrack", track);
+        // this.#mediaStream.addTrack(event.track);
+        // this.#displayElement[0].srcObject = this.#mediaStream;
+    }
+	
+    onIceCandidate(event) {
         if (event.candidate) {
                 this.#commClient.sendRtcMsg(this.#user,
                     {

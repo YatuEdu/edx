@@ -79,6 +79,14 @@
     line-height: 1.5;
 }
 
+.yt_video_area {
+	width: 15%;
+}
+
+.yt_video {
+	width: 95%;
+}
+
 button, input, textarea, select {
     outline: none;
     box-shadow: none;

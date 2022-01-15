@@ -10,7 +10,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	#view;
 	
 	constructor(roomName, view) {
-		super(roomName); 
+		super(roomName, view.videoAreaId); 
 		this._textLines = [];
 		this.#view = view;
 	}

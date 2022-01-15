@@ -22,6 +22,7 @@ class JSCodeExecutioner {
 		Run js code 
 	 */
 	runJSCode_prv(src) {
+		src = src.trim();
 		if (src) {
 			try {
 				const func = new Function('print', 'printx', src);
@@ -33,7 +34,9 @@ class JSCodeExecutioner {
 			catch (e) {
 				this.print_prv(e);
 			}
-		} 
+		} else {
+			this.printLine_prv('No code is present')
+		}
 		//console.log(`exe code: ${src}`);
 	}
 	

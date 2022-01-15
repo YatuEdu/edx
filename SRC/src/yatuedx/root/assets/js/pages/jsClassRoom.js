@@ -13,6 +13,7 @@ const YT_CODE_BOARD_ID 						= "yt_code_board";
 const YT_DIV_CODE_DISPLAY_OR_INPUT_AREA_ID 	= "yt_div_code_display_or_input_area";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
+const VD_VIEDO_AREA = "yt_video_area";
 
 const REPLACE_CBID = '{cbid}';
 const REPLACE_RN = '{rn}';
@@ -21,7 +22,7 @@ const HIDDEN_BOARD_TEMPLATE = `
 <textarea class="board"
 		  id="{cbid}" 
 		  spellcheck="false"
-		  placeholder='type your code herer....'
+		  placeholder="ype your code herer...."
 		  rows="{rn}"></textarea>`;
 								  
 /**
@@ -32,7 +33,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#displayBoardForCoding;
 	
     constructor(credMan) {
-		super(credMan, YT_CONSOLE_ID);
+		super(credMan, YT_CODE_BOARD_ID, YT_CONSOLE_ID, VD_VIEDO_AREA);
 		this.init();
 	}
 	
@@ -169,9 +170,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	**/
 	handleRun(e) {
 		e.preventDefault(); 
-		//obtain coding from local "exercise board"
-		const codeStr = $(this.codeInputTextArea).val();
-		this._jsCodeExecutioner.executeCode(codeStr);
+		
+		//obtain code from local "exercise board" and execute it locally
+		super.runCodeFromTextInput();
 	}
 	
 	/*

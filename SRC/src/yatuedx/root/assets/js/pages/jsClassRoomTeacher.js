@@ -9,6 +9,7 @@ import {PageUtil}							from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE = "yt_result_console";
+const VD_VIEDO_AREA = "yt_video_area";
 const BTN_SYNC_BOARD = "yt_btn_sync_board"; 
 const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
 const BTN_ERASE_BOARD  = 'yt_btn_erase_board';
@@ -22,7 +23,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
 	
     constructor(credMan) {
-		super(credMan, TA_RESULT_CONSOLE);
+		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, VD_VIEDO_AREA);
 		this.init();
 	}
 	
@@ -79,8 +80,12 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault(); 
 		
 		// run code locally first
+		super.runCodeFromTextInput();
+		
+		/*
 		const codeStr = $(this.codeInputTextArea).val();
 		this._jsCodeExecutioner.executeCode(codeStr);
+		*/
 		
 		// run code for each student second
 		this.#displayBoardTeacher.runCode();

@@ -5,9 +5,13 @@ import {sysConstants, sysConstStrings} 	from '../core/sysConst.js'
 
 class ProgrammingClassCommandUI extends AuthPage {
 	_jsCodeExecutioner;
+	_codeInputId;
+	_videoAreaId;
 	
-	constructor(credMan, resultConsolId) {
+	constructor(credMan, codeInputId, resultConsolId, videoAreaId) {
 		super(credMan);
+		this._codeInputId = codeInputId;
+		this._videoAreaId = videoAreaId;
 		
 		// create js code executioner
 		this._jsCodeExecutioner =  new JSCodeExecutioner(resultConsolId);
@@ -37,6 +41,37 @@ class ProgrammingClassCommandUI extends AuthPage {
 			e.stopPropagation();
 			e.preventDefault(); 			
 		}
+	}
+	
+	/**
+		Hnandle running JS code from UI text area
+	**/
+	runCodeFromTextInput() {
+		//obtain coding from local "exercise board"
+		// if there is a selection, run selected text as code
+		let codeStr = window.getSelection().toString();
+		if (!codeStr) {
+			codeStr = $(this.codeInputId).val();
+		}
+		else {
+			// de-select the selected text so that it does not confuse the
+			// user with a hidden selection
+			if (window.getSelection) {
+				window.getSelection().removeAllRanges();
+			}
+			else if (document.selection) {
+				document.selection.empty();
+			}
+		}
+		this._jsCodeExecutioner.executeCode(codeStr);
+	}
+	
+	get codeInputId() {
+		return `#${this._codeInputId}`;
+	}
+	
+	get videoAreaId() {
+		return `#${this._videoAreaId}`;
 	}
 }
 
