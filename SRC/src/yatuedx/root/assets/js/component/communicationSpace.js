@@ -38,7 +38,6 @@ class CommunicationSpace {
 		Initializing the socket client and get ready for communication between classmates and teacher
 	 **/
 	async init(roomName) {
-			debugger
 		const token = credMan.credential.token;
 		const name  = credMan.credential.name;
 			

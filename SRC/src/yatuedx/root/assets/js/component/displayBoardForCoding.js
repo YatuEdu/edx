@@ -208,7 +208,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 	#view;
 	
 	constructor(roomName, view) {
-		super(roomName); 
+		super(roomName, view.videoAreaId); 
 		this.#view = view;
 		this.initUI();
 	}
