@@ -15,6 +15,18 @@ export class SessionStoreAccess {
 		sessionStorage.setItem(this.#propName, str);
 	}
 	
+	// Store Object
+	storeObj(obj) {
+		const str = JSON.stringify(obj);
+		this.setItem(str);
+	}
+	
+	// Retrieve Object from saved string
+	retrieveObj() {
+		const str = this.getItem();
+		return JSON.parse(str);
+	}
+	
 	// remove value by key
 	removeItem() {
 		sessionStorage.removeItem(this.#propName);

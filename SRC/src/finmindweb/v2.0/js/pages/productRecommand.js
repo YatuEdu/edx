@@ -1,22 +1,34 @@
 import {sysConstants} 				from '../core/sysConst.js'
 import {credMan}      				from '../core/credManFinMind.js'
-import {Net}          				from '../core/net.js';
 import {SessionStoreAccess}			from '../core/sessionStorage.js'
-import {ApplicationPipelineManager} from '../core/applicationPipelineManager.js';
-import {WizardPipelineManager} 		from '../core/wizardPipelineManager.js';
 import {HomeAndWizardHeader} 		from './header.js';
-import {URL_LIST_HTML} 				from './urlList.js';
+
+const TABLE_BODY_ID = 'fm_tb_recommended_products';
+
+const REPLACEMENT_FOR_PRODUCT_NAME = "{pn}";
+const REPLACEMENT_FOR_MONTHLY_PREMIUM = "{mp}";
+const REPLACEMENT_FOR_ID = "{id}";
+
+const TEMPLATE_PROD = `
+<tr>
+	<td class="text-primary">{pn}</td>
+	<td>For most people that want to do</td>
+	<td class="advantages"><a href="">Advantages</a>,<a href="">Advantages</a></td>
+	<td class="price text-black">${mp}/Month</td>
+	<td class="text-end">
+		<input id={id} type="radio" class="btn-check" name="product-select" autocomplete="off">
+		<label class="btn btn-outline-primary fs-7" for="product-1">Select</label>
+	</td>
+</tr>
+`;
 
 /**
 	This class manages both login and sigup workflow
 **/
-class QuestionAnswerRecorder extends HomeAndWizardHeader {
-	#applicationMan;
-	
+class ProductRecommand extends HomeAndWizardHeader {
 	
     constructor(credMan) {
 		super(credMan); 
-		this.#applicationMan = null;
 		this.init();
 	}
 	
@@ -157,8 +169,8 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 		const qHtml = await this.#applicationMan.nextBlock(this.credMan.credential.token);
 		if (qHtml) {
 			if (qHtml.quote) {
-				if (!qHtml.data) {
-					window.location.href = `./${URL_LIST_HTML.NO_PRODUCT_FOUND}`; 
+				if (!qHtml.data.insurer) {
+					window.location.href = "./wizard-no-prod.html";
 				}
 				else {
 					// save quote to local storage
@@ -166,7 +178,7 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 					sessionStore.storeObj(qHtml.data);
 					
 					// go to quote premium page
-					window.location.href = `./${URL_LIST_HTML.PRODUCT_LIST}`; 
+					window.location.href = "./product-list";
 				}
 				return;
 			}

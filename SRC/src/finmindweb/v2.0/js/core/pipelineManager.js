@@ -86,15 +86,16 @@ class PipelineManager {
 		
 		// fill question html
 		if (resp && resp.err) {
-			alert(resp.err);
+			alert(resp.err); // todo: go to error pageX
 			return '';
 		}
 		
-		// got quote already， show it:
+		// got quote already， return it it:
 		if (resp.quote) {
 			return resp;
 		}
 		
+		// still got more questions to answer
 		return await this.prv_composeUserQustionHtml(resp.data);
 	}
 	

@@ -38,7 +38,7 @@ class CredentialManager {
 		// error?
 		if (ret.err) {
 			// TO DO: GO TO ERROR PAGE
-			this.#authError = ret.err;
+			this.#authError = ret.err.msg;
 		}
 		else {
 			// got result in data:
@@ -81,7 +81,7 @@ class CredentialManager {
 			
 			// remote call
 			const ret = await Net.tokenCheck(t);
-			if ( ret.code == 0 ) {
+			if ( ret.err ) {
 				this.update_cred(this.#userCredInfo);
 				return true;
 			}

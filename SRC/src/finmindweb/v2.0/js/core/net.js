@@ -9,6 +9,7 @@ const API_FOR_PIPELINE_BLOCKS = 2021829;
 const API_FOR_GETTING_QA_IN_BLOCK = 2021830;
 const API_FOR_SIGN_IN_WITH_EMAIL = 2021830;
 const API_FOR_SIGN_IN_WITH_NAME = 202102;
+const API_FOR_BEST_PREMIUM_QUOTE = 2021809;
 
 const FILE_UPLOAD_OP = 1;
 const FILE_LIST_OP = 2;
@@ -251,7 +252,17 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-		
+	
+
+	/**
+		FinMind API for Best premium 
+	**/	
+	static async getBestPremium(quoteXML) {
+		const req = Net.composeRequestDataForBestPremium_private(quoteXML, API_FOR_BEST_PREMIUM_QUOTE);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+	
 	/**
 		FinMind API for getting all messages 
 	**/	
@@ -282,6 +293,22 @@ class Net {
 			data: {					
 				prodId: prodId,
 				applicantRelationShip: 0
+			}
+		};
+		return Net.composePostRequestFromData_private(requestData);
+	}
+	
+	/**
+		compose finMind API request for Best Premium
+	**/	
+	static composeRequestDataForBestPremium_private(quoteXML, apiId) {
+		const requestData = {
+			header: {
+				token: '',
+				api_id: apiId
+			},
+			data: {
+				quote: quoteXML
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
@@ -628,15 +655,15 @@ class Net {
 				throw new Error(message);
 			}
 
-			const data = await response.json();
-			ret.data = data.data;
-			ret.code = data.result.code
-			if (ret.code !== 0) {
-				ret.err = "error"; // uiMan.getTextWithParams(languageConstants.SERVER_ERROR_WITH_RESPONSE, data.result.code);
+			const res = await response.json();
+			ret.data = res.data;
+			ret.errCode = res.result.code
+			if (ret.errCode !== 0) {
+				ret.err = {code: ret.errCode, msg: res.result.msg}; 
 			}
 		}
-		catch (err) {
-			ret.err = err;
+		catch (ex) {
+			ret.err = {code: 1099, msg: ex.message};
 		}
 		return ret;
 	}

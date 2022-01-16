@@ -1,6 +1,7 @@
 const sysConstants = {
 	FINMIND_CRED_STORE_KEY: 		"finmind_cred_8838",
 	FINMIND_WIZARD_STORE_KEY: 		"finmind_wizard_8838",
+	FINMIND_BEST_PREMIUM_STORE_KEY: "finmind_bstprm_8838",
 	FINMIND_BENEFICIARY_STORE_KEY: 	"finmind_beneficiary_8838",
 	FINMIND_EXISTING_STORAGE_KEY: 	"finmind_existing_storage_8838",
 	
