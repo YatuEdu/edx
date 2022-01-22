@@ -33,6 +33,16 @@ class TimeUtil {
 
 class StringUtil {
 	/*
+		Tell if an objectct is a string or not
+	 */
+	static isString(obj) {
+		if (typeof obj === 'string' || obj instanceof String) {
+			return true;
+		}
+		return false;
+	}
+		
+	/*
 	  most of Yatu control id is in form of "btn_xxx", where xxx is the associated
 	  object id.  The id could be user, group, or anything else.
 	  */

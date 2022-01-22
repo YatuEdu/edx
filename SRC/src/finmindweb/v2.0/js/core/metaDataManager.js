@@ -51,8 +51,40 @@ const enumCoverageAmount =  [
 '9millions',
 '10millions',
 ];
+
+
+// convertion map: amount string to amount integer
+const AMOUNT_CONVERTION_MAP = new Map([
+	['300K', 		300000],
+	['400K', 		400000],
+	['500K', 		500000],
+	['600K', 		600000],
+	['700K', 		700000],
+	['800K', 		800000],
+	['900K', 		900000],
+	['1million',  	1000000],
+	['2millions', 	2000000],
+	['3millions', 	3000000],
+	['4millions', 	4000000],
+	['5millions', 	5000000],
+	['6millions', 	6000000],
+	['7millions', 	7000000],
+	['8millions', 	8000000],
+	['9millions', 	9000000],
+	['10millions',  10000000], 
+]);
+
 const enumCoverageType =  ['Term Life', 'Permanent Life'];
-const enumTermCoverageYears = ['10 years', '15 years', '20 years', '25 years', '30 years', '35 years', '40 years'];
+const enumTermCoverageYears = [
+	'Permanent life',
+	'10 years', 
+	'15 years', 
+	'20 years', 
+	'25 years', 
+	'30 years', 
+	'35 years', 
+	'40 years'];
+
 const enumApplicantRelationship = ['Self', 'Child', 'Parent', 'Spouse'];
 const enumBeneficiaryRelationship = ['Child', 'Spouse', 'Parent', 'Other'];
 const enumImminentEvent = 
@@ -135,7 +167,7 @@ const enumInsCompanies = [
 'Other',
 ];
 
-
+	 
 // TODO: obtain this from server 
 const enumMap = new Map([
     [ 6, enumValueForSex ],  			// enum type for sex
@@ -231,6 +263,13 @@ class MetaDataManager {
 	**/
 	static get enumMap() {
 		return enumMap
+	}
+	
+	/**
+		get amount convertion map
+	**/
+	static get amountConvertionMap() {
+		return AMOUNT_CONVERTION_MAP;
 	}
 	
 	/**

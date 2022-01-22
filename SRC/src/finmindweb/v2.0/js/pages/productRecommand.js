@@ -169,6 +169,7 @@ class ProductRecommand extends HomeAndWizardHeader {
 		const qHtml = await this.#applicationMan.nextBlock(this.credMan.credential.token);
 		if (qHtml) {
 			if (qHtml.quote) {
+				debugger;
 				if (!qHtml.data.insurer) {
 					window.location.href = "./wizard-no-prod.html";
 				}

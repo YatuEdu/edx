@@ -1,5 +1,18 @@
 import {PipelineManager}			from './pipelineManager.js'
 import {Net}          				from './net.js';
+import {MetaDataManager}			from './metaDataManager.js'
+import {StringUtil}					from './util.js'
+
+const calcAmount = (amountString) => {
+	const amntMap = MetaDataManager.amountConvertionMap;
+	return amntMap.get(amountString);
+}
+
+const calcTime = (timeString) =>  {
+	const years = timeString.split(' ')[0];
+	return parseInt(years);
+}
+
 
 const QUOTE_API_ATTR_LIST = [
 	{
@@ -34,11 +47,17 @@ const QUOTE_API_ATTR_LIST = [
 		attr: 'app_habit_hard_drugs',
 		field: 'sv1',
 	},
-	/*{
+	{
 		attr: 'app_coverage_amount',
 		field: 'sv1',
-	} */
-	
+		calculate: calcAmount, 
+	},
+	{
+		decideToUseApi: true,
+		attr: 'app_coverage_time',
+		field: 'sv1',
+		calculate:  calcTime, // time
+	},
 ];
 
 
@@ -57,8 +76,8 @@ const QUOTE_API_MESSAGE_TEMPLATE = `
 		<checkedOptions>LIVING_BENEFIT</checkedOptions>
 		<checkedOptions>ACCIDENTAL_DEATH_RIDER</checkedOptions>
 		<checkedOptions>CHRONICLE_ILLNESS_RIDER</checkedOptions>
-		<coverageAmount>300000</coverageAmount>
-		<coverageTime>20</coverageTime>
+		<coverageAmount>[attr_8]</coverageAmount>
+		<coverageTime>[attr_9]</coverageTime>
 </quoteRequest>`;
 
 /**
@@ -123,23 +142,48 @@ class WizardPipelineManager extends PipelineManager {
 		const qMap = this.prot_deserialize();
 		
 		const qArray = Array.from(qMap, ([name, value]) => ({ name, value }));
-		
+		let useTermAPI = true;
 		let xml = QUOTE_API_MESSAGE_TEMPLATE;
 		for (let i = 0; i < QUOTE_API_ATTR_LIST.length; i++ ) {
 			const replaceMent = `[attr_${i}]`;
 			const replaceMentAttr = QUOTE_API_ATTR_LIST[i].attr;
 			const replaceMentFiled = QUOTE_API_ATTR_LIST[i].field;
+			const decideToUseApi = QUOTE_API_ATTR_LIST[i].decideToUseApi;
+			const calculate = QUOTE_API_ATTR_LIST[i].calculate;
 			const replacementObj = qArray.find(e => e.value.attr_name === replaceMentAttr);
-			const replaceMentValue = replacementObj.value[replaceMentFiled];
-			xml = xml.replace(replaceMent, replaceMentValue.toUpperCase());
+			let replaceMentValue = replacementObj.value[replaceMentFiled];
+			if (calculate) {
+				// need re-calculate (for amount and time)?
+				replaceMentValue = calculate(replaceMentValue);
+			}
+			
+			// decide to use API  or go to another page?
+			if (decideToUseApi) {
+				if (isNaN(replaceMentValue)) {
+					useTermAPI = false;
+					break;
+				}
+			}
+			if (StringUtil.isString(replaceMentValue) ) {
+				// the API only likes upper case value
+				replaceMentValue = replaceMentValue.toUpperCase();
+			}
+			xml = xml.replace(replaceMent, replaceMentValue);
 		}
 		
 		// form quote api
-		const resp = await Net.getBestPremium(xml);
-			
-		// now call API to get quote
-		if (!resp.err) {
-			return resp.data[0];
+		if (useTermAPI) {
+			const resp = await Net.getBestPremium(xml);
+				
+			// now call API to get quote
+			if (!resp.err) {
+				return resp.data[0];
+			}
+		}
+		else {
+			// use permanant life 
+			const ret = {isPermanantLife: true};
+			return ret;
 		}
 		
 		return resp.data[0];

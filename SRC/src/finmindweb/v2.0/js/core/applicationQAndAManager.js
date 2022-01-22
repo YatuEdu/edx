@@ -219,7 +219,8 @@ class ApplicationQAndAManager {
 			case 11:
 				qObj = new UserDateQuestion(qInfo); 
 				break;
-				
+			
+			// radio types
 			case 6:
 			case 7:
 			case 8:
@@ -228,12 +229,13 @@ class ApplicationQAndAManager {
 			case 12:
 			case 13:
 			case 15:
-			case 16:
 			case 17:
 				qObj = new UserEnumQuestionRadio(qInfo, enumMap.get(qInfo.attr_type)); 
 				break;
-				
+			
+			// drop down types
 			case 14:
+			case 16:
 			case 26:
 			case 27:
 			case 28:

@@ -160,6 +160,10 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 				if (!qHtml.data) {
 					window.location.href = `./${URL_LIST_HTML.NO_PRODUCT_FOUND}`; 
 				}
+				else if (qHtml.data.isPermanantLife) {
+					// go to permanant life inssurance page
+					window.location.href = `./${URL_LIST_HTML.CONTACT_US}`; 
+				}
 				else {
 					// save quote to local storage
 					const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_BEST_PREMIUM_STORE_KEY);
