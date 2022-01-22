@@ -56,11 +56,8 @@ class CommunicationSpace {
 			this._videoTrack = tracks[1];
 			this.handleRemoteVideoTrack(name, this._videoTrack);
 		} catch (e) {
-			alert('Failed to initialize media tracks');
-			return;
+			alert('Failed to initialize viedo tracks');
 		}
-		
-		
 		
 		// create the communication client to handle p2p commuinication
 		const room = groupSession.data[0].session_id;
@@ -94,13 +91,15 @@ class CommunicationSpace {
 		/*
 			If we need video for the communication board, create video client
 		*/
-		this._videoClient = new VideoClient(this._commClient, this._audioTrack , this._videoTrack);
-
-        // 收到音频轨道或视频轨道，需要放在MediaStream对象中
-        // 如果音视频轨道放在同一个MediaStream对象中，会进行音视频同步，否则独立播放
-        // 这里展示独立播放
-        this._videoClient.onRemoteVideoTrack = this.handleRemoteVideoTrack.bind(this);
-        this._videoClient.onRemoteAudioTrack = this.handleRemoteAudioTrack.bind(this);
+		if (this._videoTrack && this._audioTrack) {
+			this._videoClient = new VideoClient(this._commClient, this._audioTrack , this._videoTrack);
+		
+			// 收到音频轨道或视频轨道，需要放在MediaStream对象中
+			// 如果音视频轨道放在同一个MediaStream对象中，会进行音视频同步，否则独立播放
+			// 这里展示独立播放
+			this._videoClient.onRemoteVideoTrack = this.handleRemoteVideoTrack.bind(this);
+			this._videoClient.onRemoteAudioTrack = this.handleRemoteAudioTrack.bind(this);
+		}
 		
         // 下面是屏幕共享的方法
         $("#screenShareBtn").click(async e => {
@@ -185,7 +184,9 @@ class CommunicationSpace {
 		console.log('User joined: ' + user);
 		// Start receiving a new user's video (if the user is a teacher)
 		// TODO: decide if the user is teacher
-		this._videoClient.startShare(user, true);
+		if (this._videoClient) {
+			this._videoClient.startShare(user, true);
+		}
 	}
 	
 	/**	
@@ -197,7 +198,9 @@ class CommunicationSpace {
 		console.log('User left: ' + user);
 		
 		// 停止共享本地音视频
-        this._videoClient.stopShare(user);
+		if (this._videoClient) {
+			this._videoClient.stopShare(user);
+		}
         let userObj = this._userMap.get(user);
 		if (userObj != null) {
 			if (userObj.videoTag !=null) {

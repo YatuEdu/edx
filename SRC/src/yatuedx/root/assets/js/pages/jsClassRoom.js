@@ -70,11 +70,21 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 				this.setClassMode(cmd.data[0]);
 				break;
 				
-			// display formated code sample on board
+			// display code sample on board
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
-				this.displayCodeSample(cmd.data[0]);
+				this.displayCodeSample(cmd.data);
+				break;
+				
+			// modify code sample on board
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
+				this.displayCodeSample(cmd.data);
 				break;
 			
+			// update the sample code
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+				this.updateCodeSample(cmd.data[0], cmd.data[1]);
+				break;
+				
 			// run code sample and show result on console
 			case PTCC_COMMANDS.PTC_CODE_RUN:
 				this.runCodeFrom(cmd.data[0]);
@@ -87,10 +97,34 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		Display JS Code Smaple on the Whiteboard
 	**/	
-	displayCodeSample(codeHtml) {
-		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY);
-		$(this.codeDisplayOrInputAreaDiv).html(codeHtml);
+	displayCodeSample(codeData) {
+		const srcCode = codeData[0];
+		const formattedCode = codeData[1];
+		const currentMode = $(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE);
+		if (currentMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			// show in formatted code on board
+			$(this.codeDisplayOrInputAreaDiv).html(formattedCode);
+		}
+		else {
+			$(this.codeInputTextArea).val(srcCode);
+		}
 		this.prv_clearConsole();
+	}
+	
+	/**
+		Append or replace Code Smaple on the Whiteboard
+	**/	
+	updateCodeSample(how, text) {
+		switch(how) {
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
+				const newCode = $(this.codeInputTextArea).val() + text;
+				$(this.codeInputTextArea).val(newCode);
+				break;
+				
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
+				$(this.codeInputTextArea).val(text);
+				break;
+		}
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 import {CommunicationSpace} 	from './communicationSpace.js';
 import {PTCC_COMMANDS}			from '../command/programmingClassCommand.js'
 import {OutgoingCommand}		from '../command/outgoingCommand.js'
+import {CodeSyncManager} 		from '../component/codeSyncManager.js'	
 
 const VIDEO_TEMPLATE = `
 <
@@ -10,11 +11,34 @@ const VIDEO_TEMPLATE = `
 class DisplayBoardTeacher extends CommunicationSpace {  
 	_textLines;
 	#view;
+	#codeSyncManager;
 	
 	constructor(roomName, view) {
 		super(roomName, view.videoAreaId); 
 		this._textLines = [];
 		this.#view = view;
+		this.#codeSyncManager = new CodeSyncManager();
+	}
+	
+	/**
+		Update code buffer sample and sync with students
+	**/
+	updateCodeBufferAndSync(codeStr) {
+		const codeUpdateObj = this.#codeSyncManager.update(codeStr);
+		switch (codeUpdateObj.flag) {
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
+				// do nothing
+				break;
+				
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
+				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, codeUpdateObj.flag, codeUpdateObj.content);
+				this._commClient.sendPublicMsg(cmd.str);
+				break;
+				
+		default:
+			break;
+		}
 	}
 	
 	/**

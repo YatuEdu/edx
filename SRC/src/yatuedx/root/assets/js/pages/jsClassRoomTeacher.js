@@ -21,6 +21,7 @@ const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
 **/
 class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
+	#timer;
 	
     constructor(credMan) {
 		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, VD_VIEDO_AREA);
@@ -40,6 +41,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
+		debugger
 		const paramMap = PageUtil.getUrlParameterMap();
 		const clssName = paramMap.get(sysConstants.UPN_GROUP);
 		//const clssName = 'JS 101 Test';
@@ -65,6 +67,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
+		
+		// timer for refreshing code buffered
+		this.#timer = setInterval(this.updateCodeBufferAndSync.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+	}
+	
+	/**
+		Update code buffer sample and sync with students
+	**/
+	updateCodeBufferAndSync() {
+		const codeStr = $(this.codeInputTextArea).val();
+		this.#displayBoardTeacher.updateCodeBufferAndSync(codeStr);
 	}
 	
 	/**
@@ -168,6 +181,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 */
 	handleLeaving(e) {
 		e.preventDefault();
+		
+		// clear timer first
+		clearInterval(this.#timer);
+		
+		// clase window
 		this.#displayBoardTeacher.closeWinodw();
 	}
 	

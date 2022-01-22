@@ -10,6 +10,9 @@ const sysConstants = {
 	// default board rows
 	YATU_DEFAULT_BOARD_ROWS: 10,
 	
+	// code buffer refresh time (ms)
+	YATU_CODE_BUFFER_REFRESH_FREQUENCY: 5000,
+	
 	// role names
 	YATU_ROLE_TEACHER: 'teacher',
 	YATU_ROLE_ADMIN: 'admin',
