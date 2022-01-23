@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet" />
+<title>FinMind</title>
+</head>
+<body>
+
+<nav id="fm-globalnav" class="navbar navbar-expand-lg fixed-top bg-white">
+	<div class="container">
+		<a class="navbar-brand p-0 m-0" href="index.html"><img src="img/logo.svg" class="img-fluid"></a>
+		<button class="navbar-toggler bg-primary navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="navbar-nav justify-content-center flex-grow-1">
+				<li class="nav-item mx-lg-3">
+					<a class="nav-link" href="index.html">Home</a>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarInsurance" data-bs-toggle="dropdown"  href="#">Insurance</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7"> 
+						<li>
+							<a href="Insurance.html" class="dropdown-item rounded-3">Insurance-101</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">FAQ</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Tax</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">For Immigrants</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Senior Life</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarProducts" data-bs-toggle="dropdown"  href="#">Products</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Insurance Companies <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Hottest Products</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarEvents" data-bs-toggle="dropdown"  href="#">Events</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Events <span class="badge ms-1">Hot</span></a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Youtube Channel</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">Library</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item mx-lg-3 dropdown fm-globalnav-dropdown">
+					<a class="nav-link dropdown-toggle" id="navbarAboutUs" data-bs-toggle="dropdown"  href="#">About Us</a>
+					<ul class="dropdown-menu dropdown-lg-menu border-0 px-0 px-lg-3 fs-7">
+						<li>
+							<a href="" class="dropdown-item rounded-3">Why Join Us</a>
+						</li>
+						<li>
+							<a href="" class="dropdown-item rounded-3">People</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<a class="btn btn-primary fw-bold px-4 rounded-pill" href="Login.html">
+				Sign In
+			</a>
+		</div>
+	</div>
+</nav>
+
+<div id="wizard-steps" class="progress">
+	<div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-primary" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+	<div class="progress-bar bg-primary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<div class="nav-back container mt-4 mt-md-5">
+	<a href="Wizard5.html" class="text-body text-opacity-50 text-decoration-none">Back</a>
+</div>
+
+<div class="container mb-5">
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<h2 class="text-center mb-5">
+				All available products for you:
+			</h2>
+			<table class="table table-borderless companies-table border-bottom" id="all-available-products"  data-list='{"valueNames":["advantages","price"]}'>
+				<thead>
+					<tr class="border-bottom">
+						<th>PRODUCT NAME</th>
+						<th>BRIEF</th>
+						<th class="sort" data-sort="advantages">ADVANTAGES</th>
+						<th class="sort" data-sort="price">PRICE</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody class="list">
+					<tr>
+						<td class="text-primary">Product Name</td>
+						<td>For most people that want to do</td>
+						<td class="advantages"><a href="">Advantages</a>,<a href="">Advantages</a></td>
+						<td class="price text-black">$200/Month</td>
+						<td class="text-end">
+							<input type="radio" class="btn-check" name="product-select" id="product-1" autocomplete="off">
+							<label class="btn btn-outline-primary fs-7" for="product-1">Select</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="text-primary">Product Name</td>
+						<td>For most people that want to do</td>
+						<td class="advantages"><a href="">Advantages1</a>,<a href="">Advantages</a></td>
+						<td class="price text-black">$203/Month</td>
+						<td class="text-end">
+							<input type="radio" class="btn-check" name="product-select" id="product-2" checked autocomplete="off">
+							<label class="btn btn-outline-primary fs-7" for="product-2">Selected</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="text-primary">Product Name</td>
+						<td>For most people that want to do</td>
+						<td class="advantages"><a href="">Advantages2</a>,<a href="">Advantages</a></td>
+						<td class="price text-black">$202/Month</td>
+						<td class="text-end">
+							<input type="radio" class="btn-check" name="product-select" id="product-3" autocomplete="off">
+							<label class="btn btn-outline-primary fs-7" for="product-3">Select</label>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-12">
+			<div class="d-flex justify-content-center mt-5 pt-0 pt-lg-5">
+				<button class="btn btn-primary btn-xl px-5" type="submit">
+					Start application with the selected product
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+	var options = {
+	  valueNames: [ 'advantages','price']
+	};
+	
+	var userList = new List('all-available-products', options);
+</script>
+
+
+</body>
+</html>
