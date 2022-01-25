@@ -37,6 +37,7 @@ export class CommClient extends Socket {
 
     // 发送公共消息
     sendPublicMsg(msg) {
+		console.log('sendPublicMsg: ' + msg);
         let obj = {
             type: 'msgPublic',
             data: {

@@ -42,7 +42,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		//const clssName = 'JS 101 Test'; // TODO: fetch class name from URL:
 		const paramMap = PageUtil.getUrlParameterMap();
 		const clssName = paramMap.get(sysConstants.UPN_GROUP);
-		this.#displayBoardForCoding = new DisplayBoardForCoding(clssName, this);
+		const teacherName =paramMap.get(sysConstants.UPN_TEACHER);
+		this.#displayBoardForCoding = new DisplayBoardForCoding(clssName, teacherName, this);
 		
 		// error handling code herer
 			// if err goto errpage
@@ -58,6 +59,22 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 		$("#bt_white_board_send").click(this.handleSend.bind(this));
 		
+	}
+	
+	/**
+		Execute when timer is triggered.  Call updateCodeBufferAndSync
+	**/
+	v_handleTimer() {
+		this.updateCodeBufferAndSync();
+	}
+	
+	/**
+		Periodically passing our code to teacher to examine student's progress.
+	 **/
+	updateCodeBufferAndSync() {
+		console.log('JSClassRoom.updateCodeBufferAndSync called');
+		const codeUpdateObj = this.updateCode(this.code); 
+		this.#displayBoardForCoding.updateCodeBufferAndSync(codeUpdateObj);
 	}
 	
 	/**
@@ -106,7 +123,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.codeDisplayOrInputAreaDiv).html(formattedCode);
 		}
 		else {
-			$(this.codeInputTextArea).val(srcCode);
+			this.code=srcCode;
 		}
 		this.prv_clearConsole();
 	}
@@ -115,16 +132,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Append or replace Code Smaple on the Whiteboard
 	**/	
 	updateCodeSample(how, text) {
-		switch(how) {
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
-				const newCode = $(this.codeInputTextArea).val() + text;
-				$(this.codeInputTextArea).val(newCode);
-				break;
-				
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
-				$(this.codeInputTextArea).val(text);
-				break;
-		}
+		// obtain the new code sample using an algorithm defined in parent class as a static method
+		const newCode = ProgrammingClassCommandUI.updateContentByDifference(how, this.code, text);
+		
+		// update the code on UI
+		this.code = newCode;
 	}
 	
 	/**
@@ -134,7 +146,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// first clear the output console
 		this.prv_clearConsole();
 		// then run the new code from teacher
-		this._jsCodeExecutioner.executeCode(codeText);
+		super.executeCode(codeText);
 	}
 	
 	/**
@@ -148,31 +160,42 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			// clear code transmit timer
+			this.startOrStopCodeRefreshTimer(false);
+			
 			// result console readonly
 			$(this.resultConsoleControl).attr('readonly', true);
 			$(this.resultConsoleControl).addClass('input-disabled');
+			$(this.codeInputTextArea).addClass('input-disabled');
+			
 			// Make code-demo board active
-			$(this.codeDisplayOrInputAreaDiv).html(sysConstStrings.EMPTY);
+			// $(this.codeDisplayOrInputAreaDiv).html(sysConstStrings.EMPTY);
 			// hide run code and clear consol buttons
 			$(this.runCodeButton).hide(); 
 			$(this.clearResultButton).hide();
 		}
 		else if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+			// restart code transmit timer
+			// clear code transmit timer
+			this.startOrStopCodeRefreshTimer(true);
+			
 			// result console read and write
 			$(this.resultConsoleControl).attr('readonly', false);
 			$(this.resultConsoleControl).removeClass('input-disabled');
+			$(this.codeInputTextArea).removeClass('input-disabled');
 			// Make code-input board active
 			const cbHtml = HIDDEN_BOARD_TEMPLATE
 								.replace(REPLACE_CBID,YT_CODE_BOARD_ID)
 								.replace(REPLACE_RN, sysConstants.YATU_DEFAULT_BOARD_ROWS);
 			$(this.codeDisplayOrInputAreaDiv).html(cbHtml);
+			
 			// show run code and clear consol buttons
 			$(this.runCodeButton).show(); 
 			$(this.clearResultButton).show();
 			
 			// accept tab and insert \t when tab key is hit by user
 			// note that we do not want to bind this handler the "this" class
-			$(this.codeInputTextArea).keydown(this.handleTab);
+			this.setTabHandler();
 		}
 		
 		// remember the mode in UI
@@ -181,10 +204,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 	get resultConsoleControl() {
 		return `#${YT_CONSOLE_ID}`;
-	}
-	
-	get codeInputTextArea() {
-		return `#${YT_CODE_BOARD_ID}`;
 	}
 	
 	get runCodeButton() {

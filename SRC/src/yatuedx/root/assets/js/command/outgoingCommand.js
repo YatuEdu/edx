@@ -34,6 +34,14 @@ class OutgoingCommand {
 		}
 		return JSON.stringify(cmd)
 	}
+	
+	get id() {
+		return this.#id;
+	}
+	
+	get data() {
+		return this.#data;
+	}
 }
 
 

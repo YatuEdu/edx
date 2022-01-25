@@ -90,7 +90,7 @@ class MyGroupPageHandler {
 			}
 			else {
 				// go to class room as student
-				window.location.href =  `./class-room.html?group=${groupName}`;				
+				window.location.href =  `./class-room.html?group=${groupName}&teacher=${groupOwner}`;				
 			}
 		}
 		else {

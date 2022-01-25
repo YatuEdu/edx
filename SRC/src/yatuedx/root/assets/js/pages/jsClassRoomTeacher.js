@@ -9,13 +9,27 @@ import {PageUtil}							from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE = "yt_result_console";
-const VD_VIEDO_AREA = "yt_video_area";
+const DIV_VIEDO_AREA = "yt_div_video_area";
+const DIV_STUDENT_MSG_BOARD = "yt_div_student_textarea";
 const BTN_SYNC_BOARD = "yt_btn_sync_board"; 
 const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
 const BTN_ERASE_BOARD  = 'yt_btn_erase_board';
 const BTN_ERASE_RESULT = "yt_btn_erase_result";
 const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
- 
+
+const REPLACEMENT_TA_ID = '{taid}';
+const REPLACEMENT_TA_CLSS = '{taclss}';
+
+const TA_STUDENT_CONSOLE_PREFIX = "yt_ta_for_";
+const CSS_STUDENT_CONSOLE_EX = 'student-input-board-extend';
+const CSS_STUDENT_CONSOLE = 'student-input-board';
+
+const STUDENT_BOARD_TEMPLATE = `
+<textarea class="{taclss}"
+		  id="{taid}" 
+		  spellcheck="false"
+></textarea>`; 
+
 /**
 	This class handles JS Code runner board
 **/
@@ -24,16 +38,30 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#timer;
 	
     constructor(credMan) {
-		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, VD_VIEDO_AREA);
+		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA);
 		this.init();
 	}
 	
 	/**
-		Execute a command encapsulated by command string (cmd)
+		Execute a command 
 	**/
-	v_execute(cmd) {
-		const cmdObject = new IncomingCommand(cmd);
+	v_execute(cmdObject) {
 		switch(cmdObject.id) {
+			// new student arrived, add a comm console
+			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
+				this.addStudentConsole(cmdObject.data[0]);
+				break;
+			
+			// new left, delete the student's comm console
+			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
+				this.deleteStudentConsole(cmdObject.data[0]);
+				break;
+			
+			// update the student code console for code from each student
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+				this.updateStudentCode(cmdObject.data);
+				break;
+				
 			default:
 				break;
 		}
@@ -41,17 +69,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
-		debugger
 		const paramMap = PageUtil.getUrlParameterMap();
 		const clssName = paramMap.get(sysConstants.UPN_GROUP);
 		//const clssName = 'JS 101 Test';
 		this.#displayBoardTeacher = new DisplayBoardTeacher(clssName, this);
 		
 		// set mode to teaching mode
-		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READ_ONLY);
+		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
 		
 		// accept tab and insert \t
-		$(this.codeInputTextArea).keydown(this.handleTab);
+		this.setTabHandler();
 		
 		// hook up event 'send code sample'
 		$(this.syncBoardButton).click(this.handleSendCode.bind(this));
@@ -67,17 +94,83 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
+	}
+
+	/**
+		Add student Console for receiving student message and coding text
+	 **/
+	addStudentConsole(student) {
+		if ($(this.stdentTextAreaDiv).find(this.getStudentConsoleIdSelector(student)).length) {	
+			return;
+		}
 		
-		// timer for refreshing code buffered
-		this.#timer = setInterval(this.updateCodeBufferAndSync.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+		// add student console
+		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
+								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
+								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student));
+		$(this.stdentTextAreaDiv).append(sconsoleHtml);
+		
+		// handle clicking event
+		 $(this.getStudentConsoleIdSelector(student)).click(this.toggleStudentConsole);
+		
+	}
+	
+	/**
+		Delete student Console when he leaves.  This is not totally reliable for now.
+	 **/
+	 deleteStudentConsole(student) {
+		//$(this.getStudentConsoleIdSelector(student)).remove();
+	}
+	
+	/**
+		When the student console is clicked,  toggle bewtween a min / max sized console.
+	 **/
+	toggleStudentConsole(e) {
+		e.preventDefault(); 
+		if ($(this).hasClass( CSS_STUDENT_CONSOLE)) {
+			$(this).removeClass(CSS_STUDENT_CONSOLE);
+			$(this).addClass(CSS_STUDENT_CONSOLE_EX);
+		}
+		else {
+			$(this).removeClass(CSS_STUDENT_CONSOLE_EX);
+			$(this).addClass(CSS_STUDENT_CONSOLE);
+		}
+	}
+	
+	/**
+		Got student code and save it to student consle so that a teacher knows what his student is doing.
+		The data consists of:
+		 1) upadarte id
+		 2) update content
+		 3) from which student user
+	 **/
+	updateStudentCode(data) {
+		const how = data[0];
+		const delta = data[1];
+		const fromStudent = data[2];
+		const studentCurrentCode = $(this.getStudentConsoleIdSelector(fromStudent)).val();
+		
+		// obtain the new code sample using an algorithm defined in parent class as a static method
+		const newCode = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode, delta);
+		
+		// update the code for this student on UI
+		$(this.getStudentConsoleIdSelector(fromStudent)).val(newCode);
+	}
+	
+	/**
+		Execute when timer is triggered.  Call updateCodeBufferAndSync
+	**/
+	v_handleTimer() {
+		this.updateCodeBufferAndSync();
 	}
 	
 	/**
 		Update code buffer sample and sync with students
 	**/
 	updateCodeBufferAndSync() {
-		const codeStr = $(this.codeInputTextArea).val();
-		this.#displayBoardTeacher.updateCodeBufferAndSync(codeStr);
+		console.log('JSClassRoomTeacher.updateCodeBufferAndSync called');
+		const codeUpdateObj = this.updateCode(this.code); 
+		this.#displayBoardTeacher.updateCodeBufferAndSync(codeUpdateObj);
 	}
 	
 	/**
@@ -85,8 +178,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/
 	handleSendCode(e) {
 		e.preventDefault(); 
-		const codeStr = $(this.codeInputTextArea).val();
-		this.#displayBoardTeacher.sendCode(codeStr);
+		this.#displayBoardTeacher.sendCode(this.code);
 	}
 	
 	/**
@@ -97,11 +189,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// run code locally first
 		super.runCodeFromTextInput();
-		
-		/*
-		const codeStr = $(this.codeInputTextArea).val();
-		this._jsCodeExecutioner.executeCode(codeStr);
-		*/
 		
 		// run code for each student second
 		this.#displayBoardTeacher.runCode();
@@ -136,14 +223,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const mode =  parseInt(m, 10);
 		let obj = {};
 		if ( mode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			this.startOrStopCodeRefreshTimer(true);
 			obj = {
-				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
+				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
 				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE
 			};
 		}
 		else if (mode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+			this.startOrStopCodeRefreshTimer(false);
 			obj ={
-				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
+				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
 				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY
 			};
 			
@@ -180,10 +269,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Closing the video sharing upon closing the window
 	 */
 	handleLeaving(e) {
+		debugger;
 		e.preventDefault();
 		
-		// clear timer first
-		clearInterval(this.#timer);
+		// clear timer
+		this.startOrStopCodeRefreshTimer(false);
 		
 		// clase window
 		this.#displayBoardTeacher.closeWinodw();
@@ -198,9 +288,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${TA_RESULT_CONSOLE}`;
 	}
 	
-	// CODE INPUT TEXT Area
-	get codeInputTextArea() {
-		return `#${TA_CODE_INPUT_CONSOLE}`;
+	// student text Area div
+	get stdentTextAreaDiv() {
+		return `#${DIV_STUDENT_MSG_BOARD}`;
 	}
 	
 	// button for syncing code
@@ -227,6 +317,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	get eraseResultButton() {
 		return `#${BTN_ERASE_RESULT}`;
 	}
+	
+	// student consol it getter
+	getStudentConsoleId(student) {
+		return `${TA_STUDENT_CONSOLE_PREFIX}${student}`; 
+	}
+	
+	getStudentConsoleIdSelector(student) {
+		return `#${this.getStudentConsoleId(student)}`; 
+	}
+	
 }
 
 let jsClassRoomTeacher = null;

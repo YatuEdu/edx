@@ -1,7 +1,6 @@
 import {CommunicationSpace} 	from './communicationSpace.js';
 import {PTCC_COMMANDS}			from '../command/programmingClassCommand.js'
 import {OutgoingCommand}		from '../command/outgoingCommand.js'
-import {CodeSyncManager} 		from '../component/codeSyncManager.js'	
 
 const VIDEO_TEMPLATE = `
 <
@@ -11,20 +10,17 @@ const VIDEO_TEMPLATE = `
 class DisplayBoardTeacher extends CommunicationSpace {  
 	_textLines;
 	#view;
-	#codeSyncManager;
 	
 	constructor(roomName, view) {
 		super(roomName, view.videoAreaId); 
 		this._textLines = [];
 		this.#view = view;
-		this.#codeSyncManager = new CodeSyncManager();
 	}
 	
 	/**
 		Update code buffer sample and sync with students
 	**/
-	updateCodeBufferAndSync(codeStr) {
-		const codeUpdateObj = this.#codeSyncManager.update(codeStr);
+	updateCodeBufferAndSync(codeUpdateObj) {
 		switch (codeUpdateObj.flag) {
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
 				// do nothing
@@ -32,12 +28,33 @@ class DisplayBoardTeacher extends CommunicationSpace {
 				
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED:
 				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, codeUpdateObj.flag, codeUpdateObj.content);
-				this._commClient.sendPublicMsg(cmd.str);
+				this.sendMessageToGroup(cmd.str);
 				break;
 				
 		default:
 			break;
+		}
+	}
+	
+	/**	
+		Execute command sent by student or hadling events triggered by peers
+	**/	
+	v_execute(cmdObject) {
+		switch (cmdObject.id) {
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
+				// do nothing
+				break;
+				
+			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
+			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+				this.#view.v_execute(cmdObject);
+				break;
+				
+			default:
+				break;
 		}
 	}
 	
@@ -46,7 +63,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	 **/
 	sendCode(codeStr) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
-		this._commClient.sendPublicMsg(cmd.str);
+		this.sendMessageToGroup(cmd.str);
 	}
 	
 	/**
@@ -55,7 +72,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	 **/
 	runCode() {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CODE_RUN, null);
-		this._commClient.sendPublicMsg(cmd.str);
+		this.sendMessageToGroup(cmd.str);
 	}
 	
 	/**
@@ -63,7 +80,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	**/	
 	setMode(m) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CLASSROOM_SWITCH_MODE, m);
-		this._commClient.sendPublicMsg(cmd.str);
+		this.sendMessageToGroup(cmd.str);
 	}
 	
 	// {cmd: hi, p1: hello} -> stringfy jason

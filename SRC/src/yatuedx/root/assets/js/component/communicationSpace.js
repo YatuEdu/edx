@@ -1,14 +1,17 @@
 import {CommClient} 		from "../communication/commClient.js";
 import {VideoClient} 		from "../communication/videoClient.js"
+import {PTCC_COMMANDS}		from '../command/programmingClassCommand.js'
 import {IncomingCommand} 	from '../command/incomingCommand.js';
+import {OutgoingCommand} 	from '../command/outgoingCommand.js';
 import {sysConstants}		from "../core/sysConst.js"
 import {Net}			    from "../core/net.js"
 import {credMan}			from "../core/credMan.js"
 import {VideoUtil} 			from "../core/videoUtil.js";
 
+
 const REPLACE_PID = '{pid}';
 const VIDEO_TEMPLATE = `
-<video class="yt_video" id="yt_vido_{pid}" autoplay playsinline>"`;
+<video class="yt_video" id="yt_video_{pid}" autoplay playsinline>"`;
 
 /**
 
@@ -20,13 +23,14 @@ const VIDEO_TEMPLATE = `
  **/
 class CommunicationSpace {  
 	_cmdObject;
-	_commClient;
+	#commClient;
 	_videoClient;
 	_videoTrack;
 	_audioTrack;
 	
 	_userMap;
 	_videoDivId;
+	#me;
 	
 	constructor(roomName, videoDivId) {
 		this.init(roomName);
@@ -39,7 +43,7 @@ class CommunicationSpace {
 	 **/
 	async init(roomName) {
 		const token = credMan.credential.token;
-		const name  = credMan.credential.name;
+		this.#me  = credMan.credential.name;
 			
 		// call API to get room
 		const groupSession = await Net.groupMemberJoiningSession(token, roomName);
@@ -54,26 +58,26 @@ class CommunicationSpace {
 			tracks = await VideoUtil.getLocalMediaTracks(true, true);
 			this._audioTrack = tracks[0];
 			this._videoTrack = tracks[1];
-			this.handleRemoteVideoTrack(name, this._videoTrack);
+			this.handleRemoteVideoTrack(this.#me, this._videoTrack);
 		} catch (e) {
 			alert('Failed to initialize viedo tracks');
 		}
 		
 		// create the communication client to handle p2p commuinication
 		const room = groupSession.data[0].session_id;
-		this._commClient = new CommClient(sysConstants.YATU_SOCKET_URL, token, name, room); 
+		this.#commClient = new CommClient(sysConstants.YATU_SOCKET_URL, token, this.#me, room); 
 		
-		this._commClient.onReady = this.handleCommunicationReady.bind(this);
+		this.#commClient.onReady = this.handleCommunicationReady.bind(this);
 
-        this._commClient.onPublicMsg = this.handleMessage.bind(this);
+        this.#commClient.onPublicMsg = this.handleMessage.bind(this);
 
-        this._commClient.onPrivateMsg = this.handleMessage.bind(this);
+        this.#commClient.onPrivateMsg = this.handleMessage.bind(this);
 
-        this._commClient.onUserJoin = this.handleNewUser.bind(this);
+        this.#commClient.onUserJoin = this.handleNewUser.bind(this);
 
-        this._commClient.onUserLeave = this.handleUserLeaving.bind(this);
+        this.#commClient.onUserLeave = this.handleUserLeaving.bind(this);
 
-        this._commClient.onUserList = this.handleUserList.bind(this);
+        this.#commClient.onUserList = this.handleUserList.bind(this);
 	}
 	
 	/**
@@ -81,7 +85,7 @@ class CommunicationSpace {
 	 **/
 	handleCommunicationReady() {
 	
-		const uList = this._commClient.getUserList();
+		const uList = this.#commClient.getUserList();
 		
 		// If we do not need video for the communication board
 		////if (!this._videoDivId) {
@@ -92,7 +96,7 @@ class CommunicationSpace {
 			If we need video for the communication board, create video client
 		*/
 		if (this._videoTrack && this._audioTrack) {
-			this._videoClient = new VideoClient(this._commClient, this._audioTrack , this._videoTrack);
+			this._videoClient = new VideoClient(this.#commClient, this._audioTrack , this._videoTrack);
 		
 			// 收到音频轨道或视频轨道，需要放在MediaStream对象中
 			// 如果音视频轨道放在同一个MediaStream对象中，会进行音视频同步，否则独立播放
@@ -187,6 +191,10 @@ class CommunicationSpace {
 		if (this._videoClient) {
 			this._videoClient.startShare(user, true);
 		}
+		
+		// Child component needs to handle new user arrival event
+		const cmdObject = new OutgoingCommand(PTCC_COMMANDS.PTC_STUDENT_ARRIVAL, user);
+		this.v_execute(cmdObject);
 	}
 	
 	/**	
@@ -213,6 +221,24 @@ class CommunicationSpace {
 			}
 			this._userMap.delete(user);
 		}
+		
+		// Child component needs to handle user leaving event
+		const cmdObject = new OutgoingCommand(PTCC_COMMANDS.PTC_STUDENT_LEAVE, user);
+		this.v_execute(cmdObject);
+	}
+	
+	/**
+		Send message to entire group 
+	**/
+	sendMessageToGroup(msgStr) {
+		this.#commClient.sendPublicMsg(msgStr);
+	}
+	
+	/**
+		Send message to a user
+	**/
+	sendMessageToUser(user, msgStr) {
+		this.#commClient.sendPrivateMsg(user, msgStr);
 	}
 	
 	/**	
@@ -234,7 +260,7 @@ class CommunicationSpace {
 	/**	
 		Execute command sent by peers. Derived class must override it.
 	**/	
-	v_exe(cmdObject) {
+	v_execute(cmdObject) {
 		throw new Error('v_exe: sub-class-should-overload-this method'); 
 	}
 	
@@ -242,9 +268,18 @@ class CommunicationSpace {
 		Properties
 	 **/
 	 
-	 get videoAreaDiv() {
+	get videoAreaDiv() {
 		return this._videoDivId;
 	}
+	
+	get me() {
+		return this.#me;
+	}
+	
+	get commClient () {
+		return this.#commClient;
+	}
+	
 }
 
 export { CommunicationSpace };

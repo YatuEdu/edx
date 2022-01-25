@@ -1,5 +1,6 @@
-import {DisplayBoard} 	from './displayBoard.js';
-import {PTCC_COMMANDS}  from '../command/programmingClassCommand.js'
+import {DisplayBoard} 		from './displayBoard.js';
+import {PTCC_COMMANDS}  	from '../command/programmingClassCommand.js'
+import {OutgoingCommand}	from '../command/outgoingCommand.js'
 
 const REPLACE_FOR_BODY = '{bdy}';
 const REPLACE_FOR_LINE = '{ln}';
@@ -206,10 +207,12 @@ class StateFactory {
 
 class DisplayBoardForCoding extends DisplayBoard { 
 	#view;
+	#teacher;
 	
-	constructor(roomName, view) {
+	constructor(roomName, teacherName, view) {
 		super(roomName, view.videoAreaId); 
 		this.#view = view;
+		this.#teacher = teacherName;
 		this.initUI();
 	}
 	
@@ -223,6 +226,10 @@ class DisplayBoardForCoding extends DisplayBoard {
 	/*
 	*/
 	handleTest() {
+	}
+	
+	get classTeacher() {
+		return this.#teacher;
 	}
 	
 	/*
@@ -254,6 +261,31 @@ class DisplayBoardForCoding extends DisplayBoard {
 			default:
 				sendToUi = false
 				break;
+		}
+	}
+	
+	/**
+		During exercise mode, student send their most recent code to teacher 
+		to examine
+	 **/
+	updateCodeBufferAndSync(codeUpdateObj) {
+		switch (codeUpdateObj.flag) {
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
+				// do nothing
+				break;
+				
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
+			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED:
+				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 	// command id
+												codeUpdateObj.flag,							// uopdate flag 
+												codeUpdateObj.content, 						// update coment
+												this.me);   								// from user name
+				this.sendMessageToUser(this.#teacher, cmd.str);
+				break;
+				
+		default:
+			break;
 		}
 	}
 	

@@ -21,24 +21,35 @@ class CodeSyncManager {
 	update(newCode) {	
 		// New CODE PIECE?
 		if (!this.#lastCodeSaved) {
+			console.log('code init');
 			return this.prv_setNewCode(newCode);
 		}
 		
 		// No code changes
 		if (this.#lastCodeSaved.localeCompare(newCode) == 0 ) {
+			console.log('code no change ');
 			const retObj = {
-			flag: PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE,
+				flag: PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE,
 			};
 			return retObj;
 		}		
 		
 		// appended ?
-		const indx = newCode.indexOf(this.#lastCodeSaved);
+		let indx = newCode.indexOf(this.#lastCodeSaved);
 		if (indx === 0) {
+			console.log('code appending ');
 			return this.prv_appendNewCode(newCode);
 		}
 		
+		// delete at the end?
+		indx = this.#lastCodeSaved.indexOf(newCode);
+		if (indx === 0) {
+			console.log('code deleting ');
+			return this.prv_deletedOldCodeAtEnd(newCode);
+		}
+		
 		// treat the entire thing as new code
+		console.log('code unknown changes, refreshing ... ');
 		return this.prv_setNewCode(newCode);
 	}
 	
@@ -67,6 +78,23 @@ class CodeSyncManager {
 			content: 	appenedText
 		 };
 		 return retObj;
+	 }
+	 
+	 /**
+		New code is the old code that deletes something at the end.  
+		We only needs to send deleted location to the client
+	 **/
+	 prv_deletedOldCodeAtEnd(newCode) {
+		 const delLen =this.#lastCodeSaved.length - newCode.length;
+		 this.#lastCodeSaved = newCode;
+		 if (delLen > 0) {
+			  const retObj =  {
+				flag: 		PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED,
+				content: 	delLen
+			 }
+			 return retObj;
+		 }
+		 throw new Erro('wrong function called');
 	 }
 }
 
