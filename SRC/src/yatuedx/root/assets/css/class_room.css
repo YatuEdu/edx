@@ -91,10 +91,12 @@
 
 .student-input-board-extend {
   width: 100vw;									/* <-- children as wide as the browser window (viewport) */
-  height: 		50vw !important;
+  height: 		80vw !important;
   overflow-y: 	auto;    						/* Trigger vertical scroll    */
   z-index: 99 !important;						/* ON TOP */
   position: absolute;
+  background: #0000FF;
+  color: #FFFFFF;
 }
 
 .output-board {

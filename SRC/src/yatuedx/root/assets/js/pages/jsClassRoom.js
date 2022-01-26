@@ -91,11 +91,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
 				this.displayCodeSample(cmd.data);
 				break;
-				
-			// modify code sample on board
-			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
-				this.displayCodeSample(cmd.data);
-				break;
 			
 			// update the sample code
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:

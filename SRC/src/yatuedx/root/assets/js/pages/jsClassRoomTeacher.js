@@ -19,12 +19,14 @@ const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
 
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CLSS = '{taclss}';
+const REPLACEMENT_LB = '{lb}';
 
 const TA_STUDENT_CONSOLE_PREFIX = "yt_ta_for_";
 const CSS_STUDENT_CONSOLE_EX = 'student-input-board-extend';
 const CSS_STUDENT_CONSOLE = 'student-input-board';
 
 const STUDENT_BOARD_TEMPLATE = `
+<label>{lb}</lable>
 <textarea class="{taclss}"
 		  id="{taid}" 
 		  spellcheck="false"
@@ -106,6 +108,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// add student console
 		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
+								.replace(REPLACEMENT_LB, student)
 								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
 								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student));
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
@@ -199,45 +202,50 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/	
 	handleModeChange(e) {
 		e.preventDefault(); 
-		const m = this.setMode();
+		const newMode = this.switchMode();
 		// send the command to peers
-		this.#displayBoardTeacher.setMode(m);
+		this.#displayBoardTeacher.setMode(newMode);
 	}
 	
 	/**
-		Set students board mode
+		Switch students board mode
 	**/
-	setMode() {
+	switchMode() {
 		// current mode:
-		let m = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
-		const {btnText, newMode} = this.priv_changeMode(m);
-		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
-		$(this.modeChangeButton).text(btnText);
+		let currentModeStr = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
+		const newMode = this.priv_changeMode(currentModeStr);
 		return newMode;
 	}
 	
 	/**
 		Mode switching
 	**/
-	priv_changeMode(m) {
-		const mode =  parseInt(m, 10);
-		let obj = {};
-		if ( mode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+	priv_changeMode(currentModeStr) {
+		const currentMode =  parseInt(currentModeStr, 10);
+		let newMode;
+		if ( currentMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			newMode = PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE;
+		}
+		else if (currentMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+			newMode = PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY;	
+		}
+		this.setMode(newMode);
+		return newMode;
+	}
+	
+	/**
+		Direct mode setting
+	**/
+	setMode(newMode) {
+		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
+		if ( newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
+			$(this.modeChangeButton).text(sysConstStrings.SWITCH_TO_EXERCISE);
 			this.startOrStopCodeRefreshTimer(true);
-			obj = {
-				btnText: sysConstStrings.SWITCH_TO_EXERCISE, 
-				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE
-			};
 		}
-		else if (mode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
-			this.startOrStopCodeRefreshTimer(false);
-			obj ={
-				btnText: sysConstStrings.SWITCH_TO_LEARNING, 
-				newMode: PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY
-			};
-			
+		else if (newMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
+			$(this.modeChangeButton).text(sysConstStrings.SWITCH_TO_LEARNING);
+			this.startOrStopCodeRefreshTimer(false);	
 		}
-		return obj;
 	}
 	
 	/*

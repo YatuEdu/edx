@@ -136,7 +136,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		// if there is a selection, run selected text as code
 		let codeStr = window.getSelection().toString();
 		if (!codeStr) {
-			codeStr = $(this.codeInputId).val();
+			codeStr = $(this.codeInputTextArea).val();
 		}
 		else {
 			// de-select the selected text so that it does not confuse the

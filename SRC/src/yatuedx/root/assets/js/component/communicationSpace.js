@@ -22,20 +22,19 @@ const VIDEO_TEMPLATE = `
 	
  **/
 class CommunicationSpace {  
-	_cmdObject;
 	#commClient;
-	_videoClient;
-	_videoTrack;
-	_audioTrack;
+	#videoClient;
+	#videoTrack;
+	#audioTrack;
 	
-	_userMap;
-	_videoDivId;
+	#userMap;
+	#videoDivId;
 	#me;
 	
 	constructor(roomName, videoDivId) {
 		this.init(roomName);
-		this._videoDivId = videoDivId;
-		this._userMap = new Map();
+		this.#videoDivId = videoDivId;
+		this.#userMap = new Map();
 	}
 	
 	/**
@@ -56,9 +55,9 @@ class CommunicationSpace {
 		let tracks = null;
 		try {
 			tracks = await VideoUtil.getLocalMediaTracks(true, true);
-			this._audioTrack = tracks[0];
-			this._videoTrack = tracks[1];
-			this.handleRemoteVideoTrack(this.#me, this._videoTrack);
+			this.#audioTrack = tracks[0];
+			this.#videoTrack = tracks[1];
+			this.handleRemoteVideoTrack(this.#me, this.#videoTrack);
 		} catch (e) {
 			alert('Failed to initialize viedo tracks');
 		}
@@ -88,21 +87,21 @@ class CommunicationSpace {
 		const uList = this.#commClient.getUserList();
 		
 		// If we do not need video for the communication board
-		////if (!this._videoDivId) {
+		////if (!this.#videoDivId) {
 		//	return;
 		//}
 		
 		/*
 			If we need video for the communication board, create video client
 		*/
-		if (this._videoTrack && this._audioTrack) {
-			this._videoClient = new VideoClient(this.#commClient, this._audioTrack , this._videoTrack);
+		if (this.#videoTrack && this.#audioTrack) {
+			this.#videoClient = new VideoClient(this.#commClient, this.#audioTrack , this.#videoTrack);
 		
 			// 收到音频轨道或视频轨道，需要放在MediaStream对象中
 			// 如果音视频轨道放在同一个MediaStream对象中，会进行音视频同步，否则独立播放
 			// 这里展示独立播放
-			this._videoClient.onRemoteVideoTrack = this.handleRemoteVideoTrack.bind(this);
-			this._videoClient.onRemoteAudioTrack = this.handleRemoteAudioTrack.bind(this);
+			this.#videoClient.onRemoteVideoTrack = this.handleRemoteVideoTrack.bind(this);
+			this.#videoClient.onRemoteAudioTrack = this.handleRemoteAudioTrack.bind(this);
 		}
 		
         // 下面是屏幕共享的方法
@@ -136,6 +135,11 @@ class CommunicationSpace {
 		Handle a new peer viedo added remotely
 	**/
 	handleRemoteVideoTrack(user, videoTrack) {
+		// let child class control the visibility of this user
+		if (this.v_isUserVisible(user)) {
+			return;
+		}
+		
 		const mediaStream = new MediaStream();
 		mediaStream.addTrack(videoTrack);
 
@@ -146,12 +150,12 @@ class CommunicationSpace {
 		videoElement.srcObject = mediaStream;
 
 		// 这里保存标签，只是为了后面可以移除
-		let userObj = this._userMap.get(user);
+		let userObj = this.#userMap.get(user);
 		if (userObj != null ) {
 			userObj.videoTag = videoElement;
 		}
 		else {
-			this._userMap.set(user, {videoTag: videoElement});
+			this.#userMap.set(user, {videoTag: videoElement});
 		}		
 	}
 	
@@ -168,12 +172,12 @@ class CommunicationSpace {
 		audioCtrlId.srcObject = mediaStream;
 
 		// 这里保存标签，只是为了后面可以移除
-		let userObj = this._userMap.get(user);
+		let userObj = this.#userMap.get(user);
 		if (userObj != null ) {
 			userObj.audioTag = audioCtrlId;
 		}
 		else {
-			this._userMap.set(user, {audioTag: audioCtrlId});
+			this.#userMap.set(user, {audioTag: audioCtrlId});
 		}
 	}
     
@@ -188,8 +192,8 @@ class CommunicationSpace {
 		console.log('User joined: ' + user);
 		// Start receiving a new user's video (if the user is a teacher)
 		// TODO: decide if the user is teacher
-		if (this._videoClient) {
-			this._videoClient.startShare(user, true);
+		if (this.#videoClient) {
+			this.#videoClient.startShare(user, true);
 		}
 		
 		// Child component needs to handle new user arrival event
@@ -206,10 +210,10 @@ class CommunicationSpace {
 		console.log('User left: ' + user);
 		
 		// 停止共享本地音视频
-		if (this._videoClient) {
-			this._videoClient.stopShare(user);
+		if (this.#videoClient) {
+			this.#videoClient.stopShare(user);
 		}
-        let userObj = this._userMap.get(user);
+        let userObj = this.#userMap.get(user);
 		if (userObj != null) {
 			if (userObj.videoTag !=null) {
 				userObj.videoTag.remove();
@@ -219,7 +223,7 @@ class CommunicationSpace {
 				userObj.audioTag.remove();
 				
 			}
-			this._userMap.delete(user);
+			this.#userMap.delete(user);
 		}
 		
 		// Child component needs to handle user leaving event
@@ -264,12 +268,19 @@ class CommunicationSpace {
 		throw new Error('v_exe: sub-class-should-overload-this method'); 
 	}
 	
+	/**	
+		Control visibility of a user for video. Derived class "could" override it.
+	**/	
+	v_isUserVisible(user) {
+		return true;
+	}
+	
 	/**
 		Properties
 	 **/
 	 
 	get videoAreaDiv() {
-		return this._videoDivId;
+		return this.#videoDivId;
 	}
 	
 	get me() {

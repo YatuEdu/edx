@@ -264,6 +264,17 @@ class DisplayBoardForCoding extends DisplayBoard {
 		}
 	}
 	
+	/**	
+		Control visibility of a user for video. Student override it to allow only 
+		see the class teacher, nt other students.
+	**/	
+	v_isUserVisible(user) {
+		if (this.classTeacher.localeCompare(user) == 0)
+		{
+			return true;
+		}
+		return false;
+	}
 	/**
 		During exercise mode, student send their most recent code to teacher 
 		to examine
