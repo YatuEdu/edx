@@ -29,7 +29,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
 			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED:
-				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, codeUpdateObj.flag, codeUpdateObj.content);
+				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, codeUpdateObj.flag, codeUpdateObj.content, codeUpdateObj.md);
 				this.sendMessageToGroup(cmd.str);
 				break;
 				

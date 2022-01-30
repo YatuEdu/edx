@@ -54,6 +54,13 @@ class ProgrammingClassCommandUI extends AuthPage {
 	}
 	
 	/**
+		Copy the entire code to all the student
+	 **/
+	syncCode(codeSrc) {
+		return this.#codeSyncManager.syncCode(codeSrc);
+	}
+	
+	/**
 		Our algorithm to code updating by difference in order to optimize network traffic 
 		
 	 **/

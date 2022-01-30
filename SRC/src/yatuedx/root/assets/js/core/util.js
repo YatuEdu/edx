@@ -47,6 +47,34 @@ class StringUtil {
 		const indx = btnId.lastIndexOf("_");
 		return parseInt(btnId.substring(indx+1));
 	}
+	
+	/*
+		Our Symply and 99% good message digest algorithm
+	 */
+	static charIndxesForSha256 = [0, 1, 5, 6, 11, 19, 21, 45, 46, 47, 55, 61, 63];
+	/*
+		Our Symply and 99% good message digest algorithm: digest generation
+	 */
+	static getMessageDigest(msg) {
+		const msgSha =sha256(msg);
+		let d = '';
+		for(let i = 0; i < StringUtil.charIndxesForSha256.length; i++) {
+			d += msgSha.charAt(StringUtil.charIndxesForSha256[i]);
+		}
+		return d;
+	}
+	
+	/*
+		Our Symply and 99% good message digest algorithm: digest verifcation
+	 */
+	 static verifygetMessageDigest(msg, d) {
+		const d2 =StringUtil.getMessageDigest(msg);
+		if (d2.localeCompare(d) == 0) {
+			return true;
+		}
+		return false;
+	}
+	
 }
 
 class PageUtil {

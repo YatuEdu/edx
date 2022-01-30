@@ -7,6 +7,7 @@ import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil}							from '../core/util.js';
+import {StringUtil}		from '../core/util.js'
 
 const YT_CONSOLE_ID 						= "yt_console";
 const YT_CODE_BOARD_ID 						= "yt_code_board";
@@ -94,7 +95,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			
 			// update the sample code
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
-				this.updateCodeSample(cmd.data[0], cmd.data[1]);
+				this.updateCodeSample(cmd.data[0], cmd.data[1], cmd.data[2]);
 				break;
 				
 			// run code sample and show result on console
@@ -126,12 +127,19 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		Append or replace Code Smaple on the Whiteboard
 	**/	
-	updateCodeSample(how, text) {
+	updateCodeSample(how, text, digest) {
 		// obtain the new code sample using an algorithm defined in parent class as a static method
 		const newCode = ProgrammingClassCommandUI.updateContentByDifference(how, this.code, text);
 		
 		// update the code on UI
 		this.code = newCode;
+		
+		// verify the digest
+		if (StringUtil.verifygetMessageDigest(this.code, digest)) { 
+			console.log('verfied content');
+		} else {
+			console.log('content not verified');
+		}
 	}
 	
 	/**

@@ -15,6 +15,7 @@ const BTN_SYNC_BOARD = "yt_btn_sync_board";
 const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
 const BTN_ERASE_BOARD  = 'yt_btn_erase_board';
 const BTN_ERASE_RESULT = "yt_btn_erase_result";
+const BTN_BEAUTIFY_CODE = "yt_btn_btfy_code"
 const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
 
 const REPLACEMENT_TA_ID = '{taid}';
@@ -83,7 +84,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		this.setTabHandler();
 		
 		// hook up event 'send code sample'
-		$(this.syncBoardButton).click(this.handleSendCode.bind(this));
+		$(this.syncBoardButton).click(this.handleSyncBoard.bind(this));
 		
 		// hook up event 'run code sample'
 		$(this.modeChangeButton).click(this.handleModeChange.bind(this));
@@ -177,11 +178,14 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		Send code sample to students
+		Copy code sample as all to students
 	**/
-	handleSendCode(e) {
+	handleSyncBoard(e) {
 		e.preventDefault(); 
-		this.#displayBoardTeacher.sendCode(this.code);
+		const codeUpdateObj = this.syncCode(this.code); 
+		if (codeUpdateObj) {
+			this.#displayBoardTeacher.updateCodeBufferAndSync(codeUpdateObj);
+		}
 	}
 	
 	/**
@@ -324,6 +328,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// button for SWITCHING mode
 	get eraseResultButton() {
 		return `#${BTN_ERASE_RESULT}`;
+	}
+	
+	// button for BEAUTIFY code mode
+	get beautifyCodeButton() {
+		return `#${BTN_BEAUTIFY_CODE}`;
 	}
 	
 	// student consol it getter

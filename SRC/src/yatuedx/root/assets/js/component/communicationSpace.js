@@ -136,7 +136,7 @@ class CommunicationSpace {
 	**/
 	handleRemoteVideoTrack(user, videoTrack) {
 		// let child class control the visibility of this user
-		if (this.v_isUserVisible(user)) {
+		if (!this.v_isUserVisible(user)) {
 			return;
 		}
 		

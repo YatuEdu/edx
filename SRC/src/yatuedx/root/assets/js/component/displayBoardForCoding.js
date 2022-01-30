@@ -266,10 +266,10 @@ class DisplayBoardForCoding extends DisplayBoard {
 	
 	/**	
 		Control visibility of a user for video. Student override it to allow only 
-		see the class teacher, nt other students.
+		see the class teacher and herself, not other students.
 	**/	
 	v_isUserVisible(user) {
-		if (this.classTeacher.localeCompare(user) == 0)
+		if (this.classTeacher.localeCompare(user) == 0 || this.me.localeCompare(user))
 		{
 			return true;
 		}
