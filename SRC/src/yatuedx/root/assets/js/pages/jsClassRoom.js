@@ -138,7 +138,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		if (StringUtil.verifygetMessageDigest(this.code, digest)) { 
 			console.log('verfied content');
 		} else {
-			console.log('content not verified');
+			console.log('content not verified, asking for re-sync');
+			this.#displayBoardForCoding.askReSync();
 		}
 	}
 	

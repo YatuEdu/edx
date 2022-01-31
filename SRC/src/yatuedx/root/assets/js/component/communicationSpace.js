@@ -259,6 +259,10 @@ class CommunicationSpace {
 	handleUserList(userList) {
 		// todo:
 		console.log('User list: ' + userList.length);
+		// handle all existing user
+		// Child component needs to handle new user arrival event
+		const cmdObject = new OutgoingCommand(PTCC_COMMANDS.PTC_USER_LIST, userList);
+		this.v_execute(cmdObject);
 	}
 	
 	/**	

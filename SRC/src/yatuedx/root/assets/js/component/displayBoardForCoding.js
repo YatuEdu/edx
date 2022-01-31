@@ -301,6 +301,16 @@ class DisplayBoardForCoding extends DisplayBoard {
 	}
 	
 	/**
+	  ask for the teacher to re-syncronize code with me
+	 **/
+	askReSync() {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC, 	// command id
+										0,										    // uopdate flag 
+										this.me);									// from whom
+		this.sendMessageToUser(this.#teacher, cmd.str);
+	}
+	
+	/**
 		Display formatted code samples on UI (VIEW)
 	 **/
 	dsiplayCode(cmdObject) {

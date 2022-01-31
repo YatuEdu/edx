@@ -50,6 +50,8 @@ class DisplayBoardTeacher extends CommunicationSpace {
 			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
 			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
+			case PTCC_COMMANDS.PTC_USER_LIST:
 				this.#view.v_execute(cmdObject);
 				break;
 				
@@ -64,6 +66,15 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	sendCode(codeStr) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
 		this.sendMessageToGroup(cmd.str);
+	}
+	
+	/**
+		Send code sample to one student whose code is out of sync
+	 **/
+	syncCodeWithStudent(codeStr, targetUser) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
+		this.sendMessageToUser(targetUser, cmd.str);
+		log.console('send:' + codeStr + ' to: ' + targetUser);
 	}
 	
 	/**

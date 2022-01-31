@@ -45,31 +45,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		this.init();
 	}
 	
-	/**
-		Execute a command 
-	**/
-	v_execute(cmdObject) {
-		switch(cmdObject.id) {
-			// new student arrived, add a comm console
-			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
-				this.addStudentConsole(cmdObject.data[0]);
-				break;
-			
-			// new left, delete the student's comm console
-			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
-				this.deleteStudentConsole(cmdObject.data[0]);
-				break;
-			
-			// update the student code console for code from each student
-			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
-				this.updateStudentCode(cmdObject.data);
-				break;
-				
-			default:
-				break;
-		}
-	}
-	
 	// hook up events
 	async init() {
 		const paramMap = PageUtil.getUrlParameterMap();
@@ -98,7 +73,54 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
 	}
+	
+	/**
+		Execute a command 
+	**/
+	v_execute(cmdObject) {
+		switch(cmdObject.id) {
+			// new student arrived, add a comm console
+			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
+				this.addStudentConsole(cmdObject.data[0]);
+				break;
+			
+			// new left, delete the student's comm console
+			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
+				this.deleteStudentConsole(cmdObject.data[0]);
+				break;
+				
+			// got a list of current users that are alreay in the chat room:
+			case PTCC_COMMANDS.PTC_USER_LIST:
+				this.addStudentConsoles(cmdObject.data[0]);
+				break;
+			
+			// update the student code console for code from each student
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+				this.updateStudentCode(cmdObject.data);
+				break;
+				
+			// Sync with a student whose code is out of sync with teacher
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
+				this.syncWithStudent(cmdObject);
+				break;
+				
+			default:
+				break;
+		}
+	}
 
+	/**
+		Add student Console for a list of students already in the room
+	 **/
+	addStudentConsoles(userList) {
+		for(let u of userList) {
+			const userName = u.userName;
+			if (userName.localeCompare(this.#displayBoardTeacher.me) != 0) {
+				this.addStudentConsole(userName);
+			}
+		}
+	}
+	
 	/**
 		Add student Console for receiving student message and coding text
 	 **/
@@ -117,6 +139,13 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// handle clicking event
 		 $(this.getStudentConsoleIdSelector(student)).click(this.toggleStudentConsole);
 		
+	}
+	
+	/**
+		Sync code with one student 
+	 **/
+	syncCodeWithStudent(cmdObject) {
+		this.#displayBoardTeacher.syncCodeWithStudent(this.code, cmdObject.sender);
 	}
 	
 	/**
