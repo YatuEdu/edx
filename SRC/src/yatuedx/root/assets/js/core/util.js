@@ -67,8 +67,8 @@ class StringUtil {
 	/*
 		Our Symply and 99% good message digest algorithm: digest verifcation
 	 */
-	 static verifygetMessageDigest(msg, d) {
-		const d2 =StringUtil.getMessageDigest(msg);
+	 static verifyMessageDigest(msg, d) {
+		const d2 = StringUtil.getMessageDigest(msg);
 		if (d2.localeCompare(d) == 0) {
 			return true;
 		}

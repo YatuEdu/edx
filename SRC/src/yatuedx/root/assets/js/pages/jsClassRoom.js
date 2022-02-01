@@ -6,8 +6,7 @@ import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
-import {PageUtil}							from '../core/util.js';
-import {StringUtil}		from '../core/util.js'
+import {PageUtil, StringUtil}				from '../core/util.js';
 
 const YT_CONSOLE_ID 						= "yt_console";
 const YT_CODE_BOARD_ID 						= "yt_code_board";
@@ -133,9 +132,12 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// update the code on UI
 		this.code = newCode;
+		if (!newCode) {
+			return;  // no need to validate
+		}
 		
 		// verify the digest
-		if (StringUtil.verifygetMessageDigest(this.code, digest)) { 
+		if (StringUtil.verifyMessageDigest(newCode, digest)) { 
 			console.log('verfied content');
 		} else {
 			console.log('content not verified, asking for re-sync');
@@ -149,6 +151,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	runCodeFrom(codeText) {
 		// first clear the output console
 		this.prv_clearConsole();
+		if (!codeText) {
+			// run code from local cache, in stead of from teacher
+			codeText= this.code;
+		}
 		// then run the new code from teacher
 		super.executeCode(codeText);
 	}

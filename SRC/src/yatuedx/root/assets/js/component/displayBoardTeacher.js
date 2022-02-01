@@ -74,7 +74,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	syncCodeWithStudent(codeStr, targetUser) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
 		this.sendMessageToUser(targetUser, cmd.str);
-		log.console('send:' + codeStr + ' to: ' + targetUser);
+		console.log('send:' + codeStr + ' to: ' + targetUser);
 	}
 	
 	/**

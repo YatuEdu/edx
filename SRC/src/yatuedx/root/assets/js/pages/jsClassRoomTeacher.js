@@ -101,7 +101,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 				
 			// Sync with a student whose code is out of sync with teacher
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
-				this.syncWithStudent(cmdObject);
+				this.syncCodeWithStudent(cmdObject);
 				break;
 				
 			default:
