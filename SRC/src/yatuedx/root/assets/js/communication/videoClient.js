@@ -66,7 +66,7 @@ export class VideoClient {
     }
 
     async onRtcMsg(fromUser, msg) {
-        console.log('onRtcMsg' + msg);
+        console.log('onRtcMsg: ' + JSON.stringify(msg));
         let peer = this.#peers[fromUser];
         switch (msg.type) {
             case 'sessionDescription':
