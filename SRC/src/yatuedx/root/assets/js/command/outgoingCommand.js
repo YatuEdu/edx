@@ -14,7 +14,6 @@ class OutgoingCommand {
 	#id;
 	#data;
 	
-	
 	constructor(id, data1, ...params) {
 		this.#id = id;
 		this.#data = [];
@@ -41,6 +40,10 @@ class OutgoingCommand {
 	
 	get data() {
 		return this.#data;
+	}
+	
+	pushData(data) {
+		this.#data.push(data);
 	}
 }
 

@@ -74,7 +74,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	updateCodeBufferAndSync() {
 		console.log('JSClassRoom.updateCodeBufferAndSync called');
 		const codeUpdateObj = this.updateCode(this.code); 
-		this.#displayBoardForCoding.updateCodeBufferAndSync(codeUpdateObj);
+		if (codeUpdateObj) {
+			this.#displayBoardForCoding.updateCodeBufferAndSync(codeUpdateObj);
+		}
 	}
 	
 	/**
@@ -94,7 +96,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			
 			// update the sample code
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
-				this.updateCodeSample(cmd.data[0], cmd.data[1], cmd.data[2]);
+				this.updateCodeSample(cmd.data);
 				break;
 				
 			// run code sample and show result on console
@@ -126,22 +128,27 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		Append or replace Code Smaple on the Whiteboard
 	**/	
-	updateCodeSample(how, text, digest) {
+	updateCodeSample(how) {
 		// obtain the new code sample using an algorithm defined in parent class as a static method
-		const newCode = ProgrammingClassCommandUI.updateContentByDifference(how, this.code, text);
+		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, this.code);
 		
 		// update the code on UI
-		this.code = newCode;
-		if (!newCode) {
+		this.code = newContent;
+		if (!newContent) {
 			return;  // no need to validate
 		}
 		
-		// verify the digest
-		if (StringUtil.verifyMessageDigest(newCode, digest)) { 
-			console.log('verfied content');
-		} else {
-			console.log('content not verified, asking for re-sync');
-			this.#displayBoardForCoding.askReSync();
+		// verify the digest if it is present
+		if (digest ) {
+			if (StringUtil.verifyMessageDigest(newContent, digest)) { 
+				console.log('verfied content');
+			} else {
+				console.log('content not verified, asking for re-sync');
+				this.#displayBoardForCoding.askReSync();
+			}
+		}
+		else {
+			console.log('verfied content w/o verifiying');
 		}
 	}
 	

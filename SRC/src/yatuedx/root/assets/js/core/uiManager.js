@@ -1,10 +1,11 @@
 import {sysConstants, languageConstants} from './sysConst.js'
-import {translationMapEn} from './translatable_en.js';
+import {translationMapEn, sysErrorMapEn} from './translatable_en.js';
 import {translationMapCn} from './translatable_cn.js';
 
 class UIManager {
 	#lang = sysConstants.STATE_LANG_EN;
 	#translationMapArray; 
+	#errMsgMapArray;
 
 	/**
 		public methods
@@ -12,6 +13,7 @@ class UIManager {
     constructor() {
 		// load Translation tables
 		this.#translationMapArray = [translationMapEn, translationMapCn];
+		this.#errMsgMapArray = [sysErrorMapEn, sysErrorMapEn];
 	}
 	
 	// get current ui language
@@ -33,6 +35,11 @@ class UIManager {
 	// get a translatable text by current locale
 	getText(textId) {
 		return this.#translationMapArray[this.#lang].get(textId);
+	}
+	
+	// get an error message text by error code
+	getErrMsg(errCode) {
+		return this.#errMsgMapArray[this.#lang].get(errCode);
 	}
 	
 	// get a translatable text by current locale and replacement argument

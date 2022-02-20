@@ -21,11 +21,35 @@ class LoginPageHandler {
 	init() {
 		$( "#auth_button" ).click(this.handleSubmit.bind(this));
 		$( "#signup_button" ).click(this.handleGotoSignup);
-		$( "#user_name" ).focusout(this.validateInput)
+		$( "#user_name" ).focusout(this.validateUserName)
 		$( "#user_password" ).focusout(this.validateInput);
 		if (this.#forSignup) {
 			$( "#user_email" ).focusout(this.validateInput);
 		}
+	}
+	
+	/**
+		validate login name: it is important to have login name unique and without special chars,
+		since we use it as alias for communication group.
+	**/
+	validateUserName(e) {
+		$(this).next('p').remove();
+		const name = $(this).val();
+		let dataId = '';
+		let warning = '';
+		if (!name) {	
+			dataId = $(this).attr('data-text-id');
+		}
+		else if (!(/^[a-z\d\_\s]+$/.test(name))) {
+			dataId = $(this).attr('data-validation-id');
+		}
+		else {
+			$(this).next('p').remove();
+			return true;
+		}
+		
+		warning = uiMan.getText(dataId);
+		$(this).after( `<p style="color:red;">${warning}</p>` );  
 	}
 	
 	// handling input focus loss to check valid input
@@ -39,6 +63,7 @@ class LoginPageHandler {
 			$(this).after( `<p style="color:red;">${warning}</p>` );  
 		} else {
 			$(this).next('p').remove();
+			return true;
 		}
 	}
 	

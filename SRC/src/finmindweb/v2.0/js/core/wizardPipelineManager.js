@@ -13,6 +13,13 @@ const calcTime = (timeString) =>  {
 	return parseInt(years);
 }
 
+const ENUM_TYPE_34_FIELD_MAPPING = [
+	'',
+	'highRiskActivity',
+	'militaryService',
+	'ACCIDENTAL_DEATH_RIDER',  // 3
+	'CHRONICLE_ILLNESS_RIDER'	// 4
+];
 
 const QUOTE_API_ATTR_LIST = [
 	{
@@ -48,6 +55,31 @@ const QUOTE_API_ATTR_LIST = [
 		field: 'sv1',
 	},
 	{
+		attr: 'app_habit_multiple_insurance_info',
+		field: 'sv1',
+		fieldMapping: 0
+	},
+	{
+		attr: 'app_habit_multiple_insurance_info',
+		field: 'sv1',
+		fieldMapping: 1
+	},
+	{
+		attr: 'app_habit_multiple_insurance_info',
+		field: 'sv1',
+		fieldMapping: 2
+	},
+	{
+		attr: 'app_habit_multiple_insurance_info',
+		field: 'sv1',
+		fieldMapping: 3
+	},
+	{
+		attr: 'app_habit_multiple_insurance_info',
+		field: 'sv1',
+		fieldMapping: 4
+	},
+	{
 		attr: 'app_coverage_amount',
 		field: 'sv1',
 		calculate: calcAmount, 
@@ -71,9 +103,9 @@ const QUOTE_API_MESSAGE_TEMPLATE = `
 		<smoke>[attr_5]</smoke>
 		<marijuana>[attr_6]</marijuana>
 		<drug>[attr_7]</drug>
-		<militaryService>false</militaryService>
-		<highRiskActivity>false</highRiskActivity>
-		<checkedOptions>LIVING_BENEFIT</checkedOptions>
+		<militaryService>false</militaryService>  // => SHOULD BE checkedOptions 0
+		<highRiskActivity>false</highRiskActivity>  //  => SHOULD BE checkedOptions 1
+		<checkedOptions>LIVING_BENEFIT</checkedOptions> 
 		<checkedOptions>ACCIDENTAL_DEATH_RIDER</checkedOptions>
 		<checkedOptions>CHRONICLE_ILLNESS_RIDER</checkedOptions>
 		<coverageAmount>[attr_8]</coverageAmount>

@@ -7,7 +7,7 @@ import {sysConstants}		from "../core/sysConst.js"
 import {Net}			    from "../core/net.js"
 import {credMan}			from "../core/credMan.js"
 import {VideoUtil} 			from "../core/videoUtil.js";
-
+import {StringUtil, UtilConst}	from '../core/util.js'
 
 const REPLACE_PID = '{pid}';
 const VIDEO_TEMPLATE = `
@@ -121,6 +121,50 @@ class CommunicationSpace {
 
 	}
 	
+	/**
+		Compose content update message based on how content is updated
+	**/
+	composeContentUpateMsg(codeUpdateObj) {
+		let cmd = null;
+		switch (codeUpdateObj.flag) {
+			case UtilConst.STR_CHANGE_NON:
+				// do nothing
+				break;
+			
+			case UtilConst.STR_CHANGE_APPEND:
+			case UtilConst.STR_CHANGE_PREPEND:
+				cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 	// command id
+										codeUpdateObj.flag,							// uopdate flag 
+										codeUpdateObj.delta);						// update content											
+				break;
+				
+			case UtilConst.STR_CHANGE_DELETE_END:
+			case UtilConst.STR_CHANGE_DELETE_BEGIN:
+				cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 	// command id
+										codeUpdateObj.flag,							// uopdate flag 
+										codeUpdateObj.length); 						// update length
+				break;
+				
+			case UtilConst.STR_CHANGE_MIDDLE:
+				cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 	// command id
+										codeUpdateObj.flag,							// uopdate flag 
+										codeUpdateObj.delta, 						// update content
+										codeUpdateObj.begin,    					// update range: begin
+										codeUpdateObj.end);							// update range: end
+				break;
+				
+			default:
+				break;
+		}
+		
+		if (cmd && codeUpdateObj.digest) {
+			// also append message digest if any
+			cmd.pushData(codeUpdateObj.digest);
+		}
+			
+		return cmd;
+	}
+
 	/**	
 		Handle p2p messages by interpretting it as command and do things accordingly
 	**/

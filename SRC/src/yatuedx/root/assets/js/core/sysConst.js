@@ -51,6 +51,7 @@ const languageConstants = {
 	ACCOUNT: "p_inx_signin_btn_nm2",			// index  ACCOUNT button text
 	HOME_LINK: "p_indx_link_home",				// index home link
 	PAGE_LINK: "p_indx_link_pages",				// INDEX pages link
+	SIGNIN_NAME_INVALID_CHAR: "p_login_fld_nm_char", // login page error: name invalid
 	SIGNIN_NAME_NEEDED: "p_login_fld_nm",		// login page error: name expected
 	SIGNIN_PW_NEEDED: "p_login_fld_pw",			// login page error: pw expected
 	SIGNUP_EMAIL_NEEDED: "p_signup_fld_em",		// login page error: pw expected

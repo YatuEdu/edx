@@ -1,6 +1,7 @@
 import {CommunicationSpace} 	from './communicationSpace.js';
 import {PTCC_COMMANDS}			from '../command/programmingClassCommand.js'
 import {OutgoingCommand}		from '../command/outgoingCommand.js'
+import {UtilConst} 				from '../core/util.js'
 
 const VIDEO_TEMPLATE = `
 <
@@ -21,20 +22,9 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		Update code buffer sample and sync with students
 	**/
 	updateCodeBufferAndSync(codeUpdateObj) {
-		switch (codeUpdateObj.flag) {
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
-				// do nothing
-				break;
-				
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED:
-				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, codeUpdateObj.flag, codeUpdateObj.content, codeUpdateObj.md);
-				this.sendMessageToGroup(cmd.str);
-				break;
-				
-		default:
-			break;
+		let cmd = this.composeContentUpateMsg(codeUpdateObj);
+		if (cmd) {
+			this.sendMessageToGroup(cmd.str);
 		}
 	}
 	
@@ -69,10 +59,14 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	}
 	
 	/**
-		Send code sample to one student whose code is out of sync
+		Send code sample to one student whose code is out of sync. Update the
+		student board by replacing the entire board content.
 	 **/
 	syncCodeWithStudent(codeStr, targetUser) {
-		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 
+										UtilConst.STR_CHANGE_ALL, 
+										codeStr, 
+										'');		// no digest needed in this case
 		this.sendMessageToUser(targetUser, cmd.str);
 		console.log('send:' + codeStr + ' to: ' + targetUser);
 	}

@@ -275,28 +275,15 @@ class DisplayBoardForCoding extends DisplayBoard {
 		}
 		return false;
 	}
+	
 	/**
 		During exercise mode, student send their most recent code to teacher 
 		to examine
 	 **/
 	updateCodeBufferAndSync(codeUpdateObj) {
-		switch (codeUpdateObj.flag) {
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
-				// do nothing
-				break;
-				
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_TALI_DELETED:
-				const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 	// command id
-												codeUpdateObj.flag,							// uopdate flag 
-												codeUpdateObj.content, 						// update coment
-												this.me);   								// from user name
-				this.sendMessageToUser(this.#teacher, cmd.str);
-				break;
-				
-		default:
-			break;
+		let cmd = this.composeContentUpateMsg(codeUpdateObj);
+		if (cmd) {
+			this.sendMessageToUser(this.#teacher, cmd.str);
 		}
 	}
 	
@@ -305,8 +292,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 	 **/
 	askReSync() {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC, 	// command id
-										0,										    // uopdate flag 
-										this.me);									// from whom
+										0);										    // uopdate flag 
 		this.sendMessageToUser(this.#teacher, cmd.str);
 	}
 	

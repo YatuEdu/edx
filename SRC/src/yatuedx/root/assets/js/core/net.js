@@ -73,7 +73,7 @@ class Net {
 				ret.data = data.data;
 				ret.code = data.result.code
 				if (ret.code !== 0) {
-					ret.err = uiMan.getTextWithParams(languageConstants.SERVER_ERROR_WITH_RESPONSE, data.result.code);
+					ret.err = uiMan.getErrMsg(data.result.code);
 				}
 			}
 		}

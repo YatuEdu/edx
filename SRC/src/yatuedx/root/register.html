@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Unplug UI</title>
+    <title>Sign-up for CODEKING</title>
     <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
     <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
@@ -14,18 +14,16 @@
         <div class="container-fluid">
             <div class="row vh-100">
                 <div class="col-md-6 text-center d-flex flex-column justify-content-center auth-bg-section text-white" style="background-image: url(assets/images/register-bg.jpg)">
-                    <h1 class="text-reset">Welcome to <br> Yatu Edx</h1>
-                    <p class="font-weight-bold text-reset">Enter your personal details and join Yatu.</p>
+                    <h1 class="text-reset">Welcome to CODEKING club</h1>
+                    <p class="font-weight-bold text-reset">Where your coding dreams become reality.</p>
                 </div>
                 <div class="col-md-6 text-center d-flex flex-column justify-content-center">
                     <div class="auth-form-section">
-                        <div class="logo"><img src="assets/images/logo.svg" class="img-fluid" alt="Unplug UI" width="200"></div>
-                        <h2>Sign up</h2>
-                        <p>Free access to our dashboard</p>
+                        <div class="logo"><img src="assets/images/logo-codeking.png" class="img-fluid" alt="Home" width="200"></div>
                         <div class="auth-form">
                             <div class="form-group">
                                 <label for="username" class="sr-only">Username</label>
-                                <input type="text" data-text-id="p_login_fld_nm" name="username" id="user_name" class="form-control" placeholder="Username">
+                                <input type="text" data-text-id="p_login_fld_nm" data-validation-id="p_login_fld_nm_char" name="username" id="user_name" class="form-control" placeholder="Username">
                             </div>
                             <div class="form-group">
                             <label for="userEmail" class="sr-only">Email</label>
@@ -35,7 +33,7 @@
                             <label for="userPassword" class="sr-only">Password</label>
                             <input type="password" data-text-id="p_login_fld_pw" name="userPassword" id="user_password" class="form-control" placeholder="Password">
                             </div>
-                            <button id="auth_button" type="button" class="btn btn-success btn-block mb-3">Sign up</button>
+                            <button id="auth_button" type="button" class="btn btn-success btn-block mb-3">Submit</button>
                             <div class="form-check text-left">
                                 <input type="checkbox" class="form-check-input" name="termsAgriment" id="termsAgriment" value="termsAgreed">
                                 <label class="form-check-label" for="termsAgriment">
@@ -43,7 +41,7 @@
                                 </label>
                             </div>
                         </form>
-                        <p class="text-left mb-0">已经注册<a href="login.html">在此登录</a> </p>
+                        <p class="text-left mb-0">Already registered?<a href="login.html"> Login from here</a> </p>
                     </div>
                 </div>
             </div>

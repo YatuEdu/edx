@@ -96,7 +96,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			
 			// update the student code console for code from each student
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
-				this.updateStudentCode(cmdObject.data);
+				this.updateStudentCode(cmdObject.data, cmdObject.sender);
 				break;
 				
 			// Sync with a student whose code is out of sync with teacher
@@ -177,17 +177,14 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		 2) update content
 		 3) from which student user
 	 **/
-	updateStudentCode(data) {
-		const how = data[0];
-		const delta = data[1];
-		const fromStudent = data[2];
-		const studentCurrentCode = $(this.getStudentConsoleIdSelector(fromStudent)).val();
+	updateStudentCode(how, student) {
+		const studentCurrentCode = $(this.getStudentConsoleIdSelector(student)).val();
 		
 		// obtain the new code sample using an algorithm defined in parent class as a static method
-		const newCode = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode, delta);
+		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode);
 		
 		// update the code for this student on UI
-		$(this.getStudentConsoleIdSelector(fromStudent)).val(newCode);
+		$(this.getStudentConsoleIdSelector(student)).val(newContent);
 	}
 	
 	/**
@@ -203,7 +200,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	updateCodeBufferAndSync() {
 		console.log('JSClassRoomTeacher.updateCodeBufferAndSync called');
 		const codeUpdateObj = this.updateCode(this.code); 
-		this.#displayBoardTeacher.updateCodeBufferAndSync(codeUpdateObj);
+		if (codeUpdateObj) {
+			this.#displayBoardTeacher.updateCodeBufferAndSync(codeUpdateObj);
+		}
 	}
 	
 	/**

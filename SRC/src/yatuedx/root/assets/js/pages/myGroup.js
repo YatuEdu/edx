@@ -86,11 +86,11 @@ class MyGroupPageHandler {
 				  credMan.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
 				  credMan.credential.name === groupOwner ) {
 				// go to class room as teacher
-				window.location.href =  `./class-room-teacher.html?group=${groupName}`;
+				window.location.href =  `./class-room-teacher.html?group=${groupId}`;
 			}
 			else {
 				// go to class room as student
-				window.location.href =  `./class-room.html?group=${groupName}&teacher=${groupOwner}`;				
+				window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}`;				
 			}
 		}
 		else {
