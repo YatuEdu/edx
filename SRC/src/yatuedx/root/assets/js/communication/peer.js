@@ -1,6 +1,6 @@
 
 const ICE_SERVERS = [
-    {url:"turn:8.135.100.85:3478",
+    {urls:"turn:8.135.100.85:3478",
         "username": "webrtc_user",
         "credential": "zRk6i2fhrllloZXq",
         "credentialType": "password"
