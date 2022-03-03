@@ -7,7 +7,9 @@ const API_FOR_REGISTER = 202101;
 
 const API_FOR_JOINING_GROUP_SESSION = 202111;
 const API_FOR_MY_GROUPS = 202115;
- 
+const API_FOR_SUBJECT_SERIES = 202116;
+const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
+
 class Net {
 	/**
 		Yatu API for user-login
@@ -40,8 +42,8 @@ class Net {
 	/**
 		Yatu API for A GROUP MEMBER joining a group session (a class, or a chat)
 	**/
-	static async groupMemberJoiningSession(token, gName) {
-		const req = Net.composeRequestDataForJoiningGroupSession(token, gName);
+	static async groupMemberJoiningSession(token, grpId) {
+		const req = Net.composeRequestDataForJoiningGroupSession(token, grpId);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -55,6 +57,24 @@ class Net {
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
 	
+	/**
+		Yatu API for retrieving class schedule for a class series
+	**/
+	static async classSeriesGetSchedule(token, seriesId) {
+		const req = Net.composeRequestDataForClassSeriesSchedule(token, seriesId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for retrieving class schedule for a class series
+	**/
+	static async subjectClassSeries(token, subjectId) {
+		const req = Net.composeRequestDataForSubjectClassSeries(token, subjectId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
 	/********** Utility methods *******/
 	
 	/**
@@ -141,16 +161,19 @@ class Net {
 	}
 	
 	/**
-		Froming Yatu API request data for TOKEN validity test
+		Froming Yatu API request data for joining a group
 	**/	
-	static composeRequestDataForJoiningGroupSession(t, gName) {
+	static composeRequestDataForJoiningGroupSession(t, grpId) {
+		if (typeof grpId === 'string') {
+			grpId =  parseInt(grpId, 10);
+		}
 		const joiningGroupSessionReq = {
 			header: {
 				token: t,
 				api_id: API_FOR_JOINING_GROUP_SESSION
 			},
 			data: {
-				groupName: gName
+				groupId: grpId
 			}
 		};
 		return Net.composePostRequestFromData_private(joiningGroupSessionReq);
@@ -171,6 +194,41 @@ class Net {
 		return Net.composePostRequestFromData_private(myGroupsReq);
     }
 
+	/**
+		Froming Yatu API request data for getting Class Series Schedule
+	**/	
+	static composeRequestDataForClassSeriesSchedule(t, sId) {
+		const sIdi =  parseInt(sId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_FOR_CLASS_SERIES_SCHEDULE
+			},
+			data: {
+				seriesId: sIdi
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}
+		
+	/**
+		Froming Yatu API request data for getting Class Series FOR A Subject
+	**/	
+	static composeRequestDataForSubjectClassSeries(t, sbjId) {
+		const sbjIdi =  parseInt(sbjId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_FOR_SUBJECT_SERIES
+			},
+			data: {
+				subjectId: sbjIdi,
+				startDate: null
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}
+	
 	/**
 		forming request data for Yatu API calls
 	**/

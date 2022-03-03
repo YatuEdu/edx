@@ -20,6 +20,10 @@ const sysConstants = {
 	// URL param name:
 	UPN_GROUP: 		'group',
 	UPN_TEACHER: 	'teacher',
+	UPN_EMAIL:		'email',
+	UPN_NAME: 		'name',
+	UPN_SERIES:		'series',
+	UPN_SUBJECT:	'subject',
 	
 	// UI STATES
 	STATE_LANG_EN: 0,

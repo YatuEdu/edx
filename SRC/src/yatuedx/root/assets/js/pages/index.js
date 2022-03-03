@@ -15,6 +15,9 @@ class IndexPageHandler {
 	
 	// hook up events
 	async init() {
+		// sign up Link
+		$( "#yt_btn_redirect_to_signup" ).click(this.redirectToSignup);
+		
 		// get all the translatable elemnts
 		
 		$('.translatable').each((i, obj) => {
@@ -30,21 +33,22 @@ class IndexPageHandler {
 		if (!this.#loggedIn) {
 			// fix nav bar red button
 			btnTxt = uiMan.getText(languageConstants.SIGNIN);
-			$( "#index_login_or_account" ).click(this.handleLogin);
+			$( "#yt_btn_login_signup" ).click(this.handleLogin);
 			
 			// fix nav bar authenticated user onky items
 			$( ".for-authenticated-only" ).hide();
 		}
 		else {
 			
-			//btnTxt = uiMan.getText(languageConstants.ACCOUNT);
-			btnTxt = "我的账户";
-			$( "#index_login_or_account" ).click(this.handleAccount);
+			btnTxt = uiMan.getText(languageConstants.ACCOUNT);
+			//btnTxt = "我的账户";
+			$( "#yt_btn_login_signup" ).click(this.handleAccount);
 			
 			// fix nav bar authenticated user onky items
 			$( ".for-authenticated-only" ).show();
+			$( ".for-unauthenticated-only" ).hide();
 		}
-		$( "#index_login_or_account" ).text(btnTxt);
+		$( "#yt_btn_login_signup" ).text(btnTxt);
 	}
 	
 	// going to login page
@@ -52,6 +56,22 @@ class IndexPageHandler {
 		e.preventDefault();
 		// go to login page
 		window.location.href = "./login.html";
+	}
+	
+	// going to sign up directly
+	redirectToSignup(e) {
+		e.preventDefault();
+		
+		let emailId = $( "#yt_inpt_email").val();
+		if (!emailId) {
+			emailId = "enter_email";
+		}
+		let userName = $( "#yt_inpt_name").val();
+		if (!userName) {
+			userName = "enter_your_name";
+		}
+		// go to register page
+		window.location.href = `./register.html?email=${emailId}&name=${userName}`;
 	}
 	
 	// going to account page
@@ -70,3 +90,6 @@ $( document ).ready(function() {
     console.log( "index page ready!" );
 	indexPageHandler = new IndexPageHandler(credMan);
 });
+
+export {IndexPageHandler}
+ 

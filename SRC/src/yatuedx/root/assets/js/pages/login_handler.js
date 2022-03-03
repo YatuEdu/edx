@@ -1,6 +1,7 @@
-import {sysConstants} from '../core/sysConst.js'
-import {credMan} from '../core/credMan.js'
-import {uiMan} from '../core/uiManager.js';
+import {sysConstants} 	from '../core/sysConst.js'
+import {credMan} 		from '../core/credMan.js'
+import {uiMan} 			from '../core/uiManager.js';
+import {PageUtil}		from '../core/util.js';
 
 /**
 	This class manages both login and sigup workflow
@@ -24,6 +25,11 @@ class LoginPageHandler {
 		$( "#user_name" ).focusout(this.validateUserName)
 		$( "#user_password" ).focusout(this.validateInput);
 		if (this.#forSignup) {
+			const paramMap = PageUtil.getUrlParameterMap();
+			const email = paramMap.get(sysConstants.UPN_EMAIL);
+			const name = paramMap.get(sysConstants.UPN_NAME);
+			$( "#user_email" ).val(email);
+			$( "#user_name" ).val(name);
 			$( "#user_email" ).focusout(this.validateInput);
 		}
 	}
