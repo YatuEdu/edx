@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/fm-main.css" rel="stylesheet" />
+</head>
+<body><title>FinMind</title>
+
+<script src="js/jquery/dist/jquery.min.js"></script>
+
+<script>
+    const module = "../js/pages/index.js";
+
+    $( document ).ready(function() {
+        $('body').load('../base/base.html', function () {
+            $('body').append(`
+                <script type="module" src="`+module+`"/>
+            `);
+        });
+    });
+</script>
+
+</body>
