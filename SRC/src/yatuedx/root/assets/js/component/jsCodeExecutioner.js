@@ -6,9 +6,18 @@ import {uiMan} from '../core/uiManager.js';
 **/
 class JSCodeExecutioner {
 	#consoleId;
+	#vars;
 	
     constructor(consoleId) {
 		this.#consoleId = consoleId; 
+		// A ~ Z
+		const alpha = Array.from(Array(26)).map((e, i) => i + 65);
+		const alphabet = alpha.map((x) => String.fromCharCode(x));
+		// a ~ z
+		const alpha2 = Array.from(Array(26)).map((e, i) => i + 97);
+		const alphabet2= alpha2.map((x) => String.fromCharCode(x));
+		// merge
+		this.#vars = alphabet.concat(alphabet2);
 	}
 	
 	/*
@@ -22,6 +31,8 @@ class JSCodeExecutioner {
 		Run js code 
 	 */
 	runJSCode_prv(src) {
+		// first cleasr left over globals
+		this.undefine_vars();
 		src = src.trim();
 		if (src) {
 			try {
@@ -30,6 +41,9 @@ class JSCodeExecutioner {
 				if (res) {
 					this.print_prv(res);
 				}
+				
+				// print well-know variqables (from a ~ z)
+				this.print_vars();
 			}
 			catch (e) {
 				this.print_prv(e);
@@ -69,6 +83,37 @@ class JSCodeExecutioner {
 		}
 		$(id).val(printTex);
     }
+	
+	/*
+		undefine well know variables (a ~ z, A, Z) to avoid polluting the
+		global space.
+	 */
+	undefine_vars() {
+		// if any of the vars defined, print them:
+		this.#vars.forEach(maybe => {
+			try {
+				eval(maybe + "=undefined");
+			}
+			catch(e) {
+			} 
+		});
+	}
+	
+	/*
+		print well know variables (a ~ z, A, Z) to console.
+	 */
+	print_vars() {
+		// if any of the vars defined, print them:
+		this.#vars.forEach(maybe => {
+			try {
+				if (eval(maybe + "!==undefined")) {
+					this.printLine_prv(maybe + "=" + eval(maybe));
+				}
+			}
+			catch(e) {
+			} 
+		});
+	}
 }
 
 export {JSCodeExecutioner}

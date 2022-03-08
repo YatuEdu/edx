@@ -107,8 +107,8 @@
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
-    font-weight: 700;
-	font-size: 24px;
+    font-weight: 300;
+	font-size: 20px;
     line-height: 1.5;
 	background: #CCCFBC !important;
 	color: #0000FF;
