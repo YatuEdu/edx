@@ -282,6 +282,26 @@ class Net {
 	}
 
 	/**
+	 FinMind API for user to get own applications
+	 **/
+	static async getApplications(token, pageSize, pageNo, searchBy) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021836
+			},
+			data: {
+				pageSize: pageSize,
+				pageNo: pageNo,
+				searchBy: searchBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
 	 FinMind API for agent to get applications
 	 **/
 	static async getApplications(token, appStatus, pageSize, pageNo, searchBy, orderBy) {
@@ -296,6 +316,95 @@ class Net {
 				pageNo: pageNo,
 				searchBy: searchBy,
 				orderBy: orderBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to get clients
+	 **/
+	static async getClients(token, pageSize, pageNo, searchBy) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021837
+			},
+			data: {
+				pageSize: pageSize,
+				pageNo: pageNo,
+				name: searchBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to get applications
+	 **/
+	static async getMyApplications(token, pageSize, pageNo, searchBy) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021835
+			},
+			data: {
+				"name": searchBy,
+				"pageSize": pageSize,
+				"pageNo": pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to get profile
+	 **/
+	static async getMyProfile(token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021838
+			},
+			data: {
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to save profile
+	 **/
+	static async updateMyProfile(token, email, phone_number, first_name, middle_name, last_name, birthday, gender, address1, address2, city, state, zip_code, license_issue_state, license_expire_date, license_number) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021839
+			},
+			data: {
+				email: email,
+				phone_number: phone_number,
+				first_name: first_name,
+				middle_name: middle_name,
+				last_name: last_name,
+				birthday: birthday,
+				gender: gender,
+				address1: address1,
+				address2: address2,
+				city: city,
+				state: state,
+				zip_code: zip_code,
+				license_issue_state: license_issue_state,
+				license_expire_date: license_expire_date,
+				license_number: license_number
 			}
 		};
 		const req =  Net.composePostRequestFromData_private(requestData);

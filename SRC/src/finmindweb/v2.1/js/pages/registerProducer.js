@@ -405,7 +405,7 @@ class RegisterProducerPageHandler {
             this.#lastName = $("#fm_rgstr_last_name").val().trim();
             this.#email = $("#fm_rgstr_email").val().trim();
             this.#pw = $("#fm_rgstr_password" ).val().trim();
-            if (!this.#firstName || this.#lastName || !this.#email || !this.#pw) {
+            if (!this.#firstName || !this.#lastName || !this.#email || !this.#pw) {
                 $(e.target).after( `<p style="color:red;">Email, name, and password cannot be empty</p>` );
                 return;
             }

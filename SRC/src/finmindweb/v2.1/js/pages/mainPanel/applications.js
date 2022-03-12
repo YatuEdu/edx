@@ -9,8 +9,8 @@ const pageTemplate = `
 			<h5 class="m-0">Applications</h5>
 			<div class="ms-auto d-flex">
 				<div class="input-group me-2" style="width: 16.25rem;">
-					<input type="text" class="form-control fs-7" placeholder="Search Name" style="border-color: rgba(217, 220, 230, 1);">
-					<button class="btn btn-outline-secondary bg-transparent" type="button" style="border-color: rgba(217, 220, 230, 1);">
+					<input id="searchInput" type="text" class="form-control fs-7" placeholder="Search Name" style="border-color: rgba(217, 220, 230, 1);">
+					<button id="searchSubmit" class="btn btn-outline-secondary bg-transparent" type="button" style="border-color: rgba(217, 220, 230, 1);">
 						<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 12a6 6 0 1 1 4.548-2.087l1.32 1.32a.447.447 0 0 1 .003.631l-.004.004a.454.454 0 0 1-.318.132.454.454 0 0 1-.318-.132L9.912 10.55A5.976 5.976 0 0 1 6 12zM6 .9a5.1 5.1 0 1 0 0 10.2A5.1 5.1 0 0 0 6 .9z" fill="#1F1534" fill-opacity=".2"/></svg>
 					</button>
 				</div>
@@ -78,8 +78,8 @@ const rowTemplate = `
 	<td class="idle-time">{it}</td>
 	<td>{dp}</td>
 	<td>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary">Edit</button>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal">Delete</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary" disabled>Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
 `;
@@ -96,11 +96,26 @@ class Applications {
 	async init() {
     	this.#container.empty();
     	this.#container.append(pageTemplate);
-    	let pageSize = 10;
-    	let pageNo = 1;
-    	let maxRowNumber;
-		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, '', 'start_date asc');
-		for(let i=0; i<res.data.length; i++) {
+
+    	await this.requestList('');
+
+		let options = {
+			valueNames: [ 'create-date','last-update-time','idle-time' ]
+		};
+
+		let userList = new List('event-table', options);
+
+		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+
+	}
+
+	async requestList(searchBy) {
+		let pageSize = 10;
+		let pageNo = 1;
+		let maxRowNumber;
+		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date asc');
+		$('#list').empty();
+		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
@@ -118,12 +133,6 @@ class Applications {
 		}
 		let pagination = new Pagination($('#table'), pageSize, maxRowNumber);
 
-		let options = {
-			valueNames: [ 'create-date','last-update-time','idle-time' ]
-		};
-
-		let userList = new List('event-table', options);
-		console.log("");
 	}
 
 
@@ -148,6 +157,19 @@ class Applications {
 				return 'Declined';
 				break;
 		}
+	}
+
+	handleSearchSubmit(e) {
+    	let searchBy = $('#searchInput').val();
+		this.requestList(searchBy);
+		console.log();
+	}
+
+	handleSort(e) {
+		let dataSort = $(e.target).attr('data-sort');
+		let cls = $(e.target).attr('class');
+		e.preventDefault();
+    	console.log(e);
 	}
 }
 

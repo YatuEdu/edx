@@ -72,9 +72,16 @@ class LoginPageHandler {
         }
 
         $("#fm_login_button").click(this.handleLogin.bind(this));
+        $(document).keyup(this.keyUp.bind(this));
         $("#fm_signup_link").click(this.handleGotoSignup);
         $("#fm_email").focusout(this.validateInput)
         $("#fm_password").focusout(this.validateInput);
+    }
+
+    keyUp(e) {
+        if (e.keyCode == 13) {
+            this.handleLogin(e);
+        }
     }
 
     // handling input focus loss to check valid input
