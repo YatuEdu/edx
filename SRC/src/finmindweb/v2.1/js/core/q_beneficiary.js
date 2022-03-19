@@ -16,7 +16,7 @@ const q_template_beneficiaries_list = `
 <div class="row g-0 px-3 px-md-0">
   <div class="col">
 	<a id="fm_wz_btn_add_more" class="btn btn-success btn-sm py-0 rounded-pill d-inline-flex ms-3">
-	  <img src="img/ico-add-btn.svg" class="me-1">
+	  <img src="../img/ico-add-btn.svg" class="me-1">
 		Add New
 	</a>
   </div>

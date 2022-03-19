@@ -106,13 +106,11 @@ class ProductRecommended {
 	async handleStartApplication(e) {
 
 		//TODO 无法获取产品ID
-		let prodId = 89898991;
+		let prodId = 89898990;
 		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
 		const appId = await this.startApplicationForProduct(prodId); //4008; //
 		if (appId && appId > 0) {
-			// create 'ApplicationPipelineManager' for application pipeline management
-			this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
-
+			window.location.href = "/user/pipeline.html?appId="+appId;
 		} else {
 			alert('cannot start application');
 			return;

@@ -165,14 +165,14 @@ class PipelineManager {
 		const currentQuestions = this._qAndAManager.currentQuestions;
 		const found = currentQuestions.find(e => e.onValidating() === false);
 		if (found) {
-			alert(`Question '${found.question}' needs to be answered`);
+			alert(`Question '${found.label}' needs to be answered`);
 			return false;
 		}
 		
 		// now save the questions to DB
 		const resp = await this.v_save(token);
 		if (resp && resp.err) {
-			alert(resp.err);
+			alert(JSON.stringify(resp.err));
 			return false;
 		} else {
 			return true;

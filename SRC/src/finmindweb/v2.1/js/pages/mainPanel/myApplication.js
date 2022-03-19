@@ -26,7 +26,7 @@ const pageTemplate = `
 			</button>
 		</div>
 	</div>
-	<div class="card-body p-0 position-relative overflow-auto" style="height: 0;">
+	<div id="table" class="card-body p-0 position-relative overflow-auto" style="height: 0;">
 		
 		<div class="event-table mx-4 position-relative overflow-auto">
 			<table class="w-100">
@@ -44,24 +44,6 @@ const pageTemplate = `
 				<tbody id="list">
 				</tbody>
 			</table>	
-		</div>
-		<div class="d-flex justify-content-between mt-3 mx-4 fs-8">
-			<div class="text-secondary">
-				showing 10 out of 9000
-			</div>
-			<div class="d-flex align-items-center">
-				<span class="text-secondary">Page 01 of 56</span>
-				<ul class="pagination pagination-sm justify-content-end my-0 ms-3 event-table-pagination">
-					<li class="page-item"><a class="page-link" href="#">
-					<svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.012 4.5l3.305 3.404a.653.653 0 0 1 0 .907.607.607 0 0 1-.881 0L.78 5.045A.636.636 0 0 1 .5 4.5a.662.662 0 0 1 .28-.546L4.436.188a.614.614 0 0 1 .88 0 .653.653 0 0 1 0 .907L2.013 4.5z" fill="#8D93A6"/></svg>
-					</a></li>
-					<li class="page-item"><a class="page-link" href="#">1</a></li>
-					<li class="page-item active"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
-					<li class="page-item"><a class="page-link" href="#"><svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.988 4.5L.683 7.903a.653.653 0 0 0 0 .907.607.607 0 0 0 .881 0L5.22 5.045A.636.636 0 0 0 5.5 4.5a.662.662 0 0 0-.28-.546L1.564.188a.614.614 0 0 0-.88 0 .653.653 0 0 0 0 .907L3.987 4.5z" fill="#8D93A6"/></svg></a></li>
-				</ul>
-				<input class="form-control form-control-sm text-center position-relative" type="text" style="width: 43px;border-color: #dddfe5;">
-			</div>
 		</div>
 							
 	</div>

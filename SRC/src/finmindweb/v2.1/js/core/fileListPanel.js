@@ -5,10 +5,10 @@ import {ArrayUtil}		from './util.js'
 const template_for_file_element = `
 <li id="{id}" class="list-group-item justify-content-between align-items-center d-flex px-1">
   <div class="d-flex align-items-start">
-	<img src="img/ico-file-zip.svg" >
+	<img src="../img/ico-file-pdf.svg" >
 	<div class="ms-3 me-2">
 		<h6 class="fs-7 mb-0">{fn}</h6>
-		<span class="fs-8">3 min ago</span>
+		<span class="fs-8">{time}</span>
 	</div>
   </div>
   <div class="position-relative">
@@ -26,6 +26,7 @@ const template_for_file_element = `
 
 const replacementForFileName = '{fn}';
 const replacementForId = '{id}';
+const replacementForTime = '{time}';
 
 
 class UploadedFileListPanel { 
@@ -56,15 +57,39 @@ class UploadedFileListPanel {
 		let html = '';
 		for (let i = 0; i < list.length; i++) {
 			const f = list[i];
-			
+			let fromNow = this.timeFromNow(f.modifyTime);
+
 			html += template_for_file_element
-					   .replace(replacementForFileName, f)
-					   .replace(new RegExp(replacementForId, 'g'), this.elmentId(i));
+				.replace(replacementForFileName, f.file)
+				.replace(replacementForTime, fromNow + ' ago')
+				.replace(new RegExp(replacementForId, 'g'), this.elmentId(i));
 		}
 		
 		// hook up event handler
 		
 		return html;
+	}
+
+	timeFromNow(timeInSec) {
+		let date = moment(timeInSec*1000);
+		let now = moment(new Date());
+		let seconds = now.diff(date,"seconds");
+		let minutes = (seconds/60);
+		let hours = (minutes/60);
+		let days = (hours/60);
+
+		if (Math.floor(days)>0) {
+			return Math.floor(days) + ' days';
+		}
+		if (Math.floor(hours)>0) {
+			return Math.floor(hours) + ' hours';
+		}
+		if (Math.floor(minutes)>0) {
+			return Math.floor(minutes) + ' minutes';
+		}
+		if (Math.floor(seconds)>0) {
+			return Math.floor(seconds) + ' seconds';
+		}
 	}
 	
 	/**
@@ -98,13 +123,15 @@ class UploadedFileListPanel {
 		{
 			e.preventDefault();
 			const res = await Net.downloadUploadedFiles(token, 
-												        fileInfo, 
+												        fileInfo.file,
 													    key, key, key);
 			// if succeeded
 			if (!res.err) {
 				const strWindowFeatures = "location=yes,height=570,width=520,scrollbars=yes,status=yes";
 				const URL = res.data.url
-				window.open(URL, "_blank", strWindowFeatures);
+				// window.open(URL, "_blank", strWindowFeatures);
+				window.open(URL, "_blank");
+
 			}
 		}
 	}
@@ -135,6 +162,7 @@ class UploadedFileListPanel {
 		
 		return '';
 	}
+
 }
 
 export { UploadedFileListPanel };

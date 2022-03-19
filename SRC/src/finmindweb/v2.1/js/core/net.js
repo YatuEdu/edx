@@ -413,6 +413,25 @@ class Net {
 	}
 
 	/**
+	 FinMind API for user to get application info
+	 **/
+	static async getApplicationInfo(appId, token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021840
+			},
+			data: {
+				appId: appId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+
+	/**
 		compose finMind API request for starting to apply for a product
 	**/
 	static composeRequestDataForStartAplication_private(prodId, token){

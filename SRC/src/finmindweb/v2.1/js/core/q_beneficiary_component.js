@@ -25,7 +25,7 @@ const q_template_delete_button = `
 <div class="text-end position-absolute top-0 end-0 translate-middle-y">
 	<a id="fm_wz_btn_clss_remove_beneficiary_{id}" 
 	   class="btn btn-danger btn-sm py-0 rounded-pill d-inline-flex fm_wz_btn_clss_remove_one_beneficiary">
-		<img src="img/ico-delete-btn.svg" class="me-1">
+		<img src="../img/ico-delete-btn.svg" class="me-1">
 		Delete
 	</a>
 </div>`;

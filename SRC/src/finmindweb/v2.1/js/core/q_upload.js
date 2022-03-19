@@ -31,14 +31,14 @@ const q_template_for_one_file =
 `<h6 class="mb-3">{lb}</h6>
 <div id="file_area_{id}" class="upload-drag-area p-4 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
 	<input type="file" id="fileInput_{id}" name="upfile" class="d-none">
-	<img src="images/ico-upload-file.svg">
+	<img src="../img/ico-upload-file.svg">
 	<div id="upload_button_{id}" class="fs-7 fw-bold text-body text-opacity-50">
 		<a href="#" class="text-primary text-decoration-none">Browse</a>, or Drag& Drop your file here
 	</div>
 </div>
-<div id=progress_div_{id}>
+<div id=progress_div_{id} style="display:none">
   <div class="upload-drag-area p-4 mb-4 rounded-3 text-center d-flex align-items-center justify-content-between">
-    <img src="images/ico-file-pdf.svg">
+    <img src="../img/ico-file-pdf.svg">
 	<div class="flex-grow-1 mx-3">
 		<div class="d-flex justify-content-between fs-7 fw-bold mb-1">
 			<b id="fileName_{id}" class="text-body text-opacity-50"></b>

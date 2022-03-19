@@ -7,7 +7,7 @@ const replacementValue  = '{val}';
 const replacementForLabel = '{lb}';
 
 const q_template_integer = `
-<div class="input-group mb-3">
+<div class="mb-4">
   <label for="attributes" class="form-label">{lb}</label>
   <input type="number" size="11" min="{min}"  max="{max}" step="1" 
        class="form-control form-control-lg {clss}" 

@@ -10,7 +10,7 @@ const template_for_datetime = `
 const template_for_message_left = `
 <div class="chat-left d-flex align-items-start my-3">
   <div class="chat-avatar rounded-pill overflow-hidden me-2">
-    <img src="img/avatar-demo.jpeg" class="img-fluid">
+    <img src="../img/avatar-demo.jpeg" class="img-fluid">
   </div>
   <div class="chat-msg">
 	<h6 class="fs-8 text-body text-opacity-50 mb-1">{src}</h6>
@@ -46,7 +46,7 @@ const template_for_message_right_image = `
 						<span class="fs-8 text-body text-opacity-50">{f_size}</span>
 					</div>
 					<div>
-						<img src="img/ico-file-pdf.svg" style="width: 2rem;">
+						<img src="../img/ico-file-pdf.svg" style="width: 2rem;">
 					</div>
 				</div>
 			</article>
