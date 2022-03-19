@@ -70,6 +70,8 @@ const TEMPLATE_PROD = `
 </tr>
 `;
 
+const SIGNIN_PATH="/prelogin/login.html";
+
 /**
 	This class manages both login and sigup workflow
 **/
@@ -104,6 +106,14 @@ class ProductRecommended {
 	}
 
 	async handleStartApplication(e) {
+
+		// 如果状态失效，跳转到登录页面
+		const loggedIn = await this.#credMan.hasLoggedIn();
+		if (!loggedIn) {
+			window.location.href = SIGNIN_PATH;
+			return;
+		}
+
 
 		//TODO 无法获取产品ID
 		let prodId = 89898990;
