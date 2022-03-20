@@ -1,4 +1,5 @@
-import {ApplicationQAndAManager}			from './applicationQAndAManager.js'
+import {ApplicationQAndAManager}	from './applicationQAndAManager.js'
+import {credMan}      				from './credManFinMind.js'
 
 /**
 	Manager for pipeline question down-loading, dynamic HTML generation,
@@ -14,17 +15,42 @@ class PipelineManager {
 	_appId;
 	
 	constructor(store, appId) {
-		this._qAndAManagerHIstoryList = [];
-		this._qAndAManager = null; // new ApplicationQAndAManager();
 		this._store = store;
 		this._appId = appId;
+
+		// get current answered blocks first if any
+		// 获取目前已经回答的问题， 如果用户上次没有回答完， 这次不用从头开始。
+		this.initalizeQaAHistory();   		
     }
 
+	/**
+		Retrieve all question blocks answered from FinMind backend for 
+		the current user
+	**/
+	async initalizeQaAHistory() {
+		this._qAndAManager = null; // new ApplicationQAndAManager();
+		this._qAndAManagerHistoryList = [];
+		const t = this.credMan.credential.token;
+		const blocks = await Net.getAppPipelineBlocks(this._appId, t);
+		
+		// get all the answers from blocks and save them to QA Manger
+		if (blocks && blocks.data.length > 0) {
+			for(let i = 0; i < blocks.data.length; i++) {
+				const blockId =  blocks.data[i].block_id;
+				
+				// get qestion / answer for this block
+				const qaLst =  await Net.getQAForBlockOfApp(this._appId, blockId, t);
+				this._qAndAManager = new ApplicationQAndAManager(this._appId);
+				this._qAndAManagerHistoryList.push(this._qAndAManager);
+			}
+		}
+	}
+	
 	/**
 		Get current blockId
 	**/
 	get blockId() {
-		return this._qAndAManager.blockId;
+		return this._qAndAManager ? this._qAndAManager.blockId : 0;
 	}		
 	
 	/**

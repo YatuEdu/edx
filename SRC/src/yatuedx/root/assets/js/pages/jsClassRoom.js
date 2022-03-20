@@ -12,8 +12,9 @@ const YT_CONSOLE_ID 						= "yt_console";
 const YT_CODE_BOARD_ID 						= "yt_code_board";
 const YT_DIV_CODE_DISPLAY_OR_INPUT_AREA_ID 	= "yt_div_code_display_or_input_area";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
+const YT_BTN_SEND_MSG 						= "yt_btn_msg_send";
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
-const VD_VIEDO_AREA = "yt_video_area";
+const VD_VIEDO_AREA 						= "yt_video_area";
 
 const REPLACE_CBID = '{cbid}';
 const REPLACE_RN = '{rn}';
@@ -22,7 +23,7 @@ const HIDDEN_BOARD_TEMPLATE = `
 <textarea class="input-board"
 		  id="{cbid}" 
 		  spellcheck="false"
-		  placeholder="ype your code herer...."
+		  placeholder="type your code here...."
 		  rows="{rn}"></textarea>`;
 								  
 /**
@@ -54,7 +55,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-			
+		$(this.sendMsgButton).click(this.handleSendMsg.bind(this));
+		
 		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
 	
 		$("#bt_white_board_send").click(this.handleSend.bind(this));
@@ -227,6 +229,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_BTN_RUN_CODE_ID}`;
 	}
 	
+	get sendMsgButton() {
+		return `#${YT_BTN_SEND_MSG}`;
+	}
+		
 	get clearResultButton() {
 		return `#${YT_BTN_CLEAR_RESULT_CODE_ID}`;
 	}
@@ -243,6 +249,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//obtain code from local "exercise board" and execute it locally
 		super.runCodeFromTextInput();
+	}
+	
+	/**
+		Hnandle send message to teacher
+	**/
+	handleSendMsg(e) {
+		const msg = $("#yt_txt_msg_console").val();
+		if (msg) {
+			this.#displayBoardForCoding.sendMsgToTeacher(msg);
+		}
 	}
 	
 	/*

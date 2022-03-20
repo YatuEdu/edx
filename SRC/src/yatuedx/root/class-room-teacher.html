@@ -47,15 +47,47 @@
 						</div>
 					</div>
 					<div class="col-9">
-						<div class="row mb-4">			
-							<div class="col-2 text-center">
-								<button id="yt_btn_erase_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-									Erase Boards
-								</button>
+						<div class="row mb-4"> 
+							<div class="col-1 text-center">
+								<input type="image" id="yt_btn_btfy_code" title="Not implemented Yet"
+									   width="41" height="41" src="assets/images/tools/beautify_code.png" >
+								</input>
 							</div>
-							<div class="col-6 text-center">
-								<button id="yt_btn_switch_mode" data-mode="1" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-								</button>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_sync_board"  title="Synchronize Code"" >
+									<source width="50" height="50" type="image/webp" srcSet="assets/images/tools/sync_code.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_run_code_on_student_board"  title="Run Code"" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>	
+							<div class="col-1 text-center">
+								<picture id="yt_btn_erase_result"  title="Erase Result" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>	
+							<div class="col-1 text-center">
+								<picture id="yt_btn_share_screen" title="Share Screen" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/share_scrn.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center"> 
+								<picture id="yt_btn_switch_mode" title="Switch mode" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/switch_mode.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_erase_board"  title="Erase Board" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_screen.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
 							</div>
 						</div>	
 						<div class="row mb-4">
@@ -75,52 +107,26 @@
 							</div>
 						</div>
 						<div class="row mb-4">
-							<div class="col-2 text-center">
-								<button id="yt_btn_sync_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-									Sync Boards
-								</button>
+							<div class="col-8">
+								<textarea class="msg-board"
+								  id="yt_txt_msg_console" 
+								  spellcheck="yes" 
+								  placeholder="Message Board"
+								  rows="5"></textarea>
 							</div>
-							<div class="col-2 text-center">
-								<button id="yt_btn_run_code_on_student_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-									Run Code
-								</button>
+							<div class="col-4">
+								<div id="yt_div_msg_receiver_select">
+								</div>
+								<picture id="yt_btn_msg_send" class="btn" title="Send Message" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/send_msg.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
 							</div>
-							<div class="col-2 text-center">
-								<button id="yt_btn_erase_result" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-									Erase Result
-								</button>
-							</div>
-							<div class="col-2 text-center">
-								<button id="yt_btn_btfy_code" class="btn btn-primary fs-6p fw-bold px-3 rounded-0">
-									Beautify Code
-								</button>
-							</div>
-						</div>
+						</div>	
 					</div>
 				</div>
             </section>
         </article>
-        <div class="container">
-            <section class="blog-post-widget py-4">
-                <div class="container">
-                    <h6 class="text-center font-weight-bold text-uppercase blog-post-widget-title">Post message</h5>
-                        <form  class="pb-5 border-bottom">
-                            <div class="row">
-                                <div class="form-group col-12 mb-4">
-                                    <textarea name="comment" id="ta_white_board" spellcheck-"false" 
-									class="form-control" rows="15"></textarea>
-                                </div>
-                            </div>
-                          
-                            <div class="row">
-                                <div class="col-2 text-center">
-									<button id="bt_white_board_send" class="btn btn-danger">Send</button>
-                                </div>
-                            </div>
-                        </form>
-                </div>
-            </section>
-        </div>
         
     </main>
 
@@ -130,7 +136,7 @@
                         src="assets/images/logo-white.svg" class="img-fluid" alt="Unplug UI" width="102"></a></p>
             <nav class="nav justify-content-center flex-column flex-sm-row text-center">
                 <a href="blog.html" class="nav-link">Blog</a>
-                <a href="index.html" class="nav-link">Why Unplug?</a>
+                <a href="index.html" class="nav-link">Why CodeKing?</a>
                 <a href="about.html" class="nav-link">About Us</a>
                 <a href="contact.html" class="nav-link">Contact Us</a>
             </nav>

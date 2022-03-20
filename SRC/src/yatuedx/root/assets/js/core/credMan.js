@@ -134,6 +134,6 @@ class CredentialManager {
 	
 }
 
-const store = new LocalStoreAccess(sysConstants.FINMIND_CRED_STORE_KEY);
+const store = new LocalStoreAccess(sysConstants.YATU_CRED_STORE_KEY);
 const credMan = new CredentialManager(store);
 export { credMan };

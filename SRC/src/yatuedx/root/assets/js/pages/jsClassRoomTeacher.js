@@ -8,15 +8,17 @@ import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil}							from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
-const TA_RESULT_CONSOLE = "yt_result_console";
-const DIV_VIEDO_AREA = "yt_div_video_area";
+const TA_RESULT_CONSOLE 	= "yt_result_console";
+const DIV_VIEDO_AREA 		= "yt_div_video_area";
+const BTN_SHARE_SCREEN 		= "yt_btn_share_screen";
 const DIV_STUDENT_MSG_BOARD = "yt_div_student_textarea";
-const BTN_SYNC_BOARD = "yt_btn_sync_board"; 
-const BTN_MODE_CHANGE = 'yt_btn_switch_mode';
-const BTN_ERASE_BOARD  = 'yt_btn_erase_board';
-const BTN_ERASE_RESULT = "yt_btn_erase_result";
-const BTN_BEAUTIFY_CODE = "yt_btn_btfy_code"
-const BTN_RUN_CODE  = "yt_btn_run_code_on_student_board";
+const DIV_MSG_RECEIVER_SEL  = "yt_div_msg_receiver_select";
+const BTN_SYNC_BOARD 		= "yt_btn_sync_board"; 
+const BTN_MODE_CHANGE 		= 'yt_btn_switch_mode';
+const BTN_ERASE_BOARD  		= 'yt_btn_erase_board';
+const BTN_ERASE_RESULT 		= "yt_btn_erase_result";
+const BTN_BEAUTIFY_CODE 	= "yt_btn_btfy_code"
+const BTN_RUN_CODE  		= "yt_btn_run_code_on_student_board";
 
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CLSS = '{taclss}';
@@ -31,8 +33,18 @@ const STUDENT_BOARD_TEMPLATE = `
 <textarea class="{taclss}"
 		  id="{taid}" 
 		  spellcheck="false"
-></textarea>`; 
+		  placeholder="Enter Code Here"></textarea>`; 
 
+const MSG_RECEIVER_SELECTION_TEMPLATE = `
+  <label class="form-label">Message receiver:</label>
+  <select class="form-select form-control-lg" id="select_option_msg_rcvr">
+	{opt_body}
+  </select>
+`;
+
+const MSG_RECEIVER_OPTION_TEMPLATE = `
+<option value="{nm}">{nm}</option>
+`;
 /**
 	This class handles JS Code runner board
 **/
@@ -41,7 +53,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#timer;
 	
     constructor(credMan) {
-		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA);
+		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
 		this.init();
 	}
 	
@@ -79,6 +91,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	**/
 	v_execute(cmdObject) {
 		switch(cmdObject.id) {
+			// NEW message from student
+			case PTCC_COMMANDS.GM_HELLO_FROM_PEER:
+				this.handleStudentMsg(cmdObject.data[0], cmdObject.sender);
+				break;
+			
 			// new student arrived, add a comm console
 			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
 				this.addStudentConsole(cmdObject.data[0]);
@@ -113,12 +130,29 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Add student Console for a list of students already in the room
 	 **/
 	addStudentConsoles(userList) {
+		let msgReceiverDropdown = '';
+		let msgReceiverNames = '';
 		for(let u of userList) {
 			const userName = u.userName;
 			if (userName.localeCompare(this.#displayBoardTeacher.me) != 0) {
 				this.addStudentConsole(userName);
+				msgReceiverNames += 
+						MSG_RECEIVER_OPTION_TEMPLATE
+							.replace(new RegExp('{nm}', 'g'), userName);
 			}
 		}
+		// add message receiver dropdown
+		msgReceiverDropdown  = MSG_RECEIVER_SELECTION_TEMPLATE
+									.replace('{opt_body}', msgReceiverNames);
+		$(this.msgReceiverSelect).html(msgReceiverDropdown);
+	}
+	
+	/**
+		Recieved student incoming messages, display it with student name included
+	 **/
+	handleStudentMsg(data, sender) {
+		const msg = `${data} (from ${sender})`;
+		$("#yt_txt_msg_console").val(msg);
 	}
 	
 	/**
@@ -137,8 +171,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
 		
 		// handle clicking event
-		 $(this.getStudentConsoleIdSelector(student)).click(this.toggleStudentConsole);
-		
+		$(this.getStudentConsoleIdSelector(student)).click(this.toggleStudentConsole);	
 	}
 	
 	/**
@@ -271,11 +304,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	setMode(newMode) {
 		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
 		if ( newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
-			$(this.modeChangeButton).text(sysConstStrings.SWITCH_TO_EXERCISE);
+			$(this.modeChangeButton).prop('title', sysConstStrings.SWITCH_TO_EXERCISE);
 			this.startOrStopCodeRefreshTimer(true);
 		}
 		else if (newMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
-			$(this.modeChangeButton).text(sysConstStrings.SWITCH_TO_LEARNING);
+			$(this.modeChangeButton).prop('title', sysConstStrings.SWITCH_TO_LEARNING);
 			this.startOrStopCodeRefreshTimer(false);	
 		}
 	}
@@ -331,6 +364,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// student text Area div
 	get stdentTextAreaDiv() {
 		return `#${DIV_STUDENT_MSG_BOARD}`;
+	}
+	
+	// MESSAGE RECEIVER div
+	get msgReceiverSelect() {
+		return `#${DIV_MSG_RECEIVER_SEL}`;
 	}
 	
 	// button for syncing code

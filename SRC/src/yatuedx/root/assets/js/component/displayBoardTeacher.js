@@ -13,7 +13,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	#view;
 	
 	constructor(roomName, view) {
-		super(roomName, view.videoAreaId); 
+		super(roomName, view.videoAreaId, view.screenShareBtnId); 
 		this._textLines = [];
 		this.#view = view;
 	}
@@ -33,10 +33,7 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	**/	
 	v_execute(cmdObject) {
 		switch (cmdObject.id) {
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_NONE:
-				// do nothing
-				break;
-				
+			case PTCC_COMMANDS.GM_HELLO_FROM_PEER:	
 			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
 			case PTCC_COMMANDS.PTC_STUDENT_LEAVE:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:

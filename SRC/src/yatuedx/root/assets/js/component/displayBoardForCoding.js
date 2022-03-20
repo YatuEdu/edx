@@ -255,7 +255,6 @@ class DisplayBoardForCoding extends DisplayBoard {
 			
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 				this.#view.v_execute(cmdObject);
-				//this.updateCode(cmdObject);
 				break;
 				
 			default:
@@ -288,6 +287,17 @@ class DisplayBoardForCoding extends DisplayBoard {
 	}
 	
 	/**
+		During class,student can send messages to teacher at any time
+	 **/
+	sendMsgToTeacher(msg) {
+		if (msg) {
+			const cmd = new OutgoingCommand(PTCC_COMMANDS.GM_HELLO_FROM_PEER, 	// command id
+											msg);								// msg body
+			this.sendMessageToUser(this.#teacher, cmd.str);
+		}
+	}
+	
+	/**
 	  ask for the teacher to re-syncronize code with me
 	 **/
 	askReSync() {
@@ -309,24 +319,6 @@ class DisplayBoardForCoding extends DisplayBoard {
 		// send a "refresh" command to UI
 		const uiCmd = {id: cmdObject.id, data: [ codeText, this.formatedText ] }
 		this.#view.v_execute(uiCmd);
-	}
-	
-	/**
-		update code samples on UI (VIEW)
-	 **/
-	updateCode(cmdObject) {
-		// save the code in our buffer
-		const how = cmdObject.data[0];
-		
-		// save the code in our buffer
-		const text = cmdObject.data[1];
-		
-		switch (how) {
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_APPENDED:
-				break;
-			case PTCC_COMMANDS.PTC_CONTENT_CHANGED_ALL:
-				break;	
-		}
 	}
 	
 	/**

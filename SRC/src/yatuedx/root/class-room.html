@@ -43,17 +43,25 @@
 			<section>
 				<div class="row mb-4">
 					<div class="col-2">
-						<div id="yt_video_area" class="yt_video_area">
-						</div>	
+						<div class="row mb-4">
+							<div id="yt_video_area" class="yt_video_area">
+							</div>
+						</div>						
 					</div>
 					<div class="col-10">
 						<div class="row mb-4">
-							<div class="col-9">
-								<h6 id="yt_left_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Code Board</h6>	
+							<div class="col-8 text-left">
+								<picture id="yt_btn_run_code_from_board" class="btn" title="Run Code" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
 							</div>
-							<div class="col-3">
-								<h6 id="yt_right_column_hdr" class="text-center font-weight-bold mb-3 blog-post-widget-title">Result Board</h6>
-							</div>
+							<div class="col-4 text-left">
+								<picture id="yt_btn_clear_result" class="btn" title="Erase Result" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>	
 						</div>
 						<div class="row mb-4">
 							<div class="col-8">
@@ -65,37 +73,30 @@
 								<textarea class="output-board"
 										  id="yt_console" 
 										  spellcheck="false" 
+										  placeholder="Output Console"
 										  rows="20"></textarea>
 							</div>
 						</div>
 						<div class="row mb-4">
-							<div class="col-4 text-center">
-								<button id="yt_btn_run_code_from_board" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
-									Run Code
-								</button>
+							<div class="col-8">
+								<textarea class="msg-board"
+								  id="yt_txt_msg_console" 
+								  spellcheck="yes" 
+								  placeholder="Message Board"
+								  rows="5"></textarea>
 							</div>
-							<div class="col-4 text-center">
-								<button id="yt_btn_clear_result" data-mode="0" class="btn btn-primary fs-6p fw-bold px-3 rounded-0" >
-									Erase Result
-								</button>
-							</div>	
-						</div>
+							<div class="col-4">
+								<picture id="yt_btn_msg_send" class="btn" title="Send Message" >
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/send_msg.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+						</div>	
 					</div>
+				</div>	
 			</section>
         </article>
     </main>
-
-    <footer class="up-common-footer">
-        <div class="container">
-              <nav class="nav justify-content-center flex-column flex-sm-row text-center">
-                <a href="blog.html" class="nav-link">Blog</a>
-                <a href="index.html" class="nav-link">Why Yatu?</a>
-                <a href="about.html" class="nav-link">About Us</a>
-                <a href="contact.html" class="nav-link">Contact Us</a>
-            </nav>
-            <p class="footer-text text-center">©2022 This page is protected by Yatu </p>
-        </div>
-    </footer>
 	
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>

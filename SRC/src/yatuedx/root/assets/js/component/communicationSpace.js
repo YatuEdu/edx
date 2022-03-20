@@ -29,11 +29,13 @@ class CommunicationSpace {
 	
 	#userMap;
 	#videoDivId;
+	#screenShareBtnId
 	#me;
 	
-	constructor(roomName, videoDivId) {
+	constructor(roomName, videoDivId, screenShareBtnId) {
 		this.init(roomName);
 		this.#videoDivId = videoDivId;
+		this.#screenShareBtnId = screenShareBtnId;
 		this.#userMap = new Map();
 	}
 	
@@ -105,20 +107,21 @@ class CommunicationSpace {
 		}
 		
         // 下面是屏幕共享的方法
-        $("#screenShareBtn").click(async e => {
-            let shareTrack = await VideoUtil.getScreenShareTrack();
-            if (shareTrack!=null) {
-                $("#screenShareBtn").disabled = true;
-                videoChatNew.setLocalVideoTrack(shareTrack);
+		if (this.screenShareBtnId) {
+			$(this.screenShareBtnId).click(async e => {
+				let shareTrack = await VideoUtil.getScreenShareTrack();
+				if (shareTrack!=null) {
+					$(this.screenShareBtnId).disabled = true;
+					videoChatNew.setLocalVideoTrack(shareTrack);
 
-                shareTrack.addEventListener('ended', () => {
-                    console.log('用户停止共享屏幕 这里切换回摄像头视频');
-                    videoChatNew.setLocalVideoTrack(myVideoTrack);
-                    $("#screenShareBtn").disabled = false;
-                });
-            }
-        });
-
+					shareTrack.addEventListener('ended', () => {
+						console.log('用户停止共享屏幕 这里切换回摄像头视频');
+						videoChatNew.setLocalVideoTrack(myVideoTrack);
+						$(this.screenShareBtnId).disabled = false;
+					});
+				}
+			});
+		}
 	}
 	
 	/**
@@ -329,6 +332,10 @@ class CommunicationSpace {
 	 
 	get videoAreaDiv() {
 		return this.#videoDivId;
+	}
+	
+	get screenShareBtnId() {
+		return this.#screenShareBtnId;
 	}
 	
 	get me() {

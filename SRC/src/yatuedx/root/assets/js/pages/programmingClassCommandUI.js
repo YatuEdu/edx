@@ -9,14 +9,15 @@ class ProgrammingClassCommandUI extends AuthPage {
 	#jsCodeExecutioner;
 	#codeInputId;
 	#videoAreaId;
-	
+	#screenShareBtnId;
 	#timer;
 	#codeSyncManager;
 
-	constructor(credMan, codeInputId, resultConsolId, videoAreaId) {
+	constructor(credMan, codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
 		super(credMan);
 		this.#codeInputId = codeInputId;
 		this.#videoAreaId = videoAreaId;
+		this.#screenShareBtnId = screenShareBtnId;
 		
 		// create js code executioner
 		this.#jsCodeExecutioner =  new JSCodeExecutioner(resultConsolId);
@@ -211,6 +212,10 @@ class ProgrammingClassCommandUI extends AuthPage {
 	
 	get videoAreaId() {
 		return `#${this.#videoAreaId}`;
+	}
+	
+	get screenShareBtnId() {
+		return `#${this.#screenShareBtnId}`;
 	}
 }
 
