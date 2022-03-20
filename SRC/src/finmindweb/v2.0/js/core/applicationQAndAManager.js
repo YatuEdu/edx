@@ -117,6 +117,9 @@ class ApplicationQAndAManager {
 		return htmlForBlock;
 	}
 	
+	/**
+		Populate QnA data from external source.  
+	**/
 	async setUserQuestionsFromServerData(qList) {
 		// from finMind API
 		if (!qList || 
