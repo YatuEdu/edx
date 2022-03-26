@@ -78,7 +78,7 @@ const rowTemplate = `
 	<td class="idle-time">{it}</td>
 	<td>{dp}</td>
 	<td>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" disabled>Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary editButton" appId="{appId}">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
@@ -106,6 +106,7 @@ class Applications {
 		let userList = new List('event-table', options);
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+		$('.editButton').click(this.handleEdit.bind(this));
 
 	}
 
@@ -113,28 +114,34 @@ class Applications {
 		let pageSize = 10;
 		let pageNo = 1;
 		let maxRowNumber;
-		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date asc');
+		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date desc');
 		$('#list').empty();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
-				.replace('{pn}', row.prod_name)
+				.replace('{pn}', row.prod_name || '')
 				.replace('{cn}', row.first_name + " " + row.middle_name + " " + row.last_name)
-				.replace('{ce}', row.email)
+				.replace('{ce}', row.email || '')
 				.replace('{in}', row.insured_first_name + " " + row.insured_middle_name + " " + row.insured_last_name)
-				.replace('{ca}', row.coverage_amount)
-				.replace('{cd}', new Date(row.start_date).toLocaleString())
-				.replace('{ut}', new Date(row.last_update).toLocaleString())
-				.replace('{s}', this.appStatus(row.status))
+				.replace('{ca}', row.coverage_amount || '')
+				.replace('{cd}', new Date(row.start_date).toLocaleString() || '')
+				.replace('{ut}', new Date(row.last_update).toLocaleString() || '')
+				.replace('{s}', this.appStatus(row.status) || '')
 				.replace('{it}', '')
 				.replace('{dp}', row.agent_first_name + " " + row.agent_middle_name + " " + row.agent_last_name)
+				.replace('{appId}', row.id)
 			);
 		}
 		let pagination = new Pagination($('#table'), pageSize, maxRowNumber);
 
 	}
 
+	handleEdit(e) {
+		let row = $(e.target);
+		let appId = row.attr("appId");
+		window.location.href = "/user/pipeline.html?appId="+appId;
+	}
 
 	appStatus(status) {
     	switch (status) {

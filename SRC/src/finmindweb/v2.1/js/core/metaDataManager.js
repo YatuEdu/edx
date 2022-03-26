@@ -92,7 +92,7 @@ const AMOUNT_CONVERTION_MAP = new Map([
 	['$10 millions',  10000000],
 ]);
 
-const enumCoverageType =  ['Term Life', 'Permanent Life'];
+const enumCoverageType =  ['Term life', 'Permanent life'];
 const enumTermCoverageYears = [
 	'Permanent life',
 	'10 years', 

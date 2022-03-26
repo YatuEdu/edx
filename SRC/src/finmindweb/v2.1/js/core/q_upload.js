@@ -209,6 +209,17 @@ class FileUpload extends UserQuestionBase {
 	// get question in xml format for saving to API server
 	get serverXML() {
 		let ret ='';
+
+		if (this.onValidating()) {
+			const labels = this.label.split('*');
+			let i = 0;
+			for(; i < labels.length; i++) {
+				ret += `<e>
+					<a1>${labels[i]}</a1>
+					<a2>${i}</a2>
+				</e>`;
+			}
+		}
 		return ret;
 	}
 

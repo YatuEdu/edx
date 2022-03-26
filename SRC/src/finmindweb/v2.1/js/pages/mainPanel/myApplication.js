@@ -59,14 +59,17 @@ const rowTemplate = `
 	<td>{currentStage}</td>
 	<td>{status}</td>
 	<td>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" disabled>Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary editButton" appId="{appId}">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
 `;
 
+const pageSize = 10;
+
 class MyApplication {
 	#container;
+	#searchBy = '';
 	
     constructor(container) {
 		this.#container = container;
@@ -78,38 +81,52 @@ class MyApplication {
     	this.#container.empty();
     	this.#container.append(pageTemplate);
 
-		await this.requestList('');
+		await this.requestList(1).then(maxRowNumber => {
+			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
+		});
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+		$('.editButton').click(this.handleEdit.bind(this));
 	}
 
 	handleSearchSubmit(e) {
-		let searchBy = $('#searchInput').val();
-		this.requestList(searchBy);
+		this.#searchBy = $('#searchInput').val();
+		this.requestList(1);
 		console.log();
 	}
 
-	async requestList(searchBy) {
-		let pageSize = 10;
-		let pageNo = 1;
+	handleEdit(e) {
+		let row = $(e.target);
+		let appId = row.attr("appId");
+		window.location.href = "/user/pipeline.html?appId="+appId;
+	}
+
+	async requestList(pageNo) {
+
 		let maxRowNumber;
-		let res = await Net.getMyApplications(credMan.credential.token, pageSize, pageNo, searchBy);
+		let res = await Net.getMyApplications(credMan.credential.token, pageSize, pageNo, this.#searchBy);
 		$('#list').empty();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
-				.replace('{product}', row.product_name)
-				.replace('{insuredAmount}', row.insured_amount)
-				.replace('{coverageAmount}', row.coverage_amount)
-				.replace('{createDate}', new Date(row.start_date).toLocaleString())
-				.replace('{currentStage}', row.applicatio_status)
+				.replace('{product}', row.product_name || '')
+				.replace('{insuredAmount}', row.insured_amount || '')
+				.replace('{coverageAmount}', row.coverage_amount || '')
+				.replace('{createDate}', new Date(row.start_date).toLocaleString() || '')
+				.replace('{currentStage}', row.applicatio_status || '')
 				.replace('{status}', '')
+				.replace('{appId}', row.id)
 			);
 		}
-		new Pagination($('#table'), pageSize, maxRowNumber);
+
+		return maxRowNumber;
 	}
 
+	async handlePage(page) {
+		console.log(page);
+		await this.requestList(page);
+	}
 
 }
 

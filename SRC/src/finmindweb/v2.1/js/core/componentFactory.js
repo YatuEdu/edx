@@ -11,7 +11,7 @@ import {StringUtil}		  						from './util.js';
 import {Net}          							from './net.js';
 import {credMan}      							from './credManFinMind.js'
 
-const DEFAULT_NO_BENEFICIARY = 3;
+const DEFAULT_NO_BENEFICIARY = 1;
 const DEFAULT_NO_CONTINGENT_BENEFICIARY = 1;
 	
 /*

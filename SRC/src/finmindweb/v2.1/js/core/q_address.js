@@ -115,6 +115,17 @@ class UserAdressQuestion extends UserQuestionBase {
 		$(zipSelector).blur(function() {
 			self.setZip($(zipSelector).val());
 		});
+
+		$(zipSelector).on('input', function (e) {
+			let obj = $(zipSelector).val();
+
+			if(obj.length>5)
+				obj = obj.slice(0,5);
+			$(zipSelector).val(obj);
+		});
+		$(zipSelector).on('keypress', function (e) {
+			return e.keyCode>=48 && e.keyCode<=57;
+		});
 	}
 	
 	// Setting address value
@@ -166,12 +177,18 @@ class UserAdressQuestion extends UserQuestionBase {
 		if (this._address) {
 			const selector = `#${this.addressInputId}`;
 			$(selector).val(this._address);
+		} else {
+			const selector = `#${this.addressInputId}`;
+			$(selector).val('');
 		}
 		
 		// set initial input value for city 
 		if (this._city) {
 			const selector = `#${this.cityInputId}`;
 			$(selector).val(this._city);
+		} else {
+			const selector = `#${this.cityInputId}`;
+			$(selector).val('');
 		}
 		
 		// set initial state option if present
@@ -184,6 +201,9 @@ class UserAdressQuestion extends UserQuestionBase {
 		if (this._zip) {
 			const selector = `#${this.zipInputId}`;
 			$(selector).val(this._zip);
+		} else {
+			const selector = `#${this.zipInputId}`;
+			$(selector).val('');
 		}
 	};
 	

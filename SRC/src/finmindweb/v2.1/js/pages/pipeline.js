@@ -49,7 +49,7 @@ const page_template = `
                     <span class="me-5">
                         <img src="../img/ico-joinus-customer.svg" style="width: 1.5rem;">
                         <b class="ms-11 me-2">Client</b>
-                        <span id="customerName">Pete Cooper</span>
+                        <span id="customerName"></span>
                     </span>
                     <span id="producerNameOrFindOne">
                         <img src="../img/ico-joinus-producer.svg" style="width: 1.5rem;">
@@ -231,10 +231,7 @@ class PipelinePageHandler {
 
 
         // const appId = 89899992;
-        const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
         let appId = parseInt(this.getUrlParam('appId'));
-        this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
-        $('#customerName').text(this.#credMan.credential.name);
 
         // 更新申请详情
         await this.updateApplicationInfo(appId);
@@ -265,11 +262,25 @@ class PipelinePageHandler {
         let appInfo = await Net.getApplicationInfo(appId, credMan.credential.token);
         if (appInfo.code===0) {
             let row = appInfo.data[0];
-            if (row.agent_name!=null) {
-                $('#producerNameOrFindOne').append(producerName.replace('{producerName}', row.agent_name));
+            let agentName = row.agent_name;
+            let agentUserName = row.agent_user_name.trim();
+            let userName = row.user_name.trim();
+            if (agentName!=null) {
+                $('#producerNameOrFindOne').append(producerName.replace('{producerName}', agentName));
             } else {
                 $('#producerNameOrFindOne').append(findProducer);
             }
+            $('#customerName').text(userName);
+
+            if (this.#credMan.credential.name===userName) {
+                const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+                this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
+            } else if (this.#credMan.credential.name===agentUserName) {
+                let html = await this.showAllBlocQuestionAnswers(appId);
+                $('#user_question_block').html(html);
+            }
+
+
         }
         console.log();
     }
@@ -344,7 +355,7 @@ class PipelinePageHandler {
         if (this.#applicationMan.canGotoPreviousBlock()) {
             const qHtml = this.#applicationMan.previousBlock();
             if (qHtml) {
-                $('#user_question_block').html(qHtml);
+                $('#user_question_block').html(qHtml.html);
 
                 this.#applicationMan.hookUpEvents();
                 return;
@@ -353,6 +364,7 @@ class PipelinePageHandler {
 
         // no more blocks
         alert ('no more questions to answer');
+        return;
         $('#user_question_block').html('');
         $('#fm_wz_next_block_button').text('Start');
     }
@@ -394,6 +406,28 @@ class PipelinePageHandler {
         alert ('no more questions to answer');
         $('#user_question_block').html('');
         $('#fm_wz_next_block_button').text('Start');
+    }
+
+    async showAllBlocQuestionAnswers(appId) {
+        const t = credMan.credential.token;
+        const blocks = await Net.getAppPipelineBlocks(appId, t);
+        // get all the answers from blocks and save then to QA Manger
+        const managerList = [];
+        let html = '';
+        if (blocks && blocks.data.length > 0) {
+            for(let i = 0; i < blocks.data.length; i++) {
+                const blockId =  blocks.data[i].block_id;
+
+                // get qestion / answer for this block
+                const qaLst =  await Net.getQAForBlockOfApp(appId, blockId, t);
+                const man = new ApplicationQAndAManager(appId);
+
+                // get the static QA display (w/o interactin elements)
+                const qDisplay = await man.getUserQustionDisplay(qaLst.data);
+                html += qDisplay;
+            }
+        }
+        return html;
     }
 
 }

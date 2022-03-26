@@ -194,7 +194,7 @@ class Net {
 						t, uploadFileName, 
 						pipleLineKey, appKey,
 						conversationKey, 
-						FILE_UPLOAD_OP);
+						FILE_UPLOAD_OP, 0);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -212,7 +212,8 @@ class Net {
 						t, EMPTY_FILE_NAME, 
 						pipleLineKey, appKey, 
 						conversationKey, 
-						FILE_LIST_OP);
+						FILE_LIST_OP,
+						0);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -492,7 +493,7 @@ class Net {
 		return Net.composePostRequestFromData_private(requestData);
 	}
 	
-	static composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, op) {
+	static composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, op, userOpSelfFile) {
 		const requestData = {
 			header: {
 				token: t,
@@ -503,7 +504,8 @@ class Net {
 				applicationKey: appKey,
 				conversationKey: conversationKey,
 				fileName: uploadFileName,
-				operationType: op
+				operationType: op,
+				userOpSelfFile: userOpSelfFile
 			}
 		};
 		

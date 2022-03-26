@@ -90,7 +90,8 @@ class Attachment {
 				applicationKey: this.applicationId,
 				conversationKey: "",
 				fileName: uploadFileName,
-				operationType: 1
+				operationType: 1,
+				userOpSelfFile: 0,
 			}
 		};
 		const requestBody =  {
@@ -113,7 +114,8 @@ class Attachment {
 				applicationKey: this.applicationId,
 				conversationKey: "",
 				fileName: "",
-				operationType: 2
+				operationType: 2,
+				userOpSelfFile: 0,
 			}
 		};
 		const requestBody =  {

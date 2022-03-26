@@ -22,15 +22,16 @@ class Pagination {
     #pageContainer;
     #pageSize;
     #total;
+    #pageFunc;
     #pageNo;
     #boxList = [];
 
-    constructor(pageContainer, pageSize, total) {
-
+    constructor(pageContainer, pageSize, total, pageFunc) {
 
         this.#pageContainer = pageContainer;
         this.#pageSize = pageSize;
         this.#total = total;
+        this.#pageFunc = pageFunc;
         this.#pageNo = 1;
         let pages = Math.ceil(this.#total/this.#pageSize);
         if (pages<=0) {
@@ -60,7 +61,7 @@ class Pagination {
         }
         // 再聚焦某个box
         this.#pageNo = this.#pageNo+1;
-        this.render();
+        this.updateAndRender();
     }
 
     prev() {
@@ -76,12 +77,12 @@ class Pagination {
         }
         // 再聚焦某个box
         this.#pageNo = this.#pageNo-1;
-        this.render();
+        this.updateAndRender();
     }
 
     goBox(i) {
         this.#pageNo = this.#boxList[i];
-        this.render();
+        this.updateAndRender();
     }
 
     goPage(page) {
@@ -105,7 +106,7 @@ class Pagination {
         }
         this.#pageNo = page;
 
-        this.render();
+        this.updateAndRender();
     }
 
     render() {
@@ -147,6 +148,13 @@ class Pagination {
             }
         });
 
+    }
+
+    async updateAndRender() {
+        if (this.#pageFunc!=null) {
+            await this.#pageFunc(this.#pageNo);
+        }
+        this.render();
     }
 }
 

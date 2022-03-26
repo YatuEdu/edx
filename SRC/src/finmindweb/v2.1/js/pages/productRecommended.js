@@ -23,7 +23,7 @@ const page_template = `
 </div>
 
 <div class="nav-back container mt-4 mt-md-5">
-	<a href="Wizard5.html" class="text-body text-opacity-50 text-decoration-none">Back</a>
+	<a href="#" onclick="window.history.go(-1);" class="text-body text-opacity-50 text-decoration-none">Back</a>
 </div>
 
 <div class="container mb-5">

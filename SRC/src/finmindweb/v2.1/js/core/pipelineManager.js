@@ -1,4 +1,4 @@
-import {ApplicationQAndAManager}			from './applicationQAndAManager.js'
+import {ApplicationQAndAManager}	from './applicationQAndAManager.js'
 
 /**
 	Manager for pipeline question down-loading, dynamic HTML generation,
@@ -8,23 +8,24 @@ import {ApplicationQAndAManager}			from './applicationQAndAManager.js'
 		- WizardPipeLineManager
 **/
 class PipelineManager {
-	_qAndAManagerHistoryList; // store {xml: 'xxxx', obj: _qAndAManager}
+	_qAndAManagerHistoryList; 
 	_qAndAManager;
 	_store;
 	_appId;
 	
 	constructor(store, appId) {
-		this._qAndAManagerHIstoryList = [];
-		this._qAndAManager = null; // new ApplicationQAndAManager();
 		this._store = store;
 		this._appId = appId;
+		this._qAndAManager = null; 
+		this._qAndAManagerHistoryList = [];
+		
     }
-
+	
 	/**
 		Get current blockId
 	**/
 	get blockId() {
-		return this._qAndAManager.blockId;
+		return this._qAndAManager ? this._qAndAManager.blockId : 0;
 	}		
 	
 	/**
@@ -67,19 +68,19 @@ class PipelineManager {
 	**/
 	async nextBlock(token, param) {	
 		// if the next blocks are in history list. need to spline ALL THE BLOCKS BEHIND IT
-		const objIndex = this._qAndAManagerHIstoryList.findIndex(q => q === this._qAndAManager);
-		if (objIndex < this._qAndAManagerHIstoryList.length - 1) {
+		const objIndex = this._qAndAManagerHistoryList.findIndex(q => q === this._qAndAManager);
+		if (objIndex < this._qAndAManagerHistoryList.length - 1) {
 			// Remove the last n elements
-			const restLen = this._qAndAManagerHIstoryList.length - objIndex -1;
+			const restLen = this._qAndAManagerHistoryList.length - objIndex -1;
 			if (restLen > 0) {
 				// remove the last N blocks after this block due to the block change:
-				this._qAndAManagerHIstoryList.splice(-1 * restLen);
+				this._qAndAManagerHistoryList.splice(-1 * restLen);
 			}
 		}
 		
 		const currBlck = this._qAndAManager === null? 0 : this._qAndAManager.blockId ;
 		this._qAndAManager = new ApplicationQAndAManager(this._appId);
-		this._qAndAManagerHIstoryList.push(this._qAndAManager);
+		this._qAndAManagerHistoryList.push(this._qAndAManager);
 		
 		// initialize it from finMind API
 		const resp = await this.v_getNextQuestionBlock(token, currBlck);
@@ -115,19 +116,19 @@ class PipelineManager {
 	
 	getPreviousBlockIndex() {
 		// no previous element to go
-		if (this._qAndAManagerHIstoryList.length < 2) {
+		if (this._qAndAManagerHistoryList.length < 2) {
 			return -1;
 		}
 		
 		// get the index of the previous block
-		return this._qAndAManagerHIstoryList.findIndex(q => q === this._qAndAManager) - 1;
+		return this._qAndAManagerHistoryList.findIndex(q => q === this._qAndAManager) - 1;
 	}
 	
 	/**
-		Get the previous block of questions from _qAndAManagerHIstoryList 
+		Get the previous block of questions from _qAndAManagerHistoryList 
 		by going back to the stack.  When moving forward again, we need to see
 		if the previous question block is dirty.  If dirty, get from server.  If clean,
-		retieve from _qAndAManagerHIstoryList.
+		retieve from _qAndAManagerHistoryList.
 	**/
 	previousBlock() {
 		// no previous
@@ -137,7 +138,7 @@ class PipelineManager {
 		}
 		
 		// first current block index
-		this._qAndAManager = this._qAndAManagerHIstoryList[prevIndex];
+		this._qAndAManager = this._qAndAManagerHistoryList[prevIndex];
 		
 		// get html
 		return { name: 			this._qAndAManager.blockName,
@@ -165,20 +166,20 @@ class PipelineManager {
 		const currentQuestions = this._qAndAManager.currentQuestions;
 		const found = currentQuestions.find(e => e.onValidating() === false);
 		if (found) {
-			alert(`Question '${found.label}' needs to be answered`);
+			alert(`Question '${found.question}' needs to be answered`);
 			return false;
 		}
 		
 		// now save the questions to DB
 		const resp = await this.v_save(token);
 		if (resp && resp.err) {
-			alert(JSON.stringify(resp.err));
+			alert(resp.err);
 			return false;
 		} else {
 			return true;
 		}
 	}
-	
+
 	/**
 		To save all the answered questions to finMind service.
 		This method shall be overriden by the child classes.

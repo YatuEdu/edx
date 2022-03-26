@@ -22,7 +22,7 @@ class UserMultiControl extends UserQuestionBase {
 	// from the page.
 	onValidating() {
 		let validated = true;
-		for(let i = 0; i < this._components.length; i++） {
+		for(let i = 0; i < this._components.length; i++) {
 			if ( this._components[i].onValidating) {
 				validated = false;
 				break;
@@ -60,7 +60,7 @@ class UserMultiControl extends UserQuestionBase {
 		let componentHtml ='';
 		// combine sub-control html into an entire HTML
 		this._components.forEach(
-			c => componentHtml += c.displayHtml;
+			c => componentHtml += c.displayHtml
 		);
 		let htmlStr = q_template_components
 									.replace(replacementForId, this.id)
@@ -85,4 +85,4 @@ class UserMultiControl extends UserQuestionBase {
 	}
 }  
 
-export { UserNameQuestion };
+export { UserMultiControl };

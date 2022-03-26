@@ -103,11 +103,11 @@ class Clients {
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
 				.replace('{name}', row.first_name + " " + row.middle_name + " " + row.last_name)
-				.replace('{email}', row.email)
-				.replace('{phone}', row.phone_number)
+				.replace('{email}', row.email || '')
+				.replace('{phone}', row.phone_number || '')
 				.replace('{address}', '')
 				.replace('{birthday}', '')
-				.replace('{regDate}', new Date(row.join_date).toLocaleString())
+				.replace('{regDate}', new Date(row.join_date).toLocaleString() || '')
 				.replace('{quickNote}', '')
 			);
 		}
