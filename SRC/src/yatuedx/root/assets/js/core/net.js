@@ -9,6 +9,8 @@ const API_FOR_JOINING_GROUP_SESSION = 202111;
 const API_FOR_MY_GROUPS = 202115;
 const API_FOR_SUBJECT_SERIES = 202116;
 const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
+const API_GET_NOTES_FOR_SERIES = 202119;
+const API_ADD_NOTES = 202120;
 
 class Net {
 	/**
@@ -62,6 +64,24 @@ class Net {
 	**/
 	static async classSeriesGetSchedule(token, seriesId) {
 		const req = Net.composeRequestDataForClassSeriesSchedule(token, seriesId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for retrieving all historical notes for a class series
+	**/
+	static async classGetNotes(token, groupId) {
+		const req = Net.composeRequestDataForClassNotes(token, groupId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for adding notes for a class
+	**/
+	static async classAddNotes(token, groupId, text) {
+		const req = Net.composeRequestDataForClassAddNotes(token, groupId, text);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -123,7 +143,7 @@ class Net {
 	}
 	
 	/**
-		Froming Yatu API request data for user-sign up and register for Yatu service
+		Forming Yatu API request data for user-sign up and register for Yatu service
 	**/
 	static composeRequestDataForSignUp(userName, email, userPassword) {
 		const signupData = {
@@ -144,7 +164,7 @@ class Net {
 	}
 	
 	/**
-		Froming Yatu API request data for TOKEN validity test
+		Forming Yatu API request data for TOKEN validity test
 	**/	
 	static composeRequestDataForTokenCheck(t) {
 		// query for the yatu token's validness
@@ -161,7 +181,7 @@ class Net {
 	}
 	
 	/**
-		Froming Yatu API request data for joining a group
+		Forming Yatu API request data for joining a group
 	**/	
 	static composeRequestDataForJoiningGroupSession(t, grpId) {
 		if (typeof grpId === 'string') {
@@ -180,7 +200,7 @@ class Net {
     }
 	
 	/**
-		Froming Yatu API request data for getting all my group info
+		Forming Yatu API request data for getting all my group info
 	**/	
 	static composeRequestDataForMyGroups(t) {
 		const myGroupsReq = {
@@ -195,7 +215,7 @@ class Net {
     }
 
 	/**
-		Froming Yatu API request data for getting Class Series Schedule
+		Forming Yatu API request data for getting Class Series Schedule
 	**/	
 	static composeRequestDataForClassSeriesSchedule(t, sId) {
 		const sIdi =  parseInt(sId, 10);
@@ -212,7 +232,42 @@ class Net {
 	}
 		
 	/**
-		Froming Yatu API request data for getting Class Series FOR A Subject
+		Forming Yatu API request data for getting Class Notes
+	**/	
+	static composeRequestDataForClassNotes(t, gId) {
+		const gIdi =  parseInt(gId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_GET_NOTES_FOR_SERIES
+			},
+			data: {
+				groupId: gIdi
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}
+	
+	/**
+		Forming Yatu API request data for adding class notes
+	**/
+	static composeRequestDataForClassAddNotes(t, gId, txt) {
+		const gIdi =  parseInt(gId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_ADD_NOTES
+			},
+			data: {
+				groupId: gIdi,
+				notes: txt
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}	
+	
+	/**
+		Forming Yatu API request data for getting Class Series FOR A Subject
 	**/	
 	static composeRequestDataForSubjectClassSeries(t, sbjId) {
 		const sbjIdi =  parseInt(sbjId, 10);

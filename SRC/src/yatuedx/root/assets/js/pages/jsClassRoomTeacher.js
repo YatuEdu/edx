@@ -1,11 +1,12 @@
 import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
+import {Net}			    				from "../core/net.js"
 import {uiMan} 								from '../core/uiManager.js';
 import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
-import {PageUtil}							from '../core/util.js';
+import {PageUtil, TimeUtil}					from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE 	= "yt_result_console";
@@ -13,6 +14,8 @@ const DIV_VIEDO_AREA 		= "yt_div_video_area";
 const BTN_SHARE_SCREEN 		= "yt_btn_share_screen";
 const DIV_STUDENT_MSG_BOARD = "yt_div_student_textarea";
 const DIV_MSG_RECEIVER_SEL  = "yt_div_msg_receiver_select";
+const TA_NOTES				= "yt_txt_notes_console";
+const BTN_SAVE_NOTES		= "yt_btn_save_notes";
 const BTN_SYNC_BOARD 		= "yt_btn_sync_board"; 
 const BTN_MODE_CHANGE 		= 'yt_btn_switch_mode';
 const BTN_ERASE_BOARD  		= 'yt_btn_erase_board';
@@ -51,6 +54,7 @@ const MSG_RECEIVER_OPTION_TEMPLATE = `
 class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
 	#timer;
+	#groupId;
 	
     constructor(credMan) {
 		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
@@ -60,9 +64,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// hook up events
 	async init() {
 		const paramMap = PageUtil.getUrlParameterMap();
-		const clssName = paramMap.get(sysConstants.UPN_GROUP);
+		this.#groupId = paramMap.get(sysConstants.UPN_GROUP);
 		//const clssName = 'JS 101 Test';
-		this.#displayBoardTeacher = new DisplayBoardTeacher(clssName, this);
+		this.#displayBoardTeacher = new DisplayBoardTeacher(this.#groupId, this);
 		
 		// set mode to teaching mode
 		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
@@ -73,6 +77,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// hook up event 'send code sample'
 		$(this.syncBoardButton).click(this.handleSyncBoard.bind(this));
 		
+		// hook up event 'save notes;
+		$(this.saveNotesButton).click(this.handleSaveNotes.bind(this));
+
 		// hook up event 'run code sample'
 		$(this.modeChangeButton).click(this.handleModeChange.bind(this));
 		
@@ -84,6 +91,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
+		
+		// load teacher's notes from previous classes
+		this.loadNotes();
 	}
 	
 	/**
@@ -126,6 +136,24 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		}
 	}
 
+	/**
+		Load teacher's notes for the class from backend
+	 **/
+	async loadNotes() {
+		const resp = await Net.classGetNotes(credMan.credential.token,this.#groupId);
+		let notes = '';
+		if (resp.data.length > 0) {
+			resp.data.forEach(n => {
+				const seq = n.sequenceId ?? 0;
+				const date = TimeUtil.sqlDateToJsDate(n.time);
+				const dateStr = date.toDateString();
+				const note = `${n.notes} [class(${seq}) at ${dateStr}]\n`;
+				notes += note;
+			});
+			$(this.notesConsoleControl).val(notes);
+		}
+	}
+	
 	/**
 		Add student Console for a list of students already in the room
 	 **/
@@ -250,6 +278,15 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Save notes to DB: THE NOTES ARE FROM CONSOLE OUTPUT
+	**/	
+	async handleSaveNotes(e) {
+		e.preventDefault(); 
+		const notes = $(this.resultConsoleControl).val();
+		await Net.classAddNotes(credMan.credential.token,this.#groupId, notes);
+	}
+	
+	/**
 		Run code sample on students board
 	**/
 	handleRunCode(e) {
@@ -361,6 +398,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${TA_RESULT_CONSOLE}`;
 	}
 	
+	// techer notes for this class
+	get notesConsoleControl() {
+		return `#${TA_NOTES}`;
+	}
+	
 	// student text Area div
 	get stdentTextAreaDiv() {
 		return `#${DIV_STUDENT_MSG_BOARD}`;
@@ -369,6 +411,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// MESSAGE RECEIVER div
 	get msgReceiverSelect() {
 		return `#${DIV_MSG_RECEIVER_SEL}`;
+	}
+		
+	// button for saving notes
+	get saveNotesButton() {
+		return `#${BTN_SAVE_NOTES}`;
 	}
 	
 	// button for syncing code

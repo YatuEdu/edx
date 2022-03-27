@@ -38,8 +38,7 @@ class TimeUtil {
 	}
 	
 	static sqlDateToJsDate(sqlDate) {
-		const d=sqlDate.split("-");
-		return new Date(d[0],(d[1]-1),d[2].substr(0,2));
+		return new Date(Date.parse(sqlDate));
 	}
 }
 
