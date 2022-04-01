@@ -1,4 +1,4 @@
-const sysConstants = {
+const sysConstants = Object.freeze({
 	// system resources
 	YATU_CRED_STORE_KEY: "yatu_cred_8838",
 	YATU_AUTH_URL: "https://rtc.4thspace.cn/bfwk-privilege-management",
@@ -33,9 +33,9 @@ const sysConstants = {
 	SIGNIN_NAME_NEEDED: "login_page_name_not_empty",
 	SIGNIN_PW_NEEDED: "login_page_pw_not_be_empty",
 	SERVER_UNEXPECTED_ERR: "yatu_unexpected",
-};
+});
 
-const sysConstStrings = {
+const sysConstStrings = Object.freeze({
 	EMPTY: '',
 	UNKNOWN: 'UNKNOWN',
 	SWITCH_TO_LEARNING: 'Change classroom mode to learning (current mode: exercise)',
@@ -43,9 +43,9 @@ const sysConstStrings = {
 	
 	ATTR_MODE: 'mode',
 	TAB_STRING: '\t',
-};
+});
 
-const languageConstants = {
+const languageConstants = Object.freeze({
 	// UI STATES
 	STATE_LANG_EN: 0,
 	STATE_LANG_CN: 1,
@@ -62,12 +62,12 @@ const languageConstants = {
 
 	SERVER_UNEXPECTED_ERR: "ge_une",			// generic error: unexpected service error
 	SERVER_ERROR_WITH_RESPONSE: "ge_une_res",  	// generic error: unexpected service error
-};
+});
 
-const groupTypeConstants = {
+const groupTypeConstants = Object.freeze({
 	// known group types:
 	GPT_EDU_JSP: 10,
-};
+});
 
 	
 export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants};

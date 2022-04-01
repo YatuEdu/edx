@@ -22,9 +22,12 @@ class MyGroupPageHandler {
 		// remote call to sign up
 		const t = this.#credMan.credential.token;
 		await this.retrieveMyGroups(t);
-		await this.retrieveNewGroups(t, 10);
+		//await this.retrieveNewGroups(t, 10);
 	}	
 	
+	/**
+		retrieve the groups that I am registered with.
+	 **/
 	async retrieveMyGroups(t) {
 		const ret = await Net.groupMemberGetMyGroups(t);
 		if (ret.code === 0) {
@@ -40,7 +43,7 @@ class MyGroupPageHandler {
 				$(".myGroupRow").append(html);
 				
 				// still a valid member?
-				if (g.credit > 0) {
+				if (g.s_credit || g.g_credit) {
 					$( buttonId ).click(this.handleEntering);
 				}
 				else {
@@ -51,8 +54,9 @@ class MyGroupPageHandler {
 		}
 	}
 	
-	async retrieveNewGroups(t, top) {
-		const ret = await Net.getNewGroups(t, top);
+	/*
+	async retrieveMyGroups(t, top) {
+		const ret = await Net.getAllMyGroups(t, top);
 		// append new groups
 		if (ret.code === 0) {
 			for(let i = 0; i < ret.data.length; i++) {
@@ -64,6 +68,7 @@ class MyGroupPageHandler {
 			}
 		}
 	}
+	*/
 	
 	handleRefill(e) {
 		e.preventDefault();

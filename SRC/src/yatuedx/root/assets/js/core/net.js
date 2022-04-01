@@ -4,6 +4,7 @@ import {uiMan} from './uiManager.js';
 const API_FOR_TOKEN_CHECKING = 200000;
 const API_FOR_SIGN_IN_WITH_NAME = 202102;
 const API_FOR_REGISTER = 202101; 
+const API_FOR_GET_ALL_MY_GROUPS = 202107;
 
 const API_FOR_JOINING_GROUP_SESSION = 202111;
 const API_FOR_MY_GROUPS = 202115;
@@ -95,6 +96,14 @@ class Net {
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
 
+	/**
+		Yatu API for retrieving user's communiction groups
+	**/
+	static async getAllMyGroups(token, top) {
+		const req = Net.compoesRequestForAllMyGroups (token, top);
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
 	/********** Utility methods *******/
 	
 	/**
@@ -324,14 +333,14 @@ class Net {
 	}
 	
 	/**
-		Yatu API for logged in user to get new groups
-	**/
-	static compoesRequestForNewGroups(token, top) {
+		Yatu API for logged in user to get her groups
+	**/  
+	static compoesRequestForAllMyGroups(token, top) {
 		// query for my groups
 		const queryData = {
 			header: {
 				token: token,
-				api_id: 202107
+				api_id: API_FOR_GET_ALL_MY_GROUPS
 			},
 		
 			data: {
@@ -345,12 +354,6 @@ class Net {
 			body: JSON.stringify(queryData),
 		};
 	}
-	
-	static async getNewGroups(token, top) {
-		const req = Net.compoesRequestForNewGroups(token, top);
-		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
-	}
-	
 	
 	/**
 		Yatu API for logged in user to apply membership for a group
