@@ -8,7 +8,7 @@ const replacementForLabel = '{lb}';
 const q_template_date = `
 <div class="mb-4">
 	<label for="IssueDate" class="form-label">{lb}</label>
-	<input type="date"  name="dob" value="{vl}" class="form-control form-control-lg {clss}">
+	<input type="date" min="{min}" max="{max}" name="dob" value="{vl}" class="form-control form-control-lg {clss}">
 </div>
 `;
 
@@ -28,9 +28,13 @@ const dateFormat = [
 class UserDateQuestion extends UserQuestionBase {  
  
 	_dateStr;
+	_minDate;
+	_maxDate;
 	
-    constructor(qInfo){       
-        super(qInfo); 
+    constructor(qInfo, minDate, maxDate){
+        super(qInfo);
+        this._minDate = minDate;
+        this._maxDate = maxDate;
 		this.validateAndSave(qInfo.sv1);		
     }  
 	
@@ -107,7 +111,9 @@ class UserDateQuestion extends UserQuestionBase {
 		const htmlStr = q_template_date
 							.replace(replacementForClass, this.uiClass)
 							.replace(replacementForValue, htmlDateFormat)
-							.replace(replacementForLabel, this.label);
+							.replace(replacementForLabel, this.label)
+							.replace("{min}", this._minDate)
+							.replace("{max}", this._maxDate);
 		return htmlStr; 
 	}
 	

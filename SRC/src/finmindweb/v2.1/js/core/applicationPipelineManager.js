@@ -13,7 +13,7 @@ class ApplicationPipelineManager extends PipelineManager {
 		
 		// get current answered blocks first if any
 		// 获取目前已经回答的问题， 如果用户上次没有回答完， 这次不用从头开始。
-		this.initalizeState();  
+		// this.initalizeState();
     } 
 	
 	/**

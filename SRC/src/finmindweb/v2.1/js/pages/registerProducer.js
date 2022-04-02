@@ -1,7 +1,8 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
 import {SessionStoreAccess} from '../core/sessionStorage.js'
-import {ValidUtil} from "../core/util.js";
+import {ValidUtil, StringUtil} from "../core/util.js";
+import {MetaDataManager} from "../core/metaDataManager.js";
 
 const page_step1 = `
 <div class="container-fluid g-0">
@@ -321,7 +322,8 @@ class RegisterProducerPageHandler {
         $( "#fm_rgstr_state" ).val(this.#state);
         $( "#fm_rgstr_zip_code" ).val(this.#zipCode);
 
-        $( "#fm_rgstr_phone" ).focusout(this.validatePhone);
+        $( "#fm_rgstr_phone" ).keyup(this.validateFormatPhone);
+        $( "#fm_rgstr_phone" ).focusout(this.validateFormatPhone);
         $( "#fm_rgstr_address1" ).focusout(this.validateInput);
 
         $( "#fm_rgstr_step2_next" ).click(this.nextStep.bind(this, 2));
@@ -370,17 +372,18 @@ class RegisterProducerPageHandler {
         }
     }
 
-    validatePhone(e) {
+    validateFormatPhone(e) {
         e.preventDefault();
         $(this).next('p').remove();
         if (!$(this).val()) {
             const warning = "Phone field cannot be empty";
             $(this).after( `<p style="color:red;">${warning}</p>` );
         } else {
-            const phone = $(this).val();
-            if (!ValidUtil.isPhoneValid(phone)) {
-                $(this).after( `<p style="color:red;">Invalid phone format</p>` );
-            }
+            const obj = $(this).val();
+            let regex = MetaDataManager.regForUSPhoneNumber;
+            let formatter = StringUtil.formatUSPhoneNumber;
+            const formetted = formatter(obj);
+            $(this).val(formetted);
         }
     }
 
@@ -405,12 +408,17 @@ class RegisterProducerPageHandler {
             this.#lastName = $("#fm_rgstr_last_name").val().trim();
             this.#email = $("#fm_rgstr_email").val().trim();
             this.#pw = $("#fm_rgstr_password" ).val().trim();
+            let agree = $("#fm_rgstr_agree").is(':checked');
             if (!this.#firstName || !this.#lastName || !this.#email || !this.#pw) {
                 $(e.target).after( `<p style="color:red;">Email, name, and password cannot be empty</p>` );
                 return;
             }
             if (!ValidUtil.isEmailValid(this.#email)) {
                 $(e.target).after( `<p style="color:red;">Invalid email format</p>` );
+                return;
+            }
+            if (!agree) {
+                $(e.target).after( `<p style="color:red;">You must agree to our terms and conditions</p>` );
                 return;
             }
             this.loadStep2();

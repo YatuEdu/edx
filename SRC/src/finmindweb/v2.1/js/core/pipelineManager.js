@@ -32,9 +32,10 @@ class PipelineManager {
 		Block Id and Block Info are obtained by different API at slightly diferent time.
 		Hence we need a method to set it from outside.
 	**/
-	setBlockInfo(blockName, blockDescription) {
+	setBlockInfo(blockName, blockDescription, blockNote) {
 		this._qAndAManager.blockName = blockName;
 		this._qAndAManager.blockDescription = blockDescription;
+		this._qAndAManager.blockNote = blockNote;
 	}
 	
 	/**
@@ -143,7 +144,8 @@ class PipelineManager {
 		// get html
 		return { name: 			this._qAndAManager.blockName,
 				 description:	this._qAndAManager.blockDescription,
-				 html:		 	this._qAndAManager.getUserQustionHtmlInternal()
+				 html:		 	this._qAndAManager.getUserQustionHtmlInternal(),
+				 note:			this._qAndAManager.blockNote
 		};
 	}
 	

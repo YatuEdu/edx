@@ -104,7 +104,7 @@ class UserBeneficiaryComponent {
 
 		// use UserDateQuestion for date validation and formating
 		const dateInfo = {attr_id: id, attr_label: "", sv1: beneficiaryInfo.dob};
-		this._dob = new UserDateQuestion(dateInfo); 
+		this._dob = new UserDateQuestion(dateInfo, moment(new Date()).add(-100, 'year').format("YYYY-MM-DD"), moment(new Date()).add(0, 'year').format("YYYY-MM-DD"));
 		
 		// use UserDropdownSelection for relationship
 		const relationInfo = {attr_id: id, attr_label: "", sv1: beneficiaryInfo.relationship};

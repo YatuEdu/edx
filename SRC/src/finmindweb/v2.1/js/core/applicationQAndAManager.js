@@ -46,6 +46,7 @@ class ApplicationQAndAManager {
 	#blockDescription;
 	#quesionList;
 	#appId;
+	#blockNote;
 	
 	constructor(appId) {
 		this.#blockId = 0;
@@ -76,7 +77,14 @@ class ApplicationQAndAManager {
 	set blockDescription(bd) {
 		this.#blockDescription = bd;
 	}
-	
+
+	get blockNote() {
+		return this.#blockNote;
+	}
+
+	set blockNote(bn) {
+		this.#blockNote = bn;
+	}
 	/**
 		Form question/answer UI by dynamically generate HTML block based
 		on the questions ALREADY in the object (obtained from server before).
@@ -220,7 +228,7 @@ class ApplicationQAndAManager {
 				break;
 				
 			case 11:
-				qObj = new UserDateQuestion(qInfo); 
+				qObj = new UserDateQuestion(qInfo, moment(new Date()).add(-100, 'year').format("YYYY-MM-DD"), moment(new Date()).add(0, 'year').format("YYYY-MM-DD"));
 				break;
 			
 			// radio types

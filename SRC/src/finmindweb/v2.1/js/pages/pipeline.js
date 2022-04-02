@@ -199,7 +199,6 @@ class PipelinePageHandler {
 
     // hook up events
     async init() {
-
         // 如果状态失效，跳转到登录页面
         const loggedIn = await this.#credMan.hasLoggedIn();
         if (!loggedIn) {
@@ -275,6 +274,7 @@ class PipelinePageHandler {
             if (this.#credMan.credential.name===userName) {
                 const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
                 this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
+                this.#applicationMan.initalizeState();
             } else if (this.#credMan.credential.name===agentUserName) {
                 let html = await this.showAllBlocQuestionAnswers(appId);
                 $('#user_question_block').html(html);
@@ -350,11 +350,14 @@ class PipelinePageHandler {
     }
 
     // Get previous blck of questions from local cache and dispolay it
-    populatePreviousQuestionBlock() {
+    async populatePreviousQuestionBlock() {
         //const appId =  999;
         if (this.#applicationMan.canGotoPreviousBlock()) {
             const qHtml = this.#applicationMan.previousBlock();
             if (qHtml) {
+                const blockInfo = await Net.getBlockInfo(this.#applicationMan.blockId);
+                $('#fm_wz_block_name').text(blockInfo.blockName);
+                $('#fm_wz_block_description').text(blockInfo.blockDescription);
                 $('#user_question_block').html(qHtml.html);
 
                 this.#applicationMan.hookUpEvents();
@@ -363,7 +366,7 @@ class PipelinePageHandler {
         }
 
         // no more blocks
-        alert ('no more questions to answer');
+        alert('no more questions to answer');
         return;
         $('#user_question_block').html('');
         $('#fm_wz_next_block_button').text('Start');

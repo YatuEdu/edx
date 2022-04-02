@@ -79,6 +79,7 @@ class ProductRecommended {
 
 	#credMan;
 	#applicationMan;
+    #recommendItems = new Map();
 
     constructor(credMan) {
     	this.#credMan = credMan;
@@ -91,10 +92,11 @@ class ProductRecommended {
 		// retrieve recommendation list from session store
 		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_BEST_PREMIUM_STORE_KEY);
 		const recommendItem = sessionStore.retrieveObj();
+        this.#recommendItems.set(recommendItem.id, recommendItem);
 		const tableTrHtml = TEMPLATE_PROD
 							.replace(REPLACEMENT_FOR_MONTHLY_PREMIUM, recommendItem.premium)
 							.replaceAll(REPLACEMENT_FOR_PRODUCT_NAME, recommendItem.insurer)
-							.replaceAll(REPLACEMENT_FOR_ID, this.getSelectionId(0));
+							.replaceAll(REPLACEMENT_FOR_ID, recommendItem.id);
 		$(this.productTable).append(tableTrHtml);
 		$('input[name=product-select]').change(this.handleSelectProduct.bind(this));
 		$('#startAppSubmit').click(this.handleStartApplication.bind(this));
@@ -115,11 +117,32 @@ class ProductRecommended {
 		}
 
 
-		//TODO 无法获取产品ID
-		let prodId = 89898990;
-		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+		// let prodId = 89898990;
+		let prodId = parseInt($('input[name=product-select]:checked').attr('id'));
+
 		const appId = await this.startApplicationForProduct(prodId); //4008; //
 		if (appId && appId > 0) {
+			// 第一步自动完成
+
+            const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+            const qMap = this.prot_deserialize(sessionStore);
+            let appCoverageTime = qMap.get(8031).sv1;
+            let appCoverageAmount = qMap.get(8030).sv1;
+            let insuranceType;
+            let totalFaceAmount;
+            let premium;
+            let paymentMode;
+            let payYears;
+            if (appCoverageAmount==='Permanent life') {
+                insuranceType = 'Permanent life';
+            } else {
+                insuranceType = 'Term life';
+            }
+            totalFaceAmount = appCoverageAmount;
+            premium = this.#recommendItems.get(prodId).premium;
+            this.#applicationMan = await new ApplicationPipelineManager(sessionStore, appId);
+            let ret = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
+
 			window.location.href = "/user/pipeline.html?appId="+appId;
 		} else {
 			alert('cannot start application');
@@ -130,7 +153,7 @@ class ProductRecommended {
 	async startApplicationForProduct(pid) {
 		const res = await Net.startAplication(pid, this.#credMan.credential.token);
 		if (res.err) {
-			alert(res.err);
+			alert(res.err.msg);
 			return;
 		}
 		return res.data[0].applicationId;
@@ -146,7 +169,28 @@ class ProductRecommended {
 	
 	getSelectionId(pid) {
 		return `${SELECTION_ID_PREFIX}_${pid}`;
-	}	
+	}
+
+	prot_deserialize(store) {
+		let qMap = null;
+		const storeMapStr = store.getItem();
+		if (storeMapStr) {
+			qMap = JSON.parse  (storeMapStr,
+				(key, value) => { // desrialization with receiver func
+					if(typeof value === 'object' && value !== null) {
+						if (value.dataType === 'Map') {
+							return new Map(value.value);
+						}
+					}
+					return value;
+				}
+			);
+		}
+		else {
+			qMap = new Map;
+		}
+		return qMap;
+	}
 }
 
 let productRecommended = null;

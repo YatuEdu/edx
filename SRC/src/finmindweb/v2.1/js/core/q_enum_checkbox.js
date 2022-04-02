@@ -24,9 +24,9 @@ const q_template_enum_single = `
 	  </label></div>
 	<div data-hover="1" data-delay="0" class="tip w-dropdown">
 	  <div class="tip-toggle w-dropdown-toggle"><img src="../images/help-circle.svg" loading="eager" alt=""></div>
-	  <nav class="tip-list w-dropdown-list">
-		<div class="tip-text">There should be some explanation here.</div>
-	  </nav>
+<!--	  <nav class="tip-list w-dropdown-list">-->
+<!--		<div class="tip-text">There should be some explanation here.</div>-->
+<!--	  </nav>-->
 	</div>
 </div>
 `;

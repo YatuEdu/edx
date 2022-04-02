@@ -12,7 +12,7 @@ import {Net}          							from './net.js';
 import {credMan}      							from './credManFinMind.js'
 
 const DEFAULT_NO_BENEFICIARY = 1;
-const DEFAULT_NO_CONTINGENT_BENEFICIARY = 1;
+const DEFAULT_NO_CONTINGENT_BENEFICIARY = 0;
 	
 /*
 	COMPONENT FACTORY FOR text field control

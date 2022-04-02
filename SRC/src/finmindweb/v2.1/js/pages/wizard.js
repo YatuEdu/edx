@@ -35,6 +35,8 @@ const page_template = `
 	<div class="row justify-content-center mt-5">
 		<div class="col-12 col-lg-5">
 			<div id="user_question_block"></div>
+			<div  id="note_block">
+			</div>
 			<div class="d-flex justify-content-center mt-5">
 				<button id="fm_wz_next_block_button" class="btn btn-primary btn-xl w-100" type="submit">
 					Continue
@@ -43,6 +45,10 @@ const page_template = `
 		</div>
 	</div>
 </div>
+`;
+
+const note_template = `
+<label for="" class="form-label fs-6p">{note}</label>
 `;
 
 /**
@@ -156,11 +162,16 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 	populatePreviousQuestionBlock() {
 		//const appId =  999; 
 		if (this.#applicationMan.canGotoPreviousBlock()) {
-			const {name, description, html} = this.#applicationMan.previousBlock();
+			const {name, description, html, note} = this.#applicationMan.previousBlock();
 			if (html) {
 				$('#fm_wz_block_name').text(name);
 				$('#fm_wz_block_description').html(description);
 				$('#user_question_block').html(html);
+				if (note) {
+					$('#note_block').html(note_template.replace('{note}', "Note: "+note));
+				} else {
+					$('#note_block').html('');
+				}
 				this.#applicationMan.hookUpEvents();
 				return;
 			}
@@ -201,10 +212,16 @@ class QuestionAnswerRecorder extends HomeAndWizardHeader {
 				const blockInfo = await Net.getBlockInfo(this.#applicationMan.blockId);
 				$('#fm_wz_block_name').text(blockInfo.blockName);
 				$('#fm_wz_block_description').html(blockInfo.blockDescription);
-				this.#applicationMan.setBlockInfo(blockInfo.blockName, blockInfo.blockDescription);
+				this.#applicationMan.setBlockInfo(blockInfo.blockName, blockInfo.blockDescription, blockInfo.blockNote);
 				
 				// then set the html for all the questions of the block
 				$('#user_question_block').html(qHtml);
+				if (blockInfo.blockNote!=null) {
+					$('#note_block').html(note_template.replace('{note}', "Note: "+blockInfo.blockNote));
+				} else {
+					$('#note_block').html('');
+				}
+
 				$('#fm_wz_next_block_button').text('Next');
 				
 				this.#applicationMan.hookUpEvents();

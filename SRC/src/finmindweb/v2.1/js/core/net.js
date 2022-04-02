@@ -83,7 +83,8 @@ class Net {
 		else {
 			return {
 						blockName:        res.data[0].name,
-						blockDescription: res.data[0].description
+						blockDescription: res.data[0].description,
+						blockNote:		  res.data[0].note
 			       };
 		}
 	}
