@@ -112,11 +112,11 @@ class CommunicationSpace {
 				let shareTrack = await VideoUtil.getScreenShareTrack();
 				if (shareTrack!=null) {
 					$(this.screenShareBtnId).disabled = true;
-					videoChatNew.setLocalVideoTrack(shareTrack);
+					this.#videoClient.setLocalVideoTrack(shareTrack);
 
 					shareTrack.addEventListener('ended', () => {
 						console.log('用户停止共享屏幕 这里切换回摄像头视频');
-						videoChatNew.setLocalVideoTrack(myVideoTrack);
+						this.#videoClient.setLocalVideoTrack(this.#videoTrack);
 						$(this.screenShareBtnId).disabled = false;
 					});
 				}
