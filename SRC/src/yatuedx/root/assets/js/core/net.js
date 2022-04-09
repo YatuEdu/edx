@@ -12,6 +12,7 @@ const API_FOR_SUBJECT_SERIES = 202116;
 const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
 const API_GET_NOTES_FOR_SERIES = 202119;
 const API_ADD_NOTES = 202120;
+const API_REGISTER_FOR_CLASS = 202121;
 
 class Net {
 	/**
@@ -86,6 +87,16 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
+
+	/**
+		Yatu API for adding notes for a class
+	**/
+	static async registerForClassSeries(token, seriesId) {
+		const req = Net.composeRequestDataForClassRegistration(token, seriesId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
 
 	/**
 		Yatu API for retrieving class schedule for a class series
@@ -274,6 +285,24 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(myGroupsReq);
 	}	
+	
+	/**
+		Forming Yatu API request data for applying to register for a class offering
+	**/
+	static composeRequestDataForClassRegistration(t, sId) {
+		const sIdi =  parseInt(sId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_REGISTER_FOR_CLASS
+			},
+			data: {
+				seriesId: sIdi
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}	
+	
 	
 	/**
 		Forming Yatu API request data for getting Class Series FOR A Subject

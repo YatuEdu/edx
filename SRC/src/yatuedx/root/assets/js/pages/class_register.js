@@ -20,16 +20,16 @@ const REPLACEMENT_ID = "{id}";
 const REPLACEMENT_BTN = "{btn}";
 const REPLACEMENT_ATTR = "{attr}";
 const CLASS_DATE_TEMPLATE = `
-<div id="serirs_id_{id}" class="row">
-<div class="col-lg-4 col-md-4 col-sm-4">
+<div id="serirs_id_{id}" class="row yatu_list">
+<div class="col-lg-5 col-md-5 col-sm-5">
  <h5>{bdate} ~ {edate}</h5>
 </div>
 <div class="col-lg-4 col-md-4 col-sm-4">
  <h5>{from} ~ {to} Pacific time</h5>
 </div>
-<div class="col-lg-4 col-md-4 col-sm-4">
+<div class="col-lg-3 col-md-3 col-sm-3">
+ <button {attr}="{id}" class="{btn} btn btn-rounded btn-outline-primary yatu_list">Register</button>
  <h5>{seats} seats open</h5>
- <button {attr}="{id}" class="{btn} btn btn-danger">Register</button>
 </div>
 </div>
 `;
@@ -60,7 +60,7 @@ class ClassRegisterPageHandler extends IndexPageHandler {
 		
 		const {subject, columnHtml} = this.formatClassSeries(ret.data);
 		$("#yt_title_class").html(subject);
-		$("#yt_div_class_series").append(columnHtml);
+		$("#yt_div_class_series").append(columnHtml );
 		// handle registration events
 		const btnClass = `.${BTN_CLASS_FOR_REGISTER}`;
 		$("#yt_div_class_series").append(columnHtml);
@@ -86,6 +86,7 @@ class ClassRegisterPageHandler extends IndexPageHandler {
 						.replace(REPLACEMENT_BTN, BTN_CLASS_FOR_REGISTER)
 						.replace(REPLACEMENT_ATTR,ATTR_FOR_REGISTER_BUTTON);
 		});
+		subject += " time table";
 		return {subject, columnHtml};
 	}
 	
@@ -106,7 +107,11 @@ class ClassRegisterPageHandler extends IndexPageHandler {
 	async handleRegistration(e) {
 		e.preventDefault();
 		const seriesId = e.target.getAttribute(ATTR_FOR_REGISTER_BUTTON);
-		
+		const t = credMan.credential.token;
+		const ret = await Net.registerForClassSeries(t, seriesId);
+		if (ret.code == 0 || ret.code == 40013) {
+			alert("Successfully registered for this class.  We will inform you when you are eligible to attend.");
+		} 
 	}
 	
 	// going to sign up directly

@@ -196,6 +196,10 @@ textarea {
     line-height: 1.4;
 }
 
+.yatu_list {
+	margin-bottom:8px !important;
+}
+
 table {
 	width: 100%;
 }

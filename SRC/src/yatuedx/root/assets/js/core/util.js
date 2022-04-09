@@ -8,7 +8,7 @@ class TimeUtil {
 	static diffMinutes(dt1, dt2) 
 	{
 		const diff =(dt2 - dt1) / 60000;
-		return Math.abs(Math.round(diff));
+		return Math.round(diff);
 	}
 	
 	static timeDiffIn(unit, t1, t2) {
