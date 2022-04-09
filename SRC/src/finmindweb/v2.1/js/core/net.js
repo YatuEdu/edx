@@ -432,6 +432,47 @@ class Net {
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
 
+	/**
+	 FinMind API for agent to get clients
+	 **/
+	static async getPeoples(token, pageSize, pageNo, searchBy) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021842
+			},
+			data: {
+				pageSize: pageSize,
+				pageNo: pageNo,
+				name: searchBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to get applications
+	 **/
+	static async getAllApplications(token, appStatus, pageSize, pageNo, searchBy, orderBy) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021841
+			},
+			data: {
+				appStatus: appStatus,
+				pageSize: pageSize,
+				pageNo: pageNo,
+				searchBy: searchBy,
+				orderBy: orderBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
 
 	/**
 		compose finMind API request for starting to apply for a product

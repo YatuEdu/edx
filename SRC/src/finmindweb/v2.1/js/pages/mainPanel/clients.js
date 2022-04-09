@@ -66,11 +66,13 @@ const rowTemplate = `
 </tr>
 `;
 
+const pageSize = 10;
 
 class Clients {
 	#container;
-	
-    constructor(container) {
+	#searchBy;
+
+	constructor(container) {
 		this.#container = container;
 		this.init();
 	}
@@ -80,21 +82,27 @@ class Clients {
     	this.#container.empty();
     	this.#container.append(pageTemplate);
 
-		await this.requestList('');
+		await this.requestList('', 1).then(maxRowNumber => {
+			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
+		});
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
 
 	}
 
+	async handlePage(page) {
+		console.log(page);
+		await this.requestList(this.#searchBy, page);
+	}
+
 	handleSearchSubmit(e) {
-		let searchBy = $('#searchInput').val();
-		this.requestList(searchBy);
+		this.#searchBy = $('#searchInput').val();
+		this.requestList(this.#searchBy, 1);
 		console.log();
 	}
 
-	async requestList(searchBy) {
-		let pageSize = 10;
-		let pageNo = 1;
+	async requestList(searchBy, pageNo) {
+
 		let maxRowNumber;
 		let res = await Net.getClients(credMan.credential.token, pageSize, pageNo, searchBy);
 		$('#list').empty();
@@ -111,7 +119,7 @@ class Clients {
 				.replace('{quickNote}', '')
 			);
 		}
-		new Pagination($('#table'), pageSize, maxRowNumber);
+		return maxRowNumber;
 	}
 
 

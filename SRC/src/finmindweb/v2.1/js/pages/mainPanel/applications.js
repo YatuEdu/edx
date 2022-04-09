@@ -83,21 +83,25 @@ const rowTemplate = `
 	</td>
 </tr>
 `;
+const pageSize = 10;
 
 class Applications {
 	#container;
+	#searchBy = '';
 	
     constructor(container) {
 		this.#container = container;
 		this.init();
 	}
-	
+
 	// hook up events
 	async init() {
     	this.#container.empty();
     	this.#container.append(pageTemplate);
 
-    	await this.requestList('');
+		await this.requestList('', 1).then(maxRowNumber => {
+			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
+		});
 
 		let options = {
 			valueNames: [ 'create-date','last-update-time','idle-time' ]
@@ -110,9 +114,13 @@ class Applications {
 
 	}
 
-	async requestList(searchBy) {
+	async handlePage(page) {
+		console.log(page);
+		await this.requestList(this.#searchBy, page);
+	}
+
+	async requestList(searchBy, pageNo) {
 		let pageSize = 10;
-		let pageNo = 1;
 		let maxRowNumber;
 		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date desc');
 		$('#list').empty();
@@ -133,8 +141,7 @@ class Applications {
 				.replace('{appId}', row.id)
 			);
 		}
-		let pagination = new Pagination($('#table'), pageSize, maxRowNumber);
-
+		return maxRowNumber;
 	}
 
 	handleEdit(e) {
@@ -167,8 +174,8 @@ class Applications {
 	}
 
 	handleSearchSubmit(e) {
-    	let searchBy = $('#searchInput').val();
-		this.requestList(searchBy);
+    	this.#searchBy = $('#searchInput').val();
+		this.requestList(this.#searchBy, 1);
 		console.log();
 	}
 
