@@ -13,6 +13,8 @@ const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
 const API_GET_NOTES_FOR_SERIES = 202119;
 const API_ADD_NOTES = 202120;
 const API_REGISTER_FOR_CLASS = 202121;
+const API_USER_UPDATE_NOTES=202124;
+const API_USER_GET_NOTES=202125;
 
 class Net {
 	/**
@@ -82,8 +84,27 @@ class Net {
 	/**
 		Yatu API for adding notes for a class
 	**/
-	static async classAddNotes(token, groupId, text) {
+	static async classUpdateNotes(token, groupId, text) {
 		const req = Net.composeRequestDataForClassAddNotes(token, groupId, text);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+
+	/**
+		Yatu API for USER to update her class notes for class
+	**/
+	static async userUpdateClassNotes(token, groupId, text) {
+		const req = Net.composeRequestDataForUserUpdateNotes(token, groupId, text);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for USER to get her class notes frombackend
+	**/
+	static async userGetClassNotes(token, groupId) {
+		const req = Net.composeRequestDataForUserGetNotes(token, groupId);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -281,6 +302,42 @@ class Net {
 			data: {
 				groupId: gIdi,
 				notes: txt
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}	
+	
+	/**
+		Forming Yatu API request data for adding class notes
+	**/
+	static composeRequestDataForUserUpdateNotes(t, gId, txt) {
+		const gIdi =  parseInt(gId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_USER_UPDATE_NOTES
+			},
+			data: {
+				groupId: gIdi,
+				notes: txt,
+				updateNotes: 1
+			}
+		};
+		return Net.composePostRequestFromData_private(myGroupsReq);
+	}	
+	
+	/**
+		Forming Yatu API request data for adding class notes
+	**/
+	static composeRequestDataForUserGetNotes(t, gId) {
+		const gIdi =  parseInt(gId, 10);
+		const myGroupsReq = {
+			header: {
+				token: t,
+				api_id: API_USER_GET_NOTES
+			},
+			data: {
+				groupId: gIdi
 			}
 		};
 		return Net.composePostRequestFromData_private(myGroupsReq);

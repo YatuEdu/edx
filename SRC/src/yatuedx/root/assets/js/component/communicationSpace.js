@@ -312,6 +312,28 @@ class CommunicationSpace {
 		this.v_execute(cmdObject);
 	}
 	
+	/**
+	  ask for a user to re-syncronize message with me
+	 **/
+	askReSync(user) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC, 	// command id
+										0);										    // uopdate flag 
+		this.sendMessageToUser(user, cmd.str);
+	}
+	
+	/**
+		Send code sample to one person who requested for it, whose code is out of sync. 
+		Update thereceiver's board by replacing the entire board content.
+	 **/
+	syncCodeWithRequester(codeStr, targetUser) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 
+										UtilConst.STR_CHANGE_ALL, 
+										codeStr, 
+										'');		// no digest needed in this case
+		this.sendMessageToUser(targetUser, cmd.str);
+		console.log('send re-syned code:' + codeStr + ' to: ' + targetUser);
+	}
+	
 	/**	
 		Execute command sent by peers. Derived class must override it.
 	**/	

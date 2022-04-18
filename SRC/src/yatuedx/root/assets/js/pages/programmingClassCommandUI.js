@@ -12,7 +12,8 @@ class ProgrammingClassCommandUI extends AuthPage {
 	#screenShareBtnId;
 	#timer;
 	#codeSyncManager;
-
+	#groupId;
+	
 	constructor(credMan, codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
 		super(credMan);
 		this.#codeInputId = codeInputId;
@@ -62,8 +63,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 	}
 	
 	/**
-		Our algorithm to code updating by difference in order to optimize network traffic 
-		
+		Our algorithm to code updating by delta in order to optimize network traffic 
 	 **/
 	static updateContentByDifference(how, oldStr) {
 		let newContent = "";
@@ -196,6 +196,14 @@ class ProgrammingClassCommandUI extends AuthPage {
 	
 	executeCode(codeText) {
 		this.#jsCodeExecutioner.executeCode(codeText);
+	}
+	
+	get groupId() {
+		return this.#groupId;
+	}
+	
+	set groupId(gid) {
+		this.#groupId = gid;
 	}
 	
 	get codeInputTextArea() {

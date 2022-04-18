@@ -51,21 +51,9 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		Send code sample to all students to disaply on students white-board
 	 **/
 	sendCode(codeStr) {
+		debugger
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
 		this.sendMessageToGroup(cmd.str);
-	}
-	
-	/**
-		Send code sample to one student whose code is out of sync. Update the
-		student board by replacing the entire board content.
-	 **/
-	syncCodeWithStudent(codeStr, targetUser) {
-		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE, 
-										UtilConst.STR_CHANGE_ALL, 
-										codeStr, 
-										'');		// no digest needed in this case
-		this.sendMessageToUser(targetUser, cmd.str);
-		console.log('send:' + codeStr + ' to: ' + targetUser);
 	}
 	
 	/**

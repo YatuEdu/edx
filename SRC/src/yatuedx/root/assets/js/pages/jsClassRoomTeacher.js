@@ -6,7 +6,7 @@ import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
-import {PageUtil, TimeUtil}					from '../core/util.js';
+import {PageUtil, StringUtil, TimeUtil}		from '../core/util.js';
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE 	= "yt_result_console";
@@ -54,7 +54,6 @@ const MSG_RECEIVER_OPTION_TEMPLATE = `
 class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
 	#timer;
-	#groupId;
 	
     constructor(credMan) {
 		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
@@ -64,9 +63,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// hook up events
 	async init() {
 		const paramMap = PageUtil.getUrlParameterMap();
-		this.#groupId = paramMap.get(sysConstants.UPN_GROUP);
+		this.groupId = paramMap.get(sysConstants.UPN_GROUP);
 		//const clssName = 'JS 101 Test';
-		this.#displayBoardTeacher = new DisplayBoardTeacher(this.#groupId, this);
+		this.#displayBoardTeacher = new DisplayBoardTeacher(this.groupId, this);
 		
 		// set mode to teaching mode
 		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
@@ -125,7 +124,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 				this.updateStudentCode(cmdObject.data, cmdObject.sender);
 				break;
-				
+			
 			// Sync with a student whose code is out of sync with teacher
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
 				this.syncCodeWithStudent(cmdObject);
@@ -140,7 +139,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Load teacher's notes for the class from backend
 	 **/
 	async loadNotes() {
-		const resp = await Net.classGetNotes(credMan.credential.token,this.#groupId);
+		const resp = await Net.classGetNotes(credMan.credential.token,this.groupId);
 		let notes = '';
 		if (resp.data.length > 0) {
 			resp.data.forEach(n => {
@@ -206,7 +205,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Sync code with one student 
 	 **/
 	syncCodeWithStudent(cmdObject) {
-		this.#displayBoardTeacher.syncCodeWithStudent(this.code, cmdObject.sender);
+		this.#displayBoardTeacher.syncCodeWithRequester(this.code, cmdObject.sender);
 	}
 	
 	/**
@@ -244,8 +243,28 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// obtain the new code sample using an algorithm defined in parent class as a static method
 		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode);
 		
+		// update the code on UI
+		if (!newContent) {
+			return;  // no need to validate
+		}
+		
+		// verify the digest if it is present
+		let shouldUpdate = true;
+		if (digest) {
+			if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
+				shouldUpdate = false;
+				console.log('content not verified, asking for re-sync');
+				this.#displayBoardTeacher.askReSync(student);
+			}
+		}
+		else {
+			console.log('No digest available');
+		}
+		
 		// update the code for this student on UI
-		$(this.getStudentConsoleIdSelector(student)).val(newContent);
+		if (shouldUpdate) {
+			$(this.getStudentConsoleIdSelector(student)).val(newContent);
+		}
 	}
 	
 	/**
@@ -283,7 +302,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	async handleSaveNotes(e) {
 		e.preventDefault(); 
 		const notes = $(this.resultConsoleControl).val();
-		await Net.classAddNotes(credMan.credential.token,this.#groupId, notes);
+		await Net.classUpdateNotes(credMan.credential.token,this.groupId, notes);
 	}
 	
 	/**
@@ -341,11 +360,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	setMode(newMode) {
 		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
 		if ( newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
-			$(this.modeChangeButton).prop('title', sysConstStrings.SWITCH_TO_EXERCISE);
+			$("#yt_div_switch_mode").html(sysConstStrings.SWITCH_TO_EXERCISE);
 			this.startOrStopCodeRefreshTimer(true);
 		}
 		else if (newMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
-			$(this.modeChangeButton).prop('title', sysConstStrings.SWITCH_TO_LEARNING);
+			$("#yt_div_switch_mode").html(sysConstStrings.SWITCH_TO_LEARNING);
 			this.startOrStopCodeRefreshTimer(false);	
 		}
 	}

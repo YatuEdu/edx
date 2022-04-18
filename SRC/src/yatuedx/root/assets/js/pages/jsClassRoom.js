@@ -7,24 +7,15 @@ import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil}				from '../core/util.js';
+import {Net}			    				from "../core/net.js"
 
-const YT_CONSOLE_ID 						= "yt_console";
-const YT_CODE_BOARD_ID 						= "yt_code_board";
-const YT_DIV_CODE_DISPLAY_OR_INPUT_AREA_ID 	= "yt_div_code_display_or_input_area";
+const YT_TA_NOTES_ID 					    = "yt_ta_notes";
+const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
+const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
-const YT_BTN_SEND_MSG 						= "yt_btn_msg_send";
+const YT_COPY_CODE_TO_NOTES					= 'yt_btn_copy_from_board';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const VD_VIEDO_AREA 						= "yt_video_area";
-
-const REPLACE_CBID = '{cbid}';
-const REPLACE_RN = '{rn}';
-
-const HIDDEN_BOARD_TEMPLATE = `
-<textarea class="input-board"
-		  id="{cbid}" 
-		  spellcheck="false"
-		  placeholder="type your code here...."
-		  rows="{rn}"></textarea>`;
 								  
 /**
 	This class handles JS Code runner board
@@ -32,35 +23,34 @@ const HIDDEN_BOARD_TEMPLATE = `
 class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	#displayBoardForCoding;
+	#notes;
 	
     constructor(credMan) {
-		super(credMan, YT_CODE_BOARD_ID, YT_CONSOLE_ID, VD_VIEDO_AREA);
+		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
 		this.init();
 	}
 	
 	// hook up events
 	async init() {
-		//const clssName = 'JS 101 Test'; // TODO: fetch class name from URL:
 		const paramMap = PageUtil.getUrlParameterMap();
-		const clssName = paramMap.get(sysConstants.UPN_GROUP);
-		const teacherName =paramMap.get(sysConstants.UPN_TEACHER);
-		this.#displayBoardForCoding = new DisplayBoardForCoding(clssName, teacherName, this);
-		
-		// error handling code herer
-			// if err goto errpage
-		
+		const groupId = paramMap.get(sysConstants.UPN_GROUP);
+		this.groupId = groupId;
+		const teacher=paramMap.get(sysConstants.UPN_TEACHER);
+		this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, teacher, this);
+			
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
 		
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
+		// handle copy code to notes
+		$(this.copyNotesButton).click(this.handleCopyCodeToNotes.bind(this));
+		// handle erase result board
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-		$(this.sendMsgButton).click(this.handleSendMsg.bind(this));
-		
-		$("#bt_white_board_clear").click(this.handleClearBoard.bind(this));
-	
-		$("#bt_white_board_send").click(this.handleSend.bind(this));
-		
+		// handle notes editing
+		$(this.notesTextArea).blur(this.handleNeedtoUpdateNotes.bind(this));
+		// itialize notes we saved before
+		this.initNotes();
 	}
 	
 	/**
@@ -68,6 +58,18 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	**/
 	v_handleTimer() {
 		this.updateCodeBufferAndSync();
+	}
+	
+	/**
+		Load notes from data base
+	 **/
+	async initNotes() {
+		const resp = await Net.userGetClassNotes(credMan.credential.token, this.groupId);
+		if (resp.data.length > 0) {
+			const dbnotes = resp.data[0].notes;
+			$(this.notesTextArea).val(dbnotes);
+			this.#notes = $(this.notesTextArea).val();
+		}
 	}
 	
 	/**
@@ -91,14 +93,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 				this.setClassMode(cmd.data[0]);
 				break;
 				
-			// display code sample on board
-			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH:
-				this.displayCodeSample(cmd.data);
-				break;
-			
 			// update the sample code
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 				this.updateCodeSample(cmd.data);
+				break;
+			
+			// resync my code with teachwer
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
+				this.syncCodeWithTeacherer(cmd);
 				break;
 				
 			// run code sample and show result on console
@@ -111,20 +113,17 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Sync code with teacher when teacher asks for it.
+	 **/
+	syncCodeWithTeacherer(cmdObject) {
+		this.#displayBoardForCoding.syncCodeWithRequester(this.code, cmdObject.sender);
+	}
+	
+	/**
 		Display JS Code Smaple on the Whiteboard
 	**/	
 	displayCodeSample(codeData) {
-		const srcCode = codeData[0];
-		const formattedCode = codeData[1];
-		const currentMode = $(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE);
-		if (currentMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
-			// show in formatted code on board
-			$(this.codeDisplayOrInputAreaDiv).html(formattedCode);
-		}
-		else {
-			this.code=srcCode;
-		}
-		this.prv_clearConsole();
+		debugger;
 	}
 	
 	/**
@@ -141,16 +140,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		// verify the digest if it is present
-		if (digest ) {
+		if (digest) {
 			if (StringUtil.verifyMessageDigest(newContent, digest)) { 
 				console.log('verfied content');
 			} else {
 				console.log('content not verified, asking for re-sync');
-				this.#displayBoardForCoding.askReSync();
+				this.#displayBoardForCoding.askReSync(this.#displayBoardForCoding.classTeacher);
 			}
 		}
 		else {
-			console.log('verfied content w/o verifiying');
+			console.log('No digest available');
 		}
 	}
 	
@@ -172,12 +171,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Set class room mode to "readonly" or "readwrite"
 	 **/
 	setClassMode(newMode) {
-		const currentMode = $(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE);
-		if (currentMode === newMode) {
-			// mode already set;
-			return;
-		}
-		
 		if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
 			// clear code transmit timer
 			this.startOrStopCodeRefreshTimer(false);
@@ -187,9 +180,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.resultConsoleControl).addClass('input-disabled');
 			$(this.codeInputTextArea).addClass('input-disabled');
 			
-			// Make code-demo board active
-			// $(this.codeDisplayOrInputAreaDiv).html(sysConstStrings.EMPTY);
-			// hide run code and clear consol buttons
 			$(this.runCodeButton).hide(); 
 			$(this.clearResultButton).hide();
 		}
@@ -202,12 +192,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.resultConsoleControl).attr('readonly', false);
 			$(this.resultConsoleControl).removeClass('input-disabled');
 			$(this.codeInputTextArea).removeClass('input-disabled');
-			// Make code-input board active
-			const cbHtml = HIDDEN_BOARD_TEMPLATE
-								.replace(REPLACE_CBID,YT_CODE_BOARD_ID)
-								.replace(REPLACE_RN, sysConstants.YATU_DEFAULT_BOARD_ROWS);
-			$(this.codeDisplayOrInputAreaDiv).html(cbHtml);
-			
 			// show run code and clear consol buttons
 			$(this.runCodeButton).show(); 
 			$(this.clearResultButton).show();
@@ -216,33 +200,34 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			// note that we do not want to bind this handler the "this" class
 			this.setTabHandler();
 		}
-		
-		// remember the mode in UI
-		$(this.codeDisplayOrInputAreaDiv).data(sysConstStrings.ATTR_MODE, newMode);
 	}
 		
+	get codeBoardTextArea() {
+		return `#${YT_TA_CODE_BOARD_ID}`;
+	}
+	
 	get resultConsoleControl() {
-		return `#${YT_CONSOLE_ID}`;
+		return `#${YT_TA_OUTPUT_CONSOLE_ID}`;
 	}
 	
 	get runCodeButton() {
 		return `#${YT_BTN_RUN_CODE_ID}`;
 	}
 	
-	get sendMsgButton() {
-		return `#${YT_BTN_SEND_MSG}`;
+	get copyNotesButton() {
+		return `#${YT_COPY_CODE_TO_NOTES}`;
 	}
 		
 	get clearResultButton() {
 		return `#${YT_BTN_CLEAR_RESULT_CODE_ID}`;
 	}
-	
-	get codeDisplayOrInputAreaDiv() {
-		return `#${YT_DIV_CODE_DISPLAY_OR_INPUT_AREA_ID}`;
+
+	get notesTextArea() {
+		return `#${YT_TA_NOTES_ID}`;
 	}
 	
 	/**
-		Hnandle tab by insertng \t
+		Hnandle running code using text from code baord
 	**/
 	handleRun(e) {
 		e.preventDefault(); 
@@ -252,12 +237,38 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Hnandle copy code to notes console (and eventually save to DB)
+	**/
+	handleCopyCodeToNotes(e) {
+		e.preventDefault(); 
+		const codeTxt = $(this.codeBoardTextArea).val();
+		if (!codeTxt) {
+			return;
+		}
+		const noteTxt = $(this.notesTextArea).val();
+		const newNotes = codeTxt + '\n' + noteTxt;
+		$(this.notesTextArea).val(newNotes);
+		this.prv_saveNotesToDb();
+	}
+	
+	/**
+		Hnandle event after notes are edited. If notes are modified, save the
+		modified notes to database.
+	**/
+	async handleNeedtoUpdateNotes(e) {
+		e.preventDefault(); 
+		this.prv_saveNotesToDb();
+	}
+	
+	/**
 		Hnandle send message to teacher
 	**/
-	handleSendMsg(e) {
-		const msg = $("#yt_txt_msg_console").val();
-		if (msg) {
-			this.#displayBoardForCoding.sendMsgToTeacher(msg);
+	async prv_saveNotesToDb() {
+		const noteTxt = $(this.notesTextArea).val();
+		if (!StringUtil.testEqual(this.#notes, noteTxt)) {
+			await Net.userUpdateClassNotes(credMan.credential.token, this.groupId, noteTxt);
+			this.#notes=noteTxt;
+			console.log("saved: " + this.#notes);
 		}
 	}
 	

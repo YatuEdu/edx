@@ -141,6 +141,27 @@ class StringUtil {
 		return {flag: UtilConst.STR_CHANGE_MIDDLE, delta: deltaStr, begin: begin, end: oldLen-rearLen };
 	}
 
+	static testEqual(str1, str2)  {
+		const len1 = str1.length;
+		const len2 = str2.length;
+		if (len1 != len2) {
+			return false;
+		}
+		
+		// find difference by forward comparison:
+		let i = 0;
+		for (; i < len1 ; i++) {
+			if (str1.charAt(i) != str2.charAt(i)) {
+				break;
+			}
+		}
+		if (i < len1) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	/*
 	  Replace a piece of chars in the middle of string with another string.
 	  For example, 

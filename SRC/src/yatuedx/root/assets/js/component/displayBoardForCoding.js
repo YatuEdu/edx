@@ -254,6 +254,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 				break;
 			
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
 				this.#view.v_execute(cmdObject);
 				break;
 				
@@ -295,15 +296,6 @@ class DisplayBoardForCoding extends DisplayBoard {
 											msg);								// msg body
 			this.sendMessageToUser(this.#teacher, cmd.str);
 		}
-	}
-	
-	/**
-	  ask for the teacher to re-syncronize code with me
-	 **/
-	askReSync() {
-		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC, 	// command id
-										0);										    // uopdate flag 
-		this.sendMessageToUser(this.#teacher, cmd.str);
 	}
 	
 	/**

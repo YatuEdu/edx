@@ -38,8 +38,8 @@ const sysConstants = Object.freeze({
 const sysConstStrings = Object.freeze({
 	EMPTY: '',
 	UNKNOWN: 'UNKNOWN',
-	SWITCH_TO_LEARNING: 'Change classroom mode to learning (current mode: exercise)',
-	SWITCH_TO_EXERCISE: 'Change classroom mode to exercise (current mode: learning)',
+	SWITCH_TO_LEARNING: 'Current mode: exercise',
+	SWITCH_TO_EXERCISE: 'Current mode: learning',
 	
 	ATTR_MODE: 'mode',
 	TAB_STRING: '\t',
