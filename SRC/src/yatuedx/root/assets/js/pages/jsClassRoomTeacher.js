@@ -22,6 +22,8 @@ const BTN_ERASE_BOARD  		= 'yt_btn_erase_board';
 const BTN_ERASE_RESULT 		= "yt_btn_erase_result";
 const BTN_BEAUTIFY_CODE 	= "yt_btn_btfy_code"
 const BTN_RUN_CODE  		= "yt_btn_run_code_on_student_board";
+const BTN_MSG_SEND			= "yt_btn_msg_send";
+const SEL_MSG_RECEIVER		= "select_option_msg_rcvr";
 
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CLSS = '{taclss}';
@@ -87,6 +89,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
 		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
+		$(this.msgSendButton).click(this.handleMsgSend.bind(this));
 		
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
@@ -395,6 +398,15 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	}
 	
 	/*
+		Send message to the selected user
+	 */
+	handleMsgSend(e) {
+		const targetUser = $(this.msgReceiverDropdown).text();	
+		const msg = $(this.resultConsoleControl).val();
+		this.#displayBoardTeacher.sendPrivateMsg(msg, targetUser);
+	}
+	
+	/*
 		Closing the video sharing upon closing the window
 	 */
 	handleLeaving(e) {
@@ -462,6 +474,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${BTN_ERASE_RESULT}`;
 	}
 	
+	// button for sending message
+	get msgSendButton() {
+		return `#${BTN_MSG_SEND}`;
+	}
+	 
 	// button for BEAUTIFY code mode
 	get beautifyCodeButton() {
 		return `#${BTN_BEAUTIFY_CODE}`;
@@ -474,6 +491,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	
 	getStudentConsoleIdSelector(student) {
 		return `#${this.getStudentConsoleId(student)}`; 
+	}
+	
+	// MESSAGE RECEIVER dropdown
+	get msgReceiverDropdown() {
+		return `#${SEL_MSG_RECEIVER} option:selected`; 
 	}
 	
 }

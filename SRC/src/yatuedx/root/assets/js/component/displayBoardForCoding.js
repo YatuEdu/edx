@@ -255,6 +255,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 			
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
+			case PTCC_COMMANDS.PTC_PRIVATE_MSG:
 				this.#view.v_execute(cmdObject);
 				break;
 				

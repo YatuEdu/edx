@@ -108,30 +108,30 @@
 }
 
 .student-input-board-extend {
-  width: 100vw;									/* <-- children as wide as the browser window (viewport) */
-  height: 		80vw !important;
-  overflow-y: 	auto;    						/* Trigger vertical scroll    */
-  z-index: 99 !important;						/* ON TOP */
-  position: absolute;
-  background: #0000FF;
-  color: #FFFFFF;
+	width: 100vw;									/* <-- children as wide as the browser window (viewport) */
+	height: 80vw !important;
+	overflow-y: 	auto;    						/* Trigger vertical scroll    */
+	z-index: 99 !important;						/* ON TOP */
+	position: absolute;
+	background: #0000FF;
+	color: #FFFFFF;
 }
 
-.output-board {
-	width: 95%;
-    height: 600px !important;       
+.output-board {  
+	height: 600px !important;    
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
     font-weight: 300;
 	font-size: 20px;
     line-height: 1.5;
-	background: #CCCFBC !important;
-	color: #0000FF;
-	border:dotted 2px purple;
+	background: #888888 !important;
+	color: #ffffff;
+	border:outset 4px orange;
 }
 
-.msg-board {     
+.msg-board {
+	height: 200px !important; 
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -140,7 +140,7 @@
     line-height: 1.5;
 	background: #ccffff !important;
 	color: #000000;
-	border:dotted 2px purple;
+	border:outset 4px orange;
 }
 
 .yt_video_area {
@@ -172,6 +172,18 @@
   line-height: 15px;
   transition: 1s;
   width: 250px;
+}
+
+.selected-tab {
+	background-color: #a9a9a9;
+	color: white; 
+	border:outset 1px red;
+}
+
+.unselected-tab {
+	background-color: #d3d3d3;
+	color: white; 
+	border:outset 1px white
 }
 
 .tiphost:hover .tooltiptext {

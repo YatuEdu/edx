@@ -9,14 +9,27 @@ import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil}				from '../core/util.js';
 import {Net}			    				from "../core/net.js"
 
+const YT_TA_MSG_ID 					    	= "yt_ta_msg";
+const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
 const YT_TA_NOTES_ID 					    = "yt_ta_notes";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
-const YT_COPY_CODE_TO_NOTES					= 'yt_btn_copy_from_board';					
+const YT_BTN_COPY_CODE_TO_NOTES				= 'yt_btn_copy_from_board';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
+const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
+const YT_BTN_MSG_SEND						= 'yt_btn_msg_send';
 const VD_VIEDO_AREA 						= "yt_video_area";
-								  
+const YT_TB_OUTPUT_CONSOLE					= 'yt_tb_output_console';
+const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
+const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
+
+const TAB_LIST = [
+	{tab:YT_TB_OUTPUT_CONSOLE, sub_elements: [YT_TA_OUTPUT_CONSOLE_ID, YT_BTN_CLEAR_RESULT_CODE_ID] },
+	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_TA_NOTES_ID, YT_BTN_SEARCH_NOTES] },
+	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID, YT_BTN_MSG_SEND] },
+];
+	
 /**
 	This class handles JS Code runner board
 **/
@@ -24,6 +37,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	#displayBoardForCoding;
 	#notes;
+	#tabIndex;
 	
     constructor(credMan) {
 		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
@@ -32,6 +46,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
+		this.#tabIndex = 0;
 		const paramMap = PageUtil.getUrlParameterMap();
 		const groupId = paramMap.get(sysConstants.UPN_GROUP);
 		this.groupId = groupId;
@@ -49,6 +64,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
 		// handle notes editing
 		$(this.notesTextArea).blur(this.handleNeedtoUpdateNotes.bind(this));
+		// handle maximize or minimize video screen
+		$(this.videoScreen).click(this.toggleVideoSize);
+		// switching tab to output
+		$(this.outputConsoleTab).click(this.toggleTab.bind(this));
+		// switching tab to notes
+		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
+		// switching tab to msg
+		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
+		
 		// itialize notes we saved before
 		this.initNotes();
 	}
@@ -69,6 +93,56 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			const dbnotes = resp.data[0].notes;
 			$(this.notesTextArea).val(dbnotes);
 			this.#notes = $(this.notesTextArea).val();
+		}
+	}
+	
+	/**
+		When the teacher video is clicked,  toggle bewtween a min / max sized screen.
+	 **/
+	toggleVideoSize(e) {
+		e.preventDefault(); 
+		if ($(this).hasClass( CSS_STUDENT_CONSOLE)) {
+			$(this).removeClass(CSS_STUDENT_CONSOLE);
+			$(this).addClass(CSS_STUDENT_CONSOLE_EX);
+		}
+		else {
+			$(this).removeClass(CSS_STUDENT_CONSOLE_EX);
+			$(this).addClass(CSS_STUDENT_CONSOLE);
+		}
+	}
+	
+	/**
+		toggle tag between output, notes, and etc.
+	 **/
+	toggleTab(e) {
+		const jqTarget = $(event.target);
+		let ti = jqTarget.attr('data-tabindex');
+		ti = parseInt(ti, 10);
+		this.prv_toggleTab(ti);
+	}
+	
+	/**
+		toggle tag between output, notes, and etc.
+	 **/
+	prv_toggleTab(ti) {
+		if (ti != this.#tabIndex) {
+			TAB_LIST.forEach( (e, i) => {
+				if (i != ti) {
+					$(`#${e.tab}`).removeClass('selected-tab');
+					$(`#${e.tab}`).addClass('unselected-tab');
+					e.sub_elements.forEach(se => {
+						$(`#${se}`).hide();
+					});
+				}
+				else {
+					$(`#${e.tab}`).removeClass('unselected-tab');
+					$(`#${e.tab}`).addClass('selected-tab');
+					e.sub_elements.forEach(se => {
+						$(`#${se}`).show();
+					});
+				}
+			});
+			this.#tabIndex = ti;
 		}
 	}
 	
@@ -107,6 +181,12 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			case PTCC_COMMANDS.PTC_CODE_RUN:
 				this.runCodeFrom(cmd.data[0]);
 				break;
+				
+			// GOT message from peers
+			case PTCC_COMMANDS.PTC_PRIVATE_MSG:
+				this.receiveMsgFrom(cmd);
+				break;
+				
 			default:
 				break;
 		}
@@ -124,6 +204,26 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	**/	
 	displayCodeSample(codeData) {
 		debugger;
+	}
+	
+	/**
+		Receive message from a peer by displaying the text in the message tab.
+	 **/
+	receiveMsgFrom(cmdObject) {
+		this.displayMessage(cmdObject.data[0], cmdObject.sender);
+	}
+	
+	displayMessage(msgTxt, sender) {
+		if (msgTxt) {
+			// prepend to the old messages
+			const displayMsg = `from ${sender}: ${msgTxt}\n`;
+			const currentMsgs = $(this.msgTextArea).val();
+			const newMessages = displayMsg + currentMsgs;
+			$(this.msgTextArea).val(newMessages);
+			// switch tab to message:
+			const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_MSG_CONSOLE);
+			this.prv_toggleTab(ti);
+		}
 	}
 	
 	/**
@@ -165,6 +265,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		// then run the new code from teacher
 		super.executeCode(codeText);
+		
+		// switch tab to output:
+		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_OUTPUT_CONSOLE);
+		this.prv_toggleTab(ti);
 	}
 	
 	/**
@@ -214,8 +318,12 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_BTN_RUN_CODE_ID}`;
 	}
 	
+	get videoScreen() {
+		return `#${VD_VIEDO_AREA}`;
+	}
+	
 	get copyNotesButton() {
-		return `#${YT_COPY_CODE_TO_NOTES}`;
+		return `#${YT_BTN_COPY_CODE_TO_NOTES}`;
 	}
 		
 	get clearResultButton() {
@@ -226,6 +334,24 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_TA_NOTES_ID}`;
 	}
 	
+	get outputConsoleTab() {
+		return `#${YT_TB_OUTPUT_CONSOLE}`;
+	}
+	
+	get notesConsoleTab() {
+		return `#${YT_TB_NOTES_CONSOLE}`;
+	}
+	
+	get msgConsoleTab() {
+		return `#${YT_TB_MSG_CONSOLE}`;
+	}
+	
+	
+	get msgTextArea() {
+		return `#${YT_TA_MSG_ID}`;
+	}
+	
+	
 	/**
 		Hnandle running code using text from code baord
 	**/
@@ -233,7 +359,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		e.preventDefault(); 
 		
 		//obtain code from local "exercise board" and execute it locally
-		super.runCodeFromTextInput();
+		this.runCodeFrom();
 	}
 	
 	/**
@@ -249,6 +375,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const newNotes = codeTxt + '\n' + noteTxt;
 		$(this.notesTextArea).val(newNotes);
 		this.prv_saveNotesToDb();
+		// switch tab to notes:
+		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_NOTES_CONSOLE);
+		this.prv_toggleTab(ti);
 	}
 	
 	/**

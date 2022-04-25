@@ -334,6 +334,16 @@ class CommunicationSpace {
 		console.log('send re-syned code:' + codeStr + ' to: ' + targetUser);
 	}
 	
+	/**
+		Send private message to my peer. 
+	 **/
+	sendPrivateMsg(msg, targetUser) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_PRIVATE_MSG, 
+										msg);	
+		this.sendMessageToUser(targetUser, cmd.str);
+		console.log('send private msg:' + msg + ' to: ' + targetUser);
+	}
+	
 	/**	
 		Execute command sent by peers. Derived class must override it.
 	**/	

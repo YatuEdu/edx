@@ -49,8 +49,15 @@
 						</div>						
 					</div>
 					<div class="col-10">
-						<div class="row mb-4">
-							<div class="col-1 text-left">	 
+						<div class="row mb-0">
+							<div class="col-11">
+								<textarea class="input-board"
+									  id="yt_ta_code_board" 
+									  spellcheck="false"
+									  placeholder="Type your code here...."
+									  rows="20"></textarea>
+							</div>
+							<div class="col-1">	 
 								<picture id="yt_btn_run_code_from_board" class="btn tiphost" >
 									<span class="tooltip">
 										<div class="tooltiptext">
@@ -60,8 +67,6 @@
 									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
 									<img src="/my-image.jpg" />
 								</picture>
-							</div>
-							<div class="col-1 text-left">	 
 								<picture id="yt_btn_copy_from_board" class="btn tiphost" >
 									<span class="tooltip">
 										<div class="tooltiptext">
@@ -72,41 +77,46 @@
 									<img src="/my-image.jpg" />
 								</picture>
 							</div>
-							<div class="col-1 text-left">
-								<picture id="yt_btn_clear_result" class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Erase Result</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+						</div>
+						<div class="row mb-0">
+							<div id="yt_tb_output_console" class="col-4 selected-tab">
+								<a class="nav-link" data-tabindex="0" href="#">Output</a>
+							</div>
+							<div id="yt_tb_notes_console"  class="col-4 unselected-tab">
+								<a class="nav-link" data-tabindex="1" href="#">Notes</a>
+							</div>
+							<div id="yt_tb_msg_console"  class="col-3 unselected-tab">
+								<a class="nav-link" data-tabindex="2" href="#">Messages</a>
 							</div>	
 						</div>
-						<div class="row mb-4">
-							<div class="col-8">
-								<textarea class="input-board"
-									  id="yt_ta_code_board" 
-									  spellcheck="false"
-									  placeholder="Type your code here...."
-									  rows="20"></textarea>
-							</div>
-							<div class="col-4">
+						<div class="row mb-0">
+							<div class="col-11">
 								<textarea class="output-board"
 										  id="yt_ta_output_console" 
 										  spellcheck="false" 
 										  placeholder="Output Console"
 										  rows="20"></textarea>
-							</div>
-						</div>
-						<div class="row mb-4">
-							<div class="col-8">
 								<textarea class="msg-board"
+								  style="display:none"
 								  id="yt_ta_notes" 
 								  spellcheck="false" 
-								  placeholder="My Notes for the Class"
-								  rows="10"></textarea>
+								  placeholder="My Study Notes"
+								  rows="20"></textarea>
+								 <textarea readonly class="msg-board"
+								  style="display:none"
+								  id="yt_ta_msg" 
+								  spellcheck="trye" 
+								  placeholder="Received messages"
+								  rows="20"></textarea>
 							</div>
-							<div class="col-4">
+							<div class="col-1">
+								<picture id="yt_btn_clear_result" class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Erase Output</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
 								<picture id="yt_btn_search_notes" class="btn tiphost" >
 									<span class="tooltip">
 										<div class="tooltiptext">
@@ -117,7 +127,26 @@
 									<img src="/my-image.jpg" />
 								</picture>
 							</div>
-						</div>	
+						</div>
+						<div class="row mb-0">
+							<div class="col-11">
+								<textarea class="msg-board"
+								  style="display:none"
+								  id="yt_ta_msg_input" 
+								  spellcheck="trye" 
+								  placeholder="Enter your messages"
+								  rows="3"></textarea>	
+							</div>
+							<div class="col-1">
+								<picture id="yt_btn_msg_send" class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Send Message to Teacher</div>
+									</span>
+									<source width="41" height="38" type="image/webp" srcSet="assets/images/tools/send_msg.webp" />
+									<img src="/my-image.jpg" />
+								</picture>			
+							</div>
+						</div>
 					</div>
 				</div>	
 			</section>

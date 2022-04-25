@@ -69,7 +69,7 @@ class UserDropdownSelection extends UserQuestionBase {
 		$(jqSel).change(function(e){
 			e.preventDefault();
 			const jqSelOpt = `#${self.myId} option:selected`;
-			const selVal = $( jqSelOpt).text();
+			const selVal = $(jqSelOpt).text();
 			self.setValue( selVal);
 		});
 	}
