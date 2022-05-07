@@ -475,6 +475,255 @@ class Net {
 	}
 
 	/**
+	 FinMind API for agent to get applications
+	 **/
+	static async agentClientUpdate(token, clientId, quickNote) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021843
+			},
+			data: {
+				clientId: clientId,
+				quickNote: quickNote
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for before upload file
+	 **/
+	static async beforeUploadFile(token, uploadFileName) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021818
+			},
+			data: {
+				pipelineKey: "",
+				applicationKey: "",
+				conversationKey: "",
+				fileName: uploadFileName,
+				operationType: 1,
+				userOpSelfFile: 1,
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+    /**
+     FinMind API for list upload file
+     **/
+    static async listUploadFile(token, uploadFileName) {
+        const requestData = {
+            header: {
+                token: token,
+                api_id: 2021818
+            },
+            data: {
+                pipelineKey: "",
+                applicationKey: "",
+                conversationKey: "",
+                fileName: uploadFileName,
+                operationType: 2,
+                userOpSelfFile: 1,
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
+	/**
+	 FinMind API for download file
+	 **/
+	static async downloadFile(token, fileName) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021818
+			},
+			data: {
+				pipelineKey: "",
+				applicationKey: "",
+				conversationKey: "",
+				fileName: fileName,
+				operationType: 3,
+				userOpSelfFile: 1,
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for delete file
+	 **/
+	static async deleteFile(token, fileName) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021818
+			},
+			data: {
+				pipelineKey: "",
+				applicationKey: "",
+				conversationKey: "",
+				fileName: fileName,
+				operationType: 4,
+				userOpSelfFile: 1,
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for delete file
+	 **/
+	static async getProductList(token, fileName) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021844
+			},
+			data: {
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for create insurance policy
+	 **/
+	static async insurancePolicyAdd(token, productId, clientId, insuredName, coverageAmount, effectiveDate, status) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021846
+			},
+			data: {
+				productId: productId,
+				clientId: clientId,
+				insuredName: insuredName,
+				coverageAmount: coverageAmount,
+				effectiveDate: effectiveDate,
+				status: status
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for create insurance policy
+	 **/
+	static async insurancePolicyList(token, pageSize, pageNo, name) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021845
+			},
+			data: {
+				name: name,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for add insurance policy file
+	 **/
+	static async insurancePolicyFileAdd(token, policyId, fileName, fileSize, fileNameUn) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021848
+			},
+			data: {
+				policyId: policyId,
+				fileName: fileName,
+				fileSize: fileSize,
+				fileNameUn: fileNameUn
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyFileList(token, policyId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021852
+			},
+			data: {
+				policyId: policyId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for delete insurance policy file
+	 **/
+	static async insurancePolicyFileDelete(token, policyId, fileId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021849
+			},
+			data: {
+				policyId: policyId,
+				fileId: fileId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for delete insurance policy file
+	 **/
+	static async findClient(token, email) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021851
+			},
+			data: {
+				email: email
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+
+
+	/**
 		compose finMind API request for starting to apply for a product
 	**/
 	static composeRequestDataForStartAplication_private(prodId, token){
