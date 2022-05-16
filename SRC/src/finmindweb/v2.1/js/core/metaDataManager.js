@@ -289,6 +289,10 @@ class MetaDataManager {
 	static get amountConvertionMap() {
 		return AMOUNT_CONVERTION_MAP;
 	}
+
+	static get enumTermCoverageYears() {
+		return enumTermCoverageYears;
+	}
 	
 	/**
 		get enumYesValueMap

@@ -51,16 +51,16 @@ const pageTemplate = `
 </div>
 `;
 const rowTemplate = `
-<tr>
+<tr id="{id}">
 	<td>{name}</td>
 	<td>{email}</td>
 	<td>{phone}</td>
 	<td>{address}</td>
 	<td>{birthday}</td>
 	<td>{regDate}</td>
-	<td>{quickNote}</td>
+	<td class="quickNote">{quickNote}</td>
 	<td>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" disabled>Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
@@ -110,18 +110,57 @@ class Clients {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
+				.replace('{id}', row.id)
 				.replace('{name}', row.first_name + " " + row.middle_name + " " + row.last_name)
 				.replace('{email}', row.email || '')
 				.replace('{phone}', row.phone_number || '')
 				.replace('{address}', '')
 				.replace('{birthday}', '')
 				.replace('{regDate}', new Date(row.join_date).toLocaleString() || '')
-				.replace('{quickNote}', '')
+				.replace('{quickNote}', row.quick_note || '')
 			);
 		}
+		let that = this;
+		$(".btnEdit").click(function (e) {
+			let val = $(this).text();
+			let row = $(this).parent().parent();
+
+			if (val==='Edit') {
+				that.editEnter(row);
+			} else {
+				that.editExit(row);
+			}
+			console.log();
+		});
 		return maxRowNumber;
 	}
 
+	editEnter(row) {
+		$(row).addClass("edit");
+		let quickNote = $(row).find(".quickNote");
+		let noteText = quickNote.html();
+		quickNote.html('');
+		quickNote.append($('<input class="form-control" type="text" value="'+noteText+'">'));
+
+		$(row).find(".btnEdit").text("Save");
+	}
+
+	async editExit(row) {
+		let clientId = parseInt(row.attr('id'));
+		let quickNote = $(row).find(".quickNote");
+		let quickNoteVal = quickNote.find(".form-control").val();
+		let res = await Net.agentClientUpdate(credMan.credential.token, clientId, quickNoteVal);
+		if (res.errCode!=0) {
+		    let errMsg = res.err.msg;
+		    alert(errMsg);
+		    return;
+        }
+        quickNote.empty();
+        quickNote.html(quickNoteVal);
+        $(row).removeClass("edit");
+        $(row).find(".btnEdit").text("Edit");
+        console.log();
+	}
 
 }
 
