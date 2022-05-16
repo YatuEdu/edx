@@ -58,7 +58,9 @@ const languageConstants = Object.freeze({
 	SIGNIN_NAME_INVALID_CHAR: "p_login_fld_nm_char", // login page error: name invalid
 	SIGNIN_NAME_NEEDED: "p_login_fld_nm",		// login page error: name expected
 	SIGNIN_PW_NEEDED: "p_login_fld_pw",			// login page error: pw expected
+	SIGNIN_PW_NOT_IDENTICAL: "p_login_fld_pw_not_identical",			// login page error: pw expected
 	SIGNUP_EMAIL_NEEDED: "p_signup_fld_em",		// login page error: pw expected
+	SIGNUP_TNA_NEEDED: "tna_needed",		// login page error: pw expected
 
 	SERVER_UNEXPECTED_ERR: "ge_une",			// generic error: unexpected service error
 	SERVER_ERROR_WITH_RESPONSE: "ge_une_res",  	// generic error: unexpected service error
@@ -69,5 +71,9 @@ const groupTypeConstants = Object.freeze({
 	GPT_EDU_JSP: 10,
 });
 
+const regexConstants = Object.freeze({
+	// email regex :
+	REG_FOR_EMAIL: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+});
 	
-export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants};
+export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants, regexConstants};

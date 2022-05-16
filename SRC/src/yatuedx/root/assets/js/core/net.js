@@ -15,6 +15,8 @@ const API_ADD_NOTES = 202120;
 const API_REGISTER_FOR_CLASS = 202121;
 const API_USER_UPDATE_NOTES=202124;
 const API_USER_GET_NOTES=202125;
+const API_SEND_CODE_TO_EMAIL=202122;
+const API_VALIDATE_EMAIL=202123; 
 
 class Net {
 	/**
@@ -36,11 +38,30 @@ class Net {
 	}
 	
 	/**
+		Yatu API for request service to send 6-digit code with email to
+		an email address
+	**/
+	static async sendCodeToEmail(emailAddr) {
+		const req = Net.composeRequestDataForSendCodeToEmail(emailAddr);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
 		Yatu API for user-token validness check.
 		Warning: do not call too often
 	**/
 	static async tokenCheck(token) {
 		const req = Net.composeRequestDataForTokenCheck(token);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for email-code verification check.
+	**/
+	static async emailCodeCheck(email, code) {
+		const req = Net.composeRequestDataForEmailCodeCheck(email, code);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -219,6 +240,45 @@ class Net {
 		};
 			
 		return Net.composePostRequestFromData_private(tokenCheckReq);
+	}
+	
+	/**
+		Forming Yatu API request data for EMAIL code validity test
+	**/	
+	static composeRequestDataForSendCodeToEmail(emailAddr) {
+		// query for the yatu token's validness
+		const emailSendCodeReq = {
+			header: {
+				token: "",
+				api_id: API_SEND_CODE_TO_EMAIL
+			},
+		
+			data: {
+				userEmail: emailAddr,
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailSendCodeReq);
+	}
+	
+	/**
+		Forming Yatu API request data for EMAIL code validity test
+	**/	
+	static composeRequestDataForEmailCodeCheck(email, code) {
+		// query for the yatu token's validness
+		const emailCodeCheckReq = {
+			header: {
+				token: "",
+				api_id: API_VALIDATE_EMAIL
+			},
+		
+			data: {
+				userEmail: email,
+				veriCode: code
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailCodeCheckReq);
 	}
 	
 	/**

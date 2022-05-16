@@ -11,41 +11,99 @@
 </head>
 <body>
     <main class="auth">
-        <div class="container-fluid">
-            <div class="row vh-100">
-                <div class="col-md-6 text-center d-flex flex-column justify-content-center auth-bg-section text-white" style="background-image: url(assets/images/register-bg.jpg)">
+        <div class="container-fluid text-center justify-content-center">
+            <div class="row text-center justify-content-center">
+  				<div class="col-8 text-center d-flex flex-column justify-content-center auth-bg-section text-white" style="background-image: url(assets/images/register-bg.jpg)">
                     <h1 class="text-reset">Welcome to CODEKING club</h1>
                     <p class="font-weight-bold text-reset">Where your coding dreams become reality.</p>
                 </div>
-                <div class="col-md-6 text-center d-flex flex-column justify-content-center">
-                    <div class="auth-form-section">
-                        <div class="logo"><img src="assets/images/logo-codeking.png" class="img-fluid" alt="Home" width="200"></div>
-                        <div class="auth-form">
-                            <div class="form-group">
-                                <label for="username" class="sr-only">Username</label>
-                                <input type="text" data-text-id="p_login_fld_nm" data-validation-id="p_login_fld_nm_char" name="username" id="user_name" class="form-control" placeholder="Username">
-                            </div>
-                            <div class="form-group">
-                            <label for="userEmail" class="sr-only">Email</label>
-                            <input type="email" name="userEmail" data-text-id="p_signup_fld_em" id="user_email" class="form-control" placeholder="Email">
-                            </div>
-                            <div class="form-group">
-                            <label for="userPassword" class="sr-only">Password</label>
-                            <input type="password" data-text-id="p_login_fld_pw" name="userPassword" id="user_password" class="form-control" placeholder="Password">
-                            </div>
-                            <button id="auth_button" type="button" class="btn btn-success btn-block mb-3">Register</button>
-                            <div class="form-check text-left">
-                                <input type="checkbox" class="form-check-input" name="termsAgriment" id="termsAgriment" value="termsAgreed">
-                                <label class="form-check-label" for="termsAgriment">
-                                    I agree to terms and conditions of this website
-                                </label>
-                            </div>
-                        </form>
-                        <p class="text-left mb-0">Already registered?<a href="login.html"> Login from here</a> </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+			</div>
+			<div class="row text-center justify-content-center">
+				<div class="col-8 text-center d-flex flex-column auth-bg-section justify-content-center text-white">
+					<a class="navbar-brand" href="index.html"><img src="assets/images/logo-codeking.png" class="img-fluid" alt="CODEKING"></a>
+				</div>
+			</div>
+			<div class="row mb-4 text-center justify-content-center">
+				<div class="col-8 text-center auth-bg-section justify-content-center text-white">
+					<div class="auth-form pre-email" id="yt_div_pre_email_vefication"  style="display:block">
+						<h5 class="text-reset">Enter your email address for us to validate it.</h5>
+						<div class="row mb-4">
+							<div class="col-3 text-right auth-bg-section text-white">
+								<label for="userEmail">Your email address</label>
+							</div>
+							<div class="col-8 text-center auth-bg-section text-white text-white">
+								<input type="text" name="registration" id="yt_inpt_email" class="form-control" autocomplete="new-password" placeholder="Email">
+							</div>
+						</div>
+						<div class="row mb-1" id="yt_rw_pre_email_vefication2">
+							<div class="col-3 text-right auth-bg-section text-white text-white">
+								<label for="emailCode">Email verification code</label>
+							</div>
+							<div class="col-5 text-center d-flex flex-column text-white">
+								<input type="text" data-text-id="yt_inpt_email_code" name="code" id="yt_inpt_email_code" class="form-control" placeholder="Enter email code">
+							</div>
+							<div class="col-3 text-center auth-bg-section text-white">
+								<button id="yt_btn_send_email_code" type="button" style="width:180px;height:90%" title="A six digit email code will be sent to your mail box upon request" class="btn btn-success btn-block float-right">Obtain email code</button>
+							</div>
+						</div>
+						<div class="row mb-1" id="yt_rw_pre_email_vefication3">
+							<div class="col-11 text-center auth-bg-section text-white">
+								<button id="yt_btn_verify_code" type="button" style="width:180px;height:90%"  title="Enter the six digit email code and press the button to verify your email." class="btn btn-success btn-block float-right">Verify email</button>
+							</div>
+						</div>
+					</div>
+					<div class="auth-form post-email" id="yt_div_post_email_vefication"  style="display:none">
+						<h5 class="text-reset">Name and password</h5>
+						<div class="row mb-1 form-group" >
+							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
+								<label for="username" >User name</label>
+							</div>
+							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
+								<input type="text" data-text-id="p_login_fld_nm" data-validation-id="p_login_fld_nm_char" name="username" id="user_name" class="form-control" placeholder="Username">
+							</div>
+						</div>
+						<div class="row mb-1 form-group"  >
+							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
+								<label for="userPassword">Password</label>
+							</div>
+							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
+								<input type="password" data-text-id="p_login_fld_pw" name="userPassword" id="user_password" class="form-control" placeholder="Password">
+							</div>
+						</div>
+						<div class="row mb-1 form-group"  >
+							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
+								<label for="userPassword">Re-enter password</label>
+							</div>
+							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
+								<input type="password" data-text-id="p_login_fld_pw2" name="userPassword2" id="user_password2" class="form-control" placeholder="Password">
+							</div>
+						</div>
+						<div class="row mb-1"  >
+							<div class="col-md-7 text-center d-flex flex-column justify-content-center">
+								<div class="float-right">
+									<input type="checkbox" name="termsAndAgreement" id="ytu_ckb_tna" value="">
+									<label id="yt_lbl_tna" class="form-check-label" for="termsAndAgreement">
+										I agree to terms and conditions of this website
+									</label>
+								</div>
+							</div>
+							<div class="col-md-4 text-center text-white">
+								<button id="auth_button" type="button" style="width:180px;height:75%" class="btn btn-success btn-block mb-3 float-right">Register</button>
+							</div>
+						</div>
+						<div class="row mb-1 post-email" id="yt_dv_post_email_vefication" >
+							<div class="col-md-7 text-right text-white">
+								<label class="form-check-label float-right">Already registered?</label>
+							</div>
+							<div class="col-md-4 text-center text-white">
+								<button id="yt_btn_login" type="button" style="width:180px;height:75%" class="btn btn-success btn-block mb-3 float-right">Login</button>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
     </main>
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
