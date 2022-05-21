@@ -628,7 +628,7 @@ class Net {
 	/**
 	 FinMind API for create insurance policy
 	 **/
-	static async insurancePolicyList(token, pageSize, pageNo, name) {
+	static async agentInsurancePolicyList(token, pageSize, pageNo, name) {
 		const requestData = {
 			header: {
 				token: token,
@@ -721,7 +721,45 @@ class Net {
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
 
+	/**
+	 FinMind API for client to list insurance policy
+	 **/
+	static async clientInsurancePolicyList(token, pageSize, pageNo, name) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021854
+			},
+			data: {
+				name: name,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
 
+	/**
+	 FinMind API for admin to list insurance policy
+	 **/
+	static async adminInsurancePolicyList(token, pageSize, pageNo, name) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021853
+			},
+			data: {
+				name: name,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
 
 	/**
 		compose finMind API request for starting to apply for a product

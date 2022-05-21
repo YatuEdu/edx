@@ -55,7 +55,7 @@ const note_template = `
 	This class manages both login and sigup workflow
 **/
 class QuestionAnswerRecorder extends HomeAndWizardHeader {
-	#applicationMan;
+		#applicationMan;
 	
 	
     constructor(credMan) {

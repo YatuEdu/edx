@@ -49,7 +49,7 @@ const pageTemplate = `
 						<th>ACTION</th>
 					</tr>
 				</thead>
-				<tbody class="list" id="list">	
+				<tbody class="list" id="list">
 				</tbody>
 			</table>	
 		</div>
@@ -73,7 +73,9 @@ const pageTemplate = `
 		</div>
 							
 	</div>
+	<div id="testContainer"></div>
 </div>
+
 `;
 
 const rowTemplate = `
@@ -81,7 +83,7 @@ const rowTemplate = `
 	<td>{clientName}</td>
 	<td>{clientEmail}</td>
 	<td class="product">{product}</td>
-	<td>{insuredName}</td>
+	<td class="insuredName">{insuredName}</td>
 	<td>{coverageAmount}</td>
 	<td class="effective-date">{effectiveDate}</td>
 	<td><a href="javascript:void(0);" class="viewFilesBtn">View</a></td>
@@ -198,7 +200,7 @@ class InsurancePolicies {
 	async requestList(searchBy, pageNo) {
 		let pageSize = 10;
 		let maxRowNumber;
-		let res = await Net.insurancePolicyList(credMan.credential.token, pageSize, pageNo, searchBy);
+		let res = await Net.agentInsurancePolicyList(credMan.credential.token, pageSize, pageNo, searchBy);
 		$('#list').empty();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
@@ -219,7 +221,7 @@ class InsurancePolicies {
 
 		let that = this;
 		$(".btnEdit").click(function (e) {
-			return;
+
 			let val = $(this).text();
 			let row = $(this).parent().parent();
 
@@ -258,6 +260,15 @@ class InsurancePolicies {
 			}
 		}
 		product.append($(productSelector));
+
+        let insuredName = $(row).find(".insuredName");
+        let insuredNameCurr = insuredName.html();
+        insuredName.html('');
+        let insuredNameInput = $(`
+			<input class="form-control form-control-lg">
+		`);
+        insuredNameInput.val(insuredNameCurr);
+        insuredName.append($(insuredNameInput));
 
 		$(row).find(".btnEdit").text("Save");
 	}
@@ -331,7 +342,7 @@ class InsurancePolicies {
 	handleViewFiles(e) {
 		let idStr = $(e.target).parents("tr").attr('id');
 		let id = parseInt(idStr);
-		let filePanel = new PolicyFilePanel(id);
+		let filePanel = new PolicyFilePanel(id, true);
 	}
 
 	closeFilterSide() {

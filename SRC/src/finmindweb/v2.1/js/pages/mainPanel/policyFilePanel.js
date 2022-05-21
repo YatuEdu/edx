@@ -116,9 +116,11 @@ const deleteConfirmTemplate = `
 class PolicyFilePanel {
 
 	#policyId;
+	#canEdit;
 
-	constructor(policyId) {
+	constructor(policyId, canEdit) {
 		this.#policyId = policyId;
+		this.#canEdit = canEdit;
 		this.init();
 	}
 
@@ -128,39 +130,43 @@ class PolicyFilePanel {
 		$('#viewfile-1').remove();
 		$("body").append(pageTemplate);
 		$("body").append(deleteConfirmTemplate);
-		$('#uploadToolbar').append(fileInputBlkTemplate);
-		$('#uploadToolbar').append(progressTemplate);
-		$('#fileInput').change(e => {
-			e.preventDefault();
-			let fileList = e.target.files;
-			this.handleUploadFile(fileList[0]);
-		});
-		$('#fileInputBlk').on('drop dragdrop', (e) => {
-			console.log('drop');
-			e.preventDefault();
-			e.stopPropagation();
-			const files = e.originalEvent.dataTransfer.files;
-			this.handleUploadFile(files[0]);
-		});
-		$('#fileInputBlk').on('dragover', (e) => {
-			e.stopPropagation();
-			e.preventDefault();
-			e.originalEvent.dataTransfer.dropEffect = 'copy';
-		});
-		$('#fileInputBlk').on('dragenter', (e) => {
-			e.preventDefault();
-			console.log('dragenter');
-			this.counter++;
-			$('#fileInputBlk').addClass('is_active');
-		});
-		$('#fileInputBlk').on('dragleave', (e) => {
-			e.preventDefault();
-			console.log('dragleave');
-			this.counter--;
-			if (this.counter === 0) {
-				$('#fileInputBlk').removeClass('is_active');
-			}
-		});
+		if (this.#canEdit === true) {
+			$('#uploadToolbar').append(fileInputBlkTemplate);
+			$('#uploadToolbar').append(progressTemplate);
+
+			$('#fileInput').change(e => {
+				e.preventDefault();
+				let fileList = e.target.files;
+				this.handleUploadFile(fileList[0]);
+			});
+			$('#fileInputBlk').on('drop dragdrop', (e) => {
+				console.log('drop');
+				e.preventDefault();
+				e.stopPropagation();
+				const files = e.originalEvent.dataTransfer.files;
+				this.handleUploadFile(files[0]);
+			});
+			$('#fileInputBlk').on('dragover', (e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				e.originalEvent.dataTransfer.dropEffect = 'copy';
+			});
+			$('#fileInputBlk').on('dragenter', (e) => {
+				e.preventDefault();
+				console.log('dragenter');
+				this.counter++;
+				$('#fileInputBlk').addClass('is_active');
+			});
+			$('#fileInputBlk').on('dragleave', (e) => {
+				e.preventDefault();
+				console.log('dragleave');
+				this.counter--;
+				if (this.counter === 0) {
+					$('#fileInputBlk').removeClass('is_active');
+				}
+			});
+		}
+
 
 
 		$('#viewfile-1').modal('show');
@@ -225,8 +231,13 @@ class PolicyFilePanel {
 						.replace('{fileNameUn}', fileNameUn)
 				);
 			}
-			$('.deleteBtn').off('click');
-			$('.deleteBtn').click(this.handleDelete.bind(this));
+			if (this.#canEdit===true) {
+				$('.deleteBtn').off('click');
+				$('.deleteBtn').click(this.handleDelete.bind(this));
+			} else {
+				$('.deleteBtn').prop('disabled', true);
+			}
+
 			$('.fileViewBtn').off('click');
 			$('.fileViewBtn').click(this.handleFileView.bind(this));
 
