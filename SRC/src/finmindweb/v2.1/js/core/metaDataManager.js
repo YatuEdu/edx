@@ -92,6 +92,8 @@ const AMOUNT_CONVERTION_MAP = new Map([
 	['$10 millions',  10000000],
 ]);
 
+const enumPolicyStatus = ['active', 'fulfilled', 'lapsed', 'surrendered'];
+
 const enumCoverageType =  ['Term life', 'Permanent life'];
 const enumTermCoverageYears = [
 	'Permanent life',
@@ -292,6 +294,13 @@ class MetaDataManager {
 
 	static get enumTermCoverageYears() {
 		return enumTermCoverageYears;
+	}
+
+	/**
+	 get policy status map
+	 **/
+	static get getPolicyStatus() {
+		return enumPolicyStatus;
 	}
 	
 	/**

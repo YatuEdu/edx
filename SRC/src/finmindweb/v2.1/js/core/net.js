@@ -628,6 +628,30 @@ class Net {
 	/**
 	 FinMind API for create insurance policy
 	 **/
+	static async insurancePolicyUpdate(token, id, productId, clientId, insuredName, coverageAmount, effectiveDate, status) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021847
+			},
+			data: {
+				id: id,
+				productId: productId,
+				clientId: clientId,
+				insuredName: insuredName,
+				coverageAmount: coverageAmount,
+				effectiveDate: effectiveDate,
+				status: status
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for create insurance policy
+	 **/
 	static async agentInsurancePolicyList(token, pageSize, pageNo, name) {
 		const requestData = {
 			header: {
@@ -760,6 +784,93 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
+
+	/**
+	 FinMind API for admin to list insurance policy
+	 **/
+	static async userInqueryAdd(token, insuredName, relationship, coverageAmount, coverageTime,
+								intendedInsurer, quoteDetails, owner, resolution) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021858
+			},
+			data: {
+				insuredName: insuredName,
+				relationship:relationship,
+				coverageAmount:coverageAmount,
+				coverageTime:coverageTime,
+				intendedInsurer:intendedInsurer,
+				quoteDetails:quoteDetails,
+				owner:owner,
+				resolution:resolution
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to list insurance policy
+	 **/
+	static async userInqueriesList(token, pageSize, pageNo, name) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021855
+			},
+			data: {
+				name: name,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+    /**
+     FinMind API for admin to list insurance policy
+     **/
+    static async adminInquiriesList(token, pageSize, pageNo, name) {
+        const requestData = {
+            header: {
+                token: token,
+                api_id: 2021857
+            },
+            data: {
+                name: name,
+                pageSize: pageSize,
+                pageNo: pageNo
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
+    /**
+     FinMind API for admin to assign inquiries to agent
+     **/
+    static async adminInquiriesAssignTo(token, inquiryId, owner) {
+        const requestData = {
+            header: {
+                token: token,
+                api_id: 2021859
+            },
+            data: {
+                name: name,
+                inqueryId: inquiryId,
+                owner: owner
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
 
 	/**
 		compose finMind API request for starting to apply for a product

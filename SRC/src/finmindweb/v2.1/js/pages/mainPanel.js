@@ -12,6 +12,8 @@ import {People} from './mainPanel/people.js'
 import {AllApplications} from './mainPanel/allApplications.js'
 import {AllInsurancePolicies} from './mainPanel/allInsurancePolicies.js'
 import {ChangeLogs} from './mainPanel/changeLogs.js'
+import {MyInquiries} from './mainPanel/myInquiries.js'
+import {AllInquiries} from './mainPanel/allInquiries.js'
 
 const page_template = `
 <div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
@@ -75,6 +77,11 @@ const menu_clients = `
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>Insurance Policies
 	</a>
 </li>
+<li class="my-2">
+	<a class="fm-sw" href="#myInquiries">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>My Inquiries
+	</a>
+</li>
 `;
 
 const menu_admin = `
@@ -99,6 +106,11 @@ const menu_admin = `
 <li class="my-2">
 	<a class="fm-sw" href="#allInsurancePolicies">
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>All Insurance Policies
+	</a>
+</li>
+<li class="my-2">
+	<a class="fm-sw" href="#allInquiries">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 1.875V6.25h1.25V1.875h-1.25zM7.79 6.906L3.37 2.487l-.884.884 4.42 4.42.884-.885zm4.42 0l4.419-4.419.883.884-4.419 4.42-.884-.885zM11.25 10a1.25 1.25 0 0 1-2.333.625H1.875v-1.25h7.042a1.25 1.25 0 0 1 2.332.625zm-4.344 2.21l-4.42 4.42.884.883 4.42-4.42-.884-.883zm6.187 0l4.42 4.42-.884.883-4.42-4.42.884-.883zm5.032-2.835h-4.376v1.25h4.376v-1.25zm-8.75 8.75V13.75h1.25v4.375h-1.25z" fill="#1F232E"/></svg>All Inquiries
 	</a>
 </li>
 <li class="my-2">
@@ -212,6 +224,12 @@ class MainPageHandler {
 				break;
 			case 'changeLogs':
 				new ChangeLogs(container);
+				break;
+			case 'myInquiries':
+				new MyInquiries(container);
+				break;
+			case 'allInquiries':
+				new AllInquiries(container);
 				break;
 		}
 		$(".fm-sw").removeClass('active');

@@ -126,6 +126,13 @@ class ProductRecommended {
 
             const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
             const qMap = this.prot_deserialize(sessionStore);
+            const attrMap = new Map();
+			let attrArr = [];
+			for (let [key, value] of qMap) {
+				attrMap.set(value.attr_id, value.sv1);
+				console.log(key + ' = ' + JSON.stringify(value));
+				attrArr.push(value);
+			}
             let appCoverageTime = qMap.get(8031).sv1;
             let appCoverageAmount = qMap.get(8030).sv1;
             let insuranceType;
@@ -140,6 +147,18 @@ class ProductRecommended {
             }
             totalFaceAmount = appCoverageAmount;
             premium = this.#recommendItems.get(prodId).premium;
+
+            let insuredName = null;
+            let relationship = attrMap.get(4);
+            let coverageAmount = attrMap.get(8030);
+            let coverageTime = attrMap.get(8031);
+            let intendedInsurer = null;
+            let owner = null;
+            let resolution = null;
+            let quoteDetails = JSON.stringify(attrArr);
+			await Net.userInqueryAdd(this.#credMan.credential.token, insuredName, relationship, coverageAmount, coverageTime,
+				intendedInsurer, quoteDetails, owner, resolution);
+
             this.#applicationMan = await new ApplicationPipelineManager(sessionStore, appId);
             let ret = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
 

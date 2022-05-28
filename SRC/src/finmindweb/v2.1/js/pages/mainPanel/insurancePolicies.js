@@ -4,6 +4,7 @@ import {Net} from "../../core/net.js";
 import {MetaDataManager} from "../../core/metaDataManager.js";
 import {Pagination} from "../../core/pagination.js";
 import {PolicyFilePanel} from "./policyFilePanel.js";
+import {UIUtil} from "../../core/uiUtil.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -84,10 +85,10 @@ const rowTemplate = `
 	<td>{clientEmail}</td>
 	<td class="product">{product}</td>
 	<td class="insuredName">{insuredName}</td>
-	<td>{coverageAmount}</td>
+	<td class="coverageAmount">{coverageAmount}</td>
 	<td class="effective-date">{effectiveDate}</td>
 	<td><a href="javascript:void(0);" class="viewFilesBtn">View</a></td>
-	<td class="idle-time">{status}</td>
+	<td class="status">{status}</td>
 	<td>{currentOwner}</td>
 	<td>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
@@ -194,7 +195,10 @@ class InsurancePolicies {
 
 		$('.viewFilesBtn').click(this.handleViewFiles.bind(this));
 		let res = await Net.getProductList(credMan.credential.token);
-		this.#productList = res.data;
+		this.#productList = new Map();
+		for(let item of res.data) {
+			this.#productList.set(item.name, item.id);
+		}
 	}
 
 	async requestList(searchBy, pageNo) {
@@ -205,13 +209,20 @@ class InsurancePolicies {
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
+			const amntMap = MetaDataManager.amountConvertionMap;
+			let amountStr = '';
+			amntMap.forEach(function(value, key) {
+				if (value===row.coverage_amount) {
+					amountStr = key;
+				}
+			})
 			$('#list').append(rowTemplate
 				.replace('{id}', row.id)
 				.replace('{clientName}', row.client_name || '')
 				.replace('{clientEmail}', row.client_email || '')
 				.replace('{product}', row.product || '')
 				.replace('{insuredName}', row.insured_name || '')
-				.replace('{coverageAmount}', row.coverage_amount || '')
+				.replace('{coverageAmount}', amountStr || '')
 				.replace('{effectiveDate}', row.effective_date || '')
 				.replace('{status}', row.status || '')
 				.replace('{currentOwner}', row.current_owner || '')
@@ -244,50 +255,44 @@ class InsurancePolicies {
 	editEnter(row) {
 		$(row).addClass("edit");
 		let product = $(row).find(".product");
-		let productCurr = product.html();
-		product.html('');
-		let productSelector = $(`
-			<select class="form-select form-control-lg">
-			</select>
-		`);
-		for(let product of this.#productList) {
-			$(productSelector).append($('<option>', {
-				value: product.id,
-				text: product.name
-			}));
-			if (product.name===productCurr) {
-				productSelector.val(product.id);
-			}
-		}
-		product.append($(productSelector));
-
-        let insuredName = $(row).find(".insuredName");
-        let insuredNameCurr = insuredName.html();
-        insuredName.html('');
-        let insuredNameInput = $(`
-			<input class="form-control form-control-lg">
-		`);
-        insuredNameInput.val(insuredNameCurr);
-        insuredName.append($(insuredNameInput));
-
+		UIUtil.uiEnterEdit(product, 'selector', this.#productList);
+		let insuredName = $(row).find(".insuredName");
+		UIUtil.uiEnterEdit(insuredName, 'text');
+		let coverageAmount = $(row).find(".coverageAmount");
+		const amntMap = MetaDataManager.amountConvertionMap;
+		UIUtil.uiEnterEdit(coverageAmount, 'selector', amntMap);
+		let effectiveDate = $(row).find(".effective-date");
+		UIUtil.uiEnterEdit(effectiveDate, 'date');
+		let status = $(row).find(".status");
+		const statusList = MetaDataManager.getPolicyStatus;
+		UIUtil.uiEnterEdit(status, 'selector', statusList);
 		$(row).find(".btnEdit").text("Save");
 	}
 
 	async editExit(row) {
 		let id = parseInt(row.attr('id'));
-		let quickNote = $(row).find(".quickNote");
-		let quickNoteVal = quickNote.find(".form-control").val();
-		let res = await Net.agentClientUpdate(credMan.credential.token, clientId, quickNoteVal);
+		let clientId = row
+		let product = $(row).find(".product");
+		let productVal = UIUtil.uiExitEdit(product, 'selector');
+		let insuredName = $(row).find(".insuredName");
+		let insuredNameVal = UIUtil.uiExitEdit(insuredName, 'text');
+
+		let coverageAmount = $(row).find(".coverageAmount");
+		let coverageAmountVal = UIUtil.uiExitEdit(coverageAmount, 'selector');
+		let effectiveDate = $(row).find(".effective-date");
+		let effectiveDateVal = UIUtil.uiExitEdit(effectiveDate, 'date');
+		let status = $(row).find(".status");
+		let statusVal = UIUtil.uiExitEdit(status, 'selector');
+
+		let res = await Net.insurancePolicyUpdate(credMan.credential.token, id, parseInt(productVal), 0,
+			insuredNameVal, parseInt(coverageAmountVal), effectiveDateVal, statusVal);
 		if (res.errCode!=0) {
 			let errMsg = res.err.msg;
 			alert(errMsg);
 			return;
 		}
-		quickNote.empty();
-		quickNote.html(quickNoteVal);
 		$(row).removeClass("edit");
 		$(row).find(".btnEdit").text("Edit");
-		console.log();
 	}
 
 	async handleCreateNew() {

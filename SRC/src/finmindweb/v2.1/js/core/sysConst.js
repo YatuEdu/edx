@@ -4,6 +4,7 @@ const sysConstants = {
 	FINMIND_BEST_PREMIUM_STORE_KEY: "finmind_bstprm_8838",
 	FINMIND_BENEFICIARY_STORE_KEY: 	"finmind_beneficiary_8838",
 	FINMIND_EXISTING_STORAGE_KEY: 	"finmind_existing_storage_8838",
+    FINMIND_INQUIRIES_VIEW_KEY:     "finmind_inquiries_view_8838",
 	
 	// TODO: REMOVE THIS AFTER FinMind is moved to AWS
 	FINMIND_PORT: "http://8.135.100.85:6012/bfwk-finmind",
