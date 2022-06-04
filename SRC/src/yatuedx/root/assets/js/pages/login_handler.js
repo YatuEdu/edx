@@ -2,7 +2,7 @@ import {sysConstants, languageConstants, regexConstants} 	from '../core/sysConst
 import {credMan} 						from '../core/credMan.js'
 import {uiMan} 							from '../core/uiManager.js';
 import {PageUtil}						from '../core/util.js';
-import {Net} 							from '../core/Net.js';
+import {Net} 							from '../core/net.js';
 
 const EMAIL_INPUT_CTRL = "#yt_inpt_email";
 const PW_INPUT_CTRL = "#user_password";
