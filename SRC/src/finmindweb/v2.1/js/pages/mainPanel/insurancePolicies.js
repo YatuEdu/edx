@@ -5,6 +5,8 @@ import {MetaDataManager} from "../../core/metaDataManager.js";
 import {Pagination} from "../../core/pagination.js";
 import {PolicyFilePanel} from "./policyFilePanel.js";
 import {UIUtil} from "../../core/uiUtil.js";
+import {InsurancePolicyDetails} from "./insurancePolicyDetails.js";
+import {SessionStoreAccess} from "../../core/sessionStorage.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -44,7 +46,7 @@ const pageTemplate = `
 						<th>INSURED NAME</th>
 						<th>COVERAGE AMOUNT</th>
 						<th class="sort" data-sort="effective-date">EFFECTIVE DATE</th>
-						<th>FILES</th>
+						<th>DETAILS</th>
 						<th>STATUS</th>
 						<th>CURRENT OWNER</th>
 						<th>ACTION</th>
@@ -87,7 +89,7 @@ const rowTemplate = `
 	<td class="insuredName">{insuredName}</td>
 	<td class="coverageAmount">{coverageAmount}</td>
 	<td class="effective-date">{effectiveDate}</td>
-	<td><a href="javascript:void(0);" class="viewFilesBtn">View</a></td>
+	<td><a href="javascript:void(0);" class="viewDetailsBtn">View</a></td>
 	<td class="status">{status}</td>
 	<td>{currentOwner}</td>
 	<td>
@@ -152,6 +154,7 @@ class InsurancePolicies {
 	#container;
 	#searchBy = '';
 	#productList;
+	#policiesMap;
 
     constructor(container) {
 		this.#container = container;
@@ -193,7 +196,7 @@ class InsurancePolicies {
 			new Pagination($('#table'), this.pageSize, maxRowNumber, this.handlePage.bind(this));
 		});
 
-		$('.viewFilesBtn').click(this.handleViewFiles.bind(this));
+		$('.viewDetailsBtn').click(this.handleViewDetails.bind(this));
 		let res = await Net.getProductList(credMan.credential.token);
 		this.#productList = new Map();
 		for(let item of res.data) {
@@ -201,13 +204,24 @@ class InsurancePolicies {
 		}
 	}
 
+	handleViewDetails(e) {
+		let idStr = $(e.target).parents("tr").attr('id');
+		let id = parseInt(idStr);
+		let detail = this.#policiesMap.get(id);
+		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_POLICY_DETAIL);
+		sessionStore.setItem(JSON.stringify(detail));
+		window.location.href = '#insurancePolicyDetails';
+	}
+
 	async requestList(searchBy, pageNo) {
 		let pageSize = 10;
 		let maxRowNumber;
 		let res = await Net.agentInsurancePolicyList(credMan.credential.token, pageSize, pageNo, searchBy);
 		$('#list').empty();
+		this.#policiesMap = new Map();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
+			this.#policiesMap.set(row.id, row);
 			maxRowNumber = row.maxRowNumber;
 			const amntMap = MetaDataManager.amountConvertionMap;
 			let amountStr = '';
@@ -215,7 +229,7 @@ class InsurancePolicies {
 				if (value===row.coverage_amount) {
 					amountStr = key;
 				}
-			})
+			});
 			$('#list').append(rowTemplate
 				.replace('{id}', row.id)
 				.replace('{clientName}', row.client_name || '')

@@ -1,4 +1,3 @@
-import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
 
 const SIGNUP_PATH="./prelogin/join.html";

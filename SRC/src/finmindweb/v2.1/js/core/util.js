@@ -128,6 +128,16 @@ class StringUtil {
 		const num = s.replace(new RegExp(',', 'g'), '');
 		return parseInt(num, 10);
 	}
+
+
+	static randomString(e) {
+		e = e || 32;
+		let t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+			a = t.length,
+			n = "";
+		for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+		return n;
+	}
 }
 
 class ArrayUtil {
@@ -163,6 +173,7 @@ class ValidUtil {
 			return true;
 		}
 	}
+
 }
 
 export { TimeUtil, StringUtil, ArrayUtil, ValidUtil };

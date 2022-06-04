@@ -871,6 +871,247 @@ class Net {
         return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
     }
 
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyCashValueList(token, policyId, pageSize, pageNo) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021871
+			},
+			data: {
+				policyId: policyId,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyDeathBenefitList(token, policyId, pageSize, pageNo) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021872
+			},
+			data: {
+				policyId: policyId,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyCashValueRemove(token, policyId, year) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021861
+			},
+			data: {
+				policyId: policyId,
+				year: year
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyDeathBenefitRemove(token, policyId, year) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021865
+			},
+			data: {
+				policyId: policyId,
+				year: year
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyCashValueRemoveAll(token, policyId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021862
+			},
+			data: {
+				policyId: policyId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyDeathBenefitRemoveAll(token, policyId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021866
+			},
+			data: {
+				policyId: policyId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+    /**
+     FinMind API for add insurance policy cash value
+     **/
+    static async insurancePolicyCashValueAdd(token, policyId, year, cashValue) {
+        const requestData = {
+            header: {
+                token: token,
+                api_id: 2021860
+            },
+            data: {
+                policyId: policyId,
+                year: year,
+                cashValue: cashValue
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
+	/**
+	 FinMind API for add insurance policy cash value
+	 **/
+	static async insurancePolicyDeathBenefitAdd(token, policyId, year, deathBenefit) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021864
+			},
+			data: {
+				policyId: policyId,
+				year: year,
+				deathBenefit: deathBenefit
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyReminderList(token, policyId, pageSize, pageNo) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021870
+			},
+			data: {
+				policyId: policyId,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyReminderAdd(token, policyId, remind_content, date, email, status) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021867
+			},
+			data: {
+				policyId: policyId,
+				remind_content: remind_content,
+				date: date,
+				email: email,
+				status: status
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyReminderEdit(token, reminderId, policyId, remind_content, date, email, status) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021868
+			},
+			data: {
+				reminderId: reminderId,
+				policyId: policyId,
+				remind_content: remind_content,
+				date: date,
+				email: email,
+				status: status
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list insurance policy file
+	 **/
+	static async insurancePolicyReminderRemove(token, reminderId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021869
+			},
+			data: {
+				reminderId: reminderId,
+				policyId: 1,
+				remind_content: '',
+				date: '2022-06-01',
+				email: '',
+				status: ''
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
 
 	/**
 		compose finMind API request for starting to apply for a product
@@ -881,14 +1122,14 @@ class Net {
 				token: token,
 				api_id: 2021807
 			},
-			data: {					
+			data: {
 				prodId: prodId,
 				applicantRelationShip: 0
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		compose finMind API request for Best Premium
 	**/	

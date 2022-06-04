@@ -14,6 +14,7 @@ import {AllInsurancePolicies} from './mainPanel/allInsurancePolicies.js'
 import {ChangeLogs} from './mainPanel/changeLogs.js'
 import {MyInquiries} from './mainPanel/myInquiries.js'
 import {AllInquiries} from './mainPanel/allInquiries.js'
+import {InsurancePolicyDetails} from "./mainPanel/insurancePolicyDetails.js";
 
 const page_template = `
 <div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
@@ -152,8 +153,21 @@ class MainPageHandler {
 		if (splits.length==2) {
 			subPage = splits[1];
 		}
+		if (subPage.indexOf('?')!=-1) {
+			subPage = subPage.split('?')[0];
+		}
 		this.switchPage(subPage);
-
+		let that = this;
+		window.addEventListener("popstate", function(e) {
+			console.log("popstate" + document.URL);
+			if (document.URL.indexOf('mainPanel.html')!=-1) {
+				let page = document.URL.split('mainPanel.html#')[1];
+				if (page.indexOf('?')!=-1) {
+					page = page.split('?')[0];
+				}
+				that.switchPage(page);
+			}
+		}, false);
 	}
 
 	loadMenus() {
@@ -230,6 +244,9 @@ class MainPageHandler {
 				break;
 			case 'allInquiries':
 				new AllInquiries(container);
+				break;
+			case 'insurancePolicyDetails':
+				new InsurancePolicyDetails(container);
 				break;
 		}
 		$(".fm-sw").removeClass('active');

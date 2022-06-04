@@ -93,6 +93,7 @@ const AMOUNT_CONVERTION_MAP = new Map([
 ]);
 
 const enumPolicyStatus = ['active', 'fulfilled', 'lapsed', 'surrendered'];
+const enumReminderStatus = ['Scheduled', 'Overdue', 'Completed', 'Cancelled'];
 
 const enumCoverageType =  ['Term life', 'Permanent life'];
 const enumTermCoverageYears = [
@@ -301,6 +302,13 @@ class MetaDataManager {
 	 **/
 	static get getPolicyStatus() {
 		return enumPolicyStatus;
+	}
+
+	/**
+	 get policy reminder status map
+	 **/
+	static get getPolicyReminderStatus() {
+		return enumReminderStatus;
 	}
 	
 	/**
