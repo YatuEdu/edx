@@ -75,6 +75,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// accept tab and insert \t
 		this.setTabHandler();
 		
+		// handle key up 
+		$(this.codeInputTextArea).mouseup(this.handleMouseUp.bind(this));
+
 		// hook up event 'send code sample'
 		$(this.syncBoardButton).click(this.handleSyncBoard.bind(this));
 		
@@ -175,6 +178,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		msgReceiverDropdown  = MSG_RECEIVER_SELECTION_TEMPLATE
 									.replace('{opt_body}', msgReceiverNames);
 		$(this.msgReceiverSelect).html(msgReceiverDropdown);
+	}
+	
+	/**
+		Handle mouse up event by getting the text selection and pass the selection info to peers
+	**/
+	handleMouseUp() {
+		const {begin, end} = this.getSelection();
+		if (typeof(begin) != "undefined" && typeof(end) != "undefined" && begin != end) {
+			this.#displayBoardTeacher.setSelection(begin, end);
+		}
 	}
 	
 	/**

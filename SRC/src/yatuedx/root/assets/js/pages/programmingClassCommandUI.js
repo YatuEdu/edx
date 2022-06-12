@@ -39,6 +39,16 @@ class ProgrammingClassCommandUI extends AuthPage {
 	}
 	
 	/**
+		get seolected text range
+	 **/
+	getSelection() {
+		return {
+				begin: $(this.codeInputTextArea).prop('selectionStart'),
+				end:   $(this.codeInputTextArea).prop('selectionEnd')
+		};
+	}
+	
+	/**
 		Stub function for handling timer. Calls the actual handler "v_handleTimer", which would be provided
 		by the child class, who knows what to do.
 	 **/
@@ -168,6 +178,28 @@ class ProgrammingClassCommandUI extends AuthPage {
 			this.selectionEnd=start+1; 
 			e.stopPropagation();
 			e.preventDefault(); 			
+		}
+	}
+	
+	/*
+		Highlight a text selection based on teacher instruction
+	 */
+	highlightSelection(begin, end) {
+		const txt = document.getElementById(this.#codeInputId);
+		if(txt.createTextRange ) {
+		  const selRange = txt.createTextRange();
+		  selRange.collapse(true);
+		  selRange.moveStart('character', begin);
+		  selRange.moveEnd('character', end);
+		  selRange.select();
+		  txt.focus();
+		} else if(txt.setSelectionRange ) {
+		  txt.focus();
+		  txt.setSelectionRange(begin, end);
+		} else if( typeof txt.selectionStart != 'undefined' ) {
+		  txt.selectionStart = begin;
+		  txt.selectionEnd = end;
+		  txt.focus();
 		}
 	}
 	

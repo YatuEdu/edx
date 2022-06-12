@@ -63,7 +63,6 @@ class ClassRegisterPageHandler extends IndexPageHandler {
 		$("#yt_div_class_series").append(columnHtml );
 		// handle registration events
 		const btnClass = `.${BTN_CLASS_FOR_REGISTER}`;
-		$("#yt_div_class_series").append(columnHtml);
 		$(btnClass).click(this.handleRegistration.bind(this));
 	}
 	

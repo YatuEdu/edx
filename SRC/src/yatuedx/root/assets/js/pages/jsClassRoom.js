@@ -72,7 +72,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to msg
 		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
-		
+			
 		// itialize notes we saved before
 		this.initNotes();
 	}
@@ -171,6 +171,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 				this.updateCodeSample(cmd.data);
 				break;
+				
+			// highlight a range of text
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT:
+				this.highlightSelection(cmd.data[0], cmd.data[1]);
+				break;			
 			
 			// resync my code with teachwer
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:

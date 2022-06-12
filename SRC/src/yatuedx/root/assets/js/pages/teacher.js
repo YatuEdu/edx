@@ -3,7 +3,7 @@ import {credMan} 							from '../core/credMan.js'
 import {uiMan} 								from '../core/uiManager.js'
 import {IndexPageHandler} 					from './index.js'
 
-const GO_TO_CLASS_REGISTER_PAGE = "yt_lnk_topic_id_main";
+const BTN_CLASS_REGISTER = "#yt_btn_signup_class";
 /**
 	This class manages both login and sigup workflow
 **/
@@ -22,14 +22,14 @@ class TeacherPageHandler extends IndexPageHandler {
 		
 		// decide if I am logged in or not
 		this.#loggedIn = await credMan.hasLoggedIn();
-		$( "#yt_lnk_topic_id_main" ).click(this.registerClass.bind(this));
+		$( BTN_CLASS_REGISTER ).click(this.registerClass.bind(this));
 	}
 	
 	async registerClass(e) {
 		e.preventDefault();
 		
 		// obtain class series id
-		const subjectId = $( "#yt_lnk_topic_id_main").attr("data-subject-id");
+		const subjectId = $(BTN_CLASS_REGISTER).attr("data-subject-id");
 		if (!this.#loggedIn) {
 			// go to login pageX 
 			window.location.href = `./login.html?subject=${subjectId}`;

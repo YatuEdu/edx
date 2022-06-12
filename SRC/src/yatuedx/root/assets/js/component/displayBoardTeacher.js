@@ -57,6 +57,14 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	}
 	
 	/**
+		Highlight code selection text for all students
+	 **/
+	setSelection(begin, end) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT, begin, end);
+		this.sendMessageToGroup(cmd.str);
+	}
+	
+	/**
 		Run code sample we swent prior to this command on student's board remotely
 		for all students who are attending the class
 	 **/
