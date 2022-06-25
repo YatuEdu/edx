@@ -2,6 +2,8 @@ import {sysConstants} from '../../core/sysConst.js'
 import {credMan} from '../../core/credManFinMind.js'
 import {Net} from "../../core/net.js";
 import {Pagination} from "../../core/pagination.js";
+import {UIUtil} from "../../core/uiUtil.js";
+import {MetaDataManager} from "../../core/metaDataManager.js";
 
 const pageTemplate = `
 	<div class="card h-100 border-0 rounded-0">
@@ -63,7 +65,7 @@ const pageTemplate = `
 `;
 
 const rowTemplate = `			
-<tr>
+<tr id="{appId}">
 	<td>
 		<input class="form-check-input" type="checkbox">
 	</td>
@@ -74,10 +76,11 @@ const rowTemplate = `
 	<td>{ca}</td>
 	<td class="create-date">{cd}</td>
 	<td class="last-update-time">{ut}</td>
-	<td>{s}</td>
+	<td class="status">{s}</td>
 	<td class="idle-time">{it}</td>
 	<td>{dp}</td>
 	<td>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary viewButton" appId="{appId}">View</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary editButton" appId="{appId}">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
@@ -88,7 +91,8 @@ const pageSize = 10;
 class Applications {
 	#container;
 	#searchBy = '';
-	
+	#appStatusMapRevert;
+
     constructor(container) {
 		this.#container = container;
 		this.init();
@@ -98,6 +102,13 @@ class Applications {
 	async init() {
     	this.#container.empty();
     	this.#container.append(pageTemplate);
+
+
+		let appStatusMap = MetaDataManager.appStatusMap;
+		this.#appStatusMapRevert = new Map();
+		for(let [key,value] of appStatusMap) {
+			this.#appStatusMapRevert.set(value, key);
+		}
 
 		await this.requestList('', 1).then(maxRowNumber => {
 			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
@@ -110,6 +121,7 @@ class Applications {
 		let userList = new List('event-table', options);
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+		$('.viewButton').click(this.handleView.bind(this));
 		$('.editButton').click(this.handleEdit.bind(this));
 
 	}
@@ -122,7 +134,7 @@ class Applications {
 	async requestList(searchBy, pageNo) {
 		let pageSize = 10;
 		let maxRowNumber;
-		let res = await Net.getApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date desc');
+		let res = await Net.getApplications(credMan.credential.token, null, pageSize, pageNo, searchBy, 'start_date desc');
 		$('#list').empty();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
@@ -138,39 +150,54 @@ class Applications {
 				.replace('{s}', this.appStatus(row.status) || '')
 				.replace('{it}', '')
 				.replace('{dp}', row.agent_first_name + " " + row.agent_middle_name + " " + row.agent_last_name)
-				.replace('{appId}', row.id)
+				.replaceAll('{appId}', row.id)
 			);
 		}
 		return maxRowNumber;
 	}
 
-	handleEdit(e) {
+	handleView(e) {
 		let row = $(e.target);
 		let appId = row.attr("appId");
 		window.location.href = "/user/pipeline.html?appId="+appId;
 	}
 
-	appStatus(status) {
-    	switch (status) {
-			case 1:
-				return 'Started';
-				break;
-			case 2:
-				return 'Pending on Agent Review';
-				break;
-			case 3:
-				return 'Need more Information';
-				break;
-			case 4:
-				return 'Pending on Health Check';
-				break;
-			case 5:
-				return 'Approved';
-				break;
-			case 44:
-				return 'Declined';
-				break;
+	handleEdit(e) {
+		let val = $(e.target).text();
+		let row = $(e.target).parent().parent();
+
+		if (val==='Edit') {
+			this.editEnter(row);
+		} else {
+			this.editExit(row);
 		}
+	}
+
+	editEnter(row) {
+		$(row).addClass("edit");
+		let status = $(row).find(".status");
+		const appStatusMap = MetaDataManager.appStatusMap;
+		UIUtil.uiEnterEdit(status, 'selector', appStatusMap);
+		$(row).find(".editButton").text("Save");
+	}
+
+	async editExit(row) {
+		let id = parseInt(row.attr('id'));
+		let status = $(row).find(".status");
+		let statusVal = UIUtil.uiExitEdit(status, 'selector');
+
+		let res = await Net.updateApplicationStatus(credMan.credential.token, id, parseInt(statusVal));
+		if (res.errCode!=0) {
+			let errMsg = res.err.msg;
+			alert(errMsg);
+			return;
+		}
+		$(row).removeClass("edit");
+		$(row).find(".editButton").text("Edit");
+	}
+
+	appStatus(status) {
+    	return this.#appStatusMapRevert.get(status);
 	}
 
 	handleSearchSubmit(e) {

@@ -3,12 +3,12 @@ import {Net}          	from './net.js';
 /*
  Some known regex
  */
- 
+
  const REG_FOR_EVERYTHING 	   = /.*/gim;
  const REG_FOR_SSN 			   = /^\d{3}-?\d{2}-?\d{4}$/;
  const REG_FOR_US_PHONE_NUMBER = /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/;
  const REG_FOR_EMAIL 		   = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
- 
+
 /**
 	Enum strings.  TODO: generate them from finMind API
 **/
@@ -20,10 +20,10 @@ const enumDrinkingFrequency =  ['Never', 'Light', 'Social Occasion', 'Heavy' ];
 const enumResidence =  ['Own', 'Rent' ];
 const enumIncomeRange =  ['Under 20K', '20-50K', '50-100K', '100-150K', 'Above 150K'];
 const intention =  [
-	'Providing protection for my family, maximize death benefit', 
-	'Providing living benefits, long term care', 
-	'Providing living benefits with specified medical conditions', 
-	'Cash accumulation for supplemental income', 
+	'Providing protection for my family, maximize death benefit',
+	'Providing living benefits, long term care',
+	'Providing living benefits with specified medical conditions',
+	'Cash accumulation for supplemental income',
 	'Mortgage protection',
 	'Estate planning',
 	'I am not sure',
@@ -92,25 +92,33 @@ const AMOUNT_CONVERTION_MAP = new Map([
 	['$10 millions',  10000000],
 ]);
 
+const APP_STATUS = new Map([
+	['Started', 		1],
+	['Underwriting', 	10],
+	['Approved', 		20],
+	['Table rated', 	30],
+	['Rejected', 		44],
+]);
+
 const enumPolicyStatus = ['active', 'fulfilled', 'lapsed', 'surrendered'];
 const enumReminderStatus = ['Scheduled', 'Overdue', 'Completed', 'Cancelled'];
 
 const enumCoverageType =  ['Term life', 'Permanent life'];
 const enumTermCoverageYears = [
 	'Permanent life',
-	'10 years', 
-	'15 years', 
-	'20 years', 
-	'25 years', 
-	'30 years', 
-	'35 years', 
+	'10 years',
+	'15 years',
+	'20 years',
+	'25 years',
+	'30 years',
+	'35 years',
 	'40 years'];
 
 const enumApplicantRelationship = ['Self', 'Child', 'Parent', 'Spouse'];
 const enumBeneficiaryRelationship = ['Child', 'Spouse', 'Parent', 'Other'];
-const enumImminentEvent = 
-			['Want to consider living benefit option', 
-			 'Take or plan to take any of high-risk activities such as skydiving, scuba diving, car racing, hang gliding, ultralight flying, cave exploration, and etc.', 
+const enumImminentEvent =
+			['Want to consider living benefit option',
+			 'Take or plan to take any of high-risk activities such as skydiving, scuba diving, car racing, hang gliding, ultralight flying, cave exploration, and etc.',
 			 'A member of, or plan on joining any branch of, the Armed Forces or reserve military unit',
 			 'Want to consider adding accidental death benefits as rider',
 			 'Want to consider adding chronicle illness benefits as rider',
@@ -167,7 +175,7 @@ const enumAvocation= [
 	'Ballooning',
 	'Mountain Climbing',
 	];
-	
+
 const enumPaymentSchedule = [
 'Monthly',
 'Quarterly',
@@ -188,8 +196,8 @@ const enumInsCompanies = [
 'Other',
 ];
 
-	 
-// TODO: obtain this from server 
+
+// TODO: obtain this from server
 const enumMap = new Map([
     [ 6, enumValueForSex ],  			// enum type for sex
     [ 7, enumValueForMarriage],  		// enum type for marriage status
@@ -205,7 +213,7 @@ const enumMap = new Map([
 	[ 34, enumImminentEvent],  			// enum type for emerneng events
 	[ 19, intention],					// enum type for issurance purpose
 	[ 20, enumYesNo],  					// enum type for yes no question with extra text area
-	[ 25, enumUsCitizenOrNot],			
+	[ 25, enumUsCitizenOrNot],
 	[ 26, stateList],					// enum for US STATE LIST
 	[ 27, enumMilServices],				// enum for military services
 	[ 28, enumAvocation],				// enum for avocation
@@ -250,47 +258,55 @@ class MetaDataManager {
 	static get dropDownNoneSelection() {
 		return drop_down_none_selection;
 	}
-	
+
 	/**
 		get Reg_For_Everything
 	**/
 	static get regForEverything() {
 		return REG_FOR_EVERYTHING;
 	}
-	
+
 	/**
 		get reg_for_ssn
 	**/
 	static get regForSSN() {
 		return REG_FOR_SSN;
 	}
-	
+
 	/**
 		get REG_FOR_US_PHOMNE_NUMBER
 	**/
 	static get regForUSPhoneNumber() {
 		return REG_FOR_US_PHONE_NUMBER;
 	}
-	
+
 	/**
 		get REG_FOR_EMAIL
 	**/
 	static get regForeEmail() {
 		return REG_FOR_EMAIL;
 	}
-	
+
 	/**
 		get enumMap
 	**/
 	static get enumMap() {
 		return enumMap
 	}
-	
+
 	/**
 		get amount convertion map
 	**/
 	static get amountConvertionMap() {
 		return AMOUNT_CONVERTION_MAP;
+	}
+
+	/**
+	 * get app status map
+	 * @returns {*[]}
+	 */
+	static get appStatusMap() {
+		return APP_STATUS;
 	}
 
 	static get enumTermCoverageYears() {
@@ -310,28 +326,28 @@ class MetaDataManager {
 	static get getPolicyReminderStatus() {
 		return enumReminderStatus;
 	}
-	
+
 	/**
 		get enumYesValueMap
 	**/
 	static get enumYesValueMap() {
 		return enumYesValueMap;
 	}
-	
+
 	/*
 	  get attr name
 	  */
 	static get attrNames() {
 		return attrNameList;
 	}
-	
+
 	/**
 		get All supported attributes
-	**/	
+	**/
 	static get attrList() {
 		return attrList;
 	}
-	
+
 }
 
 export { MetaDataManager };

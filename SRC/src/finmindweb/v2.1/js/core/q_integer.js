@@ -5,9 +5,10 @@ const replacementForMin = '{min}';
 const replacementForMax = '{max}';
 const replacementValue  = '{val}';
 const replacementForLabel = '{lb}';
+const replacementFordDivId = '{divid}';
 
 const q_template_integer = `
-<div class="mb-4">
+<div class="mb-4" id="{divid}">
   <label for="attributes" class="form-label">{lb}</label>
   <input type="number" size="11" min="{min}"  max="{max}" step="1" 
        class="form-control form-control-lg {clss}" 
@@ -92,10 +93,11 @@ class UserIntegerQuestionText extends UserQuestionBase {
 	get displayHtml() {
 		const clssStr= this.uiClass;
 		const htmlStr = this.#templateToUse.replace(replacementForClass, clssStr)
-								   .replace(replacementForMin, this._min)
-								   .replace(replacementForMax, this._max)
-								   .replace(replacementForLabel, this.label)
-								   .replace(replacementValue, this._value);
+			.replace(replacementForMin, this._min)
+			.replace(replacementForMax, this._max)
+			.replace(replacementForLabel, this.label)
+			.replace(replacementValue, this._value)
+			.replace(replacementFordDivId, `${this.wrapperDivId}`);
 		return htmlStr; 
 	}
 	

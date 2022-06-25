@@ -3,6 +3,7 @@ import {SessionStoreAccess}			from '../core/sessionStorage.js'
 import {ApplicationPipelineManager} from "../core/applicationPipelineManager.js";
 import {Net} from "../core/net.js";
 import {credMan} from "../core/credManFinMind.js";
+import {ApplicationQAndAManager} from "../core/applicationQAndAManager.js";
 
 const TABLE_BODY_ID = 'fm_tb_recommended_products';
 
@@ -138,8 +139,7 @@ class ProductRecommended {
             let insuranceType;
             let totalFaceAmount;
             let premium;
-            let paymentMode;
-            let payYears;
+
             if (appCoverageAmount==='Permanent life') {
                 insuranceType = 'Permanent life';
             } else {
@@ -159,8 +159,23 @@ class ProductRecommended {
 			await Net.userInqueryAdd(this.#credMan.credential.token, insuredName, relationship, coverageAmount, coverageTime,
 				intendedInsurer, quoteDetails, owner, resolution);
 
-            this.#applicationMan = await new ApplicationPipelineManager(sessionStore, appId);
-            let ret = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
+			// TODO
+			let blockId = 1000;
+			let payMode = 'Monthly';
+			let payYears = '10';
+			const qXMLTemplate = '<block><qa><id>8031</id><strv>{coverageTime}</strv></qa><qa><id>1001</id><strv>{coverageAmount}</strv></qa><qa><id>1002</id><intv>{premium}</intv></qa><qa><id>1003</id><strv>{payMode}</strv></qa><qa><id>1004</id><intv>{payYears}</intv></qa></block>';
+			let qXML = qXMLTemplate.replace('{coverageTime}', coverageTime)
+				.replace('{coverageAmount}', coverageAmount)
+				.replace('{premium}', 30)
+				.replace('{payMode}', payMode)
+				.replace('{payYears}', payYears);
+			let ret = await Net.saveBlockQuestions(
+				appId,
+				blockId,
+				qXML,
+				this.#credMan.credential.token);
+            // this.#applicationMan = await new ApplicationPipelineManager(sessionStore, appId);
+            // let ret = await this.#applicationMan.validateAndSaveCurrentBlock(this.#credMan.credential.token);
 
 			window.location.href = "/user/pipeline.html?appId="+appId;
 		} else {

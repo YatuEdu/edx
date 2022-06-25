@@ -123,7 +123,14 @@ class LoginPageHandler {
         if (!this.#credMan.lastError) {
             // go to my page
             // window.location.href = INDEX_PATH;
-            history.go(-1);
+            // history.go(-1);
+            if ('referrer' in document) {
+                window.location = document.referrer;
+                /* OR */
+                //location.replace(document.referrer);
+            } else {
+                window.history.back();
+            }
         }
         else {
             // dispaly error message

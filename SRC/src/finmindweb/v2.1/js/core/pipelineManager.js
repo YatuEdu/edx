@@ -60,7 +60,23 @@ class PipelineManager {
 		inputElements.forEach(e => e.onChangeEvent());
 		
 		// now set the input value (or selection) if any
-		inputElements.forEach(e => e.setDisplayValue());	
+		inputElements.forEach(e => e.setDisplayValue());
+
+		// 对第一个block做特殊处理
+        if(this.blockId===1000) {
+            $("#user_question_block *").attr("disabled",true);
+            let qas = this._qAndAManager.currentQuestions;
+            let qaMap = new Map();
+            for(let qa of qas) {
+                let qObj = qa.qInfo;
+                qaMap.set(qObj.attr_id, qObj);
+            }
+            let appCoverageTime = qaMap.get(8031).sv1;
+            if (appCoverageTime!=='Permanent life') {
+                $('#fm_component_div_for_1003_undefined').hide();
+                $('#fm_component_div_for_1004_undefined').hide();
+            }
+        }
 	}
 	
 	/**

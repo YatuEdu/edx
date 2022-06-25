@@ -8,6 +8,7 @@ import {HomeAndWizardHeader} 		from './../pages/header.js';
 import {ApplicationQAndAManager}	from '../core/applicationQAndAManager.js'
 import { MessagingPanel } 			from '../core/messagingPanel.js'
 import {UploadedFileListPanel}		from '../core/fileListPanel.js';
+import {MetaDataManager} from "../core/metaDataManager.js";
 
 const page_template = `
 <div class="card position-fixed start-0 end-0 bottom-0 border-0 rounded-0 px-3 pb-3" style="top: 6rem;background: #F6F7FC;">
@@ -20,24 +21,17 @@ const page_template = `
             <span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
         </div>
         <div class="d-flex align-items-center mx-1">
-            <span class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
+            <span id="step2" class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
                 2
             </span>
-            <b class="mx-2 text-body text-black-50">PARAMED Exam</b>
+            <b  id="step2Text" class="mx-2 text-body text-black-50">Underwriting Process</b>
             <span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
         </div>
         <div class="d-flex align-items-center mx-1">
-            <span class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
+            <span id="step3" class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
                 3
             </span>
-            <b class="mx-2 text-body text-black-50">Underwriting Process</b>
-            <span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
-        </div>
-        <div class="d-flex align-items-center mx-1">
-            <span class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
-                4
-            </span>
-            <b class="mx-2 text-body text-black-50">Approved</b>
+            <b id="step3Text" class="mx-2 text-body text-black-50">Policy Delivery</b>
         </div>
     </div>
     
@@ -175,6 +169,85 @@ const page_template = `
 </div>
 `;
 
+const underWritingTemplateCustomer = `
+<p class="text-center fs-7 px-3">
+    Congratulations!  You have made a good progress. Your application will be sent to the insurance company by FinMind or the producer who you are working with.  Your application will be reviewed under an underwriting process.  The underwriting process consists of evaluating information and resources to determine how an individual will be classified (standard or substandard).
+</p>
+<h6 class="mt-5 mb-3">What's Next</h6>
+<p class="fs-7">
+    1.  Either the insurance company or your producer will schedule a paramedical exam to collect your medical information. You may receive email or phone call from a paramedical service provider for making an appointment. The most common service providers include:
+</p>
+<div class="d-flex justify-content-between px-5 mb-4">
+    <img src="../img/avatar-demo.jpeg" style="width: 120px;">
+    <img src="../img/avatar-demo.jpeg" style="width: 120px;">
+    <img src="../img/avatar-demo.jpeg" style="width: 120px;">
+</div>
+<p class="fs-7">
+    2.  In some cases the insurance company may have some additional documents for your signature. If required, you could use the messenger box on the right to upload your signed files. 
+</p>
+`;
+
+const approvedTemplate = `
+<img src="../img/passwordresetsuccessfully.png" class="d-block mx-auto" style="width: 35%;">
+<p class="text-center fs-7 px-5">
+    Congratulations! Your application has been approved. Please work with your producer or FinMind to finalize your application.
+</p>
+<p class="mt-4 fs-8 px-5 lh-lg text-body text-opacity-75">
+    1. Please make the first premium payment ready.  <br />
+    2. Your producer will deliver the policy to you either in hard copy or electronically. <br />
+    3.  When your application case is closed, you still can review it in my application page.<br />
+    4.  Please make sure your producer has uploaded the policy document and you can access it in my policy page.<br />
+    5.  You may consider setting up any reminders for yourself for future milestone.<br />
+    
+    Thank you for your business.<br />
+</p>
+`;
+
+const rejectedTemplate = `
+<img src="../img/wizardsorry.png" class="d-block my-5 mx-auto" style="width: 40%;">
+<p class="text-center fs-7 px-5">
+    We are sorry to tell you that your application was not approved. You can work with FinMind or your producer to select different product.
+</p>
+`;
+
+const needAdjustTemplate = `
+<img src="../img/wizardsorry.png" class="d-block my-5 mx-auto" style="width: 40%;">
+<p class="text-center fs-7 px-5">
+    The insurance company wishes to earn your business, however the rates need to be adjusted. You may work with your producer or FinMind to know more details. 
+</p>
+`;
+
+const underWritingTemplateProducer = `
+<div class="fs-7 mt-6">
+    <p>
+\tAt this stage, you have collected all the information required to complete the application to the insurance policy.  Please take special care with the accuracy of the application, and then complete the final application and submit to the insurance company.
+    </p>
+    <p>
+    \tIf any more information is required from customer, you could use the messenger tool on the right side of the page to communicate with the customer. 
+    </p>
+    <p>
+    \tNext you may need to coordiate with the insurance company to schedule a paramedical exam for the client if the exam shall not be waived.
+    </p> 
+    <p class="mt-5">
+        * Please keep the client updated with the latest status.
+    </p>
+</div>
+`;
+
+const policyTemplateProducer = `
+<div class="fs-7 mt-6">
+    <label class="form-label">The result of the application:</label>
+    <select id="statusSelector" class="form-select form-control-lg">
+        <option selected style="display:none">Please select</option>
+        <option value="20">Approved</option>
+        <option value="44">Rejected</option>
+        <option value="30">Table rated</option>
+    </select>
+    <p class="mt-4 lh-lg text-body text-opacity-75" id="resultTips">
+    </p>
+</div>
+`;
+
 const findProducer = `
 <a href="" class="fw-bold" data-bs-toggle="modal" data-bs-target="#FindProducerModal">Find a FinMind Producer</a>
 `;
@@ -191,6 +264,8 @@ class PipelinePageHandler {
     #currentBlockIsDynamic;
     #messagingPanel;
     #filePanel;
+    #appStatusMapRevert;
+    #appId;
 
     constructor(credMan) {
         this.#credMan = credMan;
@@ -203,6 +278,12 @@ class PipelinePageHandler {
         const loggedIn = await this.#credMan.hasLoggedIn();
         if (!loggedIn) {
             window.location.href = SIGNIN_PATH;
+        }
+
+        let appStatusMap = MetaDataManager.appStatusMap;
+        this.#appStatusMapRevert = new Map();
+        for(let [key,value] of appStatusMap) {
+            this.#appStatusMapRevert.set(value, key);
         }
 
         // when 'Start' button is clicked
@@ -230,13 +311,13 @@ class PipelinePageHandler {
 
 
         // const appId = 89899992;
-        let appId = parseInt(this.getUrlParam('appId'));
+        this.#appId = parseInt(this.getUrlParam('appId'));
 
         // 更新申请详情
-        await this.updateApplicationInfo(appId);
+        await this.updateApplicationInfo(this.#appId);
 
         // fill messages
-        this.#messagingPanel = new MessagingPanel(100, appId);
+        this.#messagingPanel = new MessagingPanel(100, this.#appId);
 
         const msgHtml = await this.#messagingPanel.getMessages();
         if (msgHtml) {
@@ -244,7 +325,7 @@ class PipelinePageHandler {
         }
 
         // fill uploaded files
-        this.#filePanel = new UploadedFileListPanel(appId);
+        this.#filePanel = new UploadedFileListPanel(this.#appId);
 
         const flHtml = await this.#filePanel.getUploadedFiles();
         if (flHtml) {
@@ -264,6 +345,7 @@ class PipelinePageHandler {
             let agentName = row.agent_name;
             let agentUserName = row.agent_user_name.trim();
             let userName = row.user_name.trim();
+            let status = row.applicatio_status;
             if (agentName!=null) {
                 $('#producerNameOrFindOne').append(producerName.replace('{producerName}', agentName));
             } else {
@@ -271,13 +353,29 @@ class PipelinePageHandler {
             }
             $('#customerName').text(userName);
 
-            if (this.#credMan.credential.name===userName) {
-                const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
-                this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
-                this.#applicationMan.initalizeState();
+                if (this.#credMan.credential.name===userName) {
+                // client view
+                if(status==='Started') {
+                    const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
+                    this.#applicationMan = new ApplicationPipelineManager(sessionStore, appId);
+                    this.#applicationMan.initalizeState();
+                } else if (status==='Underwriting') {
+                    this.showUnderWriting(true);
+                } else {
+                    this.showPolicyDelivery(status, true);
+                }
+
             } else if (this.#credMan.credential.name===agentUserName) {
-                let html = await this.showAllBlocQuestionAnswers(appId);
-                $('#user_question_block').html(html);
+                // agent view
+                if(status==='Started') {
+                    let html = await this.showAllBlocQuestionAnswers(appId);
+                    $('#user_question_block').html(html);
+                } else if (status==='Underwriting') {
+                    this.showUnderWriting(false);
+                } else {
+                    this.showPolicyDelivery(status, false);
+                }
+
             }
 
 
@@ -431,6 +529,120 @@ class PipelinePageHandler {
             }
         }
         return html;
+    }
+
+    showUnderWriting(userView) {
+        this.lightUpStep2();
+        $('#fm_wz_block_name').text("Underwriting");
+        if(userView) {
+            $('#fm_wz_block_description').parent().append(underWritingTemplateCustomer);
+            $('#fm_wz_next_block_button').text("Back to My Applications");
+            $('#fm_wz_next_block_button').off('click');
+            $('#fm_wz_next_block_button').click(e => {
+                window.location.href = '/mainPanel/mainPanel.html#myApplication';
+            });
+        } else {
+            $('#fm_wz_block_description').parent().append(underWritingTemplateProducer);
+            $('#fm_wz_next_block_button').text("Back to Applications");
+            $('#fm_wz_next_block_button').off('click');
+            $('#fm_wz_next_block_button').click(e => {
+                window.location.href = '/mainPanel/mainPanel.html#applications';
+            });
+
+        }
+
+    }
+
+    lightUpStep2() {
+        $('#step2').removeClass('text-body text-black-50');
+        $('#step2').addClass('bg-primary text-white');
+        $('#step2Text').removeClass('text-body text-black-50');
+    }
+
+    lightUpStep3() {
+        $('#step3').removeClass('text-body text-black-50');
+        $('#step3').addClass('bg-primary text-white');
+        $('#step3Text').removeClass('text-body text-black-50');
+    }
+
+    showPolicyDelivery(status, userView) {
+        this.lightUpStep2();
+        this.lightUpStep3();
+        $('#fm_wz_block_name').text("Policy Delivery");
+        if (userView) {
+            if (status==='Approved') {
+                $('#fm_wz_block_description').parent().append(approvedTemplate);
+            } else if (status==='Table rated') {
+                $('#fm_wz_block_description').parent().append(needAdjustTemplate);
+            } else if (status==='Rejected') {
+                $('#fm_wz_block_description').parent().append(rejectedTemplate);
+            }
+            $('#fm_wz_next_block_button').text("Back to My Applications");
+            $('#fm_wz_next_block_button').off('click');
+            $('#fm_wz_next_block_button').click(e => {
+                window.location.href = '/mainPanel/mainPanel.html#myApplication';
+            });
+        } else {
+            $('#fm_wz_block_description').parent().append(policyTemplateProducer);
+            let appStatusMap = MetaDataManager.appStatusMap;
+            let statusVal = appStatusMap.get(status);
+            let setContent = () => {
+                let val =  $('#statusSelector').val();
+                let tips = '';
+                switch (val) {
+                    case '20':
+                        tips = '\tHere are the list of tasks when the application is approved.<br />\n' +
+                            '\t1.  Notify the client that the application has been approved and send congratulations.<br />\n' +
+                            '\t2.  Remind the client to set up the bank account with first premium payment ready. add sufficient funding<br />\n' +
+                            '\t3.  Deliver the policy package to the client.   <br />\n' +
+                            '\t4.  Go to policy page and create a policy for client.  Allow the client to view the policy document. <br />\n' +
+                            '\t5.  Set up any reminders for important milestones of the policies.<br />';
+
+                        break;
+                    case '30':
+                        tips = '\tHere are the list of tasks when the application is table rated.<br />\n' +
+                            '\t1.   Notify the client that the application has been table rated.<br />\n' +
+                            '\t2.  Explain what is table rated and why.<br />\n' +
+                            '\t3.  If client chooses accept the product, finalize the application and deliver the policy to client.  Create a policy for client in policy page and allow client to view the documents.<br />\n' +
+                            '\t4.  If client doesn\'t accept the table rates, work with client to searching for new product with new application. Then set this state as complete.<br />';
+                        break;
+                    case '44':
+                        tips = '\tHere are the list of tasks when the application is rejected.<br />\n' +
+                            '\t1.   Notify the client that the application has been rejected.<br />\n' +
+                            '\t2.  Help client to find new product.<br />\n' +
+                            '\t3.  Set this state as complete.<br />';
+                        break;
+                }
+                $('#resultTips').html(tips);
+            };
+            $('#statusSelector').change(ee => {
+                setContent();
+            });
+            $('#statusSelector').val(statusVal);
+            setContent();
+            // if (status==='Approved') {
+            //     $('#fm_wz_block_description').parent().append(policyTemplateProducer);
+            // } else if (status==='Table rated') {
+            //     $('#fm_wz_block_description').parent().append(needAdjustTemplate);
+            // } else if (status==='Rejected') {
+            //     $('#fm_wz_block_description').parent().append(rejectedTemplate);
+            // }
+            $('#fm_wz_next_block_button').text("Confirm");
+            $('#fm_wz_next_block_button').off('click');
+            $('#fm_wz_next_block_button').click(async e => {
+                let val =  $('#statusSelector').val();
+                let res = await Net.updateApplicationStatus(credMan.credential.token, this.#appId, parseInt(val));
+                if (res.errCode!=0) {
+                    let errMsg = res.err.msg;
+                    alert(errMsg);
+                    return;
+                } else {
+                    alert('updated');
+                }
+                // window.location.href = '/mainPanel/mainPanel.html#myApplication';
+            });
+        }
+
     }
 
 }

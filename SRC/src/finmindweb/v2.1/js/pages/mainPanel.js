@@ -15,6 +15,7 @@ import {ChangeLogs} from './mainPanel/changeLogs.js'
 import {MyInquiries} from './mainPanel/myInquiries.js'
 import {AllInquiries} from './mainPanel/allInquiries.js'
 import {InsurancePolicyDetails} from "./mainPanel/insurancePolicyDetails.js";
+import {MyDashboard} from "./mainPanel/myDashboard.js";
 
 const page_template = `
 <div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
@@ -36,6 +37,11 @@ const page_template = `
 const menu_me = `
 <li class="my-2">
 	<div class="px-3 text-body text-opacity-50 fs-8 pb-2">Me</div>
+</li>
+<li class="my-2">
+	<a class="fm-sw" href="#myDashboard">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 4.375c1.68 0 3.258.442 4.622 1.217l-.922.922a8.125 8.125 0 0 0-11.82 6.944l-.005.292H.625A9.375 9.375 0 0 1 10 4.375zm8.125 9.375a8.09 8.09 0 0 0-.89-3.7l.923-.923a9.325 9.325 0 0 1 1.212 4.32l.005.303h-1.25zm.271-7.513l-.884-.884-7.954 7.955.883.884 7.955-7.955z" fill="#1F232E"/></svg>My Dashboard
+	</a>
 </li>
 <li class="my-2">
 	<a class="fm-sw" href="#myApplication">
@@ -203,6 +209,9 @@ class MainPageHandler {
 	switchPage(page) {
 		let container = $('#subMainPageContainer');
 		switch(page) {
+			case 'myDashboard':
+				new MyDashboard(container);
+				break;
 			case 'myApplication':
 				new MyApplication(container);
 				break;

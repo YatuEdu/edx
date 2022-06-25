@@ -2,7 +2,7 @@ import {sysConstants} from './sysConst.js'
 
 const API_FOR_BENEFICIARY_INFO = 2021819;
 const API_FOR_CONTINGENT_BENEFICIARY_INFO = 2021821;
-const API_FOR_FILE_UPLOAD = 2021818; 
+const API_FOR_FILE_UPLOAD = 2021818;
 const API_FOR_MESSAGE_RETRIEVAL = 2021823;
 const API_FOR_MESSAGE_SENDING = 2021824;
 const API_FOR_PIPELINE_BLOCKS = 2021829;
@@ -27,22 +27,22 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	static async loginWithEmail(email, userPassword) {
 		const req = Net.composeRequestDataForLoginWithEmail_private(email, userPassword);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for registering a new user
-	**/	
+	**/
 	static async signUp(userFirstName, userMiddleName, userLastName, email, userPassword) {
 		const req = Net.composeRequestDataForSignUp_private(userFirstName, userMiddleName, userLastName, email, userPassword);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for user sign-out
 	**/
@@ -51,28 +51,28 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for starting an application for a product id
-	**/	
+	**/
 	static async startAplication(prodId, token) {
 		const req = Net.composeRequestDataForStartAplication_private(prodId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for getting a block of user-questions
-	**/	
+	**/
 	static async getBlockQuestions(appId, token) {
 		const req = Net.composeRequestDataForUserQuestionBlock_private(appId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for getting basic info for a block
-	**/	
+	**/
 	static async getBlockInfo(blockId) {
 		const req = Net.composeRequestDataForBlockInfo_private(blockId);
 		// remote call
@@ -88,90 +88,90 @@ class Net {
 			       };
 		}
 	}
-	
+
 	/**
-		FinMind API for getting app beneficiary 
-	**/	
+		FinMind API for getting app beneficiary
+	**/
 	static async getBeneficiaryInfo(appId, token) {
 		const req = Net.composeRequestDataForAppBeneficiaryInfo_private(appId, token, API_FOR_BENEFICIARY_INFO);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for getting app CONTINGENT beneficiary INFO
-	**/	
+	**/
 	static async getContingentBeneficiaryInfo(appId, token) {
 		const req = Net.composeRequestDataForAppBeneficiaryInfo_private(appId, token, API_FOR_CONTINGENT_BENEFICIARY_INFO);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for getting app existing isurance
-	**/	
+	**/
 	static async getEixstingInsuranceInfo(appId, token) {
 		const req = Net.composeRequestDataForAppEixstingInsuranceInfo_private(appId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
-		FinMind API for getting all block ids for all the answered questions 
+		FinMind API for getting all block ids for all the answered questions
 		for an application for a given user
-	**/	
+	**/
 	static async getAppPipelineBlocks(appId, token) {
 		const req = Net.composeRequestDataForAppPipelineBlocks_private(appId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
-		FinMind API for getting all the answered questions 
+		FinMind API for getting all the answered questions
 		for a given pipeline block of an application for a given user
-	**/	
+	**/
 	static async getQAForBlockOfApp(appId, blockId, token) {
 		const req = Net.composeRequestDataForGettingQAForABlock_private(appId, blockId, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for saving a block of user-questions-answerws
-	**/	
+	**/
 	static async saveBlockQuestions(appId, blckId, questions, token) {
 		const req = Net.composeRequestDataForSavingUserQuestionBlock_private(appId, blckId, questions, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for getting the next block of user-questions for anonymous user
-	**/	
+	**/
 	static async getWizardQuestions(prodId, blckId) {
 		const req = Net.composeRequestDataForNextWizardBlock_private(prodId, blckId);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		FinMind API for updating block branching information
-	**/	
+	**/
 	static async agentUpdateBlockBranchingConditions(token, blockId, xml) {
 		const req = Net.composeRequestDataForUpdateBlockBranchingConditions_private(token, blockId, xml);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
-		FinMind API for getting a QUOTE premium 
-	**/	
+		FinMind API for getting a QUOTE premium
+	**/
 	static async getPremiumQuote(xml, token) {
 		const req = Net.composeRequestDataForGetPremiumQuote_private(xml, token);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 		Yatu API for user-token validness check.
 		Warning: do not call too often
@@ -181,7 +181,7 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 	 *  API for file uploading
 	 *	operation:
@@ -192,14 +192,14 @@ class Net {
 	 */
 	static async fileUpload(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
 		const req = Net.composeRequestDataForFileOperation_private(
-						t, uploadFileName, 
+						t, uploadFileName,
 						pipleLineKey, appKey,
-						conversationKey, 
+						conversationKey,
 						FILE_UPLOAD_OP, 0);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 	 *  API for file listing
 	 *	operation:
@@ -210,15 +210,15 @@ class Net {
 	 */
 	static async getUploadedFiles(t, pipleLineKey, appKey, conversationKey) {
 		const req = Net.composeRequestDataForFileOperation_private(
-						t, EMPTY_FILE_NAME, 
-						pipleLineKey, appKey, 
-						conversationKey, 
+						t, EMPTY_FILE_NAME,
+						pipleLineKey, appKey,
+						conversationKey,
 						FILE_LIST_OP,
 						0);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 	 *  API for file removal
 	 *	operation:
@@ -229,14 +229,14 @@ class Net {
 	 */
 	static async deleteUploadedFiles(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
 		const req = Net.composeRequestDataForFileOperation_private(
-						t, uploadFileName, 
-						pipleLineKey, appKey, 
-						conversationKey, 
+						t, uploadFileName,
+						pipleLineKey, appKey,
+						conversationKey,
 						FILE_DELETE_OP);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
 	 *  API for file downloading
 	 *	operation:
@@ -247,36 +247,36 @@ class Net {
 	 */
 	static async downloadUploadedFiles(t, uploadFileName, pipleLineKey, appKey, conversationKey) {
 		const req = Net.composeRequestDataForFileOperation_private(
-						t, uploadFileName, 
-						pipleLineKey, appKey, 
-						conversationKey, 
+						t, uploadFileName,
+						pipleLineKey, appKey,
+						conversationKey,
 						FILE_DOWNLOAD_OP);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 
 	/**
-		FinMind API for Best premium 
-	**/	
+		FinMind API for Best premium
+	**/
 	static async getBestPremium(quoteXML) {
 		const req = Net.composeRequestDataForBestPremium_private(quoteXML, API_FOR_BEST_PREMIUM_QUOTE);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
-		FinMind API for getting all messages 
-	**/	
+		FinMind API for getting all messages
+	**/
 	static async getMessages(appId, token) {
 		const req = Net.composeRequestDataForGetMessages_private(appId, token, API_FOR_MESSAGE_RETRIEVAL);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
-	
+
 	/**
-		FinMind API for sending a message 
-	**/	
+		FinMind API for sending a message
+	**/
 	static async sendMessages(appId, type, msg, token) {
 		const req = Net.composeRequestDataForSendingMessages_private(appId, token, type, msg, API_FOR_MESSAGE_SENDING);
 		// remote call
@@ -467,6 +467,25 @@ class Net {
 				pageNo: pageNo,
 				searchBy: searchBy,
 				orderBy: orderBy
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to update application's status
+	 **/
+	static async updateApplicationStatus(token, appId, status) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021873
+			},
+			data: {
+				appId: appId,
+				status: status
 			}
 		};
 		const req =  Net.composePostRequestFromData_private(requestData);
@@ -1114,6 +1133,80 @@ class Net {
 	}
 
 	/**
+	 FinMind API for list statistics completed applications
+	 **/
+	static async statisticsCompletedApplications(token, from, to) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021875
+			},
+			data: {
+				from: from,
+				to: to
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list statistics created applications
+	 **/
+	static async statisticsCreatedApplications(token, from, to) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021876
+			},
+			data: {
+				from: from,
+				to: to
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list total amount money
+	 **/
+	static async statisticsTotalAmountMoney(token, from, to) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021877
+			},
+			data: {
+				from: from,
+				to: to
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for list statistics created applications
+	 **/
+	static async userInsurancePolicyGetAll(token) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021874
+			},
+			data: {
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
 		compose finMind API request for starting to apply for a product
 	**/
 	static composeRequestDataForStartAplication_private(prodId, token){
@@ -1132,7 +1225,7 @@ class Net {
 
 	/**
 		compose finMind API request for Best Premium
-	**/	
+	**/
 	static composeRequestDataForBestPremium_private(quoteXML, apiId) {
 		const requestData = {
 			header: {
@@ -1145,7 +1238,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	static composeRequestDataForGetMessages_private(applicationId, t, apiId) {
 		const requestData = {
 			header: {
@@ -1158,7 +1251,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	static composeRequestDataForSendingMessages_private(applicationId, t, type, msgText, apiId) {
 		const requestData = {
 			header: {
@@ -1173,7 +1266,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	static composeRequestDataForFileOperation_private(t, uploadFileName, pipleLineKey, appKey, conversationKey, op, userOpSelfFile) {
 		const requestData = {
 			header: {
@@ -1189,10 +1282,10 @@ class Net {
 				userOpSelfFile: userOpSelfFile
 			}
 		};
-		
+
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		compose finMind API request for user-question
 	**/
@@ -1202,13 +1295,13 @@ class Net {
 				token: token,
 				api_id: 2021805
 			},
-			data: {					
+			data: {
 				appId: appId,
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		compose finMind API request for app-beneficiary
 	**/
@@ -1218,26 +1311,26 @@ class Net {
 				token: token,
 				api_id: apiId
 			},
-			data: {					
+			data: {
 				appId: appId,
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	static composeRequestDataForAppPipelineBlocks_private(appId, token) {
 		const requestData = {
 			header: {
 				token: token,
 				api_id: API_FOR_PIPELINE_BLOCKS
 			},
-			data: {					
+			data: {
 				appId: appId,
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/*
 		Compose request for API: API_FOR_GETTING_QA_IN_BLOCK to get all questions/answers
 		for a given block.
@@ -1248,15 +1341,15 @@ class Net {
 				token: token,
 				api_id: API_FOR_GETTING_QA_IN_BLOCK
 			},
-			data: {					
+			data: {
 				appId: appId,
 				currentBlockId: blockId
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
-	
+
+
 	/**
 		compose finMind API request for app-existing insurance
 	**/
@@ -1266,13 +1359,13 @@ class Net {
 				token: token,
 				api_id: 2021822
 			},
-			data: {					
+			data: {
 				appId: appId,
 			}
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/*
 		finMind API request forming for Login API
 	*/
@@ -1282,14 +1375,14 @@ class Net {
 				token: "",
 				api_id: API_FOR_SIGN_IN_WITH_NAME
 			},
-			data: {					
+			data: {
 				name: userName,
 				pwh: sha256(sha256(userPassword))
 			}
 		};
 		return Net.composePostRequestFromData_private(loginData);
 	}
-	
+
 	/*
 		finMind API request format for Login (with email) API
 	*/
@@ -1299,15 +1392,15 @@ class Net {
 				token: "",
 				api_id: API_FOR_SIGN_IN_WITH_EMAIL
 			},
-			data: {					
+			data: {
 				name: email,
 				pwh: sha256(sha256(userPassword))
 			}
 		};
 		return Net.composePostRequestFromData_private(loginData);
 	}
-	
-	
+
+
 	/**
 		Yatu API for user-sign up and register for Yatu service
 	**/
@@ -1317,8 +1410,8 @@ class Net {
 				token: "",
 				api_id: 202101
 			},
-			
-			data: {					
+
+			data: {
 				name: email,
 				email: email,
 				fistName: userFirstName,
@@ -1329,7 +1422,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(loginData);
 	}
-	
+
 	/**
 		Yatu API request for user sign-out
 	**/
@@ -1339,13 +1432,13 @@ class Net {
 				token: token,
 				api_id: 200001
 			},
-			
-			data: {					
+
+			data: {
 			}
 		};
 		return Net.composePostRequestFromData_private(loginData);
 	}
-	
+
 	/**
 		finMind request forming for token validation
 	**/
@@ -1356,13 +1449,13 @@ class Net {
 				token: t,
 				api_id: 200000
 			},
-		
-			data: {}					
+
+			data: {}
 		};
-			
+
 		return Net.composePostRequestFromData_private(queryData);
 	}
-	
+
 	/**
 		finMind request forming for block info retriever API
 	**/
@@ -1378,7 +1471,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		finMind request forming for saving user questions API
 	**/
@@ -1396,7 +1489,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		finMind request forming for API of obtaining next block of wizard questions
 	**/
@@ -1413,7 +1506,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	static composeRequestDataForGetPremiumQuote_private(xml, token) {
 		const requestData = {
 			header: {
@@ -1437,14 +1530,14 @@ class Net {
 				<checkedOptions>CHRONICLE_ILLNESS_RIDER</checkedOptions>
 				<coverageAmount>200000</coverageAmount>
 				coverageTime>10</coverageTime>
-				</quoteRequest> 
+				</quoteRequest>
 				*/
 			}
 		};
-		
+
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		finMind request forming for API of updating block branching information
 	**/
@@ -1461,7 +1554,7 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(requestData);
 	}
-	
+
 	/**
 		forming request data for finMind API calls
 	**/
@@ -1472,17 +1565,17 @@ class Net {
 			body: JSON.stringify(data),
 		};
 	}
-	
+
 	/**
 		main method for doing Yatu post API calls
 	**/
 	static async remoteCall(url, requestOptions) {
 		const ret = {data: null, code: 0, err: "" };
-		
+
 		try {
-			
+
 			const response = await fetch(url, requestOptions);
-			
+
 			if (!response.ok) {
 				const message = uiMan.getTextWithParams(languageConstants.SERVER_ERROR_WITH_RESPONSE, response.status);
 				throw new Error(message);
@@ -1492,7 +1585,7 @@ class Net {
 			ret.data = res.data;
 			ret.errCode = res.result.code
 			if (ret.errCode !== 0) {
-				ret.err = {code: ret.errCode, msg: res.result.msg}; 
+				ret.err = {code: ret.errCode, msg: res.result.msg};
 			}
 		}
 		catch (ex) {
@@ -1505,4 +1598,4 @@ class Net {
 
 export { Net };
 
-	
+
