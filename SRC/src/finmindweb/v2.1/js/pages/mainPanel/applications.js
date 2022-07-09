@@ -47,6 +47,7 @@ const pageTemplate = `
 							<th>COVERAGE AMOUNT</th>
 							<th class="sort" data-sort="create-date">CREATE DATE</th>
 							<th class="sort" data-sort="last-update-time">LAST UPDATE TIME</th>
+							<th>STATE</th>
 							<th>STATUS</th>
 							<th class="sort" data-sort="idle-time">IDLE TIME</th>
 							<th>DELIGATE PRODUCER</th>
@@ -76,15 +77,22 @@ const rowTemplate = `
 	<td>{ca}</td>
 	<td class="create-date">{cd}</td>
 	<td class="last-update-time">{ut}</td>
+	<td class="state">{st}</td>
 	<td class="status">{s}</td>
 	<td class="idle-time">{it}</td>
 	<td>{dp}</td>
-	<td>
+	<td class="action">
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary viewButton" appId="{appId}">View</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary editButton" appId="{appId}">Edit</button>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
+<!--		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>-->
 	</td>
 </tr>
+`;
+
+const templateAccept = `
+<button type="button" class="btn btn-sm border-0 btn-outline-primary acceptButton" appId="{appId}">Accept</button>
+/
+<button type="button" class="btn btn-sm border-0 btn-outline-primary rejectButton" appId="{appId}">Reject</button>
 `;
 const pageSize = 10;
 
@@ -92,6 +100,7 @@ class Applications {
 	#container;
 	#searchBy = '';
 	#appStatusMapRevert;
+	#appStateMapRevert;
 
     constructor(container) {
 		this.#container = container;
@@ -109,21 +118,27 @@ class Applications {
 		for(let [key,value] of appStatusMap) {
 			this.#appStatusMapRevert.set(value, key);
 		}
+		let appStateMap = MetaDataManager.appStateMap;
+		this.#appStateMapRevert = new Map();
+		for(let [key,value] of appStateMap) {
+			this.#appStateMapRevert.set(value, key);
+		}
 
 		await this.requestList('', 1).then(maxRowNumber => {
 			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
 		});
 
-		let options = {
-			valueNames: [ 'create-date','last-update-time','idle-time' ]
-		};
-
-		let userList = new List('event-table', options);
+		// let options = {
+		// 	valueNames: [ 'create-date','last-update-time','idle-time' ]
+		// };
+		//
+		// let userList = new List('event-table', options);
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
 		$('.viewButton').click(this.handleView.bind(this));
 		$('.editButton').click(this.handleEdit.bind(this));
-
+		$('.acceptButton').click(this.handleAccept.bind(this));
+		$('.rejectButton').click(this.handleReject.bind(this));
 	}
 
 	async handlePage(page) {
@@ -147,11 +162,16 @@ class Applications {
 				.replace('{ca}', row.coverage_amount || '')
 				.replace('{cd}', new Date(row.start_date).toLocaleString() || '')
 				.replace('{ut}', new Date(row.last_update).toLocaleString() || '')
+				.replace('{st}', this.appState(row.state) || '')
 				.replace('{s}', this.appStatus(row.status) || '')
 				.replace('{it}', '')
 				.replace('{dp}', row.agent_first_name + " " + row.agent_middle_name + " " + row.agent_last_name)
 				.replaceAll('{appId}', row.id)
 			);
+			if (row.state==1) {
+				$('#'+row.id).children('.action').append(templateAccept.replaceAll('{appId}', row.id));
+			}
+
 		}
 		return maxRowNumber;
 	}
@@ -170,6 +190,30 @@ class Applications {
 			this.editEnter(row);
 		} else {
 			this.editExit(row);
+		}
+	}
+
+	async handleAccept(e) {
+		let row = $(e.target);
+		let appId = parseInt(row.attr("appId"));
+		let res = await Net.agentAcceptApp(credMan.credential.token, appId, '1');
+		if (res.errCode!=0) {
+			alert('error occur');
+		} else {
+			alert('accept!');
+			await this.requestList(this.#searchBy, 1);
+		}
+	}
+
+	async handleReject(e) {
+		let row = $(e.target);
+		let appId = parseInt(row.attr("appId"));
+		let res = await Net.agentAcceptApp(credMan.credential.token, appId, '0');
+		if (res.errCode!=0) {
+			alert('error occur');
+		} else {
+			alert('reject!');
+			await this.requestList(this.#searchBy, 1);
 		}
 	}
 
@@ -194,6 +238,10 @@ class Applications {
 		}
 		$(row).removeClass("edit");
 		$(row).find(".editButton").text("Edit");
+	}
+
+	appState(state) {
+		return this.#appStateMapRevert.get(state);
 	}
 
 	appStatus(status) {

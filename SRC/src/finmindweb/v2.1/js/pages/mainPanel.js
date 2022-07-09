@@ -16,6 +16,7 @@ import {MyInquiries} from './mainPanel/myInquiries.js'
 import {AllInquiries} from './mainPanel/allInquiries.js'
 import {InsurancePolicyDetails} from "./mainPanel/insurancePolicyDetails.js";
 import {MyDashboard} from "./mainPanel/myDashboard.js";
+import {CommercialLoan} from "./mainPanel/commercialLoan.js";
 
 const page_template = `
 <div class="container-fluid position-fixed start-0 end-0 bottom-0 p-0" style="top: 6rem;">
@@ -123,6 +124,11 @@ const menu_admin = `
 <li class="my-2">
 	<a class="fm-sw" href="#changeLogs">
 		<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><g fill="#1F232E" fill-rule="nonzero"><path d="M14.4 8c.331 0 .6.293.6.655 0 .328-.222.6-.511.647l-.09.007H9.6c-.331 0-.6-.293-.6-.654 0-.33.222-.601.511-.648L9.601 8H14.4zM14.4 11c.331 0 .6.293.6.655 0 .328-.222.6-.511.647l-.09.007H9.6c-.331 0-.6-.293-.6-.654 0-.33.222-.601.511-.648l.09-.007H14.4z"/><path d="M16.667 2H3.334A1.332 1.332 0 0 0 2 3.333v13.333C2 17.403 2.597 18 3.334 18h13.333A1.333 1.333 0 0 0 18 16.665V3.333C18 2.597 17.403 2 16.667 2zM3.334 3.333h13.332v13.334l-13.332-.001V3.333z"/><path d="M6.654 2c.33 0 .601.247.648.568l.007.099v14.666a.66.66 0 0 1-.655.667.659.659 0 0 1-.647-.568L6 17.333V2.667A.66.66 0 0 1 6.654 2z"/></g></svg>Change Logs
+	</a>
+</li>
+<li class="my-2">
+	<a class="fm-sw" href="#commercialLoan">
+		<svg width="21" height="14" viewBox="0 0 21 14" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="#353943" fill-rule="nonzero"><path d="M10.487 3.947a3.054 3.054 0 1 0 .207.003l-.207-.003zm.026 1.25a1.804 1.804 0 1 1-.146.009l.146-.01zM13.673 1.731a.625.625 0 0 1 .8-.119l.082.06 4.857 4.25a.625.625 0 0 1-.742 1.002l-.082-.06-4.857-4.25a.625.625 0 0 1-.058-.883z"/><path d="M18.588 7.137a.625.625 0 0 1 .894.867l-.07.073-4.857 4.25a.625.625 0 0 1-.894-.867l.07-.073 4.857-4.25zM6.445 1.673a.625.625 0 0 1 .894.867l-.07.073-4.857 4.25a.625.625 0 0 1-.894-.867l.07-.073 4.857-4.25z"/><path d="M1.53 7.195a.625.625 0 0 1 .8-.119l.082.06 4.857 4.25a.625.625 0 0 1-.742 1.002l-.082-.06-4.857-4.25a.625.625 0 0 1-.058-.883z"/><path d="M18.39 1.018H2.607c-.957 0-1.732.775-1.732 1.732v8.5c0 .957.775 1.732 1.732 1.732h15.785a1.73 1.73 0 0 0 1.733-1.732v-8.5a1.732 1.732 0 0 0-1.735-1.732zm-15.783 1h15.784a.732.732 0 0 1 .734.732v8.5a.732.732 0 0 1-.732.732H2.607a.732.732 0 0 1-.732-.732v-8.5c0-.404.328-.732.732-.732z"/></g></g></svg>Commercial Loan
 	</a>
 </li>
 `;
@@ -256,6 +262,9 @@ class MainPageHandler {
 				break;
 			case 'insurancePolicyDetails':
 				new InsurancePolicyDetails(container);
+				break;
+			case 'commercialLoan':
+				new CommercialLoan(container);
 				break;
 		}
 		$(".fm-sw").removeClass('active');

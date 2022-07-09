@@ -1207,6 +1207,181 @@ class Net {
 	}
 
 	/**
+	 FinMind API for admin to add commercial loan
+	 **/
+	static async adminCommercialLoanAdd(token, title, description, fileName, fileSize, fileNameUn) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021878
+			},
+			data: {
+				title: title,
+				description: description,
+				fileName: fileName,
+				fileSize: fileSize,
+				fileNameUn: fileNameUn
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for admin to edit commercial loan
+	 **/
+	static async adminCommercialLoanEdit(token, id, title, description, fileName, fileSize, fileNameUn) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021879
+			},
+			data: {
+				id: id,
+				title: title,
+				description: description,
+				fileName: fileName,
+				fileSize: fileSize,
+				fileNameUn: fileNameUn
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for admin to edit commercial loan
+	 **/
+	static async adminCommercialLoanList(token, name, pageSize, pageNo) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021880
+			},
+			data: {
+				name: name,
+				pageSize: pageSize,
+				pageNo: pageNo
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for admin to edit commercial loan
+	 **/
+	static async adminCommercialLoanRemove(token, id) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021881
+			},
+			data: {
+				id: id
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to find agent by email
+	 **/
+	static async userFindAgent(token, email) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021882
+			},
+			data: {
+				email: email
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to find agent by email
+	 **/
+	static async userInviteAgent(token, appId, email) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021883
+			},
+			data: {
+				appId: appId,
+				email: email
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to accept user's invite
+	 **/
+	static async agentAcceptApp(token, appId, isAccept) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021884
+			},
+			data: {
+				appId: appId,
+				isAccept: isAccept
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to notify agent
+	 **/
+	static async userNotifyAgent(token, appId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021886
+			},
+			data: {
+				appId: appId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for agent to notify user
+	 **/
+	static async agentNotifyCustomer(token, appId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021885
+			},
+			data: {
+				appId: appId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
 		compose finMind API request for starting to apply for a product
 	**/
 	static composeRequestDataForStartAplication_private(prodId, token){

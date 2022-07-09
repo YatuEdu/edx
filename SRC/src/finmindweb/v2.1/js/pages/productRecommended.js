@@ -86,10 +86,10 @@ class ProductRecommended {
     	this.#credMan = credMan;
 		this.init();
 	}
-	
+
 	// hook up events
 	async init() {
-	
+
 		// retrieve recommendation list from session store
 		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_BEST_PREMIUM_STORE_KEY);
 		const recommendItem = sessionStore.retrieveObj();
@@ -147,6 +147,7 @@ class ProductRecommended {
             }
             totalFaceAmount = appCoverageAmount;
             premium = this.#recommendItems.get(prodId).premium;
+			premium = premium.toFixed(4);
 
             let insuredName = null;
             let relationship = attrMap.get(4);
@@ -166,7 +167,7 @@ class ProductRecommended {
 			const qXMLTemplate = '<block><qa><id>8031</id><strv>{coverageTime}</strv></qa><qa><id>1001</id><strv>{coverageAmount}</strv></qa><qa><id>1002</id><intv>{premium}</intv></qa><qa><id>1003</id><strv>{payMode}</strv></qa><qa><id>1004</id><intv>{payYears}</intv></qa></block>';
 			let qXML = qXMLTemplate.replace('{coverageTime}', coverageTime)
 				.replace('{coverageAmount}', coverageAmount)
-				.replace('{premium}', 30)
+				.replace('{premium}', premium)
 				.replace('{payMode}', payMode)
 				.replace('{payYears}', payYears);
 			let ret = await Net.saveBlockQuestions(
@@ -195,12 +196,12 @@ class ProductRecommended {
 	/**
 		properties
 	 **/
-	 
-	
+
+
 	get productTable() {
 		return `#${TABLE_BODY_ID}`;
 	}
-	
+
 	getSelectionId(pid) {
 		return `${SELECTION_ID_PREFIX}_${pid}`;
 	}

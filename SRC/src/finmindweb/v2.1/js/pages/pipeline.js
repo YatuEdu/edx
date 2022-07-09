@@ -50,9 +50,7 @@ const page_template = `
                         <b class="ms-1 me-2">Producer</b>
                     </span>
                 </div>
-                <div>
-                    <a class="btn btn-outline-primary fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#CancelApplication">Cancel Application</a>
-                    <a class="btn btn-primary fw-bold ms-3" href="#" role="button">Notify Producer</a>
+                <div id="operateDiv">
                 </div>
             </div>
             
@@ -134,12 +132,12 @@ const page_template = `
             <div class="modal-body px-5 py-3">
                 <div>
                     <label for="Email" class="form-label">Email</label>
-                    <input type="email" class="form-control form-control-lg" placeholder="Please enter producer email address">
+                    <input type="email" id="producerEmailInput" class="form-control form-control-lg" placeholder="Please enter producer email address">
                 </div>
             </div>
             <div class="modal-footer p-5 justify-content-between border-0">
                 <button type="button" class="btn fw-bold btn-outline-secondary m-0" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn fw-bold btn-primary m-0">Confirm</button>
+                <button type="button" id="findProducerBtn" class="btn fw-bold btn-primary m-0">Confirm</button>
             </div>
         </div>
     </div>
@@ -256,6 +254,15 @@ const producerName = `
 <span>{producerName}</span>
 `;
 
+const operateBtnsCustomer = `
+<a class="btn btn-outline-primary fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#CancelApplication">Cancel Application</a>
+<a class="btn btn-primary fw-bold ms-3" id="notifyProducerBtn" href="#" role="button">Notify Producer</a>
+`;
+
+const operateBtnsAgent = `
+<a class="btn btn-primary fw-bold ms-3" id="notifyCustomerBtn" href="#" role="button">Notify Customer</a>
+`;
+
 const SIGNIN_PATH="/prelogin/login.html";
 
 class PipelinePageHandler {
@@ -302,6 +309,8 @@ class PipelinePageHandler {
         // upload a file to server
         $('#fm_div_chats_file_upload').click(this.handleFileUpload.bind(this));
 
+        $('#findProducerBtn').click(this.handleFindProducer.bind(this));
+
         // start testing
 
         // $('#fm_wz_test_button').click(this.handleTest.bind(this));
@@ -315,6 +324,9 @@ class PipelinePageHandler {
 
         // 更新申请详情
         await this.updateApplicationInfo(this.#appId);
+
+        $('#notifyProducerBtn').click(this.handleNotifyProducer.bind(this));
+        $('#notifyCustomerBtn').click(this.handleNotifyCustomer.bind(this));
 
         // fill messages
         this.#messagingPanel = new MessagingPanel(100, this.#appId);
@@ -343,7 +355,7 @@ class PipelinePageHandler {
         if (appInfo.code===0) {
             let row = appInfo.data[0];
             let agentName = row.agent_name;
-            let agentUserName = row.agent_user_name.trim();
+            let agentUserName = (row.agent_user_name || '').trim();
             let userName = row.user_name.trim();
             let status = row.applicatio_status;
             if (agentName!=null) {
@@ -365,6 +377,8 @@ class PipelinePageHandler {
                     this.showPolicyDelivery(status, true);
                 }
 
+                $('#operateDiv').append(operateBtnsCustomer);
+
             } else if (this.#credMan.credential.name===agentUserName) {
                 // agent view
                 if(status==='Started') {
@@ -375,6 +389,7 @@ class PipelinePageHandler {
                 } else {
                     this.showPolicyDelivery(status, false);
                 }
+                    $('#operateDiv').append(operateBtnsAgent);
 
             }
 
@@ -643,6 +658,50 @@ class PipelinePageHandler {
             });
         }
 
+    }
+
+    async handleFindProducer() {
+        let email = $('#producerEmailInput').val();
+        let res = await Net.userFindAgent(credMan.credential.token, email);
+        if (res.errCode!=0) {
+            let errMsg = res.err.msg;
+            alert(errMsg);
+            return;
+        }
+        let agentName = res.data[0].agent_name;
+
+        res = await Net.userInviteAgent(credMan.credential.token, this.#appId, email);
+        if (res.errCode!=0) {
+            let errMsg = res.err.msg;
+            alert(errMsg);
+            return;
+        }
+        $('#producerNameOrFindOne a').remove();
+        $('#producerNameOrFindOne').append(producerName.replace('{producerName}', agentName));
+        $('#FindProducerModal').modal('hide');
+        alert('Invited');
+    }
+
+    async handleNotifyProducer() {
+        let res = await Net.userNotifyAgent(credMan.credential.token, this.#appId);
+        if (res.errCode!=0) {
+            let errMsg = res.err.msg;
+            alert(errMsg);
+            return;
+        } else {
+            alert('notified');
+        }
+    }
+
+    async handleNotifyCustomer() {
+        let res = await Net.agentNotifyCustomer(credMan.credential.token, this.#appId);
+        if (res.errCode!=0) {
+            let errMsg = res.err.msg;
+            alert(errMsg);
+            return;
+        } else {
+            alert('notified');
+        }
     }
 
 }

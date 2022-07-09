@@ -2,6 +2,7 @@ import {sysConstants} from '../../core/sysConst.js'
 import {credMan} from '../../core/credManFinMind.js'
 import {Net} from "../../core/net.js";
 import {Pagination} from "../../core/pagination.js";
+import {MetaDataManager} from "../../core/metaDataManager.js";
 
 
 const pageTemplate = `
@@ -89,6 +90,8 @@ const pageSize = 10;
 class AllApplications {
 	#container;
 	#searchBy = '';
+	#appStatusMapRevert;
+	#appStateMapRevert;
 
 	constructor(container) {
 		this.#container = container;
@@ -99,6 +102,17 @@ class AllApplications {
 	async init() {
 		this.#container.empty();
 		this.#container.append(pageTemplate);
+
+		let appStatusMap = MetaDataManager.appStatusMap;
+		this.#appStatusMapRevert = new Map();
+		for(let [key,value] of appStatusMap) {
+			this.#appStatusMapRevert.set(value, key);
+		}
+		let appStateMap = MetaDataManager.appStateMap;
+		this.#appStateMapRevert = new Map();
+		for(let [key,value] of appStateMap) {
+			this.#appStateMapRevert.set(value, key);
+		}
 
 		await this.requestList('', 1).then(maxRowNumber => {
 			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
@@ -123,7 +137,7 @@ class AllApplications {
 	async requestList(searchBy, pageNo) {
 		let pageSize = 10;
 		let maxRowNumber;
-		let res = await Net.getAllApplications(credMan.credential.token, 1, pageSize, pageNo, searchBy, 'start_date desc');
+		let res = await Net.getAllApplications(credMan.credential.token, null, pageSize, pageNo, searchBy, 'start_date desc');
 		$('#list').empty();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
@@ -151,27 +165,12 @@ class AllApplications {
 		window.location.href = "/user/pipeline.html?appId="+appId;
 	}
 
+	appState(state) {
+		return this.#appStateMapRevert.get(state);
+	}
+
 	appStatus(status) {
-		switch (status) {
-			case 1:
-				return 'Started';
-				break;
-			case 2:
-				return 'Pending on Agent Review';
-				break;
-			case 3:
-				return 'Need more Information';
-				break;
-			case 4:
-				return 'Pending on Health Check';
-				break;
-			case 5:
-				return 'Approved';
-				break;
-			case 44:
-				return 'Declined';
-				break;
-		}
+		return this.#appStatusMapRevert.get(status);
 	}
 
 	handleSearchSubmit(e) {

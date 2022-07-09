@@ -477,7 +477,9 @@ class InsurancePolicyDetails {
 	// hook up events
 	async init() {
     	this.#container.empty();
-    	this.#container.append(pageTemplate);
+    	this.#container.append(
+    	    pageTemplate.replace('{insuredName}', this.#detail.insured_name)
+        );
 		$("body").append(deleteConfirmTemplate);
 		$("body").append(toastTemplate);
 		$("body").append(filterSideReminder);
@@ -501,6 +503,11 @@ class InsurancePolicyDetails {
             new PaginationSimple($('#reminderTable'), this.pageSize, maxRowNumber, this.handleCashValuePage.bind(this));
         });
         $('#reminderAddBtn').click(this.handleCreateNewReminder.bind(this));
+        let today = new Date();
+        let min = today.toISOString().split('T')[0];
+        $('#dateInput').attr('min', min);
+        $('#closeFilterSideBtnTop').click(this.newReminderWinClose.bind(this));
+        $('#closeFilterSideBtn').click(this.newReminderWinClose.bind(this));
 	}
 
 	async updateFileList() {
@@ -827,13 +834,11 @@ class InsurancePolicyDetails {
     }
 
     async handleCreateNewReminder() {
-
-        $("#filter-side-reminder").addClass("filter-side-enabled");
-        $("mask-reminder").eq(0).attr("style", "display: block;");
-
+        this.newReminderWinOpen();
+        $('#reminderSubmitBtn').off('click');
         $('#reminderSubmitBtn').click(this.handleReminderSubmit.bind(this));
-
     }
+
 
     editEnter(row) {
         $(row).addClass("edit");
@@ -892,9 +897,14 @@ class InsurancePolicyDetails {
         let date = $('#dateInput').val();
         let content = $('#contentInput').val();
         let email = $('#emailInput').val();
-        let status = $('#statusSelect').val();
+        let status = $('#statusSelect option:selected').val();
         if (date==='' || content==='' || email==='' || status==='') {
             alert('Please fill in completely');
+            return;
+        }
+        let emailRegex = /^((([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\;))*(([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
+        if (!emailRegex.test(email)) {
+            alert('The email address is incorrect');
             return;
         }
 
@@ -904,12 +914,22 @@ class InsurancePolicyDetails {
             return;
         }
 
-        $("#filter-side-reminder").removeClass("filter-side-enabled");
-        $("mask-reminder").eq(0).attr("style", "display: none;");
+        this.newReminderWinClose();
 
         await this.updateReminderList(1).then(maxRowNumber => {
             new PaginationSimple($('#reminderTable'), this.pageSize, maxRowNumber, this.handleCashValuePage.bind(this));
         });
+    }
+
+
+    newReminderWinOpen() {
+        $("#filter-side-reminder").addClass("filter-side-enabled");
+        $("mask-reminder").eq(0).attr("style", "display: block;");
+    }
+
+    newReminderWinClose() {
+        $("#filter-side-reminder").removeClass("filter-side-enabled");
+        $("mask-reminder").eq(0).attr("style", "display: none;");
     }
 }
 

@@ -5,13 +5,13 @@ class TimeUtil {
 	static SECOND = 'sec';
 	static MM = 'mm';
 	static ONE_DAY = 1000 * 60 * 60 * 24;
-	
-	static diffMinutes(dt1, dt2) 
+
+	static diffMinutes(dt1, dt2)
 	{
 		const diff =(dt2 - dt1) / 60000;
 		return Math.abs(Math.round(diff));
 	}
-	
+
 	static diffDays(dt1, dt2) {
 		return  Math.round ( (dt2 - dt1) / TimeUtil.ONE_DAY );
 	}
@@ -19,13 +19,13 @@ class TimeUtil {
 	static getTimeString(dt) {
 		return dt.toTimeString().split(' ')[0];
 	}
-	
+
 	static getTimeStringWithoutSeconds(dt) {
 		const ts =  TimeUtil.getTimeString(dt);
 		const secindx = ts.lastIndexOf(":");
 		return ts.substring(0, secindx);
 	}
-	
+
 	static getDateString(dt) {
 		return dt.toDateString();
 	}
@@ -41,7 +41,7 @@ class StringUtil {
 		}
 		return false;
 	}
-		
+
 	/*
 	  most of Yatu control id is in form of "btn_xxx", where xxx is the associated
 	  object id.  The id could be user, group, or anything else.
@@ -50,22 +50,22 @@ class StringUtil {
 		const indx = btnId.lastIndexOf("_");
 		return parseInt(btnId.substring(indx+1));
 	}
-	
+
 	/********************************************************
 	*	Camel case string
-	*	Camel case is widely used in Java, C++, c# as variable 
-	*	names. Assume a word is given, we use this function to 
+	*	Camel case is widely used in Java, C++, c# as variable
+	*	names. Assume a word is given, we use this function to
 	*   turn the word into camel case word.
     *   For example, father is turned into Father
-    *	
+    *
 	*********************************************************/
 	static convertToCamelCase(singWord) {
 		return singWord.charAt(0).toUpperCase() + singWord.slice(1).toLowerCase();
 	}
-	
+
 	/********************************************************
 	*	Convert ',' separated integers into integer array
-	*	
+	*
 	*	For example， ‘1，3，5’ -> [1, 3, 5]
 	*
 	*********************************************************/
@@ -73,35 +73,35 @@ class StringUtil {
 		const digits = comaSeparatedArray.split(',');
 		return digits.map(s => parseInt(s));
 	}
-	
+
 	/********************************************************
 	*	Convert  integer into , seperated thousands
-	*	
+	*
 	*	For example， 10000 ->10,000
 	*
-	*********************************************************/	
+	*********************************************************/
 	static intToNumberWithCommas(x) {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
-	
+
 	/********************************************************
 	*	Convert  integer representation with coma back to integer
 	*
-	*	
+	*
 	*	For example， 10000 <- 10,000
 	*
-	*********************************************************/	
+	*********************************************************/
 	static strWithCommasToInteger(s) {
 		const num = s.replace(new RegExp(',', 'g'), '');
 		return parseInt(num, 10);
 	}
-	
+
 	/********************************************************
 	*	Convert  integer representation to SSN representation:
-	*	
+	*
 	*	For example， 345678900 => 345-67-8900
 	*
-	*********************************************************/	
+	*********************************************************/
 	static formatSocialSecurity(str){
 		let ssnDisplay = str.replace(/\D/g, '');
 		ssnDisplay = ssnDisplay.replace(/^(\d{3})/, '$1-');
@@ -109,13 +109,13 @@ class StringUtil {
 		ssnDisplay = ssnDisplay.replace(/(\d)-(\d{4}).*/, '$1-$2');
 		return ssnDisplay;
 	}
-	
+
 		/********************************************************
 	*	Convert  integer representation to USA/Canada phone number
-	*	
+	*
 	*	For example， 2064454455 => 206-445-4455
 	*
-	*********************************************************/	
+	*********************************************************/
 	static formatUSPhoneNumber(str){
 		let ssnDisplay = str.replace(/\D/g, '');
 		ssnDisplay = ssnDisplay.replace(/^(\d{3})/, '$1-');
@@ -157,7 +157,7 @@ class ValidUtil {
 	}
 
 	static isPhoneValid(str) {
-		const regExp = /^(\+?1)?[2-9]\d{2}[2-9](?!11)\d{6}$/;
+		const regExp = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 		if (!regExp.test(str.toLowerCase())) {
 			return false;
 		} else {

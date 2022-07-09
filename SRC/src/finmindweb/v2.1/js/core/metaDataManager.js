@@ -100,6 +100,14 @@ const APP_STATUS = new Map([
 	['Rejected', 		44],
 ]);
 
+const APP_STATE = new Map([
+	['Invite Received',		1],
+	['Wait for Producer',	2],
+	['Wait for Customer',	3],
+	['In Progress',			4],
+	['Unassigned',			5],
+]);
+
 const enumPolicyStatus = ['active', 'fulfilled', 'lapsed', 'surrendered'];
 const enumReminderStatus = ['Scheduled', 'Overdue', 'Completed', 'Cancelled'];
 
@@ -307,6 +315,14 @@ class MetaDataManager {
 	 */
 	static get appStatusMap() {
 		return APP_STATUS;
+	}
+
+	/**
+	 * get app state map
+	 * @returns {*[]}
+	 */
+	static get appStateMap() {
+		return APP_STATE;
 	}
 
 	static get enumTermCoverageYears() {

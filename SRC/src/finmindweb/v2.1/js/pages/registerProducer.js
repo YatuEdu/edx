@@ -95,15 +95,7 @@ const page_step2 = `
                     <div class="row">
                         <div class="col-12 mt-4">
                             <label for="Phonenumber" class="form-label fs-6p">Phone number</label>
-                            <div class="input-group d-flex">
-                                <span class="input-group-text bg-transparent border-end-0 pe-1 ps-3" id="">
-                                    <img src="../img/ico-flag-usa.svg" >
-                                </span>
-                                <select class="form-select border-start-0 border-end-0 flex-grow-0 w-auto" id="">
-                                    <option selected>+1</option>
-                                </select>
-                                <input id="fm_rgstr_phone" type="text" class="border-start-0 form-control form-control-lg">
-                            </div>
+                            <input id="fm_rgstr_phone" type="text" class="form-control form-control-lg">
                         </div>
                         <div class="col-12 mt-4">
                             <label for="address" class="form-label fs-6p">Your address line 1*</label>
