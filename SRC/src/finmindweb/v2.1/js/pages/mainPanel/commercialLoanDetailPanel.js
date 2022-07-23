@@ -141,12 +141,12 @@ class CommercialLoanDetailPanel {
     async init() {
         if($("#loanDetail").length) {
             $('#loanDetail').remove();
-        } else {
-            $("body").append(pageTemplate);
-            $("body").append(deleteConfirmTemplate);
-            $('#fileUploadDiv').append(fileInputBlkTemplate);
-            $('#fileUploadDiv').append(progressTemplate);
         }
+
+        $("body").append(pageTemplate);
+        $("body").append(deleteConfirmTemplate);
+        $('#fileUploadDiv').append(fileInputBlkTemplate);
+        $('#fileUploadDiv').append(progressTemplate);
 
         $('#fileInput').change(e => {
             e.preventDefault();

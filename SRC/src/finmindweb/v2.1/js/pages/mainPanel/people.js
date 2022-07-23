@@ -2,6 +2,8 @@ import {sysConstants} from '../../core/sysConst.js'
 import {credMan} from '../../core/credManFinMind.js'
 import {Net} from "../../core/net.js";
 import {Pagination} from "../../core/pagination.js";
+import {MetaDataManager} from "../../core/metaDataManager.js";
+import {UIUtil} from "../../core/uiUtil.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -37,6 +39,11 @@ const pageTemplate = `
 						<th>PHONE</th>
 						<th>ADDRESS</th>
 						<th>BIRTHDAY</th>
+						<th>LICENSE ISSUE STATE</th>
+						<th>LICENSE EXPIRE DATE</th>
+						<th>LICENSE NUMBER</th>
+						<th>ROLE</th>
+						<th>LICENSE STATUS</th>
 						<th>REGISTER DATE</th>
 						<th>QUICK NOTE</th>
 						<th>ACTION</th>
@@ -57,10 +64,15 @@ const rowTemplate = `
 	<td>{phone}</td>
 	<td>{address}</td>
 	<td>{birthday}</td>
+	<td>{licenseIssueState}</td>
+	<td>{licenseExpireDate}</td>
+	<td>{licenseNumber}</td>
+	<td>{role}</td>
+	<td class='licenseStatus'>{licenseStatus}</td>
 	<td>{regDate}</td>
 	<td>{quickNote}</td>
 	<td>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" disabled>Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
@@ -70,7 +82,8 @@ const pageSize = 10;
 
 class People {
 	#container;
-	#searchBy;
+	#searchBy = '';
+	#licenseStatusMapRevert;
 
 	constructor(container) {
 		this.#container = container;
@@ -81,6 +94,12 @@ class People {
 	async init() {
 		this.#container.empty();
 		this.#container.append(pageTemplate);
+
+		let licenseStatusMap = MetaDataManager.licenseStatusMap;
+		this.#licenseStatusMapRevert = new Map();
+		for(let [key,value] of licenseStatusMap) {
+			this.#licenseStatusMapRevert.set(value, key);
+		}
 
 		await this.requestList('', 1).then(maxRowNumber => {
 			new Pagination($('#table'), pageSize, maxRowNumber, this.handlePage.bind(this));
@@ -115,13 +134,77 @@ class People {
 				.replace('{phone}', row.phone_number || '')
 				.replace('{address}', '')
 				.replace('{birthday}', '')
+				.replace('{licenseIssueState}', row.license_issue_state || '')
+				.replace('{licenseExpireDate}', row.license_expire_date || '')
+				.replace('{licenseNumber}', row.license_number || '')
+				.replace('{role}', row.role_name || '')
+				.replace('{licenseStatus}', this.licenseStatus(row.license_status) || '')
 				.replace('{regDate}', new Date(row.join_date).toLocaleString() || '')
 				.replace('{quickNote}', '')
 			);
 		}
+
+		let that = this;
+		$('.btnEdit').off('click');
+		$('.btnEdit').click(function (e) {
+
+			let val = $(this).text();
+			let row = $(this).parent().parent();
+
+			if (val==='Edit') {
+				that.editEnter(row);
+			} else {
+				that.editExit(row);
+			}
+			console.log();
+		});
+
 		return maxRowNumber;
 	}
 
+	editEnter(row) {
+		$(row).addClass("edit");
+		let licenseStatus = $(row).find(".licenseStatus");
+		const licenseStatusMap = MetaDataManager.licenseStatusMap;
+		UIUtil.uiEnterEdit(licenseStatus, 'selector', licenseStatusMap);
+		$(row).find(".btnEdit").text("Save");
+	}
+
+	async editExit(row) {
+		let id = parseInt(row.attr('id'));
+		let licenseStatus = $(row).find(".licenseStatus");
+		let licenseStatusVal = UIUtil.uiExitEdit(licenseStatus, 'selector');
+
+		// let res = await Net.insurancePolicyUpdate(credMan.credential.token, id, parseInt(productVal), 0,
+		// 	insuredNameVal, parseInt(coverageAmountVal), effectiveDateVal, statusVal);
+		// if (res.errCode!=0) {
+		// 	let errMsg = res.err.msg;
+		// 	alert(errMsg);
+		// 	return;
+		// }
+		$(row).removeClass("edit");
+		$(row).find(".btnEdit").text("Edit");
+	}
+
+	licenseStatus(status) {
+		let template = '<span class="event-status {type}">{note}</span>';
+		let type = '';
+		let note = this.#licenseStatusMapRevert.get(status);;
+		switch (status) {
+			case 1:
+				type = 'status-warning';
+				break;
+			case 2:
+				type = 'status-info';
+				break;
+			case 3:
+			case 4:
+			case 5:
+				type = 'status-danger';
+				break;
+		}
+		return note==null ? '' : template.replace('{type}', type).replace('{note}', note);
+	}
 
 }
 

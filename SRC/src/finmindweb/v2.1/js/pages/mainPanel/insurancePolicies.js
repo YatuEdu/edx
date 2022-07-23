@@ -245,6 +245,7 @@ class InsurancePolicies {
 		}
 
 		let that = this;
+		$(".btnEdit").off('click');
 		$(".btnEdit").click(function (e) {
 
 			let val = $(this).text();

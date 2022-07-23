@@ -1381,6 +1381,93 @@ class Net {
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
 
+    /**
+     FinMind API for agent to notify user
+     **/
+    static async agentRegisterWithEmailAndPw(name, email, fistName, middleName, lastName, pwh, phone, address1,
+                                             address2, city, state, zipCode, licenseHome, licenseNumber, birthday) {
+        const requestData = {
+            header: {
+                api_id: 2021887
+            },
+            data: {
+                name: name,
+                email: email,
+                fistName: fistName,
+                middleName: middleName,
+                lastName: lastName,
+                pwh: pwh,
+                phone: phone,
+                address1: address1,
+                address2: address2,
+                city: city,
+                state: state,
+                zipCode: zipCode,
+                licenseHome: licenseHome,
+                licenseNumber: licenseNumber,
+                birthday: birthday
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
+	/**
+	 FinMind API for user to change password with old password
+	 **/
+	static async userChangePwWithOldPw(token, oldPwHsh, newPwHsh) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021832
+			},
+			data: {
+				oldPwHsh: oldPwHsh,
+				newPwHsh: newPwHsh
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to send code to email when forget passwrod
+	 **/
+	static async resetPwSendEmail(userEmail) {
+		const requestData = {
+			header: {
+				api_id: 2021833
+			},
+			data: {
+				userEmail: userEmail
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
+	 FinMind API for user to reset password
+	 **/
+	static async resetPwConfirm(userEmail, code, newPWHash) {
+		const requestData = {
+			header: {
+				api_id: 2021834
+			},
+			data: {
+				userEmail: userEmail,
+				code: code,
+				newPWHash: newPWHash
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
 	/**
 		compose finMind API request for starting to apply for a product
 	**/

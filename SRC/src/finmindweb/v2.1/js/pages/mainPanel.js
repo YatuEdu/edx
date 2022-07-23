@@ -190,7 +190,10 @@ class MainPageHandler {
 				break;
 			case 'agent':
 				$('#menu').append(menu_me);
-				$('#menu').append(menu_clients);
+				const licenseStatus = this.#credMan.credential.licenseStatus;
+				if (licenseStatus===2) {
+					$('#menu').append(menu_clients);
+				}
 				break;
 			case 'admin':
 				$('#menu').append(menu_me);

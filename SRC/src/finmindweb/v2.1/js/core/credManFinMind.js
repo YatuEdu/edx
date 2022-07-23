@@ -10,13 +10,13 @@ class CredentialManager {
 	#userCredInfo = {name: '', token: '', email: '', creationTime: null, role: ''};
 	#authError;
 	#store;
-	
+
 	/**
 		public methods
 	**/
     constructor(store) {
 		this.#store = store;
-		
+
 		try {
 			if (this.#store.getItem()) {
 				this.#userCredInfo  = JSON.parse(this.#store.getItem());
@@ -26,15 +26,15 @@ class CredentialManager {
 			this.#authError = err;
 		}
 	}
-	
+
 	// call remote auth server to sign in a user
 	async authenticate(userName, userPassword) {
 		// clear previous auth info before new login request
 		this.private_clear();
-		
+
 		// call remote API
 		const ret = await Net.login(userName, userPassword);
-		
+
 		// error?
 		if (ret.err) {
 			// TO DO: GO TO ERROR PAGE
@@ -43,11 +43,11 @@ class CredentialManager {
 		}
 		else {
 			// got result in data:
-			this.update_cred({name: userName, token: ret.data[0].token, email: '', role: ret.data[0].role});
+			this.update_cred({name: userName, token: ret.data[0].token, email: '', role: ret.data[0].role, licenseStatus: ret.data[0].license_status});
 		}
 		return this.#authError;
 	}
-	
+
 	// call remote auth server to sign in a user
 	async signUp(userFirstName, userMiddleName, userLastName, email, userPassword) {
 		// clear previous auth info before new login request
@@ -56,7 +56,7 @@ class CredentialManager {
 		// remote call to sign up
 		return await Net.signUp(userFirstName, userMiddleName, userLastName, email, userPassword);
 	}
-	
+
 	// call remote auth server to sign-out user
 	async signOut() {
 		// remote call to sign out if we are signed-in
@@ -68,7 +68,7 @@ class CredentialManager {
 			}
 		}
 	}
-	
+
 	// test if we have a valid token
 	async hasLoggedIn() {
 		const t = this.#userCredInfo.token;
@@ -79,7 +79,7 @@ class CredentialManager {
 			if (diff < sysConstants.FINMIND_TOKEN_VALID_IN_MIN) {
 				return true;
 			}
-			
+
 			// remote call
 			const ret = await Net.tokenCheck(t);
 			if ( !ret.err ) {
@@ -92,31 +92,31 @@ class CredentialManager {
 			return false;
 		}
 	}
-	
+
 	// Getter get credential info
 	get credential() {
 		return this.#userCredInfo;
 	}
-	
+
 	// Getter last error
 	get lastError() {
 		return this.#authError;
 	}
-	
+
 	// Is the principal agent?
 	get isAgent() {
 		return this.#userCredInfo.role === ROLE_AGENT;
 	}
-	
+
 	// Is the principal admin?
 	get isAdmin() {
 		return this.#userCredInfo.role === ROLE_ADMIN;
 	}
-		
+
 	/**
 		private methods
 	 **/
-	 
+
 	// after logged in successfully
 	update_cred(cred) {
 		this.#userCredInfo = cred;
@@ -131,7 +131,7 @@ class CredentialManager {
         this.#store.removeItem();
 		this.#userCredInfo = {name: '', token: '', email: ''};
 	}
-	
+
 }
 
 const store = new LocalStoreAccess(sysConstants.FINMIND_CRED_STORE_KEY);

@@ -108,6 +108,16 @@ const APP_STATE = new Map([
 	['Unassigned',			5],
 ]);
 
+const LICENSE_STATUS = new Map([
+	['New License Under Review',	1],
+	['License in Use',	2],
+	['License Update is Rejected',	3],
+	['License Expired',	4],
+	['License is Invalid',	5],
+]);
+
+
+
 const enumPolicyStatus = ['active', 'fulfilled', 'lapsed', 'surrendered'];
 const enumReminderStatus = ['Scheduled', 'Overdue', 'Completed', 'Cancelled'];
 
@@ -362,6 +372,14 @@ class MetaDataManager {
 	**/
 	static get attrList() {
 		return attrList;
+	}
+
+	/**
+	 * get license status map
+	 * @returns {*[]}
+	 */
+	static get licenseStatusMap() {
+		return LICENSE_STATUS;
 	}
 
 }

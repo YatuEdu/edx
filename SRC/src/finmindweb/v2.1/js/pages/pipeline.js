@@ -13,21 +13,21 @@ import {MetaDataManager} from "../core/metaDataManager.js";
 const page_template = `
 <div class="card position-fixed start-0 end-0 bottom-0 border-0 rounded-0 px-3 pb-3" style="top: 6rem;background: #F6F7FC;">
     <div class="d-flex justify-content-center align-items-center p-4">
-        <div class="d-flex align-items-center mx-1">
+        <div class="d-flex align-items-center mx-1" id="step1Div">
             <span class="bg-primary text-white fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;">
                 1
             </span>
             <b class="mx-2">Collect more info</b>
             <span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
         </div>
-        <div class="d-flex align-items-center mx-1">
+        <div class="d-flex align-items-center mx-1" id="step2Div">
             <span id="step2" class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
                 2
             </span>
             <b  id="step2Text" class="mx-2 text-body text-black-50">Underwriting Process</b>
             <span class="border-bottom" style="width: 5.625rem;border-color: rgba(31, 21, 52, 0.2);"></span>
         </div>
-        <div class="d-flex align-items-center mx-1">
+        <div class="d-flex align-items-center mx-1" id="step3Div">
             <span id="step3" class="text-body text-black-50 fs-6p fw-bold rounded-pill d-flex justify-content-center align-items-center" style="width: 2rem;height: 2rem;border: 0.0625rem solid rgba(31, 21, 52, 0.2);">
                 3
             </span>
@@ -80,7 +80,7 @@ const page_template = `
                                         <div class="mb-4">
                                             <h5 class="text-center mb-5" id="fm_wz_block_name"></h5>    
                                         </div>
-                                        <div class="mb-4">
+                                        <div class="mb-4" id="descriptionDiv">
                                             <h2 id="fm_wz_block_description"></h1>    
                                         </div>
                                         <div id="user_question_block"></div>
@@ -365,7 +365,7 @@ class PipelinePageHandler {
             }
             $('#customerName').text(userName);
 
-                if (this.#credMan.credential.name===userName) {
+            if (this.#credMan.credential.name===userName) {
                 // client view
                 if(status==='Started') {
                     const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_WIZARD_STORE_KEY);
@@ -373,8 +373,18 @@ class PipelinePageHandler {
                     this.#applicationMan.initalizeState();
                 } else if (status==='Underwriting') {
                     this.showUnderWriting(true);
+                    $('#step1Div').css("cursor","pointer");
+                    $('#step1Div').click(this.showCollectMoreInfo.bind(this));
+                    $('#step2Div').css("cursor","pointer");
+                    $('#step2Div').click(this.showUnderWriting.bind(this));
                 } else {
                     this.showPolicyDelivery(status, true);
+                    $('#step1Div').css("cursor","pointer");
+                    $('#step1Div').click(this.showCollectMoreInfo.bind(this));
+                    $('#step2Div').css("cursor","pointer");
+                    $('#step2Div').click(this.showUnderWriting.bind(this));
+                    $('#step3Div').css("cursor","pointer");
+                    $('#step3Div').click(this.showPolicyDelivery.bind(this));
                 }
 
                 $('#operateDiv').append(operateBtnsCustomer);
@@ -382,12 +392,23 @@ class PipelinePageHandler {
             } else if (this.#credMan.credential.name===agentUserName) {
                 // agent view
                 if(status==='Started') {
-                    let html = await this.showAllBlocQuestionAnswers(appId);
-                    $('#user_question_block').html(html);
+                    this.showCollectMoreInfo();
                 } else if (status==='Underwriting') {
                     this.showUnderWriting(false);
+                    $('#step1Div').css("cursor","pointer");
+                    $('#step1Div').click(this.showCollectMoreInfo.bind(this));
+                    $('#step2Div').css("cursor","pointer");
+                    $('#step2Div').click(() => {
+                        this.showUnderWriting(false);
+                    });
                 } else {
                     this.showPolicyDelivery(status, false);
+                    $('#step1Div').css("cursor","pointer");
+                    $('#step1Div').click(this.showCollectMoreInfo.bind(this));
+                    $('#step3Div').css("cursor","pointer");
+                    $('#step3Div').click(() => {
+                        this.showPolicyDelivery(status, false);
+                    });
                 }
                     $('#operateDiv').append(operateBtnsAgent);
 
@@ -546,8 +567,18 @@ class PipelinePageHandler {
         return html;
     }
 
+    async showCollectMoreInfo() {
+        let html = await this.showAllBlocQuestionAnswers(this.#appId);
+        $('#fm_wz_block_name').empty();
+        $('#descriptionDiv').empty();
+        $('#user_question_block').html(html);
+    }
+
     showUnderWriting(userView) {
         this.lightUpStep2();
+        $('#user_question_block').empty();
+        $('#descriptionDiv').empty();
+        $('#descriptionDiv').append('<h2 id="fm_wz_block_description"></h1>');
         $('#fm_wz_block_name').text("Underwriting");
         if(userView) {
             $('#fm_wz_block_description').parent().append(underWritingTemplateCustomer);
@@ -583,6 +614,9 @@ class PipelinePageHandler {
     showPolicyDelivery(status, userView) {
         this.lightUpStep2();
         this.lightUpStep3();
+        $('#user_question_block').empty();
+        $('#descriptionDiv').empty();
+        $('#descriptionDiv').append('<h2 id="fm_wz_block_description"></h1>');
         $('#fm_wz_block_name').text("Policy Delivery");
         if (userView) {
             if (status==='Approved') {
@@ -680,6 +714,11 @@ class PipelinePageHandler {
         $('#producerNameOrFindOne').append(producerName.replace('{producerName}', agentName));
         $('#FindProducerModal').modal('hide');
         alert('Invited');
+    }
+
+    async viewStep1() {
+        this.showCollectMoreInfo();
+
     }
 
     async handleNotifyProducer() {

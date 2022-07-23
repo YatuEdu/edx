@@ -27,7 +27,7 @@ const page_template = `
                     </label>
                 </div>
                 <div class="ms-auto">
-                    <a href="ForgetPassword.html" class="text-decoration-none fw-bold">Forgot password?</a>
+                    <a href="/resetPass.html" class="text-decoration-none fw-bold">Forgot password?</a>
                 </div>
             </div>
             <div class="d-flex justify-content-center mt-5 pt-3">

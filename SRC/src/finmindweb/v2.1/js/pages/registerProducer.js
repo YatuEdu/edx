@@ -3,6 +3,7 @@ import {credMan} from '../core/credManFinMind.js'
 import {SessionStoreAccess} from '../core/sessionStorage.js'
 import {ValidUtil, StringUtil} from "../core/util.js";
 import {MetaDataManager} from "../core/metaDataManager.js";
+import {Net} from "../core/net.js";
 
 const page_step1 = `
 <div class="container-fluid g-0">
@@ -94,7 +95,7 @@ const page_step2 = `
                     <h2 class="mt-5 mb-5">Register Producer Account</h2>
                     <div class="row">
                         <div class="col-12 mt-4">
-                            <label for="Phonenumber" class="form-label fs-6p">Phone number</label>
+                            <label for="Phonenumber" class="form-label fs-6p">Phone number*</label>
                             <input id="fm_rgstr_phone" type="text" class="form-control form-control-lg">
                         </div>
                         <div class="col-12 mt-4">
@@ -106,15 +107,67 @@ const page_step2 = `
                             <input id="fm_rgstr_address2" type="text" class="form-control form-control-lg" id="address2" placeholder="Please enter address">
                         </div>
                         <div class="col-4 mt-4">
-                            <label for="City" class="form-label fs-6p">City</label>
+                            <label for="City" class="form-label fs-6p">City*</label>
                             <input id="fm_rgstr_city" type="text" class="form-control form-control-lg" id="City" placeholder="City">
                         </div>
                         <div class="col-4 mt-4">
-                            <label for="State" class="form-label fs-6p">State</label>
-                            <input id="fm_rgstr_state" type="text" class="form-control form-control-lg" id="State" placeholder="State">
+                            <label for="State" class="form-label fs-6p">State*</label>
+                            <select class="form-select form-select-lg" id="fm_rgstr_state" placeholder="State">
+                                <option value="" selected style="display:none">Please select</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
                         </div>
                         <div class="col-4 mt-4">
-                            <label for="ZIP Code" class="form-label fs-6p">ZIP Code</label>
+                            <label for="ZIP Code" class="form-label fs-6p">ZIP Code*</label>
                             <input id="fm_rgstr_zip_code" type="text" class="form-control form-control-lg" id="ZIP Code" placeholder="Code">
                         </div>
                         <div class="col-12 mt-5">
@@ -212,7 +265,6 @@ const page_step3 = `
                                 <option value="West Virginia">West Virginia</option>
                                 <option value="Wisconsin">Wisconsin</option>
                                 <option value="Wyoming">Wyoming</option>
-
                             </select>
                         </div>
                         <div class="col-12 mt-4">
@@ -221,7 +273,7 @@ const page_step3 = `
                         </div>
                         <div class="col-12 mt-4 position-relative">
                             <label for="Birthday" class="form-label fs-6p">Birthday</label>
-                            <input id="id="fm_rgstr_birthday" type="date" class="form-control form-control-lg"/>
+                            <input id="fm_rgstr_birthday" type="date" class="form-control form-control-lg"/>
                         </div>
                         <div class="col-12 mt-5">
                             <button id="registerSubmit" class="btn btn-primary btn-xl w-100" type="button">Register</button>
@@ -393,7 +445,7 @@ class RegisterProducerPageHandler {
         }
     }
 
-    nextStep(currStep, e) {
+    async nextStep(currStep, e) {
         if (currStep===1) {
             this.#firstName = $("#fm_rgstr_first_name").val().trim();
             this.#middleName = $("#fm_rgstr_middle_name").val().trim();
@@ -421,11 +473,13 @@ class RegisterProducerPageHandler {
             this.#city = $( "#fm_rgstr_city" ).val().trim();
             this.#state = $( "#fm_rgstr_state" ).val().trim();
             this.#zipCode = $( "#fm_rgstr_zip_code" ).val().trim();
-            if (!this.#phone || !this.#address1) {
-                $(e.target).after( `<p style="color:red;">Phone, and Address line 1 cannot be empty</p>` );
+            if (!this.#phone || !this.#address1 || !this.#city || !this.#state || !this.#zipCode) {
+                $(e.target).next('p').remove();
+                $(e.target).after( `<p style="color:red;">Phone, Address line 1, City, State and Zip Code cannot be empty</p>` );
                 return;
             }
             if (!ValidUtil.isPhoneValid(this.#phone)) {
+                $(e.target).next('p').remove();
                 $(e.target).after( `<p style="color:red;">Invalid phone format</p>` );
                 return;
             }
@@ -443,6 +497,17 @@ class RegisterProducerPageHandler {
                 return;
             }
 
+            let ret = await Net.agentRegisterWithEmailAndPw(this.#email, this.#email, this.#firstName, this.#middleName,
+                this.#lastName, sha256(sha256(this.#pw)), this.#phone, this.#address1, this.#address2, this.#city,
+                this.#state, this.#zipCode, this.#licenseHome, this.#licenseNumber, this.#birthday);
+
+            if (ret.errCode!=0) {
+                let errMsg = ret.err.msg;
+                alert(errMsg);
+                return;
+            } else {
+                window.location.href = '/prelogin/registerSuccess.html#agent';
+            }
         }
 
         console.log(currStep);
