@@ -37,8 +37,8 @@ class Net {
 	/**
 		FinMind API for registering a new user
 	**/
-	static async signUp(userFirstName, userMiddleName, userLastName, email, userPassword) {
-		const req = Net.composeRequestDataForSignUp_private(userFirstName, userMiddleName, userLastName, email, userPassword);
+	static async signUp(userFirstName, userMiddleName, userLastName, email, userPassword, validCode) {
+		const req = Net.composeRequestDataForSignUp_private(userFirstName, userMiddleName, userLastName, email, userPassword, validCode);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
@@ -1384,7 +1384,7 @@ class Net {
     /**
      FinMind API for agent to notify user
      **/
-    static async agentRegisterWithEmailAndPw(name, email, fistName, middleName, lastName, pwh, phone, address1,
+    static async agentRegisterWithEmailAndPw(name, email, validCode, fistName, middleName, lastName, pwh, phone, address1,
                                              address2, city, state, zipCode, licenseHome, licenseNumber, birthday) {
         const requestData = {
             header: {
@@ -1393,6 +1393,7 @@ class Net {
             data: {
                 name: name,
                 email: email,
+                validCode: validCode,
                 fistName: fistName,
                 middleName: middleName,
                 lastName: lastName,
@@ -1467,6 +1468,58 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
+
+	/**
+	 FinMind API for admin to edit people
+	 **/
+	static async adminEditPeople(token, id, licenseStatus) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021888
+			},
+			data: {
+				id: id,
+				licenseStatus: licenseStatus
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+    /**
+     FinMind API for admin to edit people
+     **/
+    static async registerSendEmail(userEmail) {
+        const requestData = {
+            header: {
+                api_id: 2021890
+            },
+            data: {
+                userEmail: userEmail
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
+
+    /**
+     FinMind API for admin to edit people
+     **/
+    static async anonymousCommercialLoanList() {
+        const requestData = {
+            header: {
+                api_id: 2021889
+            },
+            data: {
+            }
+        };
+        const req =  Net.composePostRequestFromData_private(requestData);
+        // remote call
+        return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+    }
 
 	/**
 		compose finMind API request for starting to apply for a product
@@ -1666,7 +1719,7 @@ class Net {
 	/**
 		Yatu API for user-sign up and register for Yatu service
 	**/
-	static composeRequestDataForSignUp_private(userFirstName, userMiddleName, userLastName, email, userPassword) {
+	static composeRequestDataForSignUp_private(userFirstName, userMiddleName, userLastName, email, userPassword, validCode) {
 		const loginData = {
 			header: {
 				token: "",
@@ -1679,7 +1732,8 @@ class Net {
 				fistName: userFirstName,
 				middleName: userMiddleName,
 				lastName: userLastName,
-				pwh: sha256(sha256(userPassword))
+				pwh: sha256(sha256(userPassword)),
+                validCode: validCode
 			}
 		};
 		return Net.composePostRequestFromData_private(loginData);

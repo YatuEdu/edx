@@ -58,7 +58,7 @@ const pageTemplate = `
 </div>
 `;
 const rowTemplate = `
-<tr>
+<tr id="{id}">
 	<td>{name}</td>
 	<td>{email}</td>
 	<td>{phone}</td>
@@ -129,6 +129,7 @@ class People {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
 			$('#list').append(rowTemplate
+				.replace('{id}', row.id)
 				.replace('{name}', row.first_name + " " + row.middle_name + " " + row.last_name)
 				.replace('{email}', row.email || '')
 				.replace('{phone}', row.phone_number || '')
@@ -175,13 +176,12 @@ class People {
 		let licenseStatus = $(row).find(".licenseStatus");
 		let licenseStatusVal = UIUtil.uiExitEdit(licenseStatus, 'selector');
 
-		// let res = await Net.insurancePolicyUpdate(credMan.credential.token, id, parseInt(productVal), 0,
-		// 	insuredNameVal, parseInt(coverageAmountVal), effectiveDateVal, statusVal);
-		// if (res.errCode!=0) {
-		// 	let errMsg = res.err.msg;
-		// 	alert(errMsg);
-		// 	return;
-		// }
+		let res = await Net.adminEditPeople(credMan.credential.token, id, parseInt(licenseStatusVal));
+		if (res.errCode!=0) {
+			let errMsg = res.err.msg;
+			alert(errMsg);
+			return;
+		}
 		$(row).removeClass("edit");
 		$(row).find(".btnEdit").text("Edit");
 	}

@@ -1,6 +1,7 @@
 import {sysConstants} from '../../core/sysConst.js'
 import {credMan} from '../../core/credManFinMind.js'
 import {Net} from "../../core/net.js";
+import {ValidUtil} from "../../core/util.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -163,12 +164,12 @@ const editButtons = `
 
 class MyProfile {
 	#container;
-	
+
     constructor(container) {
 		this.#container = container;
 		this.init();
 	}
-	
+
 	// hook up events
 	async init() {
     	this.#container.empty();
@@ -186,6 +187,8 @@ class MyProfile {
 				.replaceAll('{producerInfoHidden}', 'hidden');
 		}
 		this.#container.append(page);
+
+		$('#birthday').attr("max", moment(new Date()).format("YYYY-MM-DD"));
 
     	this.requestProfile();
 		$('#editBtn').click(this.handelEditBtn.bind(this));
@@ -232,6 +235,33 @@ class MyProfile {
 	}
 
 	async saveEdit() {
+
+		const email = $("#email").val().trim();
+		const firstName = $("#first_name" ).val().trim();
+		const lastName = $('#last_name').val();
+		const zipCode = $('#zip_code').val();
+		const phone = $('#phone_number').val();
+
+		if (!email || !firstName || !lastName) {
+			alert('Email, first name and last name cannot be empty');
+			return;
+		}
+
+		if (!ValidUtil.isEmailValid(email)) {
+			alert('Email format is incorrect');
+			return;
+		}
+
+		if (!ValidUtil.isPhoneValid(phone)) {
+			alert('Phone format is incorrect');
+			return;
+		}
+
+		if (!ValidUtil.isZipCodeValid(zipCode)) {
+			alert('ZipCode must be 5 digits');
+			return;
+		}
+
 
     	let gender = $('input[type=radio][name=name_for_1]:checked').attr('value');
 		let res = await Net.updateMyProfile(credMan.credential.token,

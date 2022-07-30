@@ -174,6 +174,23 @@ class ValidUtil {
 		}
 	}
 
+	static isPasswordValid(str) {
+		const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
+		if (!regExp.test(str.toLowerCase())) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	static isZipCodeValid(str) {
+		const regExp = /^\d{5}(-\d{4})?$/;
+		if (!regExp.test(str.toLowerCase())) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
 
 export { TimeUtil, StringUtil, ArrayUtil, ValidUtil };

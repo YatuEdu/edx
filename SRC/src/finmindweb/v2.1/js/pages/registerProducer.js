@@ -43,7 +43,14 @@ const page_step1 = `
                         </div>
                         <div class="col-12 mt-4">
                             <label for="Email" class="form-label fs-6p">Email address*</label>
-                            <input id="fm_rgstr_email" type="email" class="form-control form-control-lg" id="Email" placeholder="Enter email address">
+                            <div class="position-relative">
+                                <input id="fm_rgstr_email" type="email" class="form-control form-control-lg" id="Email" placeholder="Enter email address">
+                                <a href="#" id="getCodeBtn" class="text-decoration-none fw-bold text-body position-absolute top-50 end-0 translate-middle">get code</a>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label for="emailVerificationCode" class="form-label fs-6p">Email verification code*</label>
+                            <input class="form-control form-control-lg" id="emailCode" placeholder="Please enter your email verification code">
                         </div>
                         <div class="col-12 mt-4">
                             <label for="password" class="form-label fs-6p">Create password*</label>
@@ -272,7 +279,7 @@ const page_step3 = `
                             <input id="fm_rgstr_license_number" type="text" class="form-control form-control-lg" placeholder="Please enter license number">
                         </div>
                         <div class="col-12 mt-4 position-relative">
-                            <label for="Birthday" class="form-label fs-6p">Birthday</label>
+                            <label for="Birthday" class="form-label fs-6p">Birthday*</label>
                             <input id="fm_rgstr_birthday" type="date" class="form-control form-control-lg"/>
                         </div>
                         <div class="col-12 mt-5">
@@ -306,6 +313,7 @@ class RegisterProducerPageHandler {
     #lastName;
     #email;
     #pw;
+    #emailCode;
 
     #phone;
     #address1;
@@ -352,6 +360,7 @@ class RegisterProducerPageHandler {
         $( "#fm_rgstr_first_name" ).focusout(this.validateInput);
         $( "#fm_rgstr_last_name" ).focusout(this.validateInput);
         $( "#fm_rgstr_step1_next" ).click(this.nextStep.bind(this, 1));
+        $('#getCodeBtn').click(this.handleGetCode.bind(this));
 
     }
 
@@ -386,6 +395,23 @@ class RegisterProducerPageHandler {
         $( "#registerSubmit" ).click(this.nextStep.bind(this, 3));
     }
 
+    async handleGetCode() {
+        let email = $('#fm_rgstr_email').val();
+        if (!ValidUtil.isEmailValid(email)) {
+            alert('Email address is incorrect');
+            return;
+        }
+        let ret = await Net.registerSendEmail(email);
+        if (ret.errCode!=0) {
+            let errMsg = ret.err.msg;
+            alert(errMsg);
+            return;
+        } else {
+            $('#getCodeBtn').text('send');
+            $('#getCodeBtn').removeAttr('href');
+            $('#getCodeBtn').off('click');
+        }
+    }
 
     // handling input focus loss to check valid input
     // add error message <p> element if empty text for the necessary fields
@@ -453,12 +479,17 @@ class RegisterProducerPageHandler {
             this.#email = $("#fm_rgstr_email").val().trim();
             this.#pw = $("#fm_rgstr_password" ).val().trim();
             let agree = $("#fm_rgstr_agree").is(':checked');
-            if (!this.#firstName || !this.#lastName || !this.#email || !this.#pw) {
+            this.#emailCode = $('#emailCode').val();
+            if (!this.#firstName || !this.#lastName || !this.#email || !this.#pw  || !emailCode) {
                 $(e.target).after( `<p style="color:red;">Email, name, and password cannot be empty</p>` );
                 return;
             }
             if (!ValidUtil.isEmailValid(this.#email)) {
                 $(e.target).after( `<p style="color:red;">Invalid email format</p>` );
+                return;
+            }
+            if (!ValidUtil.isPasswordValid(this.#pw)) {
+                $(e.target).after( `<p style="color:red;">Password is not strong enough</p>` );
                 return;
             }
             if (!agree) {
@@ -483,6 +514,10 @@ class RegisterProducerPageHandler {
                 $(e.target).after( `<p style="color:red;">Invalid phone format</p>` );
                 return;
             }
+            if (!ValidUtil.isZipCodeValid(this.#zipCode)) {
+                $(e.target).after( `<p style="color:red;">Invalid zip code</p>` );
+                return;
+            }
             this.loadStep3();
         } else if (currStep===3) {
             this.#licenseHome = $( "#fm_rgstr_license_home" ).val().trim();
@@ -497,7 +532,7 @@ class RegisterProducerPageHandler {
                 return;
             }
 
-            let ret = await Net.agentRegisterWithEmailAndPw(this.#email, this.#email, this.#firstName, this.#middleName,
+            let ret = await Net.agentRegisterWithEmailAndPw(this.#email, this.#email, this.#emailCode, this.#firstName, this.#middleName,
                 this.#lastName, sha256(sha256(this.#pw)), this.#phone, this.#address1, this.#address2, this.#city,
                 this.#state, this.#zipCode, this.#licenseHome, this.#licenseNumber, this.#birthday);
 

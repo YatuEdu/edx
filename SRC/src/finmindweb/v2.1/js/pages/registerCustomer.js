@@ -1,5 +1,7 @@
 import {sysConstants} from '../core/sysConst.js'
 import {credMan} from '../core/credManFinMind.js'
+import {ValidUtil} from "../core/util.js";
+import {Net} from "../core/net.js";
 
 const page_template = `
 <div class="container-fluid g-0">
@@ -40,8 +42,14 @@ const page_template = `
                         </div>
                         <div class="col-12 mt-4">
                             <label for="Email" class="form-label fs-6p">Email address*</label>
-                            <input id="fm_rgstr_email" type="email" class="form-control form-control-lg" id="Email" placeholder="Enter email address">
-                            
+                            <div class="position-relative">
+                                <input id="fm_rgstr_email" type="email" class="form-control form-control-lg" id="Email" placeholder="Enter email address">
+                                <a href="#" id="getCodeBtn" class="text-decoration-none fw-bold text-body position-absolute top-50 end-0 translate-middle">get code</a>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label for="emailVerificationCode" class="form-label fs-6p">Email verification code*</label>
+                            <input class="form-control form-control-lg" id="emailCode" placeholder="Please enter your email verification code">
                         </div>
                         <div class="col-12 mt-4">
                             <label for="password" class="form-label fs-6p">Create password*</label>
@@ -58,7 +66,7 @@ const page_template = `
                             </div>
                         </div>
                         <div class="col-12 mt-5">
-                            <button id="fm_rgstr_submmit" class="btn btn-primary btn-xl w-100" type="button">Register Accountn</button>
+                            <button id="fm_rgstr_submmit" class="btn btn-primary btn-xl w-100" type="button">Register Account</button>
                         </div>
                     </div>
                 </div>
@@ -95,6 +103,8 @@ class RegisterCustomerPageHandler {
         $( "#fm_rgstr_password" ).focusout(this.validateInput);
         $( "#fm_rgstr_first_name" ).focusout(this.validateInput);
         $( "#fm_rgstr_last_name" ).focusout(this.validateInput);
+
+        $('#getCodeBtn').click(this.handleGetCode.bind(this));
     }
 
     // handling input focus loss to check valid input
@@ -111,13 +121,31 @@ class RegisterCustomerPageHandler {
         }
     }
 
+    async handleGetCode() {
+        let email = $('#fm_rgstr_email').val();
+        if (!ValidUtil.isEmailValid(email)) {
+            alert('Email address is incorrect');
+            return;
+        }
+        let ret = await Net.registerSendEmail(email);
+        if (ret.errCode!=0) {
+            let errMsg = ret.err.msg;
+            alert(errMsg);
+            return;
+        } else {
+            $('#getCodeBtn').text('send');
+            $('#getCodeBtn').removeAttr('href');
+            $('#getCodeBtn').off('click');
+        }
+    }
+
     validateEmail(e) {
         e.preventDefault();
-        $(this).next('p').remove();
+        $(this).parent().next('p').remove();
         if (!$(this).val()) {
             const dataId = $(this).attr('data-text-id');
             const warning = "Email field cannot be empty"; //  uiMan.getText(dataId);
-            $(this).after( `<p style="color:red;">${warning}</p>` );
+            $(this).parent().after( `<p style="color:red;">${warning}</p>` );
         } else {
             const email = $(this).val();
             const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -140,27 +168,30 @@ class RegisterCustomerPageHandler {
         const lname = $("#fm_rgstr_last_name").val().trim();
         const email = $("#fm_rgstr_email").val().trim();
         const pw = $("#fm_rgstr_password" ).val().trim();
+        let emailCode = $('#emailCode').val();
 
-        if (!email || !pw) {
-            $(e.target).after( `<p style="color:red;">Email, name, and password cannot be empty</p>` );
+        if (!email || !pw || !emailCode) {
+            $(e.target).after( `<p style="color:red;">Email, name, valid code and password cannot be empty</p>` );
             return;
         }
-
+        if (!ValidUtil.isPasswordValid(pw)) {
+            $(e.target).after( `<p style="color:red;">Password is not strong enough</p>` );
+            return;
+        }
         if (!$('#fm_rgstr_agree').is(':checked')) {
             $(e.target).after( `<p style="color:red;">You must agree to our terms & conditions</p>` );
             return;
         }
 
         // async call to register
-        const resp = await this.#credMan.signUp(fname, mname, lname, email, pw);
-        if (resp.code === 0) {
-            // go to my page
+        const ret = await this.#credMan.signUp(fname, mname, lname, email, pw, emailCode);
+        if (ret.errCode!=0) {
+            let errMsg = ret.err.msg;
+            alert(errMsg);
+            $(e.target).after( `<p style="color:red;">${ret.errCode}</p>` );
+            return;
+        } else {
             window.location.href = REG_SUCCESS_PATH + '#customer';;
-        }
-        else {
-            //const msg = "email is in use error"; // to do, return error message from server
-            // dispaly error message
-            $(e.target).after( `<p style="color:red;">${resp.code}</p>` );
         }
     }
 }
