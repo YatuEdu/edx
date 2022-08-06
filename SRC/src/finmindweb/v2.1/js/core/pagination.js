@@ -27,7 +27,7 @@ class Pagination {
     #boxList = [];
 
     constructor(pageContainer, pageSize, total, pageFunc) {
-
+        if (total==null) total = 0;
         this.#pageContainer = pageContainer;
         this.#pageSize = pageSize;
         this.#total = total;
@@ -144,7 +144,10 @@ class Pagination {
         $("#pageGo").keypress(function (e) {
             if (e.which === 13) {
                 let page = Number($("#pageGo").val());
-                that.goPage(page);
+                // 是否可以跳转到此页？
+                let pageMax = Math.ceil(this.#total/this.#pageSize);
+                if (page<pageMax && page>0)
+                    that.goPage(page);
             }
         });
 

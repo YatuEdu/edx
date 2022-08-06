@@ -103,11 +103,6 @@ const page_template = `
 	</div>
 	<div class="swiper py-3 RecentlyFinancedSwiper">
 	    <div class="swiper-wrapper" id="loansDiv">
-	        <div class="swiper-slide" style="margin-left: 11%;">
-				<img src="../img/bg-questions.png" class="img-fluid">
-				<h6 class="p-4 pb-3 m-0">Name</h6>
-				<p class="px-4 pb-2 fs-8 lh-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnqjih...</p>
-			</div>
 		</div>
 		<div class="swiper-button-prev"></div>
 		<div class="swiper-button-next"></div>

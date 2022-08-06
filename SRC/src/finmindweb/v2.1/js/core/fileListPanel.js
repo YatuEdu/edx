@@ -13,7 +13,7 @@ const template_for_file_element = `
   </div>
   <div class="position-relative">
 	<b class="fs-8 border p-1 rounded fw-bold px-2">
-		1.46MB
+		{fileSize}
 	</b>
 	<aside class="position-absolute end-0 top-50 translate-middle-y">
 		<a id="{id}_delete"  class="btn-file-delete" title="Delete"></a>
@@ -29,27 +29,27 @@ const replacementForId = '{id}';
 const replacementForTime = '{time}';
 
 
-class UploadedFileListPanel { 
- 
+class UploadedFileListPanel {
+
 	#applicationId;
 	#fileList;
-	
-	constructor(appId) { 
+
+	constructor(appId) {
 		this.#applicationId = appId;
 	}
-	
+
 	elmentId(indx) {
 		return `uploaded_file${indx}`;
 	}
-	
+
 	deleteSelector(indx) {
 		return `#${this.elmentId(indx)}_delete`;
 	}
-	
+
 	downloadSelector(indx) {
 		return `#${this.elmentId(indx)}_download`;
 	}
-	
+
 	/*
 		Obtain the html representation for a list of messages
 	*/
@@ -62,11 +62,12 @@ class UploadedFileListPanel {
 			html += template_for_file_element
 				.replace(replacementForFileName, f.file)
 				.replace(replacementForTime, fromNow + ' ago')
-				.replace(new RegExp(replacementForId, 'g'), this.elmentId(i));
+				.replace(new RegExp(replacementForId, 'g'), this.elmentId(i))
+				.replace('{fileSize}', this.fileSize(f.size))
 		}
-		
+
 		// hook up event handler
-		
+
 		return html;
 	}
 
@@ -91,7 +92,24 @@ class UploadedFileListPanel {
 			return Math.floor(seconds) + ' seconds';
 		}
 	}
-	
+
+	fileSize(size) {
+		if (!size)
+			return "";
+
+		let num = 1024.00; //byte
+
+		if (size < num)
+			return size + "B";
+		if (size < Math.pow(num, 2))
+			return (size / num).toFixed(2) + "K"; //kb
+		if (size < Math.pow(num, 3))
+			return (size / Math.pow(num, 2)).toFixed(2) + "M"; //M
+		if (size < Math.pow(num, 4))
+			return (size / Math.pow(num, 3)).toFixed(2) + "G"; //G
+		return (size / Math.pow(num, 4)).toFixed(2) + "T"; //T
+	}
+
 	/**
 		handle delete button to delete the file from server and then
 		remove the file icon from UI
@@ -100,11 +118,11 @@ class UploadedFileListPanel {
 		const key = this.#applicationId.toString();
 		const elelement = `#${parentId}`;
 		const token = credMan.credential.token;
-		return async (e) => 
+		return async (e) =>
 		{
 			e.preventDefault();
-			const res = await Net.deleteUploadedFiles(token, 
-												      fileInfo, 
+			const res = await Net.deleteUploadedFiles(token,
+												      fileInfo,
 													  key, key, key);
 			// if succeeded
 			if (res) {
@@ -112,17 +130,17 @@ class UploadedFileListPanel {
 			}
 		}
 	}
-	
+
 	/**
 		handle down-load file button to download the file from server.
 	**/
 	createDownloadHandler(fileInfo) {
 		const key = this.#applicationId.toString();
-		const token = credMan.credential.token;		
-		return async (e) => 
+		const token = credMan.credential.token;
+		return async (e) =>
 		{
 			e.preventDefault();
-			const res = await Net.downloadUploadedFiles(token, 
+			const res = await Net.downloadUploadedFiles(token,
 												        fileInfo.file,
 													    key, key, key);
 			// if succeeded
@@ -135,7 +153,7 @@ class UploadedFileListPanel {
 			}
 		}
 	}
-	
+
 	/*
 		Obtain the html representation for a list of messages
 	*/
@@ -144,12 +162,12 @@ class UploadedFileListPanel {
 			const fileInfo = this.#fileList[i];
 			const delSelector = this.deleteSelector(i);
 			const dwnldSelector = this.downloadSelector(i);
-			
+
 			$(delSelector).click(this.createDeleteHandler(this.elmentId(i), fileInfo));
 			$(dwnldSelector).click(this.createDownloadHandler(fileInfo));
 		}
 	}
-	
+
 	async getUploadedFiles() {
 		const token = credMan.credential.token;
 		const key = this.#applicationId.toString();
@@ -159,7 +177,7 @@ class UploadedFileListPanel {
 			this.#fileList = ret.data;
 			return this.displayHtml(ret.data);
 		}
-		
+
 		return '';
 	}
 
