@@ -28,13 +28,17 @@ const SEL_MSG_RECEIVER		= "select_option_msg_rcvr";
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CLSS = '{taclss}';
 const REPLACEMENT_LB = '{lb}';
+const REPLACEMENT_STUDENT_ID = '{stdtgid}';
 
 const TA_STUDENT_CONSOLE_PREFIX = "yt_ta_for_";
 const CSS_STUDENT_CONSOLE_EX = 'student-input-board-extend';
 const CSS_STUDENT_CONSOLE = 'student-input-board';
 
+const STUDENT_TOGGLE_BUTTON_TEMPLATE = 'yt_bt_student_console_toggle_';
+
 const STUDENT_BOARD_TEMPLATE = `
 <label>{lb}</lable>
+<button class="btn btn-rounded btn-outline-primary translatable" id="{stdtgid}" >toggle</button>
 <textarea class="{taclss}"
 		  id="{taid}" 
 		  spellcheck="false"
@@ -210,11 +214,12 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
 								.replace(REPLACEMENT_LB, student)
 								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
-								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student));
+								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
+								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student));
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
 		
 		// handle clicking event
-		$(this.getStudentConsoleIdSelector(student)).click(this.toggleStudentConsole);	
+		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.toggleStudentConsole.bind(this));	
 	}
 	
 	/**
@@ -236,13 +241,18 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 **/
 	toggleStudentConsole(e) {
 		e.preventDefault(); 
-		if ($(this).hasClass( CSS_STUDENT_CONSOLE)) {
-			$(this).removeClass(CSS_STUDENT_CONSOLE);
-			$(this).addClass(CSS_STUDENT_CONSOLE_EX);
+		// get student name
+		const student = StringUtil.getIdStrFromBtnId(e.target.id);
+		// get student console Id
+		const sel = this.getStudentConsoleIdSelector(student);
+		// toggle console size by CSS toggle
+		if ($(sel).hasClass( CSS_STUDENT_CONSOLE)) {
+			$(sel).removeClass(CSS_STUDENT_CONSOLE);
+			$(sel).addClass(CSS_STUDENT_CONSOLE_EX);
 		}
 		else {
-			$(this).removeClass(CSS_STUDENT_CONSOLE_EX);
-			$(this).addClass(CSS_STUDENT_CONSOLE);
+			$(sel).removeClass(CSS_STUDENT_CONSOLE_EX);
+			$(sel).addClass(CSS_STUDENT_CONSOLE);
 		}
 	}
 	
@@ -485,8 +495,8 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// button for SWITCHING mode
 	get eraseResultButton() {
 		return `#${BTN_ERASE_RESULT}`;
-	}
-	
+	}	
+
 	// button for sending message
 	get msgSendButton() {
 		return `#${BTN_MSG_SEND}`;
@@ -500,6 +510,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// student consol it getter
 	getStudentConsoleId(student) {
 		return `${TA_STUDENT_CONSOLE_PREFIX}${student}`; 
+	}
+	
+	// button for toggle student console max/min mode
+	getstudentConsoleToggleButton(student) {
+		return `${STUDENT_TOGGLE_BUTTON_TEMPLATE}${student}`;
+	}
+	
+	// button selector for toggle student console max/min mode
+	getstudentConsoleToggleButtonSelector(student) {
+		return `#${this.getstudentConsoleToggleButton(student)}`;
 	}
 	
 	getStudentConsoleIdSelector(student) {

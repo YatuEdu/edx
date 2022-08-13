@@ -13,6 +13,8 @@ const REPLACE_PID = '{pid}';
 const VIDEO_TEMPLATE = `
 <video class="yt_video" id="yt_video_{pid}" autoplay playsinline>"`;
 
+const USER_VIDEO_ID_TEMPLATE = 'yt_video_';
+
 /**
 
 	This class (CommunicationSpace) serves as the root class for the communication room, and specifically, 
@@ -193,10 +195,19 @@ class CommunicationSpace {
 		const videTagStr = VIDEO_TEMPLATE
 							.replace(REPLACE_PID, user);
 		const videoElement = $(videTagStr)[0];
-		$(this.videoAreaDiv).append(videoElement);
+		
+		//
+		// If user has a video area, use it, otherwise add a new one
+		// this is to prevent multiple video areaq in the situation of 
+		// user's reconnection after loss of connection
+		//
+		const userSelector = `#${USER_VIDEO_ID_TEMPLATE}${user}`;
+		if ($(this.videoAreaDiv).find(userSelector).length === 0) {	
+			$(this.videoAreaDiv).append(videoElement);
+		}
 		videoElement.srcObject = mediaStream;
 
-		// 这里保存标签，只是为了后面可以移除
+		// Keep tract of all user and its video/audio tags
 		let userObj = this.#userMap.get(user);
 		if (userObj != null ) {
 			userObj.videoTag = videoElement;
