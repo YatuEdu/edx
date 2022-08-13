@@ -29,16 +29,19 @@ const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CLSS = '{taclss}';
 const REPLACEMENT_LB = '{lb}';
 const REPLACEMENT_STUDENT_ID = '{stdtgid}';
+const REPLACEMENT_STUDENT_ID2 = '{stdtgid2}';
 
 const TA_STUDENT_CONSOLE_PREFIX = "yt_ta_for_";
 const CSS_STUDENT_CONSOLE_EX = 'student-input-board-extend';
 const CSS_STUDENT_CONSOLE = 'student-input-board';
 
 const STUDENT_TOGGLE_BUTTON_TEMPLATE = 'yt_bt_student_console_toggle_';
+const STUDENT_RUN_BUTTON_TEMPLATE = 'yt_bt_student_console_code_run_';
 
 const STUDENT_BOARD_TEMPLATE = `
 <label>{lb}</lable>
-<button class="btn btn-rounded btn-outline-primary translatable" id="{stdtgid}" >toggle</button>
+<button class="btn btn-outline-primary translatable" id="{stdtgid}" >toggle</button>
+<button class="btn btn-outline-primary translatable" id="{stdtgid2}" >run</button>
 <textarea class="{taclss}"
 		  id="{taid}" 
 		  spellcheck="false"
@@ -215,11 +218,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 								.replace(REPLACEMENT_LB, student)
 								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
 								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
-								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student));
+								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
+								.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
 		
-		// handle clicking event
+		// handle toggle clicking event
 		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.toggleStudentConsole.bind(this));	
+		
+		// handle run-code clicking event
+		$(this.getstudentConsoleRunCodeButtonSelector(student)).click(this.runStudentCode.bind(this));	
+
 	}
 	
 	/**
@@ -342,6 +350,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// run code for each student second
 		this.#displayBoardTeacher.runCode();
+	}
+	
+	/**
+		Run code sample from students console
+	**/
+	runStudentCode(e) {
+		e.preventDefault(); 
+		const student = StringUtil.getIdStrFromBtnId(e.target.id);
+		const codeText = $(this.getStudentConsoleIdSelector(student)).val();
+		super.executeCode(codeText);
 	}
 	
 	/**
@@ -520,6 +538,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// button selector for toggle student console max/min mode
 	getstudentConsoleToggleButtonSelector(student) {
 		return `#${this.getstudentConsoleToggleButton(student)}`;
+	}
+	
+	// button for running student console code locally
+	getstudentRunCodeButton(student) {
+		return `${STUDENT_RUN_BUTTON_TEMPLATE}${student}`;
+	}
+	
+	// button selector for running student console code locally
+	getstudentConsoleRunCodeButtonSelector(student) {
+		return `#${this.getstudentRunCodeButton(student)}`;
 	}
 	
 	getStudentConsoleIdSelector(student) {
