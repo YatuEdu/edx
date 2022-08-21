@@ -86,7 +86,18 @@
 }
 
 .input-board {
-    height: 600px !important;       
+    height: 550px !important;       
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 700;
+	font-size: 18px;
+    line-height: 1.5;
+	border:outset 4px orange;
+}
+
+.input-board_teacher {
+	height: 600px !important;       
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -94,27 +105,6 @@
 	font-size: 24px;
     line-height: 1.5;
 	border:outset 4px orange;
-}
-
-.student-input-board {
-    width: 95%; !important;       
-    overflow-y: auto;    			/* Trigger vertical scroll    */
-    overflow-x: hidden;  			/* Hide the horizontal scroll */
-	font-family: 'Merriweather';
-    font-weight: 300;
-	font-size: 10px;
-    line-height: 10%;
-	border:outset 4px orange;
-}
-
-.student-input-board-extend {
-	width: 100vw;									/* <-- children as wide as the browser window (viewport) */
-	height: 80vw !important;
-	overflow-y: 	auto;    						/* Trigger vertical scroll    */
-	z-index: 99 !important;						/* ON TOP */
-	position: absolute;
-	background: #0000FF;
-	color: #FFFFFF;
 }
 
 .output-board {  
@@ -128,6 +118,76 @@
 	background: #888888 !important;
 	color: #ffffff;
 	border:outset 4px orange;
+}
+
+.output-board-teacher {  
+	height: 600px !important;    
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 300;
+	font-size: 24px;
+    line-height: 1.5;
+	background: #888888 !important;
+	color: #ffffff;
+	border:outset 4px orange;
+}
+
+.student-input-board-container-noshow {
+	border: none;
+	background:none;
+}
+
+.student-input-board-container-extent {
+    position:relative;
+    
+	border:outset 4px orange;
+}
+
+.student-input-board-extend {
+	position:relative;
+    border:none;
+	width: 58vw;								/* <-- children as wide as the browser window (viewport) */
+	height: 40vw;
+	overflow-y: auto;    						/* Trigger vertical scroll    */
+	z-index: 99 !important;						/* ON TOP */
+	background: #000000;
+	color: #FFFFFF;
+	resize: none;
+    outline: none;	
+}
+
+.student-input-board-button-run_code {
+	position: absolute;
+	float:right;
+	margin-top: 1px;
+    margin-right: 2px;
+	top: 6vw;
+	left: 50vw;
+	z-index: 100 !important;	
+    width: 90px;
+    height: 30px;
+    border: 1px solid #ddd;
+	color:  #00ff00;
+    background-color:#ff0000;
+}
+
+.student-input-board-button-notext {
+    width: 90px;
+    height: 30px;
+    border: 1px solid #ddd;
+	color:  white;
+    background-color:#0a0a23;
+	line-height: 50%
+}
+
+.student-input-board-button-withtext {
+	width: 90px;
+    height: 30px;
+    border: 1px solid #ddd;
+	color:  #000000;
+    background-color:#00ff00;
+	line-height: 50%
 }
 
 .msg-board {

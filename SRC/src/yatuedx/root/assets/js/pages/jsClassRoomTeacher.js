@@ -2,11 +2,12 @@ import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysCons
 import {credMan} 							from '../core/credMan.js'
 import {Net}			    				from "../core/net.js"
 import {uiMan} 								from '../core/uiManager.js';
-import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
-import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
-import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
-import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil, TimeUtil}		from '../core/util.js';
+import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
+import {STUDENT_BOARD_TEMPLATE}				from '../component/studentCommCard.js';
+import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
+import {IncomingCommand}					from '../command/incomingCommand.js'
+import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 
 const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
 const TA_RESULT_CONSOLE 	= "yt_result_console";
@@ -24,28 +25,37 @@ const BTN_BEAUTIFY_CODE 	= "yt_btn_btfy_code"
 const BTN_RUN_CODE  		= "yt_btn_run_code_on_student_board";
 const BTN_MSG_SEND			= "yt_btn_msg_send";
 const SEL_MSG_RECEIVER		= "select_option_msg_rcvr";
+const STUDENT_MESAGE_BUTTON_PREFIX = "yt_btn_std_msg_";
+const STUDENT_MESAGE_CONTAINER_PREFIX = "yt_div_std_msg_ctnr_";
+const STUDENT_MESAGE_SEND_BUTTON_PREFIX = "yt_btn_std_msg_send_";
+const STUDENT_MESAGE_TA_PREFIX = 'yt_ta_std_msg_';
 
 const REPLACEMENT_TA_ID = '{taid}';
+const REPLACEMENT_TA_CONTAINER_ID = '{console_ctnr_id}'
 const REPLACEMENT_TA_CLSS = '{taclss}';
 const REPLACEMENT_LB = '{lb}';
 const REPLACEMENT_STUDENT_ID = '{stdtgid}';
 const REPLACEMENT_STUDENT_ID2 = '{stdtgid2}';
+const REPLACEMENT_STUDENT_MSG_BTN_ID =  '{stdt_msg_btn_id}';
+const REPLACEMENT_TA_MSG_CONTAINER_ID = '{msg_ctnr_id}'
+const REPLACEMENT_BTN_MSG_SEND_ID = '{msg_send_btn_id}';
+const REPLACEMENT_TA_MSG_ID = '{std_msg_ta_id}';
 
-const TA_STUDENT_CONSOLE_PREFIX = "yt_ta_for_";
-const CSS_STUDENT_CONSOLE_EX = 'student-input-board-extend';
-const CSS_STUDENT_CONSOLE = 'student-input-board';
+const TA_STUDENT_CONSOLE_PREFIX = "yt_stdf_inpt_ta_for_";
+const TA_STUDENT_CONSOLE_CONTAINER_PREFIX = "yt_stdt_inpt_ta_ctnr_div_for_";
+
+const CSS_STUDENT_CONSOLE = 'student-input-board-container-noshow';
+const CSS_STUDENT_CONSOLE_EX = 'student-input-board-container-extend';
+
+const CSS_STUDENT_COMM_NO_TEXT = 'student-input-board-button-notext';
+const CSS_STUDENT_COMM_WITH_TEXT = 'student-input-board-button-withtext';
+
+const STUDENT_TOGGLE_BUTTON_MAX = "Code";
+const STUDENT_MESSAGE_BUTTON_MAX = "Message";
+const STUDENT_TOGGLE_BUTTON_MIN = "Hide";
 
 const STUDENT_TOGGLE_BUTTON_TEMPLATE = 'yt_bt_student_console_toggle_';
 const STUDENT_RUN_BUTTON_TEMPLATE = 'yt_bt_student_console_code_run_';
-
-const STUDENT_BOARD_TEMPLATE = `
-<label>{lb}</lable>
-<button class="btn btn-outline-primary translatable" id="{stdtgid}" >toggle</button>
-<button class="btn btn-outline-primary translatable" id="{stdtgid2}" >run</button>
-<textarea class="{taclss}"
-		  id="{taid}" 
-		  spellcheck="false"
-		  placeholder="Enter Code Here"></textarea>`; 
 
 const MSG_RECEIVER_SELECTION_TEMPLATE = `
   <label class="form-label">Message receiver:</label>
@@ -217,16 +227,26 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
 								.replace(REPLACEMENT_LB, student)
 								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
+								.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
 								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
 								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
 								.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
+								.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
+								.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
+								.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
+								.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student));
+
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
 		
-		// handle toggle clicking event
+		// handle toggle code console event
 		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.toggleStudentConsole.bind(this));	
 		
 		// handle run-code clicking event
 		$(this.getstudentConsoleRunCodeButtonSelector(student)).click(this.runStudentCode.bind(this));	
+		
+		// handle toggle message button event
+		$(this.getStudentMessageButtonSelector(student)).click(this.toggleStudentMessageContqainer.bind(this));	
+
 
 	}
 	
@@ -245,25 +265,85 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		When the student console is clicked,  toggle bewtween a min / max sized console.
+		When the student has text in their console,  make its background green. Otherwise black.
+	 **/
+	toggleStudentButton(student, hasCode) {	
+		// get student button id
+		const sel = this.getstudentConsoleToggleButtonSelector(student)
+		
+		// toggle button style by CSS toggle
+		if (hasCode) {
+			$(sel).removeClass(CSS_STUDENT_COMM_NO_TEXT);
+			$(sel).addClass(CSS_STUDENT_COMM_WITH_TEXT);
+		}
+		else {
+			$(sel).removeClass(CSS_STUDENT_COMM_NO_TEXT);
+			$(sel).addClass(CSS_STUDENT_COMM_WITH_TEXT);
+		}
+	}
+	
+	/**
+		When the student message board show/hide button is clicked,  toggle bewtween a min / max sized console.
 	 **/
 	toggleStudentConsole(e) {
 		e.preventDefault(); 
 		// get student name
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		// get student console Id
-		const sel = this.getStudentConsoleIdSelector(student);
-		// toggle console size by CSS toggle
-		if ($(sel).hasClass( CSS_STUDENT_CONSOLE)) {
-			$(sel).removeClass(CSS_STUDENT_CONSOLE);
-			$(sel).addClass(CSS_STUDENT_CONSOLE_EX);
-		}
-		else {
-			$(sel).removeClass(CSS_STUDENT_CONSOLE_EX);
-			$(sel).addClass(CSS_STUDENT_CONSOLE);
-		}
+		const containerSelector = this.getStudentConsoleContainerIdSelector(student);
+		// get student button id
+		const buttonSelector = this.getstudentConsoleToggleButtonSelector(student)
+	
+		const minClass = CSS_STUDENT_CONSOLE;
+		const maxClass = CSS_STUDENT_CONSOLE_EX;
+		
+		const maxButtonText = STUDENT_TOGGLE_BUTTON_MAX;
+		const minButtonText = STUDENT_TOGGLE_BUTTON_MIN;
+		this.toggleContainer(student, containerSelector, buttonSelector, 
+							 minClass, maxClass, maxButtonText, minButtonText);
 	}
 	
+	/**
+		When the student message board show/hide button is clicked,  toggle bewtween a min / max sized message board.
+	 **/
+	toggleStudentMessageContqainer(e) {
+		e.preventDefault(); 
+		// get student name
+		const student = StringUtil.getIdStrFromBtnId(e.target.id);
+		// get student console Id
+		const containerSelector = this.getStudentMessageContainerIdSelector(student);
+		// get student button id
+		const buttonSelector = this.getStudentMessageButtonSelector(student)
+	
+		const minClass = CSS_STUDENT_CONSOLE;
+		const maxClass = CSS_STUDENT_CONSOLE_EX;
+		
+		const maxButtonText = STUDENT_MESSAGE_BUTTON_MAX;
+		const minButtonText = STUDENT_TOGGLE_BUTTON_MIN 
+		this.toggleContainer(student, containerSelector, buttonSelector, 
+							 minClass, maxClass, maxButtonText, minButtonText);
+	}
+	
+	/**
+		Internal method to  toggle bewtween a min / max sized code/message board.
+	 **/
+	toggleContainer(student, containerSelector, buttonSelector, 
+					minClass, maxClass, maxButtonText, minButtonText) {
+		// toggle console size by CSS toggle
+		if ($(containerSelector).hasClass(minClass)) {
+			$(containerSelector).removeClass(minClass);
+			$(containerSelector).addClass(maxClass);
+			$(containerSelector).show();
+			$(buttonSelector).html(minButtonText);
+		}
+		else {
+			$(containerSelector).removeClass(maxClass);
+			$(containerSelector).addClass(minClass);
+			$(containerSelector).hide();
+			$(buttonSelector).html(maxButtonText);
+		}
+	}
+
 	/**
 		Got student code and save it to student consle so that a teacher knows what his student is doing.
 		The data consists of:
@@ -277,28 +357,39 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// obtain the new code sample using an algorithm defined in parent class as a static method
 		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode);
 		
-		// update the code on UI
-		if (!newContent) {
-			return;  // no need to validate
-		}
-		
-		// verify the digest if it is present
-		let shouldUpdate = true;
-		if (digest) {
-			if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
-				shouldUpdate = false;
-				console.log('content not verified, asking for re-sync');
-				this.#displayBoardTeacher.askReSync(student);
+		while (true) {		
+			// update the code on UI
+			if (!newContent) {
+				// no new content, brek out of while loop 
+				break;  
 			}
-		}
-		else {
-			console.log('No digest available');
+			
+			// verify the digest if it is present
+			let shouldUpdate = true;
+			if (digest) {
+				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
+					shouldUpdate = false;
+					console.log('content not verified, asking for re-sync');
+					this.#displayBoardTeacher.askReSync(student);
+				}
+			}
+			else {
+				console.log('No digest available');
+			}
+			
+			// update the code for this student on UI
+			if (shouldUpdate) {
+				$(this.getStudentConsoleIdSelector(student)).val(newContent);
+			}
+			
+			// break out of the while loop normally
+			break;
 		}
 		
-		// update the code for this student on UI
-		if (shouldUpdate) {
-			$(this.getStudentConsoleIdSelector(student)).val(newContent);
-		}
+		// change student button to indicate that student has new code
+		const hasCode = $(this.getStudentConsoleIdSelector(student)).val().trim().length > 0;
+		this.toggleStudentButton(student, hasCode);
+
 	}
 	
 	/**
@@ -525,7 +616,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${BTN_BEAUTIFY_CODE}`;
 	}
 	
-	// student consol it getter
+	// student console container id getter
+	getStudentConsoleContainerId(student) {
+		return `${TA_STUDENT_CONSOLE_CONTAINER_PREFIX}${student}`; 
+	}
+	
+	// student console container selector getter
+	getStudentConsoleContainerIdSelector(student) {
+		return `#${this.getStudentConsoleContainerId(student)}`; 
+	}
+	
+	// student console id getter
 	getStudentConsoleId(student) {
 		return `${TA_STUDENT_CONSOLE_PREFIX}${student}`; 
 	}
@@ -550,6 +651,47 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		return `#${this.getstudentRunCodeButton(student)}`;
 	}
 	
+	// button for showing(hide) student message console
+	getStudentMessageButtonId(student) {
+		return `${STUDENT_MESAGE_BUTTON_PREFIX}${student}`;
+	}
+	
+	// button selector for button which showing(hide) student message console
+	getStudentMessageButtonSelector(student) {
+		return `#${this.getStudentMessageButtonId(student)}`;
+	}
+	
+	// container student message console
+	getStudentMessageContainerId(student) {
+		return `${STUDENT_MESAGE_CONTAINER_PREFIX}${student}`;
+	}
+	
+	// selector for container student message console
+	getStudentMessageContainerIdSelector(student) {
+		return `#${this.getStudentMessageContainerId(student)}`; 
+	}
+	
+	// button for sending messages to student
+	getStudentMessageSendBtnId(student) {
+		return `${STUDENT_MESAGE_SEND_BUTTON_PREFIX}${student}`;
+	}
+	
+	// selector for button for sending messages to student
+	getStudentMessageSendBtnIdSelector(student) {
+		return `#${this.getStudentMessageSendBtnId(student)}`; 
+	}
+	
+	// text area for receiving messages from student
+	getStudentMessageTaId(student) {
+		return `${STUDENT_MESAGE_TA_PREFIX}${student}`;
+	}
+	
+	// selector for text area for receiving messages from student
+	getStudentMessageTaIdSelector(student) {
+		return `#${this.getStudentMessageTaId(student)}`; 
+	}
+		
+	// selector for student code console
 	getStudentConsoleIdSelector(student) {
 		return `#${this.getStudentConsoleId(student)}`; 
 	}
