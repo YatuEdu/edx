@@ -5,7 +5,7 @@ import {ArrayUtil}		from './util.js'
 const template_for_file_element = `
 <li id="{id}" class="list-group-item justify-content-between align-items-center d-flex px-1">
   <div class="d-flex align-items-start">
-	<img src="../img/ico-file-pdf.svg" >
+	<img src="../img/{ico}.svg" >
 	<div class="ms-3 me-2">
 		<h6 class="fs-7 mb-0">{fn}</h6>
 		<span class="fs-8">{time}</span>
@@ -27,6 +27,7 @@ const template_for_file_element = `
 const replacementForFileName = '{fn}';
 const replacementForId = '{id}';
 const replacementForTime = '{time}';
+const replacementForIco = '{ico}';
 
 
 class UploadedFileListPanel {
@@ -58,12 +59,15 @@ class UploadedFileListPanel {
 		for (let i = 0; i < list.length; i++) {
 			const f = list[i];
 			let fromNow = this.timeFromNow(f.modifyTime);
-
+			let fileType = f.file.substring(f.file.lastIndexOf('.') + 1);
+            if (fileType==='jpeg' || fileType==='bmp')
+                fileType = 'jpg';
 			html += template_for_file_element
-				.replace(replacementForFileName, f.file)
+                .replace(replacementForFileName, f.file)
 				.replace(replacementForTime, fromNow + ' ago')
 				.replace(new RegExp(replacementForId, 'g'), this.elmentId(i))
 				.replace('{fileSize}', this.fileSize(f.size))
+                .replace(replacementForIco, 'ico-file-'+fileType)
 		}
 
 		// hook up event handler
@@ -122,7 +126,7 @@ class UploadedFileListPanel {
 		{
 			e.preventDefault();
 			const res = await Net.deleteUploadedFiles(token,
-												      fileInfo,
+												      fileInfo.file,
 													  key, key, key);
 			// if succeeded
 			if (res) {

@@ -9,6 +9,7 @@ import {ApplicationQAndAManager}	from '../core/applicationQAndAManager.js'
 import { MessagingPanel } 			from '../core/messagingPanel.js'
 import {UploadedFileListPanel}		from '../core/fileListPanel.js';
 import {MetaDataManager} from "../core/metaDataManager.js";
+import {FileUploadUtil} from "../core/fileUploadUtil.js";
 
 const page_template = `
 <div class="card position-fixed start-0 end-0 bottom-0 border-0 rounded-0 px-3 pb-3" style="top: 6rem;background: #F6F7FC;">
@@ -107,6 +108,7 @@ const page_template = `
                             <div class="card-footer bg-transparent d-flex">
                                 <a href="#" id="fm_div_chats_file_upload" class="flex-shrink-0 mt-1">
                                     <img src="../img/ico-chat-upload.svg">
+                                    <input id="chats_file_upload" type="file" style = "display:none">
                                 </a>
                                 <div class="flex-grow-1 px-2">
                                     <textarea id="fm_div_chats_msg_textarea" class="form-control border-0" placeholder="Type a message here" rows="2"></textarea>
@@ -307,7 +309,11 @@ class PipelinePageHandler {
         $('#fm_div_chats_send').click(this.handleChatSend.bind(this));
 
         // upload a file to server
-        $('#fm_div_chats_file_upload').click(this.handleFileUpload.bind(this));
+        $('#fm_div_chats_file_upload').click(e => {
+            $('#chats_file_upload')[0].click();
+        });
+
+        $('#chats_file_upload').change(this.handleFileUpload.bind(this));
 
         $('#findProducerBtn').click(this.handleFindProducer.bind(this));
 
@@ -437,7 +443,22 @@ class PipelinePageHandler {
     }
 
     async handleFileUpload(e) {
-        e.preventDefault();
+        let file = e.target.files[0];
+        let fileName = file.name;
+        let that = this;
+        await FileUploadUtil.handleUploadFile(e.target, fileName, async (progress, isErr, errMsg) => {
+            console.log(progress);
+            if (progress==100) {
+                const msgHtml = await that.#messagingPanel.sendMsg(2, fileName);
+                if (msgHtml) {
+                    $('#fm_div_chats').append(msgHtml);
+                }
+            }
+
+        }, this.#appId);
+
+        console.log();
+        // await this.uploadFile(fileList[0]);
     }
 
     // When user clicks 'prev (<)', we need to

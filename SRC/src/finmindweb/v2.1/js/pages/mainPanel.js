@@ -185,7 +185,7 @@ class MainPageHandler {
 	loadMenus() {
 		const role = this.#credMan.credential.role;
 		switch (role) {
-			case 'client':
+			case 'user':
 				$('#menu').append(menu_me);
 				break;
 			case 'agent':

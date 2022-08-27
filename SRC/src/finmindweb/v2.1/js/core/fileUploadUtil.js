@@ -1,6 +1,7 @@
 import {sysConstants} from './sysConst.js';
 import {Net} 		  from './net.js';
 import {credMan} 	  from './credManFinMind.js';
+import {FileUtil} from "./fileUtil.js";
 
 class FileUploadUtil {
 
@@ -44,23 +45,29 @@ class FileUploadUtil {
 					$(fileInput).val("");
 				}
 			}
-		}
+		};
+
+		let suffix = file.name.substring(file.name.lastIndexOf('.') + 1);
+		let contentType = FileUtil.getContentType(suffix);
 
 		fReader.onload = function (e) {
 			console.log("try send to url:\n" + resUrl);
 			xhReq.open("PUT", resUrl, true);
 
 			//xhreq.setRequestHeader("Content-Type", "application/octet-stream"); //流类型 ok
-			xhReq.setRequestHeader("Content-Type", "application/pdf"); //pdf类型 ok
+			// xhReq.setRequestHeader("Content-Type", "application/pdf"); //pdf类型 ok
+			xhReq.setRequestHeader("Content-Type", contentType);
 		//	xhReq.setRequestHeader("Content-Length", file.size);     //文件大小
 			xhReq.setRequestHeader("uploadfile_name", encodeURI(fileDesignatedName)); //兼容中文
 			xhReq.send(fReader.result);
-		}
+		};
 		fReader.onprogress = function (e) {
 			//	uploadProgress.value = e.loaded*100/e.total;
-			console.log("progress: " + e.loaded*100/e.total);
-			refreshProgress(Math.round(e.loaded*100/e.total), true, '');
-		}
+			let v = Math.round(e.loaded*100/e.total);
+			if (v>=100) v=99;
+			console.log("progress: " + v);
+			refreshProgress(v, true, '');
+		};
 
 		// start reading and pushing to server...
 		await fReader.readAsArrayBuffer(file);

@@ -27,7 +27,7 @@ const q_template_for_all_files = `
 	{f_upld_lst}
 </div>`
 ;
-const q_template_for_one_file = 
+const q_template_for_one_file =
 `<h6 class="mb-3">{lb}</h6>
 <div id="file_area_{id}" class="upload-drag-area p-4 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
 	<input type="file" id="fileInput_{id}" name="upfile" class="d-none">
@@ -55,20 +55,20 @@ const q_template_for_one_file =
 `
 ;
 
-class FileUpload extends UserQuestionBase {  
+class FileUpload extends UserQuestionBase {
 
 	#applicationId;
 	#resultMap;
-	 
+
     constructor(qInfo, applicationId) {
 		super(qInfo);
-		
+
 		// label 上传什么文件的提示
 		this.#applicationId = applicationId;
 		this.#resultMap = new Map();
-    } 
-	
-	// Method for validating the result value upon moving away 
+    }
+
+	// Method for validating the result value upon moving away
 	// from the page.
 	onValidating() {
 		const labels = this.label.split('*');
@@ -81,44 +81,44 @@ class FileUpload extends UserQuestionBase {
 		}
 		return true;
 	}
-	
+
 	getFileInputSelector(indx) {
 		return `#fileInput_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getUploadButtonSelector(indx) {
 		return `#upload_button_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getFileAreaSelector(indx) {
 		return `#file_area_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getProgressDivSelector(indx) {
 		return `#progress_div_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getProgressNumSelector(indx) {
-		return `#progress_num_${this.getIdPostfix(indx)}`;	
+		return `#progress_num_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getProgressBarSelector(indx) {
 		return `#progress_bar_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getProgressResultIconSelector(indx) {
 		return `#progress_result_icon_${this.getIdPostfix(indx)}`;
 	}
-	
+
 	getIdPostfix(indx) {
 		return `${this.qInfo.attr_id}_file${indx}`;
 	}
-	
+
 	/*
 		Generate anornymous event handlers for all the file buttons
 		within the file button array for our applicaion. Each callback
 		is a closure with all the information for showing progress and result.
-		
+
 		parameters:
 			fileInput 	- the file input control
 			indx		- id of the file input within the array
@@ -132,26 +132,26 @@ class FileUpload extends UserQuestionBase {
 			return await FileUploadUtil.handleUploadFile(uploader, fileDesignatedName, refresh, self.#applicationId);
 		}
 	}
-	
-	// Method for hooking up event handler to handle RADIO 
+
+	// Method for hooking up event handler to handle RADIO
 	// selectioon change event
 	onChangeEvent() {
 		// create callback hanldes for all file input controls we have
 		// for this file list control
 		const labels = this.label.split('*');
-		for(let indx = 0; indx < labels.length; indx++) {	
+		for(let indx = 0; indx < labels.length; indx++) {
 			const fileInputSelector = this.getFileInputSelector(indx);
 			const uploadButtonSelector = this.getUploadButtonSelector(indx);
 			const progressBar = this.getProgressBarSelector(indx);
-			
+
 			$(progressBar).hide();
 
 			$(uploadButtonSelector).click(e => {
 				$(fileInputSelector).click();
 			});
-			
+
 			// hook up the main event handler for uploadng the a file when file button is clicked
-			const fn = this.normalizeFileName(labels[indx]);
+			const fn = this.normalizeFileName(labels[indx]) + ".pdf";
 			$(fileInputSelector).change(this.createFileInputCallback($(fileInputSelector), fn, indx));
 		}
 	}
@@ -161,10 +161,10 @@ class FileUpload extends UserQuestionBase {
 		const progressNum = this.getProgressNumSelector(indx);
 		const progressBar = this.getProgressBarSelector(indx);
 		const resultIcon = this.getProgressResultIconSelector(indx);
-		
+
 		$(progressNum).html(progress+'%');
 		$(progressBar).css("width", progress+"%");
-		
+
 		if (result==true) {
 			if (progress==100) {
 				$(resultIcon).html(q_resultIconSuccess);
@@ -178,17 +178,17 @@ class FileUpload extends UserQuestionBase {
 		}
 		$(progressDiv).show();
 	}
-	
+
 	// This method can be called when we need to serialize the question / answer
 	// to JSON format (usually for session store)
 	serialize() {
 	}
-	
+
 	// This method is called after the UI is rendered to display its
 	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
 	};
-	
+
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {
 		let uploadOne = '';
@@ -205,7 +205,7 @@ class FileUpload extends UserQuestionBase {
 							.replace(replacementForFileList, uploadOne);
 		return htmlStr;
 	}
-	
+
 	// get question in xml format for saving to API server
 	get serverXML() {
 		let ret ='';
@@ -229,7 +229,7 @@ class FileUpload extends UserQuestionBase {
 	normalizeFileName(fn) {
 		return fn.replace(new RegExp(' ', 'g'), '_');
 	}
-	
-}  
+
+}
 
 export { FileUpload };

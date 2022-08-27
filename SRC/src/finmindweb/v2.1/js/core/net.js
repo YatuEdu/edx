@@ -232,7 +232,7 @@ class Net {
 						t, uploadFileName,
 						pipleLineKey, appKey,
 						conversationKey,
-						FILE_DELETE_OP);
+						FILE_DELETE_OP, 0);
 		// remote call
 		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
 	}
