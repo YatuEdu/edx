@@ -93,16 +93,20 @@
     font-weight: 700;
 	font-size: 18px;
     line-height: 1.5;
+	color: white;
+	background: #274c43;
 	border:outset 4px orange;
 }
 
-.input-board_teacher {
+.input-board-teacher {
 	height: 600px !important;       
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
     font-weight: 700;
 	font-size: 24px;
+	color: white;
+	background: #274c43;
     line-height: 1.5;
 	border:outset 4px orange;
 }
@@ -115,8 +119,8 @@
     font-weight: 300;
 	font-size: 20px;
     line-height: 1.5;
-	background: #888888 !important;
-	color: #ffffff;
+	background: #ffffff !important;
+	color: #B026FF;
 	border:outset 4px orange;
 }
 
@@ -128,19 +132,17 @@
     font-weight: 300;
 	font-size: 24px;
     line-height: 1.5;
-	background: #888888 !important;
-	color: #ffffff;
+	background: #ffffff !important;
+	color: #B026FF;
 	border:outset 4px orange;
 }
 
-.student-input-board-container-noshow {
-	border: none;
-	background:none;
-}
-
 .student-input-board-container-extent {
-    position:relative;
-    
+    position:relative; 
+	background-color: grey;	
+	display: inline-block;
+	width: 58vw;								/* <-- children as wide as the browser window (viewport) */
+	height: 40vw;
 	border:outset 4px orange;
 }
 
@@ -157,19 +159,99 @@
     outline: none;	
 }
 
-.student-input-board-button-run_code {
+.student-msg-board-extend {
+	position:relative;
+    border:none;
+	width: 58vw;								/* <-- children as wide as the browser window (viewport) */
+	height: 20vw;
+	overflow-y: auto;    						/* Trigger vertical scroll    */
+	z-index: 99 !important;						/* ON TOP */
+	background: #0ABAB5;
+	color: #FFFFFF;
+	resize: none;
+    outline: none;
+	border:outset 4px orange;	
+}
+
+.teacher-msg-board-extend {
+	position:relative;
+	top: 0;
+    border:none;
+	width: 58vw;								/* <-- children as wide as the browser window (viewport) */
+	height: 10vw;
+	overflow-y: auto;    						/* Trigger vertical scroll    */
+	z-index: 99 !important;						/* ON TOP */
+	background: #b1b3b2;
+	color: #FFFFFF;
+	resize: none;
+    outline: none;	
+	border:outset 4px orange;
+}
+
+.student-input-board-button-run-code {
 	position: absolute;
-	float:right;
 	margin-top: 1px;
     margin-right: 2px;
-	top: 6vw;
+	top: 3.2vw;
 	left: 50vw;
+	z-index: 100 !important;	
+    width: 5vw;
+    height: 1.8vw;
+    border: 1px solid #ddd;
+	color:  #00ff00;
+    background-color:#ff0000;
+	line-height: 50%
+}
+
+.student-input-board-button-close {
+	z-index: 100 !important;	
+    background-image: url('../images/dynamic/button-close.png');
+	background-size: 2.7vw 1.8vw;
+    width: 2.7vw;  
+    height: 1.8vw;
+	background-color:#ff0000
+}
+
+.student-input-board-button-close-size {
+	position: absolute;
+	top: 3.2vw; 
+	left: 55.8vw; 
+}
+
+.student-input-board-button-close-size2 {
+	position: absolute;
+	top: 4.8vw; 
+	left: 55.8vw; 
+}
+
+.btn-mail-box-dimention {
+	background-size: 2.7vw 2.7vw;
+    width: 2.7vw;  
+    height: 2.7vw;
+}
+
+
+.btn-mail-box-no-msg {
+	background-image: url('../images/dynamic/msg_box_no_msg.jpg');
+}
+
+.btn-mail-box-with-msg {
+	background-image: url('../images/dynamic/msg_box_with_msg.jpg');
+}
+
+.student-msg-board-button-send-msg {
+	position: absolute;
+	margin-top: 1px;
+    margin-right: 2px;
+	top: 25vw;
+	left: 53.7vw;
 	z-index: 100 !important;	
     width: 90px;
     height: 30px;
     border: 1px solid #ddd;
 	color:  #00ff00;
     background-color:#ff0000;
+	line-height: 50%
 }
 
 .student-input-board-button-notext {

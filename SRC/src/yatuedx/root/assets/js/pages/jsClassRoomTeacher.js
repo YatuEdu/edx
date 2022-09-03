@@ -23,32 +23,32 @@ const BTN_ERASE_BOARD  		= 'yt_btn_erase_board';
 const BTN_ERASE_RESULT 		= "yt_btn_erase_result";
 const BTN_BEAUTIFY_CODE 	= "yt_btn_btfy_code"
 const BTN_RUN_CODE  		= "yt_btn_run_code_on_student_board";
-const BTN_MSG_SEND			= "yt_btn_msg_send";
 const SEL_MSG_RECEIVER		= "select_option_msg_rcvr";
 const STUDENT_MESAGE_BUTTON_PREFIX = "yt_btn_std_msg_";
 const STUDENT_MESAGE_CONTAINER_PREFIX = "yt_div_std_msg_ctnr_";
 const STUDENT_MESAGE_SEND_BUTTON_PREFIX = "yt_btn_std_msg_send_";
 const STUDENT_MESAGE_TA_PREFIX = 'yt_ta_std_msg_';
+const TEACHER_MESAGE_TA_PREFIX = 'yt_ta_tchr_msg_';
 
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CONTAINER_ID = '{console_ctnr_id}'
-const REPLACEMENT_TA_CLSS = '{taclss}';
 const REPLACEMENT_LB = '{lb}';
 const REPLACEMENT_STUDENT_ID = '{stdtgid}';
 const REPLACEMENT_STUDENT_ID2 = '{stdtgid2}';
 const REPLACEMENT_STUDENT_MSG_BTN_ID =  '{stdt_msg_btn_id}';
+const REPLACEMENT_CLOSE_BTN_ID =  '{btn_close}';
 const REPLACEMENT_TA_MSG_CONTAINER_ID = '{msg_ctnr_id}'
 const REPLACEMENT_BTN_MSG_SEND_ID = '{msg_send_btn_id}';
 const REPLACEMENT_TA_MSG_ID = '{std_msg_ta_id}';
+const REPLACEMENT_TA_TCHR_MSG_ID = '{tchr_msg_ta_id}';
 
 const TA_STUDENT_CONSOLE_PREFIX = "yt_stdf_inpt_ta_for_";
 const TA_STUDENT_CONSOLE_CONTAINER_PREFIX = "yt_stdt_inpt_ta_ctnr_div_for_";
-
-const CSS_STUDENT_CONSOLE = 'student-input-board-container-noshow';
-const CSS_STUDENT_CONSOLE_EX = 'student-input-board-container-extend';
+const BTN_CONSOLE_CLOSE_PREFIX = 'yt_btn_close_student_board';
 
 const CSS_STUDENT_COMM_NO_TEXT = 'student-input-board-button-notext';
 const CSS_STUDENT_COMM_WITH_TEXT = 'student-input-board-button-withtext';
+const CSS_STUDENT_CONSOLE_HIDE_BTN = 'student-input-board-button-close';
 
 const STUDENT_TOGGLE_BUTTON_MAX = "Code";
 const STUDENT_MESSAGE_BUTTON_MAX = "Message";
@@ -109,8 +109,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
 		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
-		$(this.msgSendButton).click(this.handleMsgSend.bind(this));
-		
+
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
 		
@@ -191,10 +190,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 							.replace(new RegExp('{nm}', 'g'), userName);
 			}
 		}
-		// add message receiver dropdown
-		msgReceiverDropdown  = MSG_RECEIVER_SELECTION_TEMPLATE
-									.replace('{opt_body}', msgReceiverNames);
-		$(this.msgReceiverSelect).html(msgReceiverDropdown);
 	}
 	
 	/**
@@ -211,8 +206,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Recieved student incoming messages, display it with student name included
 	 **/
 	handleStudentMsg(data, sender) {
-		const msg = `${data} (from ${sender})`;
-		$("#yt_txt_msg_console").val(msg);
+		const msg = data;
+		
+		// 1. make message button green 
+		const msgBtnSelector = this.getStudentMessageButtonSelector(sender);
+		if (msgBtnSelector) {			
+			this.toggleStudentButtonInner(msgBtnSelector, true);
+			
+			// 2. insert message to student message board
+			const msgConsoleSelector =  this.getStudentMessageTaIdSelector(sender);
+			$(msgConsoleSelector).val(msg);
+		}		
 	}
 	
 	/**
@@ -226,7 +230,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// add student console
 		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
 								.replace(REPLACEMENT_LB, student)
-								.replace(REPLACEMENT_TA_CLSS, CSS_STUDENT_CONSOLE)
 								.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
 								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
 								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
@@ -234,20 +237,25 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 								.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
 								.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
 								.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
-								.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student));
+								.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student))
+								.replace(REPLACEMENT_TA_TCHR_MSG_ID, this.getTeacherMessageTaId(student));
 
 		$(this.stdentTextAreaDiv).append(sconsoleHtml);
 		
 		// handle toggle code console event
-		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.toggleStudentConsole.bind(this));	
+		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.showStudentConsole.bind(this));	
 		
 		// handle run-code clicking event
 		$(this.getstudentConsoleRunCodeButtonSelector(student)).click(this.runStudentCode.bind(this));	
 		
 		// handle toggle message button event
-		$(this.getStudentMessageButtonSelector(student)).click(this.toggleStudentMessageContqainer.bind(this));	
+		$(this.getStudentMessageButtonSelector(student)).click(this.showStudentMessageContainer.bind(this));	
+		
+		// handle hide student board click
+		$(this.StudentBoardHideButtoncClassSelector).click(this.hideStudentContainer.bind(this));	
 
-
+		// handle sending message to student
+		$(this.getStudentMessageSendBtnIdSelector).click(this.sendMessageToStudent.bind(this));
 	}
 	
 	/**
@@ -269,78 +277,61 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 **/
 	toggleStudentButton(student, hasCode) {	
 		// get student button id
-		const sel = this.getstudentConsoleToggleButtonSelector(student)
-		
+		const selector = this.getstudentConsoleToggleButtonSelector(student)
+		this.toggleStudentButtonInner(selector, hasCode);
+	}
+	
+	toggleStudentButtonInner(selector, hasMsg) {		
 		// toggle button style by CSS toggle
-		if (hasCode) {
-			$(sel).removeClass(CSS_STUDENT_COMM_NO_TEXT);
-			$(sel).addClass(CSS_STUDENT_COMM_WITH_TEXT);
+		if (hasMsg) {
+			$(selector).removeClass(CSS_STUDENT_COMM_NO_TEXT);
+			$(selector).addClass(CSS_STUDENT_COMM_WITH_TEXT);
 		}
 		else {
-			$(sel).removeClass(CSS_STUDENT_COMM_NO_TEXT);
-			$(sel).addClass(CSS_STUDENT_COMM_WITH_TEXT);
+			$(selector).removeClass(CSS_STUDENT_COMM_NO_TEXT);
+			$(selector).addClass(CSS_STUDENT_COMM_WITH_TEXT);
 		}
 	}
 	
 	/**
 		When the student message board show/hide button is clicked,  toggle bewtween a min / max sized console.
 	 **/
-	toggleStudentConsole(e) {
+	showStudentConsole(e) {
 		e.preventDefault(); 
 		// get student name
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		// get student console Id
 		const containerSelector = this.getStudentConsoleContainerIdSelector(student);
-		// get student button id
-		const buttonSelector = this.getstudentConsoleToggleButtonSelector(student)
-	
-		const minClass = CSS_STUDENT_CONSOLE;
-		const maxClass = CSS_STUDENT_CONSOLE_EX;
-		
-		const maxButtonText = STUDENT_TOGGLE_BUTTON_MAX;
-		const minButtonText = STUDENT_TOGGLE_BUTTON_MIN;
-		this.toggleContainer(student, containerSelector, buttonSelector, 
-							 minClass, maxClass, maxButtonText, minButtonText);
+		this.showContainer(containerSelector);
 	}
 	
 	/**
 		When the student message board show/hide button is clicked,  toggle bewtween a min / max sized message board.
 	 **/
-	toggleStudentMessageContqainer(e) {
+	showStudentMessageContainer(e) {
 		e.preventDefault(); 
 		// get student name
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		// get student console Id
 		const containerSelector = this.getStudentMessageContainerIdSelector(student);
-		// get student button id
-		const buttonSelector = this.getStudentMessageButtonSelector(student)
+		this.showContainer(containerSelector);
+	}
 	
-		const minClass = CSS_STUDENT_CONSOLE;
-		const maxClass = CSS_STUDENT_CONSOLE_EX;
-		
-		const maxButtonText = STUDENT_MESSAGE_BUTTON_MAX;
-		const minButtonText = STUDENT_TOGGLE_BUTTON_MIN 
-		this.toggleContainer(student, containerSelector, buttonSelector, 
-							 minClass, maxClass, maxButtonText, minButtonText);
+	/**
+		When the student message board hide button is clicked,  close its parent container.
+	 **/
+	hideStudentContainer(e) {
+		// 1. get parent
+		$(`#${event.target.parentElement.id}`).hide();
 	}
 	
 	/**
 		Internal method to  toggle bewtween a min / max sized code/message board.
 	 **/
-	toggleContainer(student, containerSelector, buttonSelector, 
-					minClass, maxClass, maxButtonText, minButtonText) {
+	showContainer(containerSelector) {
 		// toggle console size by CSS toggle
-		if ($(containerSelector).hasClass(minClass)) {
-			$(containerSelector).removeClass(minClass);
-			$(containerSelector).addClass(maxClass);
+		if (!$(containerSelector).is(":visible")) {
 			$(containerSelector).show();
-			$(buttonSelector).html(minButtonText);
-		}
-		else {
-			$(containerSelector).removeClass(maxClass);
-			$(containerSelector).addClass(minClass);
-			$(containerSelector).hide();
-			$(buttonSelector).html(maxButtonText);
 		}
 	}
 
@@ -451,6 +442,13 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		const codeText = $(this.getStudentConsoleIdSelector(student)).val();
 		super.executeCode(codeText);
+	}
+	
+	sendMessageToStudent(e) {
+		e.preventDefault(); 
+		const student = StringUtil.getIdStrFromBtnId(e.target.id);
+		const msgText = $(this.getTeacherMessageTaIdSelector(student)).val();
+		this.#displayBoardTeacher.sendPrivateMsg(msgText, student);
 	}
 	
 	/**
@@ -605,11 +603,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	get eraseResultButton() {
 		return `#${BTN_ERASE_RESULT}`;
 	}	
-
-	// button for sending message
-	get msgSendButton() {
-		return `#${BTN_MSG_SEND}`;
-	}
 	 
 	// button for BEAUTIFY code mode
 	get beautifyCodeButton() {
@@ -639,6 +632,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// button selector for toggle student console max/min mode
 	getstudentConsoleToggleButtonSelector(student) {
 		return `#${this.getstudentConsoleToggleButton(student)}`;
+	}
+	
+	// button selector for button for hiding student code/message console
+	get StudentBoardHideButtoncClassSelector() {
+		return `.${CSS_STUDENT_CONSOLE_HIDE_BTN}`;
 	}
 	
 	// button for running student console code locally
@@ -689,6 +687,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// selector for text area for receiving messages from student
 	getStudentMessageTaIdSelector(student) {
 		return `#${this.getStudentMessageTaId(student)}`; 
+	}
+	
+	// text area for teacher to send messages to student
+	getTeacherMessageTaId(student) {
+		return `${TEACHER_MESAGE_TA_PREFIX}${student}`;
+	}
+	
+	// selector for text area for teacher to send messages to student
+	getTeacherMessageTaIdSelector(student) {
+		return `#${this.getTeacherMessageTaId(student)}`; 
 	}
 		
 	// selector for student code console

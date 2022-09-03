@@ -23,12 +23,18 @@ const VD_VIEDO_AREA 						= "yt_video_area";
 const YT_TB_OUTPUT_CONSOLE					= 'yt_tb_output_console';
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
 const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
+const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
+
+const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
+const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
 
 const TAB_LIST = [
 	{tab:YT_TB_OUTPUT_CONSOLE, sub_elements: [YT_TA_OUTPUT_CONSOLE_ID, YT_BTN_CLEAR_RESULT_CODE_ID] },
 	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_TA_NOTES_ID, YT_BTN_SEARCH_NOTES] },
 	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID, YT_BTN_MSG_SEND] },
 ];
+
+const MSG_TAB_INDX = 2;
 	
 /**
 	This class handles JS Code runner board
@@ -72,7 +78,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to msg
 		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
-			
+		// handle sending message to teacher
+		$(this.sendMsgButon).click(this.handleSendMessage.bind(this));
+		// handle message indicator clicking
+		$(this.messageIndicatorBtnSelector).click(this.toggleToMegTab.bind(this));
+		
 		// itialize notes we saved before
 		this.initNotes();
 	}
@@ -124,6 +134,17 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		toggle tag between output, notes, and etc.
 	 **/
+	toggleToMegTab(e) {
+		this.prv_toggleTab(MSG_TAB_INDX);
+		
+		// make the message box to be "no new message"
+		const selector = $(this.messageIndicatorBtnSelector);
+		this.messageIndicatorHasNoMessage(selector)
+	}
+	
+	/**
+		toggle tag between output, notes, and etc.
+	 **/
 	prv_toggleTab(ti) {
 		if (ti != this.#tabIndex) {
 			TAB_LIST.forEach( (e, i) => {
@@ -144,6 +165,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			});
 			this.#tabIndex = ti;
 		}
+		// scroll to bottom so we can see the bottom panel better
+		$(window).scrollTop(300);
 	}
 	
 	/**
@@ -216,6 +239,35 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	 **/
 	receiveMsgFrom(cmdObject) {
 		this.displayMessage(cmdObject.data[0], cmdObject.sender);
+		
+		// make message indicator green
+		this.toggleMessageIndicator();
+	}
+	
+	/**
+		After receiving message from a peer we make the message indicator green. After the message is viewed,
+		we make it normal.
+	 **/
+	toggleMessageIndicator() {
+		const selector = $(this.messageIndicatorBtnSelector);
+		if (selector.hasClass(CSS_MSG_BOX_NO_MSG)) {
+			this.messageIndicatorHasMessage(selector);
+		}
+		else {
+			this.messageIndicatorHasNoMessage(selector)
+		}
+	}
+	
+	messageIndicatorHasNoMessage(selector) {
+		selector.removeClass(CSS_MSG_BOX_WITH_MSG);
+		selector.addClass(CSS_MSG_BOX_NO_MSG);
+		selector.prop('title', 'your have no new messages');
+	}
+	
+	messageIndicatorHasMessage(selector) {
+		selector.removeClass(CSS_MSG_BOX_NO_MSG);
+		selector.addClass(CSS_MSG_BOX_WITH_MSG);
+		selector.prop('title', 'your have new messages');
 	}
 	
 	displayMessage(msgTxt, sender) {
@@ -356,6 +408,17 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_TA_MSG_ID}`;
 	}
 	
+	get sendMsgButon() {
+		return `#${YT_BTN_MSG_SEND}`;
+	}
+	
+	get messageInputTa() {
+		return `#${YT_TA_MSG_INPUT_ID}`;
+	}
+	
+	get messageIndicatorBtnSelector() {
+		return `#${YT_TB_MSG_INDICATOR}`;
+	}
 	
 	/**
 		Hnandle running code using text from code baord
@@ -395,7 +458,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		Hnandle send message to teacher
+		Hnandle saving notes
 	**/
 	async prv_saveNotesToDb() {
 		const noteTxt = $(this.notesTextArea).val();
@@ -427,12 +490,21 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/*
-		Send program to the group.
+		Send message button clicked and send message to techer.
 	 */
-	handleSend(e) {
+	handleSendMessage(e) {
 		e.preventDefault();
-		const srcTxt = $("#ta_white_board").val();
-		this.print_prv("sending ...");
+		
+		// 1. get the message
+		const outgoingMsg = $(this.messageInputTa).val();
+		
+		if (outgoingMsg) {
+			// 2. send to teacher
+			this.#displayBoardForCoding.sendMsgToTeacher(outgoingMsg);
+			// 3. erase the message (so that it does not linger)
+			$(this.messageInputTa).val("");
+		}
+		
 	}
 }
 
