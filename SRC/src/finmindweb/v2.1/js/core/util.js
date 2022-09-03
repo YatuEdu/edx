@@ -175,7 +175,7 @@ class ValidUtil {
 	}
 
 	static isPasswordValid(str) {
-		const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
+		const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[`~!@#$%^&*()_+<>?:"{},.\/\\;'[\]])[A-Za-z\d`~!@#$%^&*()_+<>?:"{},.\/\\;'[\]]{8,}$/;
 		if (!regExp.test(str.toLowerCase())) {
 			return false;
 		} else {

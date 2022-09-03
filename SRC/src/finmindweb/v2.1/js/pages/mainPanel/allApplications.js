@@ -3,6 +3,7 @@ import {credMan} from '../../core/credManFinMind.js'
 import {Net} from "../../core/net.js";
 import {Pagination} from "../../core/pagination.js";
 import {MetaDataManager} from "../../core/metaDataManager.js";
+import {UIUtil} from "../../core/uiUtil.js";
 
 
 const pageTemplate = `
@@ -47,6 +48,7 @@ const pageTemplate = `
 							<th>COVERAGE AMOUNT</th>
 							<th class="sort" data-sort="create-date">CREATE DATE</th>
 							<th class="sort" data-sort="last-update-time">LAST UPDATE TIME</th>
+							<th>STATE</th>
 							<th>STATUS</th>
 							<th class="sort" data-sort="idle-time">IDLE TIME</th>
 							<th>DELIGATE PRODUCER</th>
@@ -65,7 +67,7 @@ const pageTemplate = `
 `;
 
 const rowTemplate = `			
-<tr>
+<tr id="{appId}">
 	<td>
 		<input class="form-check-input" type="checkbox">
 	</td>
@@ -76,12 +78,13 @@ const rowTemplate = `
 	<td>{ca}</td>
 	<td class="create-date">{cd}</td>
 	<td class="last-update-time">{ut}</td>
-	<td>{s}</td>
+	<td class="state">{st}</td>
+	<td class="status">{s}</td>
 	<td class="idle-time">{it}</td>
 	<td>{dp}</td>
 	<td>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary viewButton" appId="{appId}">View</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary editButton" appId="{appId}">Edit</button>
-		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
 `;
@@ -125,6 +128,7 @@ class AllApplications {
 		let userList = new List('event-table', options);
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+		$('.viewButton').click(this.handleView.bind(this));
 		$('.editButton').click(this.handleEdit.bind(this));
 
 	}
@@ -150,19 +154,54 @@ class AllApplications {
 				.replace('{ca}', row.coverage_amount || '')
 				.replace('{cd}', new Date(row.start_date).toLocaleString() || '')
 				.replace('{ut}', new Date(row.last_update).toLocaleString() || '')
+				.replace('{st}', this.appState(row.state) || '')
 				.replace('{s}', this.appStatus(row.status) || '')
 				.replace('{it}', '')
 				.replace('{dp}', row.agent_first_name + " " + row.agent_middle_name + " " + row.agent_last_name)
-				.replace('{appId}', row.id)
+				.replaceAll('{appId}', row.id)
 			);
 		}
 		return maxRowNumber;
 	}
 
-	handleEdit(e) {
+	handleView(e) {
 		let row = $(e.target);
 		let appId = row.attr("appId");
 		window.location.href = "/user/pipeline.html?appId="+appId;
+	}
+
+	handleEdit(e) {
+		let val = $(e.target).text();
+		let row = $(e.target).parent().parent();
+
+		if (val==='Edit') {
+			this.editEnter(row);
+		} else {
+			this.editExit(row);
+		}
+	}
+
+	editEnter(row) {
+		$(row).addClass("edit");
+		let status = $(row).find(".status");
+		const appStatusMap = MetaDataManager.appStatusMap;
+		UIUtil.uiEnterEdit(status, 'selector', appStatusMap);
+		$(row).find(".editButton").text("Save");
+	}
+
+	async editExit(row) {
+		let id = parseInt(row.attr('id'));
+		let status = $(row).find(".status");
+		let statusVal = UIUtil.uiExitEdit(status, 'selector');
+
+		let res = await Net.updateApplicationStatus(credMan.credential.token, id, parseInt(statusVal));
+		if (res.errCode!=0) {
+			let errMsg = res.err.msg;
+			alert(errMsg);
+			return;
+		}
+		$(row).removeClass("edit");
+		$(row).find(".editButton").text("Edit");
 	}
 
 	appState(state) {

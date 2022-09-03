@@ -3,6 +3,9 @@ import {Net} from "../../core/net.js";
 import {MetaDataManager} from "../../core/metaDataManager.js";
 import {Pagination} from "../../core/pagination.js";
 import {PolicyFilePanel} from "./policyFilePanel.js";
+import {SessionStoreAccess} from "../../core/sessionStorage.js";
+import {sysConstants} from "../../core/sysConst.js";
+import {UIUtil} from "../../core/uiUtil.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -15,12 +18,6 @@ const pageTemplate = `
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 12a6 6 0 1 1 4.548-2.087l1.32 1.32a.447.447 0 0 1 .003.631l-.004.004a.454.454 0 0 1-.318.132.454.454 0 0 1-.318-.132L9.912 10.55A5.976 5.976 0 0 1 6 12zM6 .9a5.1 5.1 0 1 0 0 10.2A5.1 5.1 0 0 0 6 .9z" fill="#1F1534" fill-opacity=".2"/></svg>
 				</button>
 			</div>
-			<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
-				Delete
-			</button>
-			<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
-				Edit
-			</button>
 			<button type="button" class="btn btn-primary ms-2 me-3" style="width: 8rem;" id="create-new-btn">
 				Create New
 			</button>
@@ -30,7 +27,7 @@ const pageTemplate = `
 			</button>
 		</div>
 	</div>
-	<div class="card-body p-0 position-relative overflow-auto" style="height: 0;">
+	<div id="table" class="card-body p-0 position-relative overflow-auto" style="height: 0;">
 		
 		<div class="event-table mx-4 position-relative overflow-auto" id="event-table" data-list='{"valueNames":["effective-date"]}'>
 			<table class="w-100">
@@ -42,7 +39,7 @@ const pageTemplate = `
 						<th>INSURED NAME</th>
 						<th>COVERAGE AMOUNT</th>
 						<th class="sort" data-sort="effective-date">EFFECTIVE DATE</th>
-						<th>FILES</th>
+						<th>DETAILS</th>
 						<th>STATUS</th>
 						<th>CURRENT OWNER</th>
 						<th>ACTION</th>
@@ -51,26 +48,7 @@ const pageTemplate = `
 				<tbody class="list" id="list">
 				</tbody>
 			</table>	
-		</div>
-		<div class="d-flex justify-content-between mt-3 mx-4 fs-8">
-			<div class="text-secondary">
-				showing 10 out of 9000
-			</div>
-			<div class="d-flex align-items-center">
-				<span class="text-secondary">Page 01 of 56</span>
-				<ul class="pagination pagination-sm justify-content-end my-0 ms-3 event-table-pagination">
-					<li class="page-item"><a class="page-link" href="#">
-					<svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.012 4.5l3.305 3.404a.653.653 0 0 1 0 .907.607.607 0 0 1-.881 0L.78 5.045A.636.636 0 0 1 .5 4.5a.662.662 0 0 1 .28-.546L4.436.188a.614.614 0 0 1 .88 0 .653.653 0 0 1 0 .907L2.013 4.5z" fill="#8D93A6"/></svg>
-					</a></li>
-					<li class="page-item"><a class="page-link" href="#">1</a></li>
-					<li class="page-item active"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
-					<li class="page-item"><a class="page-link" href="#"><svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.988 4.5L.683 7.903a.653.653 0 0 0 0 .907.607.607 0 0 0 .881 0L5.22 5.045A.636.636 0 0 0 5.5 4.5a.662.662 0 0 0-.28-.546L1.564.188a.614.614 0 0 0-.88 0 .653.653 0 0 0 0 .907L3.987 4.5z" fill="#8D93A6"/></svg></a></li>
-				</ul>
-				<input class="form-control form-control-sm text-center position-relative" type="text" style="width: 43px;border-color: #dddfe5;">
-			</div>
-		</div>
-							
+		</div>			
 	</div>
 	<div id="testContainer"></div>
 </div>
@@ -83,13 +61,13 @@ const rowTemplate = `
 	<td>{clientEmail}</td>
 	<td class="product">{product}</td>
 	<td class="insuredName">{insuredName}</td>
-	<td>{coverageAmount}</td>
+	<td class="coverageAmount">{coverageAmount}</td>
 	<td class="effective-date">{effectiveDate}</td>
-	<td><a href="javascript:void(0);" class="viewFilesBtn">View</a></td>
-	<td class="idle-time">{status}</td>
+	<td><a href="javascript:void(0);" class="viewDetailsBtn">View</a></td>
+	<td class="status">{status}</td>
 	<td>{currentOwner}</td>
 	<td>
-		<button disabled type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
 		<button type="button" disabled class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal">Delete</button>
 	</td>
 </tr>
@@ -150,6 +128,7 @@ class AllInsurancePolicies {
 	#container;
 	#searchBy = '';
 	#productList;
+	#policiesMap;
 
 	constructor(container) {
 		this.#container = container;
@@ -162,7 +141,7 @@ class AllInsurancePolicies {
 		this.#container.empty();
 		this.#container.append(pageTemplate);
 		$("body").append(filterSide);
-		console.log('insurancePolicies init');
+		console.log('allInsurancePolicies init');
 		$('#create-new-btn').click(this.handleCreateNew.bind(this));
 		$('#closeFilterSideBtn').click(this.closeFilterSide.bind(this));
 		$('#closeFilterSideBtnTop').click(this.closeFilterSide.bind(this));
@@ -191,9 +170,22 @@ class AllInsurancePolicies {
 			new Pagination($('#table'), this.pageSize, maxRowNumber, this.handlePage.bind(this));
 		});
 
-		$('.viewFilesBtn').click(this.handleViewFiles.bind(this));
+		$('.viewDetailsBtn').click(this.handleViewDetails.bind(this));
 		let res = await Net.getProductList(credMan.credential.token);
-		this.#productList = res.data;
+		this.#productList = new Map();
+		for(let item of res.data) {
+			this.#productList.set(item.name, item.id);
+		}
+	}
+
+
+	handleViewDetails(e) {
+		let idStr = $(e.target).parents("tr").attr('id');
+		let id = parseInt(idStr);
+		let detail = this.#policiesMap.get(id);
+		const sessionStore = new SessionStoreAccess(sysConstants.FINMIND_POLICY_DETAIL);
+		sessionStore.setItem(JSON.stringify(detail));
+		window.location.href = '#insurancePolicyDetails';
 	}
 
 	async requestList(searchBy, pageNo) {
@@ -201,16 +193,25 @@ class AllInsurancePolicies {
 		let maxRowNumber;
 		let res = await Net.adminInsurancePolicyList(credMan.credential.token, pageSize, pageNo, searchBy);
 		$('#list').empty();
+		this.#policiesMap = new Map();
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
+			this.#policiesMap.set(row.id, row);
 			maxRowNumber = row.maxRowNumber;
+			const amntMap = MetaDataManager.amountConvertionMap;
+			let amountStr = '';
+			amntMap.forEach(function(value, key) {
+				if (value===row.coverage_amount) {
+					amountStr = key;
+				}
+			});
 			$('#list').append(rowTemplate
 				.replace('{id}', row.id)
 				.replace('{clientName}', row.client_name || '')
 				.replace('{clientEmail}', row.client_email || '')
 				.replace('{product}', row.product || '')
 				.replace('{insuredName}', row.insured_name || '')
-				.replace('{coverageAmount}', row.coverage_amount || '')
+				.replace('{coverageAmount}', amountStr || '')
 				.replace('{effectiveDate}', row.effective_date || '')
 				.replace('{status}', row.status || '')
 				.replace('{currentOwner}', row.current_owner || '')
@@ -219,6 +220,7 @@ class AllInsurancePolicies {
 		}
 
 		let that = this;
+		$(".btnEdit").off('click');
 		$(".btnEdit").click(function (e) {
 
 			let val = $(this).text();
@@ -243,50 +245,44 @@ class AllInsurancePolicies {
 	editEnter(row) {
 		$(row).addClass("edit");
 		let product = $(row).find(".product");
-		let productCurr = product.html();
-		product.html('');
-		let productSelector = $(`
-			<select class="form-select form-control-lg">
-			</select>
-		`);
-		for(let product of this.#productList) {
-			$(productSelector).append($('<option>', {
-				value: product.id,
-				text: product.name
-			}));
-			if (product.name===productCurr) {
-				productSelector.val(product.id);
-			}
-		}
-		product.append($(productSelector));
-
+		UIUtil.uiEnterEdit(product, 'selector', this.#productList);
 		let insuredName = $(row).find(".insuredName");
-		let insuredNameCurr = insuredName.html();
-		insuredName.html('');
-		let insuredNameInput = $(`
-			<input class="form-control form-control-lg">
-		`);
-		insuredNameInput.val(insuredNameCurr);
-		insuredName.append($(insuredNameInput));
-
+		UIUtil.uiEnterEdit(insuredName, 'text');
+		let coverageAmount = $(row).find(".coverageAmount");
+		const amntMap = MetaDataManager.amountConvertionMap;
+		UIUtil.uiEnterEdit(coverageAmount, 'selector', amntMap);
+		let effectiveDate = $(row).find(".effective-date");
+		UIUtil.uiEnterEdit(effectiveDate, 'date');
+		let status = $(row).find(".status");
+		const statusList = MetaDataManager.getPolicyStatus;
+		UIUtil.uiEnterEdit(status, 'selector', statusList);
 		$(row).find(".btnEdit").text("Save");
 	}
 
 	async editExit(row) {
 		let id = parseInt(row.attr('id'));
-		let quickNote = $(row).find(".quickNote");
-		let quickNoteVal = quickNote.find(".form-control").val();
-		let res = await Net.agentClientUpdate(credMan.credential.token, clientId, quickNoteVal);
+		let clientId = row
+		let product = $(row).find(".product");
+		let productVal = UIUtil.uiExitEdit(product, 'selector');
+		let insuredName = $(row).find(".insuredName");
+		let insuredNameVal = UIUtil.uiExitEdit(insuredName, 'text');
+
+		let coverageAmount = $(row).find(".coverageAmount");
+		let coverageAmountVal = UIUtil.uiExitEdit(coverageAmount, 'selector');
+		let effectiveDate = $(row).find(".effective-date");
+		let effectiveDateVal = UIUtil.uiExitEdit(effectiveDate, 'date');
+		let status = $(row).find(".status");
+		let statusVal = UIUtil.uiExitEdit(status, 'selector');
+
+		let res = await Net.insurancePolicyUpdate(credMan.credential.token, id, parseInt(productVal), 0,
+			insuredNameVal, parseInt(coverageAmountVal), effectiveDateVal, statusVal);
 		if (res.errCode!=0) {
 			let errMsg = res.err.msg;
 			alert(errMsg);
 			return;
 		}
-		quickNote.empty();
-		quickNote.html(quickNoteVal);
 		$(row).removeClass("edit");
 		$(row).find(".btnEdit").text("Edit");
-		console.log();
 	}
 
 	async handleCreateNew() {
@@ -341,13 +337,14 @@ class AllInsurancePolicies {
 	handleViewFiles(e) {
 		let idStr = $(e.target).parents("tr").attr('id');
 		let id = parseInt(idStr);
-		let filePanel = new PolicyFilePanel(id, false);
+		let filePanel = new PolicyFilePanel(id, true);
 	}
 
 	closeFilterSide() {
 		$("#filter-side").removeClass("filter-side-enabled");
 		$("mask").eq(0).attr("style", "display: none;");
 	}
+
 
 
 }

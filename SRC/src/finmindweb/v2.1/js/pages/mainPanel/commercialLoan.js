@@ -39,7 +39,7 @@ const pageTemplate = `
 `;
 
 const rowTemplate = `
-<tr id="{id}">
+<tr id="{id}" file_name_un="{file_name_un}">
 	<td class="title">{title}</td>
 	<td class="description">{description}</td>
 	<td>
@@ -48,6 +48,7 @@ const rowTemplate = `
 	</td>
 	<td>{createdDatetime}</td>
 	<td>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary viewBtn">View</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary editBtn">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary delBtn">Delete</button>
 	</td>
@@ -104,6 +105,14 @@ class CommercialLoan {
 		$('#createBtn').click(this.handleCreateNewLoan.bind(this));
 	}
 
+	async handleView(e) {
+		let row = $(e.target).parent().parent();
+		let fileUn = row.attr('file_name_un');
+
+		let res = await Net.downloadFile(credMan.credential.token, fileUn);
+		window.open(res.data.url);
+	}
+
 	handleCreateNewLoan(e) {
 		let createPanel = new CommercialLoanDetailPanel(false);
 		createPanel.setUpdatedListener(async () => {
@@ -135,16 +144,21 @@ class CommercialLoan {
 		for (let i = 0; i < res.data.length; i++) {
 			let row = res.data[i];
 			maxRowNumber = row.maxRowNumber;
+
 			$('#list').append(rowTemplate
 				.replace('{id}', row.id)
 				.replace('{title}', row.title)
 				.replace('{description}', row.description || '')
 				.replace('{imgName}', row.file_name || '')
 				.replace('{createdDatetime}', new Date(row.created_datetime).toLocaleString() || '')
+				.replace('{file_name_un}', row.file_name_un)
 			);
 		}
 
 		let that = this;
+
+		$('.viewBtn').off('click');
+		$('.viewBtn').click(this.handleView.bind(this));
 
 		$('.editBtn').off('click');
 		$(".editBtn").click(function (e) {

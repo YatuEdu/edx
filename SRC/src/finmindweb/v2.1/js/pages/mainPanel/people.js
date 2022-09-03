@@ -65,12 +65,12 @@ const rowTemplate = `
 	<td>{address}</td>
 	<td>{birthday}</td>
 	<td>{licenseIssueState}</td>
-	<td>{licenseExpireDate}</td>
+	<td class='licenseExpireDate'>{licenseExpireDate}</td>
 	<td>{licenseNumber}</td>
 	<td>{role}</td>
 	<td class='licenseStatus'>{licenseStatus}</td>
 	<td>{regDate}</td>
-	<td>{quickNote}</td>
+	<td class='quickNote'>{quickNote}</td>
 	<td>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
@@ -168,6 +168,10 @@ class People {
 		let licenseStatus = $(row).find(".licenseStatus");
 		const licenseStatusMap = MetaDataManager.licenseStatusMap;
 		UIUtil.uiEnterEdit(licenseStatus, 'selector', licenseStatusMap);
+		let licenseExpireDate = $(row).find(".licenseExpireDate");
+		UIUtil.uiEnterEdit(licenseExpireDate, 'date');
+		let quickNote = $(row).find(".quickNote");
+		UIUtil.uiEnterEdit(quickNote, 'text');
 		$(row).find(".btnEdit").text("Save");
 	}
 
@@ -175,8 +179,12 @@ class People {
 		let id = parseInt(row.attr('id'));
 		let licenseStatus = $(row).find(".licenseStatus");
 		let licenseStatusVal = UIUtil.uiExitEdit(licenseStatus, 'selector');
+		let licenseExpireDate = $(row).find(".licenseExpireDate");
+		let licenseExpireDateVal = UIUtil.uiExitEdit(licenseExpireDate, 'date');
+		let quickNote = $(row).find(".quickNote");
+		let quickNoteVal = UIUtil.uiExitEdit(quickNote, 'text');
 
-		let res = await Net.adminEditPeople(credMan.credential.token, id, parseInt(licenseStatusVal));
+		let res = await Net.adminEditPeople(credMan.credential.token, id, parseInt(licenseStatusVal), licenseExpireDateVal, quickNoteVal);
 		if (res.errCode!=0) {
 			let errMsg = res.err.msg;
 			alert(errMsg);

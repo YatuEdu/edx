@@ -17,7 +17,7 @@ const pageTemplate = `
 				</li>
 			</ul>
 			<div class="input-group w-auto">
-				<input type="text" class="form-control form-control-sm border-end-0" style="width: 4.75rem;border-color: rgba(31, 21, 52, 0.2);" id="chartDate" lay-key="1">
+				<input type="text" class="form-control form-control-sm border-end-0" style="width: 4.75rem;border-color: rgba(31, 21, 52, 0.2);" id="chartDate" max="2022" lay-key="1">
 				<span class="input-group-text bg-transparent" style="border-color: rgba(31, 21, 52, 0.2);">
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M1.5 2.784c0-.433.351-.784.784-.784h7.433c.432 0 .783.35.783.784v7.432c0 .433-.35.784-.783.784H2.284a.784.784 0 0 1-.784-.784V2.784z" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 1v2M4 1v2M1.5 5h9" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round"/></svg>
 				</span>
@@ -137,12 +137,14 @@ class AdminDashboard {
 		this.#container.empty();
 		this.#container.append(pageTemplate);
 		console.log('producerDashboard init');
-		$('#chartDate').val(new Date().getFullYear());
+		let currYear = new Date().getFullYear();
+		$('#chartDate').val(currYear);
 		let that = this;
 		laydate.render({
 			elem: '#chartDate'
 			,lang: 'en'
 			,type: 'year'
+			,max: ''+currYear
 			,change: function (value) { //监听日期被切换
 				that.draw(value);
 			}

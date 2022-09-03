@@ -1473,7 +1473,7 @@ class Net {
 	/**
 	 FinMind API for admin to edit people
 	 **/
-	static async adminEditPeople(token, id, licenseStatus) {
+	static async adminEditPeople(token, id, licenseStatus, licenseExpireDate, quickNote) {
 		const requestData = {
 			header: {
 				token: token,
@@ -1481,7 +1481,9 @@ class Net {
 			},
 			data: {
 				id: id,
-				licenseStatus: licenseStatus
+				licenseStatus: licenseStatus,
+				licenseExpireDate: licenseExpireDate,
+				quickNote: quickNote
 			}
 		};
 		const req =  Net.composePostRequestFromData_private(requestData);

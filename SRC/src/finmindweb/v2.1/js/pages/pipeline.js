@@ -395,7 +395,7 @@ class PipelinePageHandler {
 
                 $('#operateDiv').append(operateBtnsCustomer);
 
-            } else if (this.#credMan.credential.name===agentUserName) {
+            } else {
                 // agent view
                 if(status==='Started') {
                     this.showCollectMoreInfo();
