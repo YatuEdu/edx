@@ -300,7 +300,11 @@ class CommunicationSpace {
 		Send message to a user
 	**/
 	sendMessageToUser(user, msgStr) {
-		this.#commClient.sendPrivateMsg(user, msgStr);
+		if (msgStr) {
+			this.#commClient.sendPrivateMsg(user, msgStr);
+			return true;
+		}
+		return false;
 	}
 	
 	/**	
@@ -349,10 +353,15 @@ class CommunicationSpace {
 		Send private message to my peer. 
 	 **/
 	sendPrivateMsg(msg, targetUser) {
-		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_PRIVATE_MSG, 
-										msg);	
-		this.sendMessageToUser(targetUser, cmd.str);
-		console.log('send private msg:' + msg + ' to: ' + targetUser);
+		if (msg) {
+			const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_PRIVATE_MSG, 
+											msg);	
+			this.sendMessageToUser(targetUser, cmd.str);
+			console.log('send private msg:' + msg + ' to: ' + targetUser);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**	

@@ -238,10 +238,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Receive message from a peer by displaying the text in the message tab.
 	 **/
 	receiveMsgFrom(cmdObject) {
-		this.displayMessage(cmdObject.data[0], cmdObject.sender);
-		
-		// make message indicator green
-		this.toggleMessageIndicator();
+		if (this.displayMessage(cmdObject.data[0], cmdObject.sender)) {
+			// make message indicator green
+			this.toggleMessageIndicator();
+		}
 	}
 	
 	/**
@@ -270,17 +270,18 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		selector.prop('title', 'your have new messages');
 	}
 	
+	/**
+		Display messages from peers on message board
+	**/
 	displayMessage(msgTxt, sender) {
 		if (msgTxt) {
 			// prepend to the old messages
 			const displayMsg = `from ${sender}: ${msgTxt}\n`;
-			const currentMsgs = $(this.msgTextArea).val();
-			const newMessages = displayMsg + currentMsgs;
-			$(this.msgTextArea).val(newMessages);
-			// switch tab to message:
-			const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_MSG_CONSOLE);
-			this.prv_toggleTab(ti);
+			$(this.msgTextArea).val(displayMsg);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**

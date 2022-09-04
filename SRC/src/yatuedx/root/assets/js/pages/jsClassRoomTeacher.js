@@ -46,8 +46,8 @@ const TA_STUDENT_CONSOLE_PREFIX = "yt_stdf_inpt_ta_for_";
 const TA_STUDENT_CONSOLE_CONTAINER_PREFIX = "yt_stdt_inpt_ta_ctnr_div_for_";
 const BTN_CONSOLE_CLOSE_PREFIX = 'yt_btn_close_student_board';
 
-const CSS_STUDENT_COMM_NO_TEXT = 'student-input-board-button-notext';
-const CSS_STUDENT_COMM_WITH_TEXT = 'student-input-board-button-withtext';
+const CSS_STUDENT_COMM_NO_TEXT = 'btn-mail-box-dimention-teacher';
+const CSS_STUDENT_COMM_WITH_TEXT = 'btn-mail-box-with-msg';
 const CSS_STUDENT_CONSOLE_HIDE_BTN = 'student-input-board-button-close';
 
 const STUDENT_TOGGLE_BUTTON_MAX = "Code";
@@ -195,7 +195,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	/**
 		Handle mouse up event by getting the text selection and pass the selection info to peers
 	**/
-	handleMouseUp() {
+	handleMouseUp(e) {
+		e.preventDefault(); 
+		e.stopPropagation();
 		const {begin, end} = this.getSelection();
 		if (typeof(begin) != "undefined" && typeof(end) != "undefined" && begin != end) {
 			this.#displayBoardTeacher.setSelection(begin, end);
@@ -284,12 +286,10 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	toggleStudentButtonInner(selector, hasMsg) {		
 		// toggle button style by CSS toggle
 		if (hasMsg) {
-			$(selector).removeClass(CSS_STUDENT_COMM_NO_TEXT);
 			$(selector).addClass(CSS_STUDENT_COMM_WITH_TEXT);
 		}
 		else {
-			$(selector).removeClass(CSS_STUDENT_COMM_NO_TEXT);
-			$(selector).addClass(CSS_STUDENT_COMM_WITH_TEXT);
+			$(selector).removeClass(CSS_STUDENT_COMM_WITH_TEXT);
 		}
 	}
 	
@@ -298,11 +298,19 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 **/
 	showStudentConsole(e) {
 		e.preventDefault(); 
+		e.stopPropagation();
+		
 		// get student name
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		// get student console Id
 		const containerSelector = this.getStudentConsoleContainerIdSelector(student);
+		const btnSelector = '#' + e.target.id;
+		
+		// show code console
 		this.showContainer(containerSelector);
+		
+		// make message btn non-flashing
+		this.toggleStudentButtonInner(btnSelector, false); 
 	}
 	
 	/**
@@ -310,11 +318,18 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 **/
 	showStudentMessageContainer(e) {
 		e.preventDefault(); 
+		e.stopPropagation();
+		
 		// get student name
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
+		const btnSelector = '#' + e.target.id;
+		
 		// get student console Id
 		const containerSelector = this.getStudentMessageContainerIdSelector(student);
 		this.showContainer(containerSelector);
+		
+		// make message btn non-flashing
+		this.toggleStudentButtonInner(btnSelector, false);
 	}
 	
 	/**
@@ -446,9 +461,18 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	
 	sendMessageToStudent(e) {
 		e.preventDefault(); 
-		const student = StringUtil.getIdStrFromBtnId(e.target.id);
-		const msgText = $(this.getTeacherMessageTaIdSelector(student)).val();
-		this.#displayBoardTeacher.sendPrivateMsg(msgText, student);
+		e.stopPropagation();
+		
+		// Not sure why, but this event is also triggered when message text area is clicked
+		// We must prevent the message sending when text area is clicked.
+		if (e.target.id && 
+			e.target.id.startsWith(this.getStudentMessageSendBtnId(""))) {
+			const student = StringUtil.getIdStrFromBtnId(e.target.id);
+			const msgText = $(this.getTeacherMessageTaIdSelector(student)).val();
+			if (this.#displayBoardTeacher.sendPrivateMsg(msgText, student)) {
+				$(this.getTeacherMessageTaIdSelector(student)).val('');
+			}
+		}
 	}
 	
 	/**
@@ -525,15 +549,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault();
 		const srcTxt = $("#ta_white_board").val();
 		this.runJSCode_prv(srcTxt);
-	}
-	
-	/*
-		Send message to the selected user
-	 */
-	handleMsgSend(e) {
-		const targetUser = $(this.msgReceiverDropdown).text();	
-		const msg = $(this.resultConsoleControl).val();
-		this.#displayBoardTeacher.sendPrivateMsg(msg, targetUser);
 	}
 	
 	/*

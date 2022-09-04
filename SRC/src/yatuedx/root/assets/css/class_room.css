@@ -166,8 +166,8 @@
 	height: 20vw;
 	overflow-y: auto;    						/* Trigger vertical scroll    */
 	z-index: 99 !important;						/* ON TOP */
-	background: #0ABAB5;
-	color: #FFFFFF;
+	background: #ccffff;
+	color: #000000;
 	resize: none;
     outline: none;
 	border:outset 4px orange;	
@@ -181,8 +181,8 @@
 	height: 10vw;
 	overflow-y: auto;    						/* Trigger vertical scroll    */
 	z-index: 99 !important;						/* ON TOP */
-	background: #b1b3b2;
-	color: #FFFFFF;
+	background: #ccffff;
+	color: #000000;
 	resize: none;
     outline: none;	
 	border:outset 4px orange;
@@ -192,7 +192,7 @@
 	position: absolute;
 	margin-top: 1px;
     margin-right: 2px;
-	top: 3.2vw;
+	top: 4.2vw;
 	left: 50vw;
 	z-index: 100 !important;	
     width: 5vw;
@@ -214,36 +214,21 @@
 
 .student-input-board-button-close-size {
 	position: absolute;
-	top: 3.2vw; 
+	top: 4.2vw; 
 	left: 55.8vw; 
 }
 
 .student-input-board-button-close-size2 {
 	position: absolute;
-	top: 4.8vw; 
+	top: 6.0vw; 
 	left: 55.8vw; 
-}
-
-.btn-mail-box-dimention {
-	background-size: 2.7vw 2.7vw;
-    width: 2.7vw;  
-    height: 2.7vw;
-}
-
-
-.btn-mail-box-no-msg {
-	background-image: url('../images/dynamic/msg_box_no_msg.jpg');
-}
-
-.btn-mail-box-with-msg {
-	background-image: url('../images/dynamic/msg_box_with_msg.jpg');
 }
 
 .student-msg-board-button-send-msg {
 	position: absolute;
 	margin-top: 1px;
     margin-right: 2px;
-	top: 25vw;
+	top: 28vw;
 	left: 53.7vw;
 	z-index: 100 !important;	
     width: 90px;
@@ -254,22 +239,59 @@
 	line-height: 50%
 }
 
-.student-input-board-button-notext {
-    width: 90px;
-    height: 30px;
-    border: 1px solid #ddd;
-	color:  white;
-    background-color:#0a0a23;
-	line-height: 50%
+.btn-mail-box-dimention {
+	background-color: #1c87c9;
+	-webkit-border-radius: 60px;
+	border-radius: 60px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
 }
 
-.student-input-board-button-withtext {
-	width: 90px;
-    height: 30px;
-    border: 1px solid #ddd;
-	color:  #000000;
-    background-color:#00ff00;
-	line-height: 50%
+.btn-mail-box-dimention-teacher {
+	background-color: #1c87c9;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
+	width: 100px;
+    height: 40px;
+	margin-top: 4px
+}
+
+@keyframes glowing {
+	0% {
+	  background-color: #ff0000;
+	  box-shadow: 0 0 5px #2ba805;
+	}
+	50% {
+	  background-color: #1c87c9;
+	  box-shadow: 0 0 20px #49e819;
+	}
+	100% {
+	  background-color: #1c87c9;
+	  box-shadow: 0 0 5px #2ba805;
+	}
+  }
+  
+.btn-mail-box-with-msg {
+	animation: glowing 1300ms infinite;
+}
+
+.btn-mail-box-no-msg {
 }
 
 .msg-board {
