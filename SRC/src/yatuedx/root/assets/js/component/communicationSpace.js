@@ -1,19 +1,19 @@
-import {CommClient} 		from "../communication/commClient.js";
-import {VideoClient} 		from "../communication/videoClient.js"
-import {PTCC_COMMANDS}		from '../command/programmingClassCommand.js'
-import {IncomingCommand} 	from '../command/incomingCommand.js';
-import {OutgoingCommand} 	from '../command/outgoingCommand.js';
-import {sysConstants}		from "../core/sysConst.js"
-import {Net}			    from "../core/net.js"
-import {credMan}			from "../core/credMan.js"
-import {VideoUtil} 			from "../core/videoUtil.js";
-import {StringUtil, UtilConst}	from '../core/util.js'
+import {CommClient} 				from "../communication/commClient.js";
+import {VideoClient} 				from "../communication/videoClient.js"
+import {PTCC_COMMANDS}				from '../command/programmingClassCommand.js'
+import {IncomingCommand} 			from '../command/incomingCommand.js';
+import {OutgoingCommand} 			from 	'../command/outgoingCommand.js';
+import {sysConstants, uiConstants}	from "../core/sysConst.js"
+import {Net}			    		from "../core/net.js"
+import {credMan}					from "../core/credMan.js"
+import {VideoUtil} 					from "../core/videoUtil.js";
+import {StringUtil, UtilConst}		from '../core/util.js'
 
 const REPLACE_PID = '{pid}';
-const VIDEO_TEMPLATE = `
-<video class="yt_video" id="yt_video_{pid}" autoplay playsinline>"`;
+const REPLACE_PID_TEMPLATE = '{pidtmplt}';
 
-const USER_VIDEO_ID_TEMPLATE = 'yt_video_';
+const VIDEO_TEMPLATE = `
+<video class="yt-video" id="{pidtmplt}{pid}" autoplay playsinline>"`;
 
 /**
 
@@ -28,13 +28,14 @@ class CommunicationSpace {
 	#videoClient;
 	#videoTrack;
 	#audioTrack;
-	
+	#userVideoItTemplate
 	#userMap;
 	#videoDivId;
 	#screenShareBtnId
 	#me;
 	
 	constructor(roomName, videoDivId, screenShareBtnId) {
+		this.#userVideoItTemplate = uiConstants.VIDEO_ID_TEMPLATE;
 		this.init(roomName);
 		this.#videoDivId = videoDivId;
 		this.#screenShareBtnId = screenShareBtnId;
@@ -193,6 +194,7 @@ class CommunicationSpace {
 		mediaStream.addTrack(videoTrack);
 
 		const videTagStr = VIDEO_TEMPLATE
+							.replace(REPLACE_PID_TEMPLATE, this.#userVideoItTemplate)
 							.replace(REPLACE_PID, user);
 		const videoElement = $(videTagStr)[0];
 		
@@ -201,7 +203,7 @@ class CommunicationSpace {
 		// this is to prevent multiple video areaq in the situation of 
 		// user's reconnection after loss of connection
 		//
-		const userSelector = `#${USER_VIDEO_ID_TEMPLATE}${user}`;
+		const userSelector = `#${this.#userVideoItTemplate}${user}`;
 		if ($(this.videoAreaDiv).find(userSelector).length === 0) {	
 			$(this.videoAreaDiv).append(videoElement);
 		}

@@ -1,4 +1,4 @@
-import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
+import {sysConstants, sysConstStrings, uiConstants} from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
 import {uiMan} 								from '../core/uiManager.js';
 import {DisplayBoardForCoding}				from '../component/displayBoardForCoding.js'
@@ -27,6 +27,8 @@ const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
 
 const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
+const CSS_VIDEO_MIN = 'yt-video';
+const CSS_VIDEO_MAX = 'yt-video-max';
 
 const TAB_LIST = [
 	{tab:YT_TB_OUTPUT_CONSOLE, sub_elements: [YT_TA_OUTPUT_CONSOLE_ID, YT_BTN_CLEAR_RESULT_CODE_ID] },
@@ -35,6 +37,8 @@ const TAB_LIST = [
 ];
 
 const MSG_TAB_INDX = 2;
+const USER_VIDEO_AREA = uiConstants.VIDEO_AREA_ID;
+const USER_VIDEO_ID_TEMPLATE = uiConstants.VIDEO_ID_TEMPLATE;
 	
 /**
 	This class handles JS Code runner board
@@ -44,6 +48,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#displayBoardForCoding;
 	#notes;
 	#tabIndex;
+	#teacher;
 	
     constructor(credMan) {
 		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
@@ -56,8 +61,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const paramMap = PageUtil.getUrlParameterMap();
 		const groupId = paramMap.get(sysConstants.UPN_GROUP);
 		this.groupId = groupId;
-		const teacher=paramMap.get(sysConstants.UPN_TEACHER);
-		this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, teacher, this);
+		this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
+		this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, this.#teacher, this);
 			
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
@@ -71,7 +76,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// handle notes editing
 		$(this.notesTextArea).blur(this.handleNeedtoUpdateNotes.bind(this));
 		// handle maximize or minimize video screen
-		$(this.videoScreen).click(this.toggleVideoSize);
+		$(this.videoAreaSelector).click(this.toggleVideoSize.bind(this));
 		// switching tab to output
 		$(this.outputConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to notes
@@ -111,13 +116,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	 **/
 	toggleVideoSize(e) {
 		e.preventDefault(); 
-		if ($(this).hasClass( CSS_STUDENT_CONSOLE)) {
-			$(this).removeClass(CSS_STUDENT_CONSOLE);
-			$(this).addClass(CSS_STUDENT_CONSOLE_EX);
+		const videoSelector = this.teacherVideoSelector;
+		if ($(videoSelector).hasClass( CSS_VIDEO_MIN)) {
+			$(videoSelector).removeClass(CSS_VIDEO_MIN);
+			$(videoSelector).addClass(CSS_VIDEO_MAX);
 		}
 		else {
-			$(this).removeClass(CSS_STUDENT_CONSOLE_EX);
-			$(this).addClass(CSS_STUDENT_CONSOLE);
+			$(videoSelector).removeClass(CSS_VIDEO_MAX);
+			$(videoSelector).addClass(CSS_VIDEO_MIN);
 		}
 	}
 	
@@ -376,7 +382,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_BTN_RUN_CODE_ID}`;
 	}
 	
-	get videoScreen() {
+	get videoScreenSelector() {
 		return `#${VD_VIEDO_AREA}`;
 	}
 	
@@ -419,6 +425,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	get messageIndicatorBtnSelector() {
 		return `#${YT_TB_MSG_INDICATOR}`;
+	}
+	
+	get teacherVideoSelector() {
+		return `#${USER_VIDEO_ID_TEMPLATE}${this.#teacher}`;	
+	}
+	
+	get videoAreaSelector() {
+		return `#${USER_VIDEO_AREA}`;
 	}
 	
 	/**

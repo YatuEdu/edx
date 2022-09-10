@@ -307,12 +307,26 @@
 	border:outset 4px orange;
 }
 
-.yt_video_area {
+.yt-video-area {
 	width: 95%;
 }
 
-.yt_video {
-	width: 95%;
+.yt-video {
+	width: 100%;
+}
+
+.yt-video-max {
+	position:relative;
+    border:none;
+	width: 100vw;								/* <-- children as wide as the browser window (viewport) */
+	height: 100%;
+	overflow-y: auto;    						/* Trigger vertical scroll    */
+	z-index: 99 !important;						/* ON TOP */
+	background: #ccffff;
+	color: #000000;
+	resize: none;
+    outline: none;
+	border:outset 4px orange;
 }
 
 .tooltip { 

@@ -75,5 +75,11 @@ const regexConstants = Object.freeze({
 	// email regex :
 	REG_FOR_EMAIL: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 });
+
+const uiConstants = Object.freeze({
+	// vedio id template :
+	VIDEO_ID_TEMPLATE: "yt_video_",
+	VIDEO_AREA_ID: "yt_video_area",
+});
 	
-export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants, regexConstants};
+export {sysConstants, sysConstStrings, groupTypeConstants, languageConstants, regexConstants, uiConstants};
