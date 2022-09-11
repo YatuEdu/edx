@@ -158,10 +158,10 @@ const pageTemplate = `
 						
 						<div class="mb-4" {producerInfoHidden}>
 							<label for="LicenseCurrentState" class="form-label">License Current State</label>
-							<div class="mt-2">
-								<span class="event-status py-2 px-4 fs-7 status-warning">
-									New License Under Review
-								</span>
+							<div class="mt-2" id="licenseStatus">
+<!--								<span class="event-status py-2 px-4 fs-7 status-warning">-->
+<!--									New License Under Review-->
+<!--								</span>-->
 								<!-- <span class="event-status py-2 px-4 fs-7 status-info">
 									License in Use
 								</span>
@@ -218,6 +218,28 @@ const editButtons = `
 </button>
 `;
 
+function statusTemplate(status) {
+	let template = '';
+	switch(status) {
+		case 1:
+			template = `<span class="event-status py-2 px-4 fs-7 status-warning">New License Under Review</span>`;
+			break;
+		case 2:
+			template = `<span class="event-status py-2 px-4 fs-7 status-info">License in Use</span>`;
+			break;
+		case 3:
+			template = `<span class="event-status py-2 px-4 fs-7 status-danger">License Update is Rejected</span>`;
+			break;
+		case 4:
+			template = `<span class="event-status py-2 px-4 fs-7 status-danger">License Expired</span>`;
+			break;
+		case 5:
+			template = `<span class="event-status py-2 px-4 fs-7 status-danger">License is Invalid</span>`;
+			break;
+	}
+	return $(template);
+}
+
 class MyProfile {
 	#container;
 
@@ -272,6 +294,8 @@ class MyProfile {
 			$('#license_issue_state').val(row.license_issue_state);
 			$('#license_expire_date').val(row.license_expire_date);
 			$('#license_number').val(row.license_number);
+			$('#licenseStatus').empty();
+			$('#licenseStatus').append(statusTemplate(row.license_status));
 		}
 		console.log();
 	}
@@ -311,7 +335,7 @@ class MyProfile {
 			return;
 		}
 
-		if (!ValidUtil.isPhoneValid(phone)) {
+		if (!ValidUtil.isNumber(phone)) {
 			alert('Phone format is incorrect');
 			return;
 		}

@@ -16,12 +16,6 @@ const pageTemplate = `
 						<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 12a6 6 0 1 1 4.548-2.087l1.32 1.32a.447.447 0 0 1 .003.631l-.004.004a.454.454 0 0 1-.318.132.454.454 0 0 1-.318-.132L9.912 10.55A5.976 5.976 0 0 1 6 12zM6 .9a5.1 5.1 0 1 0 0 10.2A5.1 5.1 0 0 0 6 .9z" fill="#1F1534" fill-opacity=".2"/></svg>
 					</button>
 				</div>
-				<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
-					Delete
-				</button>
-				<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
-					Edit
-				</button>
 				<button type="button" class="btn btn-primary ms-2 me-3" style="width: 8rem;" id="create-new-btn">
 					Create New
 				</button>
@@ -94,6 +88,11 @@ const templateAccept = `
 /
 <button type="button" class="btn btn-sm border-0 btn-outline-primary rejectButton" appId="{appId}">Reject</button>
 `;
+
+const cancelTemplate = `
+<button type="button" class="btn btn-sm border-0 btn-outline-primary btnCancel">Cancel</button>
+`;
+
 const pageSize = 10;
 
 class Applications {
@@ -139,11 +138,19 @@ class Applications {
 		$('.editButton').click(this.handleEdit.bind(this));
 		$('.acceptButton').click(this.handleAccept.bind(this));
 		$('.rejectButton').click(this.handleReject.bind(this));
+
+		$('#searchInput').keypress(this.handleKeyPress.bind(this));
 	}
 
 	async handlePage(page) {
 		console.log(page);
 		await this.requestList(this.#searchBy, page);
+	}
+
+	handleKeyPress(e) {
+		if (e.which === 13) {
+			this.handleSearchSubmit(e);
+		}
 	}
 
 	async requestList(searchBy, pageNo) {
@@ -223,6 +230,10 @@ class Applications {
 		const appStatusMap = MetaDataManager.appStatusMap;
 		UIUtil.uiEnterEdit(status, 'selector', appStatusMap);
 		$(row).find(".editButton").text("Save");
+		$(row).find('.action').append($(cancelTemplate));
+		let btnCancel = $(row).find('.btnCancel');
+		btnCancel.off('click');
+		btnCancel.click(this.editCancel.bind(this, $(row)));
 	}
 
 	async editExit(row) {
@@ -236,8 +247,15 @@ class Applications {
 			alert(errMsg);
 			return;
 		}
+		this.editCancel(row);
+	}
+
+	editCancel(row) {
+		let status = $(row).find(".status");
+		UIUtil.uiExitEdit(status, 'selector');
 		$(row).removeClass("edit");
 		$(row).find(".editButton").text("Edit");
+		$(row).find('.btnCancel').remove();
 	}
 
 	appState(state) {

@@ -191,6 +191,15 @@ class ValidUtil {
 			return true;
 		}
 	}
+
+	static isNumber(str) {
+		const regExp = /^[0-9]*$/;
+		if (!regExp.test(str.toLowerCase())) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
 
 export { TimeUtil, StringUtil, ArrayUtil, ValidUtil };
