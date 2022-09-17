@@ -15,15 +15,19 @@ const YT_TA_NOTES_ID 					    = "yt_ta_notes";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
-const YT_BTN_COPY_CODE_TO_NOTES				= 'yt_btn_copy_from_board';					
+const YT_BTN_COPY_CODE_TO_NOTES				= 'yt_btn_save_code_to_db_popup';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
+const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
 const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
 const YT_BTN_MSG_SEND						= 'yt_btn_msg_send';
+const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
 const VD_VIEDO_AREA 						= "yt_video_area";
 const YT_TB_OUTPUT_CONSOLE					= 'yt_tb_output_console';
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
 const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
 const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
+const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
+const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
 
 const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
@@ -57,6 +61,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
+		// initialize dialog boxes for this page
+		$(this.codeSaveDialogSelector).dialog({
+				autoOpen : false, 
+				modal : true, 
+				show : "blind", 
+				hide : "blind", 
+		});
+		
+		// other initialization
 		this.#tabIndex = 0;
 		const paramMap = PageUtil.getUrlParameterMap();
 		const groupId = paramMap.get(sysConstants.UPN_GROUP);
@@ -87,6 +100,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.sendMsgButon).click(this.handleSendMessage.bind(this));
 		// handle message indicator clicking
 		$(this.messageIndicatorBtnSelector).click(this.toggleToMegTab.bind(this));
+		// handle save code to DB
+		$(this.saveCodeToDbButtonSelector).click(this.saveCodeToDb.bind(this));
+		// handle erasing code from board
+		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
 		
 		// itialize notes we saved before
 		this.initNotes();
@@ -109,6 +126,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.notesTextArea).val(dbnotes);
 			this.#notes = $(this.notesTextArea).val();
 		}
+	}
+	
+	async saveCodeToDb(e) {
+		e.preventDefault();
+		
+		alert("code saved:" + $(this.codeNameTextSelector).val());
+		
+		//close dialog box:
+		$(this.codeSaveDialogSelector).dialog("close");
 	}
 	
 	/**
@@ -146,6 +172,13 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// make the message box to be "no new message"
 		const selector = $(this.messageIndicatorBtnSelector);
 		this.messageIndicatorHasNoMessage(selector)
+	}
+	
+	/**
+		erase code from board
+	 **/
+	eraseCodeFromBoard(e) {
+		$(this.codeBoardTextArea).val('');
 	}
 	
 	/**
@@ -369,7 +402,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			this.setTabHandler();
 		}
 	}
-		
+	
+	get eraseCodeFromBoardButtonSelector() {
+		return `#${YT_BTN_CLEAR_CODE_BOARD}`;
+	}
+	
+	get codeSaveDialogSelector() {
+		return `#${YT_DL_ASK_FOR_SAVING_CODE}`;
+	}
+	
 	get codeBoardTextArea() {
 		return `#${YT_TA_CODE_BOARD_ID}`;
 	}
@@ -389,7 +430,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	get copyNotesButton() {
 		return `#${YT_BTN_COPY_CODE_TO_NOTES}`;
 	}
+	
+	get saveCodeToDbButtonSelector() {
+		return `#${YT_BTN_SAVE_CODE}`;
+	}
 		
+	get codeNameTextSelector() {
+		return `#${YT_TXT_CODE_NAME}`;
+	}
+	
 	get clearResultButton() {
 		return `#${YT_BTN_CLEAR_RESULT_CODE_ID}`;
 	}
@@ -454,13 +503,19 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		if (!codeTxt) {
 			return;
 		}
-		const noteTxt = $(this.notesTextArea).val();
-		const newNotes = codeTxt + '\n' + noteTxt;
-		$(this.notesTextArea).val(newNotes);
-		this.prv_saveNotesToDb();
+		
+		// todo: add code to code list
+		
+		//const noteTxt = $(this.notesTextArea).val();
+		//const newNotes = codeTxt + '\n' + noteTxt;
+		//$(this.notesTextArea).val(newNotes);
+		//this.prv_saveNotesToDb();
 		// switch tab to notes:
 		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_NOTES_CONSOLE);
 		this.prv_toggleTab(ti);
+		
+		// ask if user want to save code to code depot?
+		 $(this.codeSaveDialogSelector).dialog("open");
 	}
 	
 	/**

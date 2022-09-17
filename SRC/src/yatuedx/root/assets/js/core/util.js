@@ -192,7 +192,7 @@ class StringUtil {
 	}
 	
 	/*
-		Our Symply and 99% good message digest algorithm
+		Our simple and 99% good message digest algorithm
 	 */
 	static charIndxesForSha256 = [0, 1, 5, 6, 11, 19, 21, 45, 46, 47, 55, 61, 63];
 	/*

@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
 	<link rel="stylesheet" href="assets/css/class_room.css"/>
-	<link rel="stylesheet" href="assets/css/yatu-main.css"  />
+	<link rel="stylesheet" href="assets/css/yatu-main.css"/>
+	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
 </head>
 
 <body>
@@ -36,10 +37,16 @@
     </header>
 
     <main>
+		<div id="yt_dl_ask_to_save" title="Save my code to code depot">
+			<p>
+             <input type="name" name="codename" id="yt_txt_code_name" class="form-control" placeholder="Code Name">  
+			 <button id="yt_btn_save_code_to_db" type="button" class="btn btn-mail-box-dimention">Save</button>
+			</p>
+		</div>
         <article>
 			<section>
 				<div class="row mb-4">
-					<div class="col-2">
+					<div class="col-2 tool-tbtn-dimention-left">
 						<div class="row mb-4">
 							<div id="yt_video_area" class="yt-video-area">
 							</div>
@@ -47,32 +54,35 @@
 					</div>
 					<div class="col-10">
 						<div class="row mb-0">
-							<div class="col-11">
+							<div class="col-11 tool-tbtn-dimention-left">
 								<textarea class="input-board"
 									  id="yt_ta_code_board" 
 									  spellcheck="false"
 									  placeholder="Type your code here...."
 									  rows="20"></textarea>
 							</div>
-							<div class="col-1">	 
-								<picture id="yt_btn_run_code_from_board" class="btn tiphost" >
+							<div class="col-1 tool-tbtn-dimention">	 
+								<button id="yt_btn_run_code_from_board" class="btn-tool-dimention btn-run-code tiphost">
 									<span class="tooltip">
 										<div class="tooltiptext">
-										Run code 
+										Run code
 										</div>
 									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
-								<picture id="yt_btn_copy_from_board" class="btn tiphost" >
+								</button>
+								<button id="yt_btn_save_code_to_db_popup" class="btn-tool-dimention btn-save-db tiphost">
 									<span class="tooltip">
 										<div class="tooltiptext">
-										Copy notes from board
+										Save code to my code depot 
 										</div>
 									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/notepad.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+								</button>
+								<button id="yt_btn_erase_code" class="btn-tool-dimention btn-eraser tiphost">
+									<span class="tooltip">
+										<div class="tooltiptext">
+										Erase code from board
+										</div>
+									</span>
+								</button>
 							</div>
 						</div>
 						<div class="row mb-0">
@@ -80,14 +90,14 @@
 								<a class="nav-link" data-tabindex="0" href="#">Output</a>
 							</div>
 							<div id="yt_tb_notes_console"  class="col-4 unselected-tab">
-								<a class="nav-link" data-tabindex="1" href="#">Notes</a>
+								<a class="nav-link" data-tabindex="1" href="#">My code</a>
 							</div>
 							<div id="yt_tb_msg_console"  class="col-3 unselected-tab">
 								<a class="nav-link" data-tabindex="2" href="#">Messages</a>
 							</div>	
 						</div>
 						<div class="row mb-0">
-							<div class="col-11">
+							<div class="col-11 tool-tbtn-dimention-left">
 								<textarea class="output-board"
 										  id="yt_ta_output_console" 
 										  spellcheck="false" 
@@ -106,7 +116,7 @@
 								  placeholder="Received messages"
 								  rows="20"></textarea>
 							</div>
-							<div class="col-1">
+							<div class="col-xs-1 tool-tbtn-dimention">
 								<picture id="yt_btn_clear_result" class="btn tiphost" >
 									<span class="tooltip">
 										<div class="tooltiptext">Erase Output</div>
@@ -126,7 +136,7 @@
 							</div>
 						</div>
 						<div class="row mb-0">
-							<div class="col-11">
+							<div class="col-11 tool-tbtn-dimention-left">
 								<textarea class="msg-board"
 								  style="display:none"
 								  id="yt_ta_msg_input" 
@@ -134,8 +144,8 @@
 								  placeholder="Enter your messages"
 								  rows="3"></textarea>	
 							</div>
-							<div class="col-1">
-								<picture id="yt_btn_msg_send" class="btn tiphost  float-left" >
+							<div class="col-xs-1 tool-tbtn-dimention">
+								<picture id="yt_btn_msg_send" class="btn tiphost pull-left" >
 									<span class="tooltip">
 										<div class="tooltiptext">Send Message to Teacher</div>
 									</span>
@@ -153,6 +163,7 @@
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
 	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/jquery-ui/jquery-ui.min.js"></script>
 	<script src="./assets/js/helpers/sha256.js"></script> 	
 	<script type="module" src="./assets/js/pages/jsClassRoom.js"></script>
 </body>

@@ -56,6 +56,11 @@
 	font-family: 'Mulish-Bold';
 }
 
+.ui-dialog .ui-dialog-titlebar {
+    background-color: #1c87c9;
+	color: white;
+}
+
 .js-k {
 	color: #0000FF;
 }
@@ -239,6 +244,25 @@
 	line-height: 50%
 }
 
+.btn-tool-dimention {
+	background-size: 64px 64px;
+    width:  64px;  
+    height: 62px;
+	border: none;
+}
+
+.btn-save-db {
+	background-image: url('../images/dynamic/save_db.png');
+}
+
+.btn-run-code {
+	background-image: url('../images/dynamic/run_code.png');
+}
+
+.btn-eraser {
+	background-image: url('../images/dynamic/eraser.png');
+}
+
 .btn-mail-box-dimention {
 	background-color: #1c87c9;
 	-webkit-border-radius: 60px;
@@ -252,6 +276,7 @@
 	padding: 5px 15px;
 	text-align: center;
 	text-decoration: none;
+	margin-top: 1px;
 }
 
 .btn-mail-box-dimention-teacher {
@@ -308,7 +333,12 @@
 }
 
 .yt-video-area {
-	width: 95%;
+	background-repeat:no-repeat;
+	background-size:contain;
+	height:200px;
+	width:500px;;
+	background-image: url('../images/dynamic/empty-avatar.png') !important;
+	border:outset 4px orange;
 }
 
 .yt-video {
@@ -350,6 +380,19 @@
   line-height: 15px;
   transition: 1s;
   width: 250px;
+}
+
+.tool-tbtn-dimention {
+	margin-left:  0 !important;
+	padding-left: 0 !important;
+    float:left;
+}
+
+.tool-tbtn-dimention-left {
+	margin-right:  0 !important;
+	padding-right: 0 !important;
+    float:right;
+
 }
 
 .selected-tab {
