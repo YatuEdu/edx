@@ -279,8 +279,8 @@ const page_step3 = `
                             <input id="fm_rgstr_license_number" type="text" class="form-control form-control-lg" placeholder="Please enter license number">
                         </div>
                         <div class="col-12 mt-4 position-relative">
-                            <label for="Birthday" class="form-label fs-6p">Birthday*</label>
-                            <input id="fm_rgstr_birthday" type="date" class="form-control form-control-lg"/>
+                            <label for="Birthday" class="form-label fs-6p">License Expire Date*</label>
+                            <input id="fm_rgstr_license_expire_date" type="date" class="form-control form-control-lg"/>
                         </div>
                         <div class="col-12 mt-5">
                             <button id="registerSubmit" class="btn btn-primary btn-xl w-100" type="button">Register</button>
@@ -324,7 +324,7 @@ class RegisterProducerPageHandler {
 
     #licenseHome;
     #licenseNumber;
-    #birthday;
+    #licenseExpireDate;
 
     constructor(credMan) {
         this.#credMan = credMan;
@@ -388,7 +388,7 @@ class RegisterProducerPageHandler {
 
         $( "#fm_rgstr_license_home" ).val(this.#licenseHome);
         $( "#fm_rgstr_license_number" ).val(this.#licenseNumber);
-        $( "#fm_rgstr_birthday" ).val(this.#birthday);
+        $( "#fm_rgstr_license_expire_date" ).val(this.#licenseExpireDate);
 
         $( "#fm_rgstr_license_number" ).focusout(this.validateLicenseNumber);
 
@@ -522,7 +522,7 @@ class RegisterProducerPageHandler {
         } else if (currStep===3) {
             this.#licenseHome = $( "#fm_rgstr_license_home" ).val().trim();
             this.#licenseNumber = $( "#fm_rgstr_license_number" ).val().trim();
-            this.#birthday = $( "#fm_rgstr_birthday" ).val().trim();
+            this.#licenseExpireDate = $( "#fm_rgstr_license_expire_date" ).val().trim();
             if (!this.#licenseHome || !this.#licenseNumber) {
                 $(e.target).after( `<p style="color:red;">License home, and Address line 1 cannot be empty</p>` );
                 return;
@@ -534,7 +534,7 @@ class RegisterProducerPageHandler {
 
             let ret = await Net.agentRegisterWithEmailAndPw(this.#email, this.#email, this.#emailCode, this.#firstName, this.#middleName,
                 this.#lastName, sha256(sha256(this.#pw)), this.#phone, this.#address1, this.#address2, this.#city,
-                this.#state, this.#zipCode, this.#licenseHome, this.#licenseNumber, this.#birthday);
+                this.#state, this.#zipCode, this.#licenseHome, this.#licenseNumber, this.#licenseExpireDate);
 
             if (ret.errCode!=0) {
                 let errMsg = ret.err.msg;

@@ -9,9 +9,9 @@ const pageTemplate = `
 		<h5 class="m-0">Dashboard</h5>
 		<div class="ms-auto d-flex align-items-center">
 			<div class="mx-4">
-				<span class="text-secondary">Updated at: </span>2021-06-18 08:24:59
+				<span class="text-secondary">Updated at: </span><span id="updatedTime">2021-06-18 08:24:59</span>
 			</div>
-			<button type="button" class="btn text-primary" id="event-export-btn">
+			<button type="button" class="btn text-primary" id="btnRefresh">
 				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.01 6.232h3v-3" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.111 4.11a5.5 5.5 0 0 1 7.778 0l2.122 2.122M4.99 9.768h-3v3" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.889 11.89a5.498 5.498 0 0 1-7.778 0L1.989 9.767" stroke="#1871FF" stroke-linecap="round" stroke-linejoin="round"/></svg>
 				Refresh
 			</button>
@@ -148,58 +148,63 @@ class MyDashboard {
 			,type: 'year'
 		});
 
-		this.draw(false);
+		await this.draw(false);
+
+		$('#btnRefresh').click
 	}
 
 	async draw(isAll) {
 
 		let ret = await Net.userInsurancePolicyGetAll(credMan.credential.token);
-		for(let data of ret.data) {
-			$('#list').append(rowTemplate
-				.replace('{id}', data.id)
-				.replace('{productName}', data.product_name)
-				.replace('{insuredName}', data.insured_name)
-				.replace('{insurer}', '')
-				.replace('{coverage}', data.coverage_amount)
-				.replace('{startDate}', data.effective_date)
-			);
+		if (ret.data.length > 0) {
+			for(let data of ret.data) {
+				$('#list').append(rowTemplate
+					.replace('{id}', data.id)
+					.replace('{productName}', data.product_name)
+					.replace('{insuredName}', data.insured_name)
+					.replace('{insurer}', '')
+					.replace('{coverage}', data.coverage_amount)
+					.replace('{startDate}', data.effective_date)
+				);
 
-			let chartRow = $('#'+data.id).find('.chartRow');
+				let chartRow = $('#'+data.id).find('.chartRow');
 
-			if (data.details!=null) {
-				let chartCashValue = $(chartTemplate.replace('{chartName}', 'Cash Value'));
-				chartRow.append(chartCashValue);
-				let chartDeathBenefit = $(chartTemplate.replace('{chartName}', 'Death Benefit'));
-				chartRow.append(chartDeathBenefit);
-				let rows = data.details.split(',');
-				let valueMapCashValue = new Map();
-				let valueMapDeathBenefit = new Map();
-				for(let row of rows) {
-					let cols = row.split('|');
-					valueMapCashValue.set(cols[0], cols[1]);
-					valueMapDeathBenefit.set(cols[0], cols[2]);
+				if (data.details!=null) {
+					let chartCashValue = $(chartTemplate.replace('{chartName}', 'Cash Value'));
+					chartRow.append(chartCashValue);
+					let chartDeathBenefit = $(chartTemplate.replace('{chartName}', 'Death Benefit'));
+					chartRow.append(chartDeathBenefit);
+					let rows = data.details.split(',');
+					let valueMapCashValue = new Map();
+					let valueMapDeathBenefit = new Map();
+					for(let row of rows) {
+						let cols = row.split('|');
+						valueMapCashValue.set(cols[0], cols[1]);
+						valueMapDeathBenefit.set(cols[0], cols[2]);
+					}
+					this.#cashValueMap.set(data.id, valueMapCashValue);
+					this.#deathBenefitMap.set(data.id, valueMapDeathBenefit);
+
+					this.drawLineSeries(chartCashValue.find('.chartDiv'), isAll, valueMapCashValue, 'USD');
+					this.drawLineSeries(chartDeathBenefit.find('.chartDiv'), isAll, valueMapDeathBenefit, 'USD');
+
+					// 切换处理
+					// let div = $('#'+data.id).find('.cashValue');
+					this.chartDurationSwitch(chartCashValue, valueMapCashValue);
+					// let div2 = $('#'+data.id).find('.deathBenefit');
+					this.chartDurationSwitch(chartDeathBenefit, valueMapDeathBenefit);
+
+				} else {
+					let chartCashValue = $(noCashValueTemplate);
+					chartRow.append(chartCashValue);
+					let chartDeathBenefit = $(flatDeathBenefitTemplate);
+					chartRow.append(chartDeathBenefit);
 				}
-				this.#cashValueMap.set(data.id, valueMapCashValue);
-				this.#deathBenefitMap.set(data.id, valueMapDeathBenefit);
 
-				this.drawLineSeries(chartCashValue.find('.chartDiv'), isAll, valueMapCashValue, 'USD');
-				this.drawLineSeries(chartDeathBenefit.find('.chartDiv'), isAll, valueMapDeathBenefit, 'USD');
-
-				// 切换处理
-				// let div = $('#'+data.id).find('.cashValue');
-				this.chartDurationSwitch(chartCashValue, valueMapCashValue);
-				// let div2 = $('#'+data.id).find('.deathBenefit');
-				this.chartDurationSwitch(chartDeathBenefit, valueMapDeathBenefit);
-
-			} else {
-				let chartCashValue = $(noCashValueTemplate);
-				chartRow.append(chartCashValue);
-				let chartDeathBenefit = $(flatDeathBenefitTemplate);
-				chartRow.append(chartDeathBenefit);
 			}
-
+		} else {
+			$('#list').append('You don\'t have any data with us currently.\n');
 		}
-
 		$('#updatedTime').text(moment(new Date()).format('YYYY/MM/DD HH:mm:ss'));
 
 	}

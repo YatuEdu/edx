@@ -7,6 +7,8 @@ import {PolicyFilePanel} from "./policyFilePanel.js";
 import {UIUtil} from "../../core/uiUtil.js";
 import {InsurancePolicyDetails} from "./insurancePolicyDetails.js";
 import {SessionStoreAccess} from "../../core/sessionStorage.js";
+import {DeleteConfirmPanel} from "../../core/DeleteConfirmPanel.js";
+import {PaginationSimple} from "../../core/paginationSimple.js";
 
 const pageTemplate = `
 <div class="card h-100 border-0 rounded-0">
@@ -69,7 +71,7 @@ const rowTemplate = `
 	<td>{currentOwner}</td>
 	<td>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
-		<button type="button" disabled class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal">Delete</button>
+		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnDelete">Delete</button>
 	</td>
 </tr>
 `;
@@ -248,12 +250,28 @@ class InsurancePolicies {
 			console.log();
 		});
 
+		$('.btnDelete').off('click');
+		$('.btnDelete').click(this.handleDelete.bind(this));
+
 		return maxRowNumber;
 	}
 
 	async handlePage(page) {
 		console.log(page);
 		await this.requestList(this.#searchBy, page);
+	}
+
+	handleDelete(e) {
+		let id = $(e.target).parent().parent().prop('id');
+		let that = this;
+		new DeleteConfirmPanel('insurance policy', async () => {
+			let ret = await Net.agentInsurancePolicyRemove(credMan.credential.token, parseInt(id));
+			if (ret.code==null || ret.code==0) {
+				await this.requestList(this.#searchBy, 1);
+			} else {
+				alert(ret.err.msg);
+			}
+		}).show();
 	}
 
 	editEnter(row) {

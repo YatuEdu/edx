@@ -690,6 +690,24 @@ class Net {
 	}
 
 	/**
+	 FinMind API for delete insurance policy
+	 **/
+	static async agentInsurancePolicyRemove(token, policyId) {
+		const requestData = {
+			header: {
+				token: token,
+				api_id: 2021891
+			},
+			data: {
+				policyId: policyId
+			}
+		};
+		const req =  Net.composePostRequestFromData_private(requestData);
+		// remote call
+		return await Net.remoteCall(sysConstants.FINMIND_PORT, req);
+	}
+
+	/**
 	 FinMind API for add insurance policy file
 	 **/
 	static async insurancePolicyFileAdd(token, policyId, fileName, fileSize, fileNameUn) {
@@ -1386,7 +1404,7 @@ class Net {
      FinMind API for agent to notify user
      **/
     static async agentRegisterWithEmailAndPw(name, email, validCode, fistName, middleName, lastName, pwh, phone, address1,
-                                             address2, city, state, zipCode, licenseHome, licenseNumber, birthday) {
+                                             address2, city, state, zipCode, licenseHome, licenseNumber, licenseExpireDate) {
         const requestData = {
             header: {
                 api_id: 2021887
@@ -1407,7 +1425,7 @@ class Net {
                 zipCode: zipCode,
                 licenseHome: licenseHome,
                 licenseNumber: licenseNumber,
-                birthday: birthday
+				licenseExpireDate: licenseExpireDate
             }
         };
         const req =  Net.composePostRequestFromData_private(requestData);

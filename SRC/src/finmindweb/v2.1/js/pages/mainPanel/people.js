@@ -71,11 +71,15 @@ const rowTemplate = `
 	<td class='licenseStatus'>{licenseStatus}</td>
 	<td>{regDate}</td>
 	<td class='quickNote'>{quickNote}</td>
-	<td>
+	<td class="action">
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary btnEdit">Edit</button>
 		<button type="button" class="btn btn-sm border-0 btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DeleteEventModal" disabled>Delete</button>
 	</td>
 </tr>
+`;
+
+const cancelTemplate = `
+<button type="button" class="btn btn-sm border-0 btn-outline-primary btnCancel">Cancel</button>
 `;
 
 const pageSize = 10;
@@ -155,7 +159,7 @@ class People {
 			if (val==='Edit') {
 				that.editEnter(row);
 			} else {
-				that.editExit(row);
+				that.editExit(row, true);
 			}
 			console.log();
 		});
@@ -173,9 +177,13 @@ class People {
 		let quickNote = $(row).find(".quickNote");
 		UIUtil.uiEnterEdit(quickNote, 'text');
 		$(row).find(".btnEdit").text("Save");
+		$(row).find('.btnEdit').after($(cancelTemplate));
+		let btnCancel = $(row).find('.btnCancel');
+		btnCancel.off('click');
+		btnCancel.click(this.editExit.bind(this, $(row), false));
 	}
 
-	async editExit(row) {
+	async editExit(row, save) {
 		let id = parseInt(row.attr('id'));
 		let licenseStatus = $(row).find(".licenseStatus");
 		let licenseStatusVal = UIUtil.uiExitEdit(licenseStatus, 'selector');
@@ -184,14 +192,18 @@ class People {
 		let quickNote = $(row).find(".quickNote");
 		let quickNoteVal = UIUtil.uiExitEdit(quickNote, 'text');
 
-		let res = await Net.adminEditPeople(credMan.credential.token, id, parseInt(licenseStatusVal), licenseExpireDateVal, quickNoteVal);
-		if (res.errCode!=0) {
-			let errMsg = res.err.msg;
-			alert(errMsg);
-			return;
+		if (save) {
+			let res = await Net.adminEditPeople(credMan.credential.token, id, parseInt(licenseStatusVal), licenseExpireDateVal, quickNoteVal);
+			if (res.errCode!=0) {
+				let errMsg = res.err.msg;
+				alert(errMsg);
+				return;
+			}
 		}
+
 		$(row).removeClass("edit");
 		$(row).find(".btnEdit").text("Edit");
+		$(row).find('.btnCancel').remove();
 	}
 
 	licenseStatus(status) {
