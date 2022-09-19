@@ -8,14 +8,16 @@ import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil}				from '../core/util.js';
 import {Net}			    				from "../core/net.js"
+import {MY_CODE_LIST_TEMPLATE}				from '../component/codeListCard.js'
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
-const YT_TA_NOTES_ID 					    = "yt_ta_notes";
+const YT_TA_NOTES_ID 					    = "yt_ta_notes"; //todo: remove it
+const YT_DIV_CODE_MANAGER 					= "yt_div_code_manager";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
-const YT_BTN_COPY_CODE_TO_NOTES				= 'yt_btn_save_code_to_db_popup';					
+const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
 const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
@@ -28,6 +30,8 @@ const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
 const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
 const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
 const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
+const YT_COL_CODE_LIST						= 'yt_col_code_list';
+const YT_TA_SELECTED_CODE					= 'yt_ta_selected_code';
 
 const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
@@ -36,14 +40,18 @@ const CSS_VIDEO_MAX = 'yt-video-max';
 
 const TAB_LIST = [
 	{tab:YT_TB_OUTPUT_CONSOLE, sub_elements: [YT_TA_OUTPUT_CONSOLE_ID, YT_BTN_CLEAR_RESULT_CODE_ID] },
-	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_TA_NOTES_ID, YT_BTN_SEARCH_NOTES] },
+	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER, YT_BTN_SEARCH_NOTES] },
 	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID, YT_BTN_MSG_SEND] },
 ];
 
+const MIN_CODE_LENGTH = 16;
 const MSG_TAB_INDX = 2;
 const USER_VIDEO_AREA = uiConstants.VIDEO_AREA_ID;
 const USER_VIDEO_ID_TEMPLATE = uiConstants.VIDEO_ID_TEMPLATE;
 	
+const REPLACE_CODELIST_ID = "{codelstid}";
+const REPLACE_CODELIST_LABEL = "{lb}";
+
 /**
 	This class handles JS Code runner board
 **/
@@ -83,7 +91,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
 		// handle copy code to notes
-		$(this.copyNotesButton).click(this.handleCopyCodeToNotes.bind(this));
+		$(this.copyAndSaveCodeButtonSelector).click(this.handleCopyAndSaveCodeToDb.bind(this));
 		// handle erase result board
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
 		// handle notes editing
@@ -106,7 +114,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
 		
 		// itialize notes we saved before
-		this.initNotes();
+		this.initCodeDepot();
 	}
 	
 	/**
@@ -119,19 +127,60 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		Load notes from data base
 	 **/
-	async initNotes() {
-		const resp = await Net.userGetClassNotes(credMan.credential.token, this.groupId);
+	async initCodeDepot() {
+		const resp = await Net.memberListCode(credMan.credential.token, this.groupId);
 		if (resp.data.length > 0) {
-			const dbnotes = resp.data[0].notes;
-			$(this.notesTextArea).val(dbnotes);
-			this.#notes = $(this.notesTextArea).val();
+			let first = true;
+			resp.data.forEach(codeHeader => {
+				const newEntry = MY_CODE_LIST_TEMPLATE
+								.replace(REPLACE_CODELIST_ID, this.getCodeListEntryId(codeHeader.hash))
+								.replace(REPLACE_CODELIST_LABEL, codeHeader.name);
+					
+				// ADD code header to code list 
+				$(this.codeListDivSelector).append(newEntry);
+				
+				// the first entry is selected by default
+				if (first) {
+					// insert code to the code text area
+					this.getCodeFor(codeHeader.name)
+					first = false;
+				}
+			});
 		}
+	}
+	
+	async getCodeFor(codeName) {
+		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
+															  this.groupId, 
+															  codeName);
+		$(this.selectedCodeTextAreaSelector).val(respCodeText.data[0].text);
 	}
 	
 	async saveCodeToDb(e) {
 		e.preventDefault();
 		
-		alert("code saved:" + $(this.codeNameTextSelector).val());
+		const codeName = $(this.codeNameTextSelector).val();
+		if (!codeName) {
+			alert("Please enter code name!");
+			return;
+		}
+		
+		const codeText = $(this.codeBoardTextArea).val();
+		if (!codeText || codeText.length < MIN_CODE_LENGTH) {
+			alert("Please enter more code!");
+			return;
+		}
+		
+		const codeHash = StringUtil.getMessageDigest(codeText);
+		
+		const resp = await Net.memberAddCode(credMan.credential.token, 
+											 this.groupId, codeName, 
+											 codeText, codeHash);
+		if (resp.err) {
+			alert("ERROR encountered: code:" +  resp.err);
+		} else {
+			// add code to our code manager
+		}
 		
 		//close dialog box:
 		$(this.codeSaveDialogSelector).dialog("close");
@@ -403,87 +452,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 	}
 	
-	get eraseCodeFromBoardButtonSelector() {
-		return `#${YT_BTN_CLEAR_CODE_BOARD}`;
-	}
-	
-	get codeSaveDialogSelector() {
-		return `#${YT_DL_ASK_FOR_SAVING_CODE}`;
-	}
-	
-	get codeBoardTextArea() {
-		return `#${YT_TA_CODE_BOARD_ID}`;
-	}
-	
-	get resultConsoleControl() {
-		return `#${YT_TA_OUTPUT_CONSOLE_ID}`;
-	}
-	
-	get runCodeButton() {
-		return `#${YT_BTN_RUN_CODE_ID}`;
-	}
-	
-	get videoScreenSelector() {
-		return `#${VD_VIEDO_AREA}`;
-	}
-	
-	get copyNotesButton() {
-		return `#${YT_BTN_COPY_CODE_TO_NOTES}`;
-	}
-	
-	get saveCodeToDbButtonSelector() {
-		return `#${YT_BTN_SAVE_CODE}`;
-	}
-		
-	get codeNameTextSelector() {
-		return `#${YT_TXT_CODE_NAME}`;
-	}
-	
-	get clearResultButton() {
-		return `#${YT_BTN_CLEAR_RESULT_CODE_ID}`;
-	}
-
-	get notesTextArea() {
-		return `#${YT_TA_NOTES_ID}`;
-	}
-	
-	get outputConsoleTab() {
-		return `#${YT_TB_OUTPUT_CONSOLE}`;
-	}
-	
-	get notesConsoleTab() {
-		return `#${YT_TB_NOTES_CONSOLE}`;
-	}
-	
-	get msgConsoleTab() {
-		return `#${YT_TB_MSG_CONSOLE}`;
-	}
-	
-	
-	get msgTextArea() {
-		return `#${YT_TA_MSG_ID}`;
-	}
-	
-	get sendMsgButon() {
-		return `#${YT_BTN_MSG_SEND}`;
-	}
-	
-	get messageInputTa() {
-		return `#${YT_TA_MSG_INPUT_ID}`;
-	}
-	
-	get messageIndicatorBtnSelector() {
-		return `#${YT_TB_MSG_INDICATOR}`;
-	}
-	
-	get teacherVideoSelector() {
-		return `#${USER_VIDEO_ID_TEMPLATE}${this.#teacher}`;	
-	}
-	
-	get videoAreaSelector() {
-		return `#${USER_VIDEO_AREA}`;
-	}
-	
 	/**
 		Hnandle running code using text from code baord
 	**/
@@ -495,9 +463,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		Hnandle copy code to notes console (and eventually save to DB)
+		Hnandle copy code to from code console to memory and eventually save to DB
 	**/
-	handleCopyCodeToNotes(e) {
+	handleCopyAndSaveCodeToDb(e) {
 		e.preventDefault(); 
 		const codeTxt = $(this.codeBoardTextArea).val();
 		if (!codeTxt) {
@@ -576,6 +544,107 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 	}
+	
+	/**
+			UI Properties
+	 **/
+	
+	get eraseCodeFromBoardButtonSelector() {
+		return `#${YT_BTN_CLEAR_CODE_BOARD}`;
+	}
+	
+	get codeSaveDialogSelector() {
+		return `#${YT_DL_ASK_FOR_SAVING_CODE}`;
+	}
+	
+	get codeBoardTextArea() {
+		return `#${YT_TA_CODE_BOARD_ID}`;
+	}
+	
+	get resultConsoleControl() {
+		return `#${YT_TA_OUTPUT_CONSOLE_ID}`;
+	}
+	
+	get runCodeButton() {
+		return `#${YT_BTN_RUN_CODE_ID}`;
+	}
+	
+	get videoScreenSelector() {
+		return `#${VD_VIEDO_AREA}`;
+	}
+	
+	get copyAndSaveCodeButtonSelector() {
+		return `#${YT_BTN_SAVE_CODE_POPUP}`;
+	}
+	
+	get saveCodeToDbButtonSelector() {
+		return `#${YT_BTN_SAVE_CODE}`;
+	}
+		
+	get codeNameTextSelector() {
+		return `#${YT_TXT_CODE_NAME}`;
+	}
+	
+	get clearResultButton() {
+		return `#${YT_BTN_CLEAR_RESULT_CODE_ID}`;
+	}
+
+	get codeManagerDivSelector() {
+		return `#${YT_DIV_CODE_MANAGER}`;
+	}
+	
+	get notesTextArea() {
+		return `#${YT_TA_NOTES_ID}`;
+	}
+	
+	get outputConsoleTab() {
+		return `#${YT_TB_OUTPUT_CONSOLE}`;
+	}
+	
+	get notesConsoleTab() {
+		return `#${YT_TB_NOTES_CONSOLE}`;
+	}
+	
+	get msgConsoleTab() {
+		return `#${YT_TB_MSG_CONSOLE}`;
+	}
+	
+	
+	get msgTextArea() {
+		return `#${YT_TA_MSG_ID}`;
+	}
+	
+	get sendMsgButon() {
+		return `#${YT_BTN_MSG_SEND}`;
+	}
+	
+	get messageInputTa() {
+		return `#${YT_TA_MSG_INPUT_ID}`;
+	}
+	
+	get messageIndicatorBtnSelector() {
+		return `#${YT_TB_MSG_INDICATOR}`;
+	}
+	
+	get teacherVideoSelector() {
+		return `#${USER_VIDEO_ID_TEMPLATE}${this.#teacher}`;	
+	}
+	
+	get videoAreaSelector() {
+		return `#${USER_VIDEO_AREA}`;
+	}
+	
+	getCodeListEntryId(hash) {
+		return `yt_code_list_entry_{hash}`;
+	}
+	
+	get codeListDivSelector() {
+		return `#${YT_COL_CODE_LIST}`;
+	}
+
+	get selectedCodeTextAreaSelector() {
+		return `#${YT_TA_SELECTED_CODE}`;
+	}		
 }
 
 let jsClassRoom = null;

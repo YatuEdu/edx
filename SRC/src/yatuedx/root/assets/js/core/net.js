@@ -17,6 +17,10 @@ const API_USER_UPDATE_NOTES=202124;
 const API_USER_GET_NOTES=202125;
 const API_SEND_CODE_TO_EMAIL=202122;
 const API_VALIDATE_EMAIL=202123; 
+const API_ADD_CODE = 202126;
+const API_LIST_CODE_HEADERS = 202128;
+const API_GET_CODE_TEXT = 202129;
+const API_DELETE_CODE = 202127;
 
 class Net {
 	/**
@@ -102,6 +106,42 @@ class Net {
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
 	
+	/**
+		Yatu API for member to add code to code-depot
+	**/
+	static async memberAddCode(token, groupId, codeName, codeText, codeHash) {
+		const req = Net.composeRequestDataForMemberAddCode(token, groupId, codeName, codeText, codeHash);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for member to list his code from code-depot
+	**/
+	static async memberListCode(token, groupId) {
+		const req = Net.composeRequestDataForMemberListCode(token, groupId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for member to get code text from code-depot by name
+	**/
+	static async memberGetCodeText(token, groupId, codeName) {
+		const req = Net.composeRequestDataForMemberGetCodeText(token, groupId, codeName);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for member to delete code from code-depot by name
+	**/
+	static async memberDeleteCode(token, groupId, codeName) {
+		const req = Net.composeRequestDataForMemberDeleteCode(token, groupId, codeName);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
 	/**
 		Yatu API for adding notes for a class
 	**/
@@ -348,6 +388,79 @@ class Net {
 		};
 		return Net.composePostRequestFromData_private(myGroupsReq);
 	}
+
+	/**
+		Forming Yatu API request data for adding code to code depot
+	**/
+	static composeRequestDataForMemberAddCode(t, groupId, codeName, codeText, codeHash) {
+		const intGroupId =  parseInt(groupId, 10);
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_ADD_CODE
+			},
+			data: {
+				groupId: intGroupId,
+				name: codeName,
+				code: codeText,
+				hash: codeHash
+			}
+		};
+		return Net.composePostRequestFromData_private(apiRequest);
+	}	
+	
+	/**
+		Forming Yatu API request data for listing code heasers (name, hash)
+	**/
+	static composeRequestDataForMemberListCode(t, groupId) {
+		const intGroupId =  parseInt(groupId, 10);
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_LIST_CODE_HEADERS
+			},
+			data: {
+				groupId: intGroupId
+			}
+		};
+		return Net.composePostRequestFromData_private(apiRequest);
+	}
+
+	/**
+		Forming Yatu API request data for get code text
+	**/
+	static composeRequestDataForMemberGetCodeText(t, groupId, codeName) {
+		const intGroupId =  parseInt(groupId, 10);
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_GET_CODE_TEXT
+			},
+			data: {
+				groupId: intGroupId,
+				name: codeName
+			}
+		};
+		return Net.composePostRequestFromData_private(apiRequest);
+	}	
+
+	/**
+		Forming Yatu API request data for deleting code by name
+	**/
+	static composeRequestDataForMemberDeleteCode(t, groupId, codeName) {
+		const intGroupId =  parseInt(groupId, 10);
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_DELETE_CODE
+			},
+			data: {
+				groupId: intGroupId,
+				name: codeName
+			}
+		};
+		return Net.composePostRequestFromData_private(apiRequest);
+	}			
 	
 	/**
 		Forming Yatu API request data for adding class notes

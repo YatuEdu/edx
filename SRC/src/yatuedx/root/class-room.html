@@ -86,7 +86,7 @@
 							</div>
 						</div>
 						<div class="row mb-0">
-							<div id="yt_tb_output_console" class="col-4 selected-tab">
+							<div id="yt_tb_output_console" class="col-4 selected-tab tool-tbtn-dimention-left">
 								<a class="nav-link" data-tabindex="0" href="#">Output</a>
 							</div>
 							<div id="yt_tb_notes_console"  class="col-4 unselected-tab">
@@ -103,12 +103,20 @@
 										  spellcheck="false" 
 										  placeholder="Output Console"
 										  rows="20"></textarea>
-								<textarea class="msg-board"
-								  style="display:none"
-								  id="yt_ta_notes" 
-								  spellcheck="false" 
-								  placeholder="My Study Notes"
-								  rows="20"></textarea>
+								<div id="yt_div_code_manager" style="display:none">
+									<div class="row mb-0">
+										<div id="yt_col_code_list" class="col-3">
+										
+										</div>
+										<div id="yt_col_code_text" class="col-9">
+											<textarea class="msg-board"
+											  id="yt_ta_selected_code" 
+											  spellcheck="false" 
+											  placeholder="Load code from DB"
+											  rows="40"></textarea>
+										</div>
+									</div>
+								</div>
 								 <textarea readonly class="msg-board"
 								  style="display:none"
 								  id="yt_ta_msg" 

@@ -320,7 +320,7 @@
 }
 
 .msg-board {
-	height: 200px !important; 
+	height: 400px !important; 
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
