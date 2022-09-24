@@ -1,7 +1,9 @@
 import {UserQuestionBase} 	from './q_base.js';
-import {StringUtil} 		from './util.js';
+import {ArrayUtil, StringUtil} from './util.js';
 import {MetaDataManager} 	from './metaDataManager.js';
 import {FileUploadUtil} 	from './fileUploadUtil.js'
+import {credMan} from "./credManFinMind.js";
+import {Net} from "./net.js";
 
 const replacementForId = '{id}';
 const replacementForLabel = '{lb}';
@@ -23,13 +25,20 @@ const q_resultIconFailed = `
 `;
 
 const q_template_for_all_files = `
-<div id="file_uplod_list_{id}">
+<div style="width: 100%; justify-content: center; display: flex;">
+<div id="loader" class="loader"></div>
+</div>
+<div id="file_upload_list" style="display:none">
 	{f_upld_lst}
 </div>`
 ;
 const q_template_for_one_file =
-`<h6 class="mb-3">{lb}</h6>
-<div id="file_area_{id}" class="upload-drag-area p-4 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
+`
+<div class="p-2 mb-2">
+	<span class="form-label">{lb}</span>
+	<button style="float:right;display:none" id="cancel_btn_{id}" type="button" class="btn btn-sm btn-primary">&#215; Cancel</button>
+</div>
+<div id="file_area_{id}" class="upload-drag-area p-2 mb-4 rounded-3 text-center" @dragover="fileDragover" @drop="fileDrop">
 	<input type="file" id="fileInput_{id}" name="upfile" class="d-none">
 	<img src="../img/ico-upload-file.svg">
 	<div id="upload_button_{id}" class="fs-7 fw-bold text-body text-opacity-50">
@@ -45,12 +54,13 @@ const q_template_for_one_file =
 			<span id=progress_num_{id} class="text-body text-opacity-25">100%</span>
 		</div>
 		<div class="progress" style="height: 6px;">
-		<div id=progress_bar_{id} class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+		<div id=progress_bar_{id} class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
 		</div>
 	</div>
 	<div id="progress_result_icon_{id}">
 	</div>
   </div>
+
 </div>
 `
 ;
@@ -66,7 +76,31 @@ class FileUpload extends UserQuestionBase {
 		// label 上传什么文件的提示
 		this.#applicationId = applicationId;
 		this.#resultMap = new Map();
+
+		this.init();
+
     }
+
+	async init() {
+
+		const token = credMan.credential.token;
+		const key = this.#applicationId.toString();
+		const ret = await Net.getUploadedFiles(token, key, key, key);
+
+		let uploaded = new Set();
+		for(let o of ret.data) {
+			uploaded.add(o.file.split('.')[0].replaceAll('_', ' '));
+		}
+		const labels = this.label.split('*');
+		for(let i = 0; i < labels.length; i++) {
+			if (uploaded.has(labels[i])) {
+				this.refreshProgress(i, 100, true, '');
+			}
+		}
+		$('#file_upload_list').show();
+		$('#loader').hide();
+	}
+
 
 	// Method for validating the result value upon moving away
 	// from the page.
@@ -110,6 +144,10 @@ class FileUpload extends UserQuestionBase {
 		return `#progress_result_icon_${this.getIdPostfix(indx)}`;
 	}
 
+	getCancelBtnSelector(indx) {
+		return `#cancel_btn_${this.getIdPostfix(indx)}`;
+	}
+
 	getIdPostfix(indx) {
 		return `${this.qInfo.attr_id}_file${indx}`;
 	}
@@ -142,9 +180,6 @@ class FileUpload extends UserQuestionBase {
 		for(let indx = 0; indx < labels.length; indx++) {
 			const fileInputSelector = this.getFileInputSelector(indx);
 			const uploadButtonSelector = this.getUploadButtonSelector(indx);
-			const progressBar = this.getProgressBarSelector(indx);
-
-			$(progressBar).hide();
 
 			$(uploadButtonSelector).click(e => {
 				$(fileInputSelector).click();
@@ -161,6 +196,8 @@ class FileUpload extends UserQuestionBase {
 		const progressNum = this.getProgressNumSelector(indx);
 		const progressBar = this.getProgressBarSelector(indx);
 		const resultIcon = this.getProgressResultIconSelector(indx);
+		const fileInputAreaDiv = this.getFileAreaSelector(indx);
+		const cancelBtn = this.getCancelBtnSelector(indx);
 
 		$(progressNum).html(progress+'%');
 		$(progressBar).css("width", progress+"%");
@@ -169,6 +206,13 @@ class FileUpload extends UserQuestionBase {
 			if (progress==100) {
 				$(resultIcon).html(q_resultIconSuccess);
 				this.#resultMap.set(indx, true);
+				$(cancelBtn).off('click');
+				$(cancelBtn).click(e => {
+					$(progressDiv).hide();
+					$(cancelBtn).hide();
+					$(fileInputAreaDiv).show();
+				});
+				$(cancelBtn).show();
 			} else {
 				$(resultIcon).html('');
 			}
@@ -177,6 +221,7 @@ class FileUpload extends UserQuestionBase {
 			$(progressNum).html(resultMsg);
 		}
 		$(progressDiv).show();
+		$(fileInputAreaDiv).hide();
 	}
 
 	// This method can be called when we need to serialize the question / answer
@@ -191,6 +236,7 @@ class FileUpload extends UserQuestionBase {
 
 	// get display html for the entire enum group in form of radio buttons
 	get displayHtml() {
+
 		let uploadOne = '';
 
 		const labels = this.label.split('*');
@@ -219,6 +265,11 @@ class FileUpload extends UserQuestionBase {
 					<a2>${i}</a2>
 				</e>`;
 			}
+			ret =
+				`<qa>
+				<id>${this.id}</id>
+				<list>${ret}</list>
+				</qa>`;
 		}
 		return ret;
 	}

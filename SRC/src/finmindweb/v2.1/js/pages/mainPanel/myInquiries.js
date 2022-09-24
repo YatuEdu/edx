@@ -15,12 +15,6 @@ const pageTemplate = `
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 12a6 6 0 1 1 4.548-2.087l1.32 1.32a.447.447 0 0 1 .003.631l-.004.004a.454.454 0 0 1-.318.132.454.454 0 0 1-.318-.132L9.912 10.55A5.976 5.976 0 0 1 6 12zM6 .9a5.1 5.1 0 1 0 0 10.2A5.1 5.1 0 0 0 6 .9z" fill="#1F1534" fill-opacity=".2"/></svg>
 				</button>
 			</div>
-			<button type="button" class="btn btn-outline-secondary ms-2" style="width: 5.125rem;border-color: rgba(217, 220, 230, 1);">
-				Delete
-			</button>
-			<button type="button" class="btn btn-primary ms-2 me-3" style="width: 5.125rem;">
-				Edit
-			</button>
 			<button type="button" class="btn" id="event-export-btn">
 				<svg class="me-1" width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.563 7.063l3.187-3.188L10.562.687M11.625 11.313H1.531a.531.531 0 0 1-.531-.53v-7.97" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.857 8.656a6.378 6.378 0 0 1 6.174-4.781h3.719" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 				Export
@@ -76,12 +70,12 @@ const pageSize = 10;
 class MyInquiries {
 	#container;
 	#searchBy = '';
-	
+
     constructor(container) {
 		this.#container = container;
 		this.init();
 	}
-	
+
 	// hook up events
 	async init() {
     	this.#container.empty();
@@ -92,6 +86,7 @@ class MyInquiries {
 		});
 
 		$('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+		$('#searchInput').keypress(this.handleKeyPress.bind(this));
 		$('.view').click(this.handleView.bind(this));
 	}
 
@@ -100,6 +95,13 @@ class MyInquiries {
 		this.requestList(1);
 		console.log();
 	}
+
+	async handleKeyPress(e) {
+		if (e.which === 13) {
+			await this.handleSearchSubmit(e);
+		}
+	}
+
 
 	handleView(e) {
 		let quoteDetails = $(e.target).attr('quoteDetails');

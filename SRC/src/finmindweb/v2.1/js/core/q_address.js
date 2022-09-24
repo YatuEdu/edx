@@ -26,7 +26,7 @@ const state_option_item_template = `
 const q_template_text = `
 <div class="row mb-4">
 	<div class="col">	
-		<label class="form-label" for="address">Adress</label>
+		<label class="form-label" for="address">Address</label>
 		<input type="text" id="address_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{addr}" maxlength="32"/>
 	</div>
 </div>
@@ -40,7 +40,7 @@ const q_template_text = `
 		{state_selects}
 	</div>
 	<div class="col">	
-		<label class="form-label"  for="Zip code">ZipCode</label>
+		<label class="form-label"  for="Zip code">Zip code</label>
 		<input type="text" id="zip_{id}" class="form-control form-control-lg user_name_input" data-seq="1" value="{zp}" maxlength="32"/>
 	</div>
 </div>`;
@@ -67,21 +67,21 @@ const q_template_text_ro = `
 	</div>
 </div>`;
 
-class UserAdressQuestion extends UserQuestionBase {  
+class UserAdressQuestion extends UserQuestionBase {
 	_address;
 	_city;
 	_state;
 	_zip;
-	
-    constructor(qInfo){  
-        super(qInfo);  
+
+    constructor(qInfo){
+        super(qInfo);
 		this._address = qInfo.sv1;
 		this._city = qInfo.sv2;
 		this._state = qInfo.sv3;
 		this._zip = qInfo.sv4;
-    }  
-	
-	// Method for validating the result value upon moving away 
+    }
+
+	// Method for validating the result value upon moving away
 	// from the page.
 	onValidating() {
 		if (this._address && this._city && this._state && this._zip) {
@@ -89,28 +89,28 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		return false;
 	}
-	
-	// Method for hooking up event handler to handle RADIO 
+
+	// Method for hooking up event handler to handle RADIO
 	// selectioon change event
 	onChangeEvent() {
 		const self = this;
-		
+
 		//when text edit is done, set the value ffrom the text field:
 		const addrSelector = `#${this.addressInputId}`;
 		$(addrSelector).blur(function() {
 			self.setAddress($(addrSelector).val());
 		});
-		
+
 		const citySelector = `#${this.cityInputId}`;
 		$(citySelector).blur(function() {
 			self.setCity($(citySelector).val());
 		});
-		
+
 		const stateSelector = `#${this.stateSelectId}`;
 		$(stateSelector).change(function() {
 			self.setState($(stateSelector).val());
 		});
-		
+
 		const zipSelector = `#${this.zipInputId}`;
 		$(zipSelector).blur(function() {
 			self.setZip($(zipSelector).val());
@@ -127,7 +127,7 @@ class UserAdressQuestion extends UserQuestionBase {
 			return e.keyCode>=48 && e.keyCode<=57;
 		});
 	}
-	
+
 	// Setting address value
 	setAddress(obj) {
 		if (typeof obj !== 'string') {
@@ -135,7 +135,7 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		this._address = obj;
 	}
-	
+
 	// Setting city value
 	setCity(obj) {
 		if (typeof obj !== 'string') {
@@ -143,7 +143,7 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		this._city = obj;
 	}
-	
+
 	// Setting state value
 	setState(obj) {
 		if (typeof obj !== 'string') {
@@ -151,7 +151,7 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		this._state = obj;
 	}
-	
+
 	// Setting zip value
 	setZip(obj) {
 		if (typeof obj !== 'string') {
@@ -159,7 +159,7 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		this._zip = obj;
 	}
-	
+
 	// This method can be called when we need to serialize the question / answer
 	// to JSON format (usually for session store)
 	serialize() {
@@ -168,11 +168,11 @@ class UserAdressQuestion extends UserQuestionBase {
 		this.qInfo.sv3 = this._state;
 		this.qInfo.sv4 = this._zip;
 	}
-	
+
 	// This method is called after the UI is rendered to display its
 	// input value (or selection fo check box and radio button and dropdown)
 	setDisplayValue() {
-		
+
 		// set initial input value for addresas
 		if (this._address) {
 			const selector = `#${this.addressInputId}`;
@@ -181,8 +181,8 @@ class UserAdressQuestion extends UserQuestionBase {
 			const selector = `#${this.addressInputId}`;
 			$(selector).val('');
 		}
-		
-		// set initial input value for city 
+
+		// set initial input value for city
 		if (this._city) {
 			const selector = `#${this.cityInputId}`;
 			$(selector).val(this._city);
@@ -190,14 +190,14 @@ class UserAdressQuestion extends UserQuestionBase {
 			const selector = `#${this.cityInputId}`;
 			$(selector).val('');
 		}
-		
+
 		// set initial state option if present
 		if (this._state) {
 			const selector = `#${this.stateSelectId}`;
 			$(selector).val(this._state);
 		}
-		
-		// set initial input value for zip 
+
+		// set initial input value for zip
 		if (this._zip) {
 			const selector = `#${this.zipInputId}`;
 			$(selector).val(this._zip);
@@ -206,27 +206,27 @@ class UserAdressQuestion extends UserQuestionBase {
 			$(selector).val('');
 		}
 	};
-	
+
 	// get address input id
 	get addressInputId() {
 		return `address_${this.id}`;
 	}
-	
+
 	// get city input id
 	get cityInputId() {
 		return `city_${this.id}`;
 	}
-	
+
 	// get state seledct id
 	get stateSelectId() {
 		return `select_state_${this.id}`;
 	}
-	
+
 	// get zip input id
 	get zipInputId() {
 		return `zip_${this.id}`;
 	}
-	
+
 	// get display html for the address combination
 	get displayHtml() {
 		const stateList  = MetaDataManager.enumMap.get(26); // todo: use const variable
@@ -240,17 +240,17 @@ class UserAdressQuestion extends UserQuestionBase {
 		let stateSelect = state_select_html_template
 											.replace(replacementForId, this.id)
 											.replace(replacementForStates, stateOptions);
-		
+
 		let htmlStr = q_template_text
 											.replace(new RegExp(replacementForId, 'g') ,this.id)
 											.replace(replacementForAddr, this._address)
 											.replace(replacementForCity, this._city)
 											.replace(replacementForZip, this._zip)
 											.replace(replacementForStateSelect,stateSelect)
-		
-		return htmlStr; 
+
+		return htmlStr;
 	}
-	
+
 	// get read-only display html for the address combination
 	get displayHtmlReadOnly() {
 		let htmlStr = q_template_text_ro
@@ -259,15 +259,15 @@ class UserAdressQuestion extends UserQuestionBase {
 											.replace(replacementForCity, this._city)
 											.replace(replacementForZip,  this._zip)
 											.replace(replacementForSt,   this._state)
-		
-		return htmlStr; 
+
+		return htmlStr;
 	}
-	
+
 	// get question in xml format for saving to API server
 	get serverXML() {
 		let ret ='';
-		if (this.onValidating()) {		
-			ret = 
+		if (this.onValidating()) {
+			ret =
 `<qa>
 <id>${this.id}</id>
 <strv>${this._address}</strv>
@@ -278,6 +278,6 @@ class UserAdressQuestion extends UserQuestionBase {
 		}
 		return ret;
 	}
-}  
+}
 
 export { UserAdressQuestion };

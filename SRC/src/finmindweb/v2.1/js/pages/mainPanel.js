@@ -156,7 +156,7 @@ class MainPageHandler {
 		this.loadMenus();
 
 		// 页面切换处理
-		$('.fm-sw').click(this.handlePageSwitch.bind(this));
+		//$('.fm-sw').click(this.handlePageSwitch.bind(this));
 
 		// 初始化子页面
 		let hash = window.location.hash;

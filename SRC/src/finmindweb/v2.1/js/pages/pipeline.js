@@ -344,6 +344,10 @@ class PipelinePageHandler {
 
         // fill uploaded files
         this.#filePanel = new UploadedFileListPanel(this.#appId);
+        await this.refreshFilePanel();
+    }
+
+    async refreshFilePanel() {
 
         const flHtml = await this.#filePanel.getUploadedFiles();
         if (flHtml) {
@@ -351,8 +355,6 @@ class PipelinePageHandler {
         }
         // hook up file delete and download events handler
         this.#filePanel.changeEvent();
-
-
     }
 
     async updateApplicationInfo(appId) {
@@ -416,7 +418,8 @@ class PipelinePageHandler {
                         this.showPolicyDelivery(status, false);
                     });
                 }
-                    $('#operateDiv').append(operateBtnsAgent);
+
+                $('#operateDiv').append(operateBtnsAgent);
 
             }
 
@@ -501,6 +504,8 @@ class PipelinePageHandler {
         // get next block of questions
         if (canMove) {
             await this.populateNextQuestionBlock();
+        } else {
+            console.log();
         }
     }
 
@@ -521,10 +526,9 @@ class PipelinePageHandler {
         }
 
         // no more blocks
+
         alert('no more questions to answer');
-        return;
-        $('#user_question_block').html('');
-        $('#fm_wz_next_block_button').text('Start');
+        //$('#fm_wz_next_block_button').text('Start');
     }
 
     // Get next blck of questions from finMind and dispolay it
@@ -561,9 +565,12 @@ class PipelinePageHandler {
         }
 
         // no more blocks
-        alert ('no more questions to answer');
+        // alert ('no more questions to answer');
+
+        $('#fm_wz_block_description').html('No more questions to answer, please wait for the producer to process.');
         $('#user_question_block').html('');
-        $('#fm_wz_next_block_button').text('Start');
+        $('#fm_wz_block_name').text('');
+    //    $('#fm_wz_next_block_button').text('Start');
     }
 
     async showAllBlocQuestionAnswers(appId) {
@@ -721,6 +728,10 @@ class PipelinePageHandler {
         if (res.errCode!=0) {
             let errMsg = res.err.msg;
             alert(errMsg);
+            return;
+        }
+        if (res.data.length==0) {
+            alert('no such producer.');
             return;
         }
         let agentName = res.data[0].agent_name;

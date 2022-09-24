@@ -85,7 +85,7 @@ const noCashValueTemplate = `
 			<path d="M6 4.5v2" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round" />
 			<ellipse cx="6" cy="8.5" rx=".5" ry=".5" fill="#1F1534" fill-opacity=".5" /></svg></span>
 		<div class="input-group d-inline-flex w-auto ms-3">
-		  <input type="text" class="form-control form-control-sm border-end-0" style="width: 3.5rem;border-color: rgba(31, 21, 52, 0.2);" id="ChartDate-1" lay-key="1" value="2022">
+		  <input type="text" class="form-control form-control-sm border-end-0 chartDate" style="width: 3.5rem;border-color: rgba(31, 21, 52, 0.2);" lay-key="1" value="2022">
 		  <span class="input-group-text bg-transparent" style="border-color: rgba(31, 21, 52, 0.2);">
 			<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 			  <path clip-rule="evenodd" d="M1.5 2.784c0-.433.351-.784.784-.784h7.433c.432 0 .783.35.783.784v7.432c0 .433-.35.784-.783.784H2.284a.784.784 0 0 1-.784-.784V2.784z" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round" />
@@ -114,7 +114,7 @@ const flatDeathBenefitTemplate = `
 		<path d="M6 4.5v2" stroke="#1F1534" stroke-opacity=".5" stroke-width="1.008" stroke-linecap="round" stroke-linejoin="round" />
 		<ellipse cx="6" cy="8.5" rx=".5" ry=".5" fill="#1F1534" fill-opacity=".5" /></svg></span>
 	<div class="input-group d-inline-flex w-auto ms-3">
-	  <input type="text" class="form-control form-control-sm border-end-0" style="width: 3.5rem;border-color: rgba(31, 21, 52, 0.2);" id="ChartDate-1" lay-key="1" value="2022">
+	  <input type="text" class="form-control form-control-sm border-end-0 chartDate" style="width: 3.5rem;border-color: rgba(31, 21, 52, 0.2);" lay-key="1" value="2022">
 	  <span class="input-group-text bg-transparent" style="border-color: rgba(31, 21, 52, 0.2);">
 		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 		  <path clip-rule="evenodd" d="M1.5 2.784c0-.433.351-.784.784-.784h7.433c.432 0 .783.35.783.784v7.432c0 .433-.35.784-.783.784H2.284a.784.784 0 0 1-.784-.784V2.784z" stroke="#458FF6" stroke-width=".784" stroke-linecap="round" stroke-linejoin="round" />
@@ -150,11 +150,16 @@ class MyDashboard {
 
 		await this.draw(false);
 
-		$('#btnRefresh').click
+		$('#btnRefresh').click(this.refresh.bind(this));
+	}
+
+	async refresh() {
+		$('#list').empty();
+		await this.draw(false);
 	}
 
 	async draw(isAll) {
-
+		$('#list').empty();
 		let ret = await Net.userInsurancePolicyGetAll(credMan.credential.token);
 		if (ret.data.length > 0) {
 			for(let data of ret.data) {

@@ -10,8 +10,8 @@ const pageTemplate = `
 		<h5 class="m-0">Insurance Policies</h5>
 		<div class="ms-auto d-flex">
 			<div class="input-group me-2" style="width: 16.25rem;">
-				<input type="text" class="form-control fs-7" placeholder="Search Name" style="border-color: rgba(217, 220, 230, 1);">
-				<button class="btn btn-outline-secondary bg-transparent" type="button" style="border-color: rgba(217, 220, 230, 1);">
+				<input id="searchInput" type="text" class="form-control fs-7" placeholder="Search Name" style="border-color: rgba(217, 220, 230, 1);">
+				<button id="searchSubmit" class="btn btn-outline-secondary bg-transparent" type="button" style="border-color: rgba(217, 220, 230, 1);">
 					<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 12a6 6 0 1 1 4.548-2.087l1.32 1.32a.447.447 0 0 1 .003.631l-.004.004a.454.454 0 0 1-.318.132.454.454 0 0 1-.318-.132L9.912 10.55A5.976 5.976 0 0 1 6 12zM6 .9a5.1 5.1 0 1 0 0 10.2A5.1 5.1 0 0 0 6 .9z" fill="#1F1534" fill-opacity=".2"/></svg>
 				</button>
 			</div>
@@ -21,7 +21,7 @@ const pageTemplate = `
 			</button>
 		</div>
 	</div>
-	<div class="card-body p-0 position-relative overflow-auto" style="height: 0;">
+	<div id="table" class="card-body p-0 position-relative overflow-auto" style="height: 0;">
 		
 		<div class="event-table mx-4 position-relative overflow-auto" id="event-table" data-list='{"valueNames":["effective-date"]}'>
 			<table class="w-100">
@@ -42,26 +42,7 @@ const pageTemplate = `
 				<tbody class="list" id="list">
 				</tbody>
 			</table>	
-		</div>
-		<div class="d-flex justify-content-between mt-3 mx-4 fs-8">
-			<div class="text-secondary">
-				showing 10 out of 9000
-			</div>
-			<div class="d-flex align-items-center">
-				<span class="text-secondary">Page 01 of 56</span>
-				<ul class="pagination pagination-sm justify-content-end my-0 ms-3 event-table-pagination">
-					<li class="page-item"><a class="page-link" href="#">
-					<svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.012 4.5l3.305 3.404a.653.653 0 0 1 0 .907.607.607 0 0 1-.881 0L.78 5.045A.636.636 0 0 1 .5 4.5a.662.662 0 0 1 .28-.546L4.436.188a.614.614 0 0 1 .88 0 .653.653 0 0 1 0 .907L2.013 4.5z" fill="#8D93A6"/></svg>
-					</a></li>
-					<li class="page-item"><a class="page-link" href="#">1</a></li>
-					<li class="page-item active"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
-					<li class="page-item"><a class="page-link" href="#"><svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.988 4.5L.683 7.903a.653.653 0 0 0 0 .907.607.607 0 0 0 .881 0L5.22 5.045A.636.636 0 0 0 5.5 4.5a.662.662 0 0 0-.28-.546L1.564.188a.614.614 0 0 0-.88 0 .653.653 0 0 0 0 .907L3.987 4.5z" fill="#8D93A6"/></svg></a></li>
-				</ul>
-				<input class="form-control form-control-sm text-center position-relative" type="text" style="width: 43px;border-color: #dddfe5;">
-			</div>
-		</div>
-							
+		</div>			
 	</div>
 	<div id="testContainer"></div>
 </div>
@@ -182,9 +163,23 @@ class MyInsurancePolicies {
             new Pagination($('#table'), this.pageSize, maxRowNumber, this.handlePage.bind(this));
         });
 
+        $('#searchSubmit').click(this.handleSearchSubmit.bind(this));
+        $('#searchInput').keypress(this.handleKeyPress.bind(this));
         $('.viewFilesBtn').click(this.handleViewFiles.bind(this));
         let res = await Net.getProductList(credMan.credential.token);
         this.#productList = res.data;
+    }
+
+    async handleSearchSubmit(e) {
+        this.#searchBy = $('#searchInput').val();
+        await this.requestList(this.#searchBy, 1);
+        console.log();
+    }
+
+    async handleKeyPress(e) {
+        if (e.which === 13) {
+            await this.handleSearchSubmit(e);
+        }
     }
 
     async requestList(searchBy, pageNo) {
