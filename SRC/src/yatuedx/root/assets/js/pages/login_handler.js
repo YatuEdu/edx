@@ -1,7 +1,7 @@
 import {sysConstants, languageConstants, regexConstants} 	from '../core/sysConst.js'
 import {credMan} 						from '../core/credMan.js'
 import {uiMan} 							from '../core/uiManager.js';
-import {PageUtil}						from '../core/util.js';
+import {PageUtil, StringUtil}			from '../core/util.js';
 import {Net} 							from '../core/net.js';
 
 const EMAIL_INPUT_CTRL = "#yt_inpt_email";
@@ -88,7 +88,7 @@ class LoginPageHandler {
 		if (!name) {	
 			errId = $(tgt).attr('data-text-id');
 		}
-		else if (!(/^[a-z\d\_\s]+$/.test(name))) {
+		else if (!StringUtil.isValidYatuName(name)) {
 			errId = $(tgt).attr('data-validation-id');
 		}
 		

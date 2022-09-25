@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
 	<link rel="stylesheet" href="assets/css/class_room.css"/>
 	<link rel="stylesheet" href="assets/css/yatu-main.css"/>
+	<link rel="stylesheet" href="assets/css/codeManager.css"/>
 	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
 </head>
 
@@ -36,7 +37,7 @@
         </nav>
     </header>
 
-    <main>
+    <main class="yt_main">
 		<div id="yt_dl_ask_to_save" title="Save my code to code depot">
 			<p>
              <input type="name" name="codename" id="yt_txt_code_name" class="form-control" placeholder="Code Name">  
@@ -86,7 +87,7 @@
 							</div>
 						</div>
 						<div class="row mb-0">
-							<div id="yt_tb_output_console" class="col-4 selected-tab tool-tbtn-dimention-left">
+							<div id="yt_tb_output_console" class="col-4 selected-tab">
 								<a class="nav-link" data-tabindex="0" href="#">Output</a>
 							</div>
 							<div id="yt_tb_notes_console"  class="col-4 unselected-tab">
@@ -103,19 +104,7 @@
 										  spellcheck="false" 
 										  placeholder="Output Console"
 										  rows="20"></textarea>
-								<div id="yt_div_code_manager" style="display:none">
-									<div class="row mb-0">
-										<div id="yt_col_code_list" class="col-3">
-										
-										</div>
-										<div id="yt_col_code_text" class="col-9">
-											<textarea class="msg-board"
-											  id="yt_ta_selected_code" 
-											  spellcheck="false" 
-											  placeholder="Load code from DB"
-											  rows="40"></textarea>
-										</div>
-									</div>
+								<div id="yt_div_code_manager" data-type="ytComponent" style="display:none">	
 								</div>
 								 <textarea readonly class="msg-board"
 								  style="display:none"

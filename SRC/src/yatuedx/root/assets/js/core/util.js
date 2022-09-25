@@ -191,6 +191,11 @@ class StringUtil {
 		return parseInt(StringUtil.getIdStrFromBtnId(btnId));
 	}
 	
+	static getExt(filename) {
+		const indx = filename.lastIndexOf(".");
+		return filename.substring(indx+1);
+	}
+	
 	/*
 		Our simple and 99% good message digest algorithm
 	 */
@@ -219,10 +224,36 @@ class StringUtil {
 		return false;
 	}
 	
+	/*
+		yatu name must be alphabet and digit only
+	*/
+	static YATU_NAME_REGEX = /^[A-Za-z][A-Za-z0-9_]+$/;
+	static isValidYatuName(name) {
+		return StringUtil.YATU_NAME_REGEX.test(name);
+	}
+	
 }
 
 class PageUtil {
-
+	static loadJsCssfile(filename){
+		const filetype = StringUtil.getExt(filename);
+		
+		if (filetype=="js"){ //if filename is a external JavaScript file
+			const fileref = document.createElement('script')
+			fileref.setAttribute("type","text/javascript")
+			fileref.setAttribute("src", filename)
+		}
+		else if (filetype=="css"){ //if filename is an external CSS file
+			const fileref = document.createElement("link")
+			fileref.setAttribute("rel", "stylesheet")
+			fileref.setAttribute("type", "text/css")
+			fileref.setAttribute("href", filename)
+		}
+		if (typeof fileref != "undefined") {
+			//document.getElementsByTagName("head")[0].appendChild(fileref)
+		}
+	}
+	
 	static getUrlParameterMap() {
 		const sPageURL = window.location.search.substring(1);
 		const sURLVariables = sPageURL.split('&');

@@ -8,7 +8,7 @@ import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil}				from '../core/util.js';
 import {Net}			    				from "../core/net.js"
-import {MY_CODE_LIST_TEMPLATE}				from '../component/codeListCard.js'
+import {CodeManContainer}					from '../component/new/codeManager.js'
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
@@ -31,7 +31,6 @@ const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
 const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
 const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
 const YT_COL_CODE_LIST						= 'yt_col_code_list';
-const YT_TA_SELECTED_CODE					= 'yt_ta_selected_code';
 
 const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
@@ -61,6 +60,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#notes;
 	#tabIndex;
 	#teacher;
+	#codeManContainer;
 	
     constructor(credMan) {
 		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
@@ -94,8 +94,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.copyAndSaveCodeButtonSelector).click(this.handleCopyAndSaveCodeToDb.bind(this));
 		// handle erase result board
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-		// handle notes editing
-		$(this.notesTextArea).blur(this.handleNeedtoUpdateNotes.bind(this));
 		// handle maximize or minimize video screen
 		$(this.videoAreaSelector).click(this.toggleVideoSize.bind(this));
 		// switching tab to output
@@ -131,21 +129,26 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const resp = await Net.memberListCode(credMan.credential.token, this.groupId);
 		if (resp.data.length > 0) {
 			let first = true;
+			const codeDataList = [];
 			resp.data.forEach(codeHeader => {
-				const newEntry = MY_CODE_LIST_TEMPLATE
-								.replace(REPLACE_CODELIST_ID, this.getCodeListEntryId(codeHeader.hash))
-								.replace(REPLACE_CODELIST_LABEL, codeHeader.name);
-					
-				// ADD code header to code list 
-				$(this.codeListDivSelector).append(newEntry);
+				const codeEntry = {name: codeHeader.name, hash: codeHeader.hash};
+				codeDataList.push(codeEntry);
 				
 				// the first entry is selected by default
 				if (first) {
 					// insert code to the code text area
-					this.getCodeFor(codeHeader.name)
+					codeEntry.text = this.getCodeFor(codeHeader.name);
 					first = false;
 				}
 			});
+			
+			this.codeManContainer = new CodeManContainer(
+					'', 
+					'CODEManger', 
+					'yt_div_code_manager', 
+					codeDataList,
+					this.getCodeFor.bind(this),
+					"tbd", 0);
 		}
 	}
 	
@@ -153,15 +156,25 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
 															  this.groupId, 
 															  codeName);
-		$(this.selectedCodeTextAreaSelector).val(respCodeText.data[0].text);
+		return respCodeText.data[0].text;
 	}
 	
+	/*
+		Save user's code to his code depot in DB.  
+		The code name needs to be normalized to prevent SQL injections and makes it easier to
+		organize in UI.
+	*/
 	async saveCodeToDb(e) {
 		e.preventDefault();
 		
 		const codeName = $(this.codeNameTextSelector).val();
 		if (!codeName) {
 			alert("Please enter code name!");
+			return;
+		}
+		
+		if (!StringUtil.isValidYatuName(codeName)) {
+			alert("Code name must start with an alphabet and contains only alphanumeric chars without space or special chars!");
 			return;
 		}
 		
@@ -180,6 +193,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			alert("ERROR encountered: code:" +  resp.err);
 		} else {
 			// add code to our code manager
+			this.codeManContainer.addCodeEntry(codeName, codeHash, codeText);
 		}
 		
 		//close dialog box:
@@ -487,15 +501,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		Hnandle event after notes are edited. If notes are modified, save the
-		modified notes to database.
-	**/
-	async handleNeedtoUpdateNotes(e) {
-		e.preventDefault(); 
-		this.prv_saveNotesToDb();
-	}
-	
-	/**
 		Hnandle saving notes
 	**/
 	async prv_saveNotesToDb() {
@@ -634,17 +639,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${USER_VIDEO_AREA}`;
 	}
 	
-	getCodeListEntryId(hash) {
-		return `yt_code_list_entry_{hash}`;
-	}
-	
 	get codeListDivSelector() {
 		return `#${YT_COL_CODE_LIST}`;
-	}
-
-	get selectedCodeTextAreaSelector() {
-		return `#${YT_TA_SELECTED_CODE}`;
-	}		
+	}	
 }
 
 let jsClassRoom = null;
