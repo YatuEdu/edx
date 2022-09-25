@@ -42,7 +42,10 @@ class LoginPageHandler {
 		$( "#ytu_ckb_tna" ).click(this.validateAll.bind(this));
 		$( "#user_name" ).focusout(this.validateAll.bind(this));
 		$( PW_INPUT_CTRL ).focusout(this.validateAll.bind(this));
+		$( "#user_password" ).focusout(this.validateAll.bind(this));
+		$( "#user_password" ).keyup(this.validateAll.bind(this));
 		$( "#user_password2" ).focusout(this.validateAll.bind(this));
+		$( "#user_password2" ).keyup(this.validateAll.bind(this));
 		$( EMAIL_INPUT_CTRL).keyup(this.checkEmailText);
 		$( EMAIL_INPUT_CTRL).blur(this.checkEmailText);
 		$( "#yt_inpt_email_code").keyup(this.checkEmailCodeText);

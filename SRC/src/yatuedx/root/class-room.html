@@ -28,6 +28,15 @@
 
                 <div class="collapse navbar-collapse" id="unplugNavbar">
                     <ul class="navbar-nav ml-auto">
+						<li class="nav-item active yt-li-dimention">
+                            <button id="yt_btn_run_code_from_board" class="btn btn-mail-box-dimention btn-mail-box-no-msg" title="Run code from console">Run code</button>
+                        </li>
+						<li class="nav-item active yt-li-dimention">
+                            <button id="yt_btn_save_code_to_db_popup" class="btn btn-mail-box-dimention btn-mail-box-no-msg" title="Save code to my depot">Save code</button>
+                        </li>
+						<li class="nav-item active yt-li-dimention">
+                            <button id="yt_btn_clear_result" class="btn btn-mail-box-dimention btn-mail-box-no-msg" title="Clear output console">Clear output</button>
+                        </li>
 						<li class="nav-item active">
                             <button id="yt_btn_msg_indicator" class="btn btn-mail-box-dimention btn-mail-box-no-msg" title="no message">Message</button>
                         </li>
@@ -55,56 +64,38 @@
 					</div>
 					<div class="col-10">
 						<div class="row mb-0">
-							<div class="col-11 tool-tbtn-dimention-left">
-								<textarea class="input-board"
+							<div class="col-8 tool-tbtn-dimention-left">
+								<div class="ta-container">
+									<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-left">+</button>
+									<textarea class="input-board"
 									  id="yt_ta_code_board" 
 									  spellcheck="false"
 									  placeholder="Type your code here...."
 									  rows="20"></textarea>
+								</div>
 							</div>
-							<div class="col-1 tool-tbtn-dimention">	 
-								<button id="yt_btn_run_code_from_board" class="btn-tool-dimention btn-run-code tiphost">
-									<span class="tooltip">
-										<div class="tooltiptext">
-										Run code
-										</div>
-									</span>
-								</button>
-								<button id="yt_btn_save_code_to_db_popup" class="btn-tool-dimention btn-save-db tiphost">
-									<span class="tooltip">
-										<div class="tooltiptext">
-										Save code to my code depot 
-										</div>
-									</span>
-								</button>
-								<button id="yt_btn_erase_code" class="btn-tool-dimention btn-eraser tiphost">
-									<span class="tooltip">
-										<div class="tooltiptext">
-										Erase code from board
-										</div>
-									</span>
-								</button>
-							</div>
-						</div>
-						<div class="row mb-0">
-							<div id="yt_tb_output_console" class="col-4 selected-tab">
-								<a class="nav-link" data-tabindex="0" href="#">Output</a>
-							</div>
-							<div id="yt_tb_notes_console"  class="col-4 unselected-tab">
-								<a class="nav-link" data-tabindex="1" href="#">My code</a>
-							</div>
-							<div id="yt_tb_msg_console"  class="col-3 unselected-tab">
-								<a class="nav-link" data-tabindex="2" href="#">Messages</a>
-							</div>	
-						</div>
-						<div class="row mb-0">
-							<div class="col-11 tool-tbtn-dimention-left">
-								<textarea class="output-board"
+							<div class="col-4 tool-tbtn-dimention">
+								<div class="ta-container">
+									<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-right">+</button>							
+									<textarea class="output-board"
 										  id="yt_ta_output_console" 
 										  spellcheck="false" 
 										  placeholder="Output Console"
 										  rows="20"></textarea>
-								<div id="yt_div_code_manager" data-type="ytComponent" style="display:none">	
+								</div>
+							</div>
+						</div>
+						<div class="row mb-0">
+							<div id="yt_tb_notes_console"  class="col-6 selected-tab">
+								<a class="nav-link" data-tabindex="0" href="#">Code depot</a>
+							</div>
+							<div id="yt_tb_msg_console"  class="col-6 unselected-tab">
+								<a class="nav-link" data-tabindex="1" href="#">Messages</a>
+							</div>	
+						</div>
+						<div class="row mb-0">
+							<div class="col-12 tool-tbtn-dimention-left">
+								<div id="yt_div_code_manager" data-type="ytComponent" style="display:block">	
 								</div>
 								 <textarea readonly class="msg-board"
 								  style="display:none"
@@ -113,42 +104,14 @@
 								  placeholder="Received messages"
 								  rows="20"></textarea>
 							</div>
-							<div class="col-xs-1 tool-tbtn-dimention">
-								<picture id="yt_btn_clear_result" class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Erase Output</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
-								<picture id="yt_btn_search_notes" class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">
-										Search notes by key words
-										</div>
-									</span>
-									<source width="45" height="45" type="image/webp" srcSet="assets/images/tools/search_notes.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
-							</div>
-						</div>
 						<div class="row mb-0">
-							<div class="col-11 tool-tbtn-dimention-left">
+							<div class="col-12 tool-tbtn-dimention-left">
 								<textarea class="msg-board"
 								  style="display:none"
 								  id="yt_ta_msg_input" 
 								  spellcheck="trye" 
 								  placeholder="Enter your messages"
 								  rows="3"></textarea>	
-							</div>
-							<div class="col-xs-1 tool-tbtn-dimention">
-								<picture id="yt_btn_msg_send" class="btn tiphost pull-left" >
-									<span class="tooltip">
-										<div class="tooltiptext">Send Message to Teacher</div>
-									</span>
-									<source width="41" height="38" type="image/webp" srcSet="assets/images/tools/send_msg.webp" />
-									<img src="/my-image.jpg" />
-								</picture>			
 							</div>
 						</div>
 					</div>

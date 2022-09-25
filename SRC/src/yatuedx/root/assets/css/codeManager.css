@@ -11,7 +11,7 @@
 .textButton{
 	text-align: left !important;
 	border: none;
-	background-color: #cc99ff;
+	background-color: #d3d3d3;
 	transition: all ease-in-out 0.2s;
 	cursor: pointer;
 	margin-bottom: 1px;
@@ -19,5 +19,5 @@
 
 .textButton:hover{
   border: 1px solid #888;
-  background-color: #9933ff;
+  background-color: #a9a9a9;
 }

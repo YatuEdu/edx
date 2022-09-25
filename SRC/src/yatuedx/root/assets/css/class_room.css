@@ -1,3 +1,5 @@
+
+
 .blob-num {
     width: 1%;
     min-width: 50px;
@@ -91,7 +93,7 @@
 }
 
 .input-board {
-    height: 550px !important; 
+    height: 100% !important; 
 	width: 100%;
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
@@ -102,6 +104,50 @@
 	color: white;
 	background: #274c43;
 	border:outset 4px orange;
+	margin-right: 5px;
+}
+
+.ta-btn-minmax-zorder-left {
+	z-index: 90 !important;			/* ON TOP */
+}
+
+.ta-btn-minmax-zorder-right {
+	z-index: 99 !important;			/* ON TOP */
+}
+
+.ta-btn-minmax {
+    position:absolute;
+    top: 0px;
+    right:0px;
+    width: 30px;
+	height: 26px;
+	background-color: #d3d3d3;
+	transition: all ease-in-out 0.2s;
+	cursor: pointer;
+}
+
+.ta-btn-minmax:hover{
+  border: 1px solid #888;
+  background-color: #a9a9a9;
+}
+
+.ta-container-max {
+	position:absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	background-color: grey;	
+	display: flex;
+	width: 80vw;					
+	height: 3000px;
+	border:outset 4px orange;
+	z-index: 88 !important;			/* ON TOP */
+}
+
+.ta-container {
+	position:relative;
+	height: 600px !important; 
+	width: 100%;
 }
 
 .input-board-teacher {
@@ -118,7 +164,7 @@
 }
 
 .output-board {  
-	height: 600px !important;    
+	height: 100% !important;    
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -264,10 +310,14 @@
 	background-image: url('../images/dynamic/eraser.png');
 }
 
+.yt-li-dimention {
+	margin-right: 2px !important;
+}
+
 .btn-mail-box-dimention {
 	background-color: #1c87c9;
 	-webkit-border-radius: 60px;
-	border-radius: 60px;
+	border-radius: 50px;
 	border: none;
 	color: #eeeeee;
 	cursor: pointer;

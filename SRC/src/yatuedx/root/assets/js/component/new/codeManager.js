@@ -7,8 +7,8 @@ const MY_CODE_LIST_TEMPLATE = `
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
   <div class="col-4">
-	<button class="textButton smallTextButton" id="{codeInsId}" title="Insert the code at the beginning of the code console">Insert</button>
-	<button class="textButton smallTextButton" id="{codeDelId}" title="Delete the code">Delete</button>
+	<button class="textButton smallTextButton ins-code" id="{codeInsId}" title="Insert the code at the beginning of the code console">Insert</button>
+	<button class="textButton smallTextButton del-code" id="{codeDelId}" title="Delete the code">Delete</button>
   </div>
 </div>
 `;
@@ -123,10 +123,17 @@ class CodeManContainer extends ComponentBase {
 	#CodeMan;
 	#getCodeFromDbMethod;
 	#selectedCodeName;
+	#codeInoputBoardId;
 	
-	constructor(id, name, parentId, codeDataList, getCodeFromDbMethod, userName, group) {
+	constructor(id, 
+				name, 
+				parentId, 
+				codeInoputBoardId,
+				codeDataList, 
+				getCodeFromDbMethod, 
+				userName, group) {
 		super(id, name, parentId, "", MY_CSS);
-		
+		this.#codeInoputBoardId = codeInoputBoardId;
 		this.#CodeMan = new CodeMan(codeDataList, userName, group);
 		const codeListHtml = this.prv_buildCodeListHtml(codeDataList);
 		const componentHtml = TEMPLETE
@@ -137,12 +144,12 @@ class CodeManContainer extends ComponentBase {
 		this.mount(componentHtml);
 		
 		// add event handler for all the list entry
-		codeDataList.forEach(codeHeader => $(this.getCodeListLinkSelector(codeHeader.name))
-												.click(this.handleGetCodeFor.bind(this)));
+		codeDataList.forEach(codeHeader => $(this.eventHandlerForNewCode(codeHeader.name)));
 					
 		// call this function to get code by name
 		this.#getCodeFromDbMethod = getCodeFromDbMethod;
 	}
+	
 	
 	/*
 		public methods
@@ -158,8 +165,47 @@ class CodeManContainer extends ComponentBase {
 			$(this.codeListSelector).append(newEntryHtml);
 			
 			// hook up click event handler
-			$(this.getCodeListLinkSelector(codeName)).click(this.handleGetCodeFor.bind(this))
+			this.eventHandlerForNewCode(codeHeader.name);
 		}
+	}
+	
+	// hook up click event handler for new code entry
+	eventHandlerForNewCode(codeName) {	
+		// click to select the code
+		$(this.getCodeListLinkSelector(codeName)).click(this.handleGetCodeFor.bind(this));
+		
+		// handle insert code to code console by name
+		// code insert button selector
+		$(this.getCodeInsertSelector(codeName)).click(this.handleInsertCode.bind(this));
+		$(this.getCodeDeleteSelector(codeName)).click(this.handleDeleteCode.bind(this));
+	}
+	
+	// get the code clicked and insert into code input console
+	async handleInsertCode(e) {
+		const id = $(e.target).attr("id");
+		const codeName = StringUtil.getIdStrFromBtnId(id);
+		const codeText = await this.prv_getCodeFor(codeName);
+		if (codeText) {
+			// insert to code console
+			let existingCodeStr = $(this.codeInputBoardSelector).val();
+			existingCodeStr = codeText + '\n' + existingCodeStr;
+			// update UI
+			$(this.codeInputBoardSelector).val(existingCodeStr);
+		}
+	}
+	
+	handleDeleteCode(e) {
+		alert('Are you sure you want to delete the code permanantly from code depot?');
+	}
+	
+	// id for deleting code
+	getCodeDeleteId(name) {
+		return `yt_btn_code_del_${name}}`;
+	}
+	
+	// selector for button which deletes code
+	getCodeDeleteSelector(name) {
+		return `#${this.getCodeDeleteId(name)}`;
 	}
 	
 	/*
@@ -265,12 +311,17 @@ class CodeManContainer extends ComponentBase {
 	
 	// id for deleting code
 	getCodeDeleteId(name) {
-		return `yt_btn_code_del_${name}}`;
+		return `yt_btn_code_del_${name}`;
 	}
 	
 	// selector for button which deletes code
 	getCodeDeleteSelector(name) {
 		return `#${this.getCodeDeleteId(name)}`;
+	}
+	
+	// slector for code input board outside of this component
+	get codeInputBoardSelector() {
+		return `#${this.#codeInoputBoardId}`;
 	}
 }
 

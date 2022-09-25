@@ -23,8 +23,7 @@ const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
 const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
 const YT_BTN_MSG_SEND						= 'yt_btn_msg_send';
 const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
-const VD_VIEDO_AREA 						= "yt_video_area";
-const YT_TB_OUTPUT_CONSOLE					= 'yt_tb_output_console';
+const VD_VIEDO_AREA 						= "yt_video_area";	
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
 const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
 const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
@@ -36,10 +35,12 @@ const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
 const CSS_VIDEO_MIN = 'yt-video';
 const CSS_VIDEO_MAX = 'yt-video-max';
+const CSS_BTN_MAX_INPUT = 'ta-btn-minmax';
+const CSS_MAX_CONTAINER = 'ta-container-max';
+const CSS_MIN_CONTAINER = 'ta-container';
 
 const TAB_LIST = [
-	{tab:YT_TB_OUTPUT_CONSOLE, sub_elements: [YT_TA_OUTPUT_CONSOLE_ID, YT_BTN_CLEAR_RESULT_CODE_ID] },
-	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER, YT_BTN_SEARCH_NOTES] },
+	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER] },
 	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID, YT_BTN_MSG_SEND] },
 ];
 
@@ -88,6 +89,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
 		
+		// maxize or minimize input consoles
+		$(this.inputMaxMinButtonClassSelector).click(this.handleInputMaxMin);
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
 		// handle copy code to notes
@@ -96,8 +99,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
 		// handle maximize or minimize video screen
 		$(this.videoAreaSelector).click(this.toggleVideoSize.bind(this));
-		// switching tab to output
-		$(this.outputConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to notes
 		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to msg
@@ -145,7 +146,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			this.codeManContainer = new CodeManContainer(
 					'', 
 					'CODEManger', 
-					'yt_div_code_manager', 
+					'yt_div_code_manager',
+					YT_TA_CODE_BOARD_ID,
 					codeDataList,
 					this.getCodeFor.bind(this),
 					"tbd", 0);
@@ -198,6 +200,28 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//close dialog box:
 		$(this.codeSaveDialogSelector).dialog("close");
+	}
+	
+	/**
+		Clicking the max-min button toggles bewtween a min / max sized screen.
+	 **/
+	handleInputMaxMin(e) {
+		e.preventDefault();
+		
+		// find the target container to toggle
+		const par = $(event.target).parent();
+		if ($(par).hasClass( CSS_MIN_CONTAINER)) {
+			$(par).removeClass(CSS_MIN_CONTAINER);
+			$(par).addClass(CSS_MAX_CONTAINER);
+			
+			$(event.target).html('-');
+	
+		}
+		else {
+			$(par).removeClass(CSS_MAX_CONTAINER);
+			$(par).addClass(CSS_MIN_CONTAINER);
+			$(event.target).html('+');
+		}
 	}
 	
 	/**
@@ -425,10 +449,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		// then run the new code from teacher
 		super.executeCode(codeText);
-		
-		// switch tab to output:
-		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_OUTPUT_CONSOLE);
-		this.prv_toggleTab(ti);
 	}
 	
 	/**
@@ -602,10 +622,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_TA_NOTES_ID}`;
 	}
 	
-	get outputConsoleTab() {
-		return `#${YT_TB_OUTPUT_CONSOLE}`;
-	}
-	
 	get notesConsoleTab() {
 		return `#${YT_TB_NOTES_CONSOLE}`;
 	}
@@ -642,6 +658,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	get codeListDivSelector() {
 		return `#${YT_COL_CODE_LIST}`;
 	}	
+	
+	get inputMaxMinButtonClassSelector() {
+		return `.${CSS_BTN_MAX_INPUT}`;
+	}
 }
 
 let jsClassRoom = null;
