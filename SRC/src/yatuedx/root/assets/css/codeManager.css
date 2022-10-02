@@ -1,9 +1,9 @@
 .smallTextButton{
-  width: 60px;
+  width: 34px;
   height: 30px;
 }
 
-.bigsmallTextButton{
+.bigTextButton {
   width: 200px;
   height: 32px;
 }
@@ -11,13 +11,20 @@
 .textButton{
 	text-align: left !important;
 	border: none;
-	background-color: #d3d3d3;
 	transition: all ease-in-out 0.2s;
 	cursor: pointer;
 	margin-bottom: 1px;
+	z-index: 66 !important;	
 }
 
 .textButton:hover{
   border: 1px solid #888;
+  background-color: #1aff8c;
+  font-weight: 700;
+}
+
+.textButton-seledcted {
+  border: 1px solid #888;
   background-color: #a9a9a9;
+  font-weight: 700;
 }

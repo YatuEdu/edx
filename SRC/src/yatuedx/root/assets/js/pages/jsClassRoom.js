@@ -77,7 +77,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 				show : "blind", 
 				hide : "blind", 
 		});
-		
+
+
 		// other initialization
 		this.#tabIndex = 0;
 		const paramMap = PageUtil.getUrlParameterMap();
@@ -86,11 +87,22 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
 		this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, this.#teacher, this);
 			
+		// itialize code manager
+		this.initCodeDepot();
+		
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
 		
-		// maxize or minimize input consoles
-		$(this.inputMaxMinButtonClassSelector).click(this.handleInputMaxMin);
+		/**
+			maxize or minimize input consoles.
+			Note that we handle this event at the body level so that all "+" button events are
+			handled, not just the "+" button in this class.
+			
+			We should make the button a component, and place it anywhere we want.
+			
+		 **/
+		$(document.body).on('click', this.inputMaxMinButtonClassSelector, this.handleInputMaxMin);
+		
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
 		// handle copy code to notes
@@ -112,8 +124,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// handle erasing code from board
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
 		
-		// itialize notes we saved before
-		this.initCodeDepot();
 	}
 	
 	/**
@@ -150,6 +160,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 					YT_TA_CODE_BOARD_ID,
 					codeDataList,
 					this.getCodeFor.bind(this),
+					this.updateCodeToDb.bind(this),
 					"tbd", 0);
 		}
 	}
@@ -187,12 +198,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		const codeHash = StringUtil.getMessageDigest(codeText);
+		const existingCodeEntry = this.codeManContainer.getCodeEntry(codeName);
+		if (existingCodeEntry) {
+			// do you want to update existing code in db?
+			alert(`Error: code with name [${codeName}] already exists in db.  Use update button to update the code.`);
+			return;
+		} 
 		
-		const resp = await Net.memberAddCode(credMan.credential.token, 
-											 this.groupId, codeName, 
-											 codeText, codeHash);
+		const resp = await this.updateCodeToDb(codeName, codeText);
 		if (resp.err) {
-			alert("ERROR encountered: code:" +  resp.err);
+			alert("Error encountered: error code:" +  resp.err);
 		} else {
 			// add code to our code manager
 			this.codeManContainer.addCodeEntry(codeName, codeHash, codeText);
@@ -200,6 +215,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//close dialog box:
 		$(this.codeSaveDialogSelector).dialog("close");
+	}
+	
+	async updateCodeToDb(codeName, codeText) {
+		const codeHash = StringUtil.getMessageDigest(codeText);
+		const resp = await Net.memberAddCode(credMan.credential.token, 
+											 this.groupId, codeName, 
+											 codeText, codeHash);
+		return resp;
 	}
 	
 	/**
@@ -213,13 +236,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		if ($(par).hasClass( CSS_MIN_CONTAINER)) {
 			$(par).removeClass(CSS_MIN_CONTAINER);
 			$(par).addClass(CSS_MAX_CONTAINER);
-			
+			// change button text to "-"
 			$(event.target).html('-');
 	
 		}
 		else {
 			$(par).removeClass(CSS_MAX_CONTAINER);
 			$(par).addClass(CSS_MIN_CONTAINER);
+			// change button text to "+"
 			$(event.target).html('+');
 		}
 	}
@@ -517,6 +541,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		this.prv_toggleTab(ti);
 		
 		// ask if user want to save code to code depot?
+		const selectedCodeName = this.codeManContainer.currentSelection;
+		$(this.codeNameTextSelector).val(selectedCodeName);
 		 $(this.codeSaveDialogSelector).dialog("open");
 	}
 	

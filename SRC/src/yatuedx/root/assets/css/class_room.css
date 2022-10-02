@@ -107,14 +107,6 @@
 	margin-right: 5px;
 }
 
-.ta-btn-minmax-zorder-left {
-	z-index: 90 !important;			/* ON TOP */
-}
-
-.ta-btn-minmax-zorder-right {
-	z-index: 99 !important;			/* ON TOP */
-}
-
 .ta-btn-minmax {
     position:absolute;
     top: 0px;
@@ -141,8 +133,32 @@
 	width: 80vw;					
 	height: 3000px;
 	border:outset 4px orange;
+}
+
+.ta-btn-minmax-zorder-left {
+	z-index: 99 !important;			/* ON TOP */
+}
+
+.ta-btn-minmax-zorder-right {
+	z-index: 90 !important;			/* ON TOP */
+}
+
+.ta-btn-minmax-zorder-lower-left {
+	z-index: 81 !important;			/* ON TOP */
+}
+
+.ta-container-zorder-left {
 	z-index: 88 !important;			/* ON TOP */
 }
+
+.ta-container-zorder-lower-left {
+	z-index: 80 !important;			/* ON TOP */
+}
+
+.ta-container-zorder-right {
+	z-index: 77 !important;			/* ON TOP */
+}
+
 
 .ta-container {
 	position:relative;
@@ -371,7 +387,7 @@
 }
 
 .msg-board {
-	height: 400px !important; 
+	height: 100% !important;
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -455,7 +471,7 @@
 .unselected-tab {
 	background-color: #d3d3d3;
 	color: white; 
-	border:outset 1px white
+	border:outset 1px white;
 }
 
 .tiphost:hover .tooltiptext {
