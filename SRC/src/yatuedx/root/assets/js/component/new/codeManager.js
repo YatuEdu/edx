@@ -5,10 +5,10 @@ import {StringUtil}			from '../../core/util.js';
 
 const MY_CODE_LIST_TEMPLATE = `
 <div class="row mb-0" id={codelstDivId}>
-  <div class="col-7">
+  <div class="col-7 tool-tbtn-dimention-left">
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
-  <div class="col-5">
+  <div class="col-5 tool-tbtn-dimention">
 	<button class="textButton smallTextButton rpl-code" id="{codeRplId}" title="Replace the code in the code console with this code">Rpl</button>
 	<button class="textButton smallTextButton ins-code" id="{codeInsId}" title="Insert the code at the beginning of the code console">Ins</button>
 	<button class="textButton smallTextButton upd-code" id="{codeUpdId}" title="Update the code in the code depot">Upd</button>
@@ -25,8 +25,8 @@ const TEMPLETE_2 = '
 */
 
 const TEMPLETE = 
-`<div id='yt_div_code_man' class="row mb-0">
- <div id="yt_col_code_text" class="col-7">
+`<div id='yt_div_code_man' class="row mb-0 yt-list-panel-right">
+ <div id="yt_col_code_text" class="col-7 tool-tbtn-dimention-left">
   <div class="ta-container ta-container-zorder-lower-left">
 	<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-lower-left">+</button>							
 	<textarea class="msg-board"
@@ -36,7 +36,7 @@ const TEMPLETE =
 		  rows="40"></textarea>
   </div>
  </div>
- <div id="yt_col_code_list" class="col-5">
+ <div id="yt_col_code_list" class="col-5 tool-tbtn-dimention">
 	{codeListHolder}
  </div>
 </div>

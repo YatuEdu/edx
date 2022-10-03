@@ -13,13 +13,20 @@ const GROUP_CARD_TEMPLATE = `
 			<h6 ##9 class="mb-0 font-weight-bold translatable" id="card_name_##1" data-text-id="c_group_fld_nm_##1">##2</h6>
 			<p class="mb-0"></p>
 			<p class="h5 font-weight-bold mb-3 translatable" data-text-id="c_group_fld_num_online_##1">##4 ##7</p>
-			<button class="btn btn-rounded btn-outline-primary translatable" id="card_btn_##1" 
+			<button class="btn btn-rounded btn-outline-primary translatable" id="join_btn_##1" 
 					data-grp-type="##3"
 					data-grp-name="##2"
 					data-grp-id="##5"
 					data-grp-owner="##6"
 					data-grp-dt="##8"
-			        data-text-id="c_group_fld_btn_enter">join</button>
+			        data-text-id="c_group_fld_btn_enter">Join Class</button>
+			<button class="btn btn-rounded btn-outline-primary translatable" id="exe_btn_##1" 
+					data-grp-type="##3"
+					data-grp-name="##2"
+					data-grp-id="##5"
+					data-grp-owner="##6"
+					data-grp-dt="##8"
+			        data-text-id="c_group_fld_btn_enter">Do Exercise</button>
 		</div>
 	</div>
   </div>
@@ -31,7 +38,8 @@ function cutShort(length, str) {
 
 function getGroupCardHtml(groupInfo) {
 	let htmlCard = GROUP_CARD_TEMPLATE;
-	const btnAttrId = `#card_btn_${groupInfo.id}`;
+	const joinBtnAttrId = `#join_btn_${groupInfo.id}`;
+	const exeBtnAttrId = `#exe_btn_${groupInfo.id}`;
 	
 	// alert for the class is it starts within 8 hours 
 	let colorStyle = "";
@@ -57,7 +65,7 @@ function getGroupCardHtml(groupInfo) {
 						.replace('##9', colorStyle)
 						.replace('##10', inHours )
 						.replace('##11', inMinutes);
-	return  {buttonId: btnAttrId, html: htmlCard};
+	return  {joinBtnId: joinBtnAttrId, exeBtnId: exeBtnAttrId, html: htmlCard};
 }
 
 export {getGroupCardHtml};

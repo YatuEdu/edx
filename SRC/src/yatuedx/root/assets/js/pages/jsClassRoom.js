@@ -30,6 +30,8 @@ const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
 const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
 const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
 const YT_COL_CODE_LIST						= 'yt_col_code_list';
+const YT_COL_VIDEO_AREA  					= 'yt_col_video_area';
+const YT_COL_CODING_AREA					= 'yt_col_coding_area';
 
 const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
@@ -62,6 +64,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#tabIndex;
 	#teacher;
 	#codeManContainer;
+	#groupId;
 	
     constructor(credMan) {
 		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
@@ -83,10 +86,20 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		this.#tabIndex = 0;
 		const paramMap = PageUtil.getUrlParameterMap();
 		const groupId = paramMap.get(sysConstants.UPN_GROUP);
-		this.groupId = groupId;
-		this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
-		this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, this.#teacher, this);
-			
+		const modeStr = paramMap.get(sysConstants.UPN_MODE);
+		const mode = modeStr ? parseInt(modeStr, 10) : 0;
+		this.#groupId = groupId;
+		
+		
+		if (mode !== 0) {
+			// Do not show video if we are only doing excersize
+			$(this.columnVideoAreaSelector).hide();
+		} else {
+			// show video if we are in class mode	
+			this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
+			this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, this.#teacher, this);
+		}
+		
 		// itialize code manager
 		this.initCodeDepot();
 		
@@ -137,7 +150,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Load notes from data base
 	 **/
 	async initCodeDepot() {
-		const resp = await Net.memberListCode(credMan.credential.token, this.groupId);
+		const resp = await Net.memberListCode(credMan.credential.token, this.#groupId);
 		if (resp.data.length > 0) {
 			let first = true;
 			const codeDataList = [];
@@ -167,7 +180,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	async getCodeFor(codeName) {
 		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
-															  this.groupId, 
+															  this.#groupId, 
 															  codeName);
 		return respCodeText.data[0].text;
 	}
@@ -220,7 +233,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async updateCodeToDb(codeName, codeText) {
 		const codeHash = StringUtil.getMessageDigest(codeText);
 		const resp = await Net.memberAddCode(credMan.credential.token, 
-											 this.groupId, codeName, 
+											 this.#groupId, codeName, 
 											 codeText, codeHash);
 		return resp;
 	}
@@ -552,7 +565,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async prv_saveNotesToDb() {
 		const noteTxt = $(this.notesTextArea).val();
 		if (!StringUtil.testEqual(this.#notes, noteTxt)) {
-			await Net.userUpdateClassNotes(credMan.credential.token, this.groupId, noteTxt);
+			await Net.userUpdateClassNotes(credMan.credential.token, this.#groupId, noteTxt);
 			this.#notes=noteTxt;
 			console.log("saved: " + this.#notes);
 		}
@@ -599,6 +612,19 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 			UI Properties
 	 **/
+	
+	get columnVideoAreaSelector() {
+		return `#${YT_COL_VIDEO_AREA}`;
+	}
+	
+	get columnCodingAreaSelector() {
+		return `#${YT_COL_CODING_AREA}`;
+	}
+	
+	get resultConsoleControl() {
+		return `#${YT_TA_OUTPUT_CONSOLE_ID}`;
+	}
+	
 	
 	get eraseCodeFromBoardButtonSelector() {
 		return `#${YT_BTN_CLEAR_CODE_BOARD}`;

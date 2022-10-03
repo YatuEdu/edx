@@ -35,7 +35,7 @@ class MyGroupPageHandler {
 			this.sortGroupByTime(myGroup);
 			for(let i = 0; i < myGroup.length; i++) {
 				const g = myGroup[i];
-				const  {buttonId, html} = getGroupCardHtml(
+				const  {joinBtnId, exeBtnId, html} = getGroupCardHtml(
 							{id: g.id, 
 							 name: g.name, 
 							 type: g.type, 
@@ -47,9 +47,10 @@ class MyGroupPageHandler {
 							});
 				$(".myGroupRow").append(html);
 				
+				$( exeBtnId ).click(this.handleExercize);
 				// still a valid member?
 				if (g.s_credit || g.g_credit) {
-					$( buttonId ).click(this.handleEntering);
+					$( joinBtnId ).click(this.handleEntering);
 				}
 				else {
 					$( buttonId ).text("Sign up for the group");
@@ -116,6 +117,19 @@ class MyGroupPageHandler {
 	handleRefill(e) {
 		e.preventDefault();
 		alert('entering:' + $(this).attr('data-grp-name') + ":" + $(this).attr('data-grp-type'));
+	}
+	
+	
+	/**
+		Enter the exercize room if applicable
+	**/
+	handleExercize(e) {
+		e.preventDefault();
+		
+		// go to exercize room as student
+		const groupId = $(this).attr('data-grp-id');
+		const groupOwner = $(this).attr('data-grp-owner');
+		window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}&mode=1`;
 	}
 	
 	/**

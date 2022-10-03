@@ -24,6 +24,7 @@ const sysConstants = Object.freeze({
 	UPN_NAME: 		'name',
 	UPN_SERIES:		'series',
 	UPN_SUBJECT:	'subject',
+	UPN_MODE:		'mode',
 	
 	// UI STATES
 	STATE_LANG_EN: 0,
