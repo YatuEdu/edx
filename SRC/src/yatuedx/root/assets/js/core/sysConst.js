@@ -50,6 +50,7 @@ const languageConstants = Object.freeze({
 	// UI STATES
 	STATE_LANG_EN: 0,
 	STATE_LANG_CN: 1,
+	TAB_SPACE: 4,
 	
 	// UI Text Id
 	SIGNIN: "p_inx_signin_btn_nm",				// index  sign in button text

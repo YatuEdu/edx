@@ -232,6 +232,16 @@ class StringUtil {
 		return StringUtil.YATU_NAME_REGEX.test(name);
 	}
 	
+	/* test is a char is letter or digit */
+	static ALPGANUMERIC_REXP = /^[a-z0-9]+$/;
+	charIsLetter(c) {
+	  if (typeof c !== 'string') {
+		return false;
+	  }
+
+	  return StringUtil.ALPGANUMERIC_REXP.test(c);
+	}
+	
 }
 
 class PageUtil {

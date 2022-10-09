@@ -1,5 +1,6 @@
-import {sysConstants, languageConstants} from '../core/sysConst.js'
-import {uiMan} from '../core/uiManager.js';
+import {sysConstants, languageConstants} 	from '../core/sysConst.js'
+import {uiMan} 								from '../core/uiManager.js';
+import {CodeAnalyst}						from './new/codeAnalyst.js'
 
 /**
 	This class handles JS Code runner board
@@ -32,45 +33,58 @@ class JSCodeExecutioner {
 	 */
 	runJSCode_prv(src) {
 		// first cleasr left over globals
-		this.undefine_vars();
+		this.#undefineVars();
 		src = src.trim();
 		if (src) {
 			try {
 				const func = new Function('print', 'printx', src);
-				const res = func(this.printLine_prv.bind(this), this.print_prv.bind(this));
+				const res = func(this.#printLine.bind(this), this.#appendMessage.bind(this));
 				if (res) {
-					this.print_prv(res);
+					this.#appendMessage(res);
 				}
 				
 				// print well-know variqables (from a ~ z)
-				this.print_vars();
+				this.#printvars();
 			}
 			catch (e) {
-				this.print_prv(e);
+				this.#handleErrors(src, e);
 			}
 		} else {
-			this.printLine_prv('No code is present')
+			this.#printLine('No code is present')
 		}
 		//console.log(`exe code: ${src}`);
+	}
+	
+	/**
+		When errors are encountered, we use our own JS cod analyst to dispply our
+		diagnostic messagews
+	 **/
+	#handleErrors(codeText, e) {
+		this.#printLine(e);
+		
+		// analyse the code
+		const codeAnalyst = new CodeAnalyst(codeText);
+		const errors = codeAnalyst.shallowInspect();
+		errors.forEach(e  => this.#printLine(e.errorDisplay));
 	}
 	
 	/*
 		append message text to console in a new line
 	 */
-	printLine_prv(msg) {
+	#printLine(msg) {
 		const id = `#${this.#consoleId}`;
 		const oldTxt = $(id).val();
 		if (oldTxt) {
 			msg = '\n' + msg;
 		}
 		//printResult(msg);
-		this.print_prv(msg);
+		this.#appendMessage(msg);
 	}
 	
 	/*
 		append message text to console.
 	 */
-	print_prv(msg) {
+	#appendMessage(msg) {
 		//  append message to console
 		const id = `#${this.#consoleId}`;
 		const oldTxt = $(id).val();
@@ -88,7 +102,7 @@ class JSCodeExecutioner {
 		undefine well know variables (a ~ z, A, Z) to avoid polluting the
 		global space.
 	 */
-	undefine_vars() {
+	#undefineVars() {
 		// if any of the vars defined, print them:
 		this.#vars.forEach(maybe => {
 			try {
@@ -102,12 +116,12 @@ class JSCodeExecutioner {
 	/*
 		print well know variables (a ~ z, A, Z) to console.
 	 */
-	print_vars() {
+	#printvars() {
 		// if any of the vars defined, print them:
 		this.#vars.forEach(maybe => {
 			try {
 				if (eval(maybe + "!==undefined")) {
-					this.printLine_prv(maybe + "=" + eval(maybe));
+					this.#printLine(maybe + "=" + eval(maybe));
 				}
 			}
 			catch(e) {
