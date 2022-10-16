@@ -123,6 +123,12 @@
   background-color: #a9a9a9;
 }
 
+.ta-container {
+	position:relative;
+	height: 600px !important; 
+	width: 100%;
+}
+
 .ta-container-max {
 	position:absolute;
 	left: 0;
@@ -157,13 +163,6 @@
 
 .ta-container-zorder-right {
 	z-index: 77 !important;			/* ON TOP */
-}
-
-
-.ta-container {
-	position:relative;
-	height: 600px !important; 
-	width: 100%;
 }
 
 .input-board-teacher {
@@ -342,9 +341,7 @@
 }
 
 .btn-mail-box-dimention {
-	background-color: #1c87c9;
-	-webkit-border-radius: 60px;
-	border-radius: 50px;
+	background-color: #39ac73;
 	border: none;
 	color: #eeeeee;
 	cursor: pointer;

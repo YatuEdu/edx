@@ -9,11 +9,13 @@ import {IncomingCommand}					from '../command/incomingCommand.js'
 import {PageUtil, StringUtil}				from '../core/util.js';
 import {Net}			    				from "../core/net.js"
 import {CodeManContainer}					from '../component/new/codeManager.js'
+import {CodeInputConsole}					from '../component/new/CodeInputConsole.js';
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
 const YT_TA_NOTES_ID 					    = "yt_ta_notes"; //todo: remove it
 const YT_DIV_CODE_MANAGER 					= "yt_div_code_manager";
+const YT_DIV_CODE_EDITOR					= "yt_div_code_editor";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
@@ -40,6 +42,8 @@ const CSS_VIDEO_MAX = 'yt-video-max';
 const CSS_BTN_MAX_INPUT = 'ta-btn-minmax';
 const CSS_MAX_CONTAINER = 'ta-container-max';
 const CSS_MIN_CONTAINER = 'ta-container';
+const CSS_CODING_COL_WITH_VIDEO = 'col-10';
+const CSS_CODING_COL_WITHOUT_VIDEO = 'col-12';
 
 const TAB_LIST = [
 	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER] },
@@ -64,6 +68,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#tabIndex;
 	#teacher;
 	#codeManContainer;
+	#codeInputConsoleComponent;
 	#groupId;
 	
     constructor(credMan) {
@@ -94,6 +99,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		if (mode !== 0) {
 			// Do not show video if we are only doing excersize
 			$(this.columnVideoAreaSelector).hide();
+			$(this.columnCodingAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
+			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
+			
 		} else {
 			// show video if we are in class mode	
 			this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
@@ -102,6 +110,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// itialize code manager
 		this.initCodeDepot();
+		
+		// initialize code editor
+		this.#codeInputConsoleComponent = new CodeInputConsole(
+					"", 
+					YT_DIV_CODE_EDITOR, 
+					YT_DIV_CODE_EDITOR, 
+					YT_TA_CODE_BOARD_ID, 
+					YT_TA_OUTPUT_CONSOLE_ID
+		);
 		
 		// upon initialization, student board is in "exercise" mode
 		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
@@ -166,7 +183,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 				}
 			});
 			
-			this.codeManContainer = new CodeManContainer(
+			this.#codeManContainer = new CodeManContainer(
 					'', 
 					'CODEManger', 
 					'yt_div_code_manager',
@@ -211,7 +228,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		const codeHash = StringUtil.getMessageDigest(codeText);
-		const existingCodeEntry = this.codeManContainer.getCodeEntry(codeName);
+		const existingCodeEntry = this.#codeManContainer.getCodeEntry(codeName);
 		if (existingCodeEntry) {
 			// do you want to update existing code in db?
 			alert(`Error: code with name [${codeName}] already exists in db.  Use update button to update the code.`);
@@ -223,7 +240,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			alert("Error encountered: error code:" +  resp.err);
 		} else {
 			// add code to our code manager
-			this.codeManContainer.addCodeEntry(codeName, codeHash, codeText);
+			this.#codeManContainer.addCodeEntry(codeName, codeHash, codeText);
 		}
 		
 		//close dialog box:
@@ -531,6 +548,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//obtain code from local "exercise board" and execute it locally
 		this.runCodeFrom();
+		
+		// show output cosole
+		this.#codeInputConsoleComponent.showOutput();
 	}
 	
 	/**
@@ -554,7 +574,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		this.prv_toggleTab(ti);
 		
 		// ask if user want to save code to code depot?
-		const selectedCodeName = this.codeManContainer.currentSelection;
+		const selectedCodeName = this.#codeManContainer.currentSelection;
 		$(this.codeNameTextSelector).val(selectedCodeName);
 		 $(this.codeSaveDialogSelector).dialog("open");
 	}

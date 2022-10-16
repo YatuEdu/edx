@@ -1,0 +1,69 @@
+.code-console-container {
+	position:relative;
+	height: 600px !important; 
+	width: 98.9%;
+	border:outset 4px orange;
+}
+
+.code-console-container-max {
+	position:absolute;
+	left: 5;
+	top: 0;
+	background-color: grey;	
+	display: flex;
+	width:   98.9%;					
+	height: 3000px;
+	border:outset 4px orange;
+}
+
+.code-console-container-dimention {
+	margin-left:  0 !important;
+	padding-left: 0 !important;
+	margin-right:  0 !important;
+	padding-right: 1 !important;
+	float:left;
+
+}
+
+.show-hide-button{
+	position:absolute;
+    top: 0px;
+    right:0px;
+    width: 30px;
+	height: 26px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #d3d3d3;
+	transition: all ease-in-out 0.2s;
+	cursor: pointer;
+	font-weight: 900;
+	z-index: 99 !important;	
+}
+
+.show-hide-button:hover{
+  border: 1px solid #888;
+  background-color: #1aff8c;
+  font-weight: 900;
+}
+
+.output-board-float-container {  
+	position:absolute;
+    top: 300px;
+    left:0px;
+	height: 300px;   
+	width: 100%;	
+	background-color: #d3d3d3;
+	transition: all ease-in-out 0.2s;	
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 300;
+	font-size: 20px;
+    line-height: 1.5;
+	background: #ffffff !important;
+	color: #B026FF;
+	border-top: outset 4px orange;
+	border-right: outset 4px orange;
+	border-bottom: outset 4px orange;
+}
