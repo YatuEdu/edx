@@ -27,6 +27,10 @@ const BRACKET_TYPE_ROUND = 3;
 const ACTION_OPEN = 1;
 const ACTION_CLOSE = 2;
 
+const QUOTE_TYPE_DOUBLE = 1;
+const QUOTE_TYPE_SINGLE = 2;
+const QUOTE_TYPE_BACKTICK = 3;
+
 const STANDARD_TOKEN_MAP = new Map([
 	['if', 			{type: TOKEN_TYPE_KEY, followedBy: ['('] } ],
 	['else', 		{type: TOKEN_TYPE_KEY, followedBy: ['{', 'if'] } ],
@@ -50,9 +54,9 @@ const STANDARD_TOKEN_MAP = new Map([
 	['this', 		{type: TOKEN_TYPE_KEY, followedBy: ['.', ';'] }],
 	['$', 			{type: TOKEN_TYPE_KEY, followedBy: ['{',], includedInside: ["`"] }],
 	
-	['"', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING }],
-	["'", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING }],
-	["`", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING }],
+	['"', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING, quoteType: QUOTE_TYPE_DOUBLE }],
+	["'", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING, quoteType: QUOTE_TYPE_SINGLE}],
+	["`", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING, quoteType: QUOTE_TYPE_BACKTICK }],
 	
 	['{', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, action: ACTION_OPEN   }],
 	['}', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, action: ACTION_CLOSE  }],
@@ -174,7 +178,7 @@ class TokenError {
 	get token() { return this.#token; }
 	
 	get errorDisplay() {
-		return `Error: ${this.msg} at line: ${this.token.lineNo}, position: ${this.token.beginPos}, found token '${this.token.name}'`;
+		return `Error: ${this.msg} at line: ${this.token.lineNo}, position: ${this.token.beginPos}, found token <<< ${this.token.name} >>>`;
 	}
 }
 
@@ -184,6 +188,12 @@ class CodeAnalyst {
 	#codeBlocks
 	#tokens
 	#codeStr;
+	
+	// syntax parsing one outcome
+	#variables;
+	#stringLiterals;
+	#numbers;
+	#expressions;
 	
 	constructor(codeStr) {
 		this.#codeStr = codeStr
@@ -204,6 +214,7 @@ class CodeAnalyst {
 	shallowInspect() {
 		const errors = []
 		const bracketStack = [];
+		const quoteStack = [];
 		for (let i = 0; i < this.tokens.length; i++) {
 			const tokenInfo = STANDARD_TOKEN_MAP.get(this.tokens[i].name);
 			const followedByInfo = this.#canBeFollowed(i);
@@ -213,11 +224,15 @@ class CodeAnalyst {
 			}
 			
 			// INSPECT BRACKET matches
-			if (tokenInfo && tokenInfo.bracketType) {
-				const unmatchError = this.#checkBracketMatches(this.tokens[i], bracketStack);
-				if (unmatchError) {
-					const bracketMismatchError = new TokenError(unmatchError, this.tokens[i]);
-					errors.push(bracketMismatchError);
+			if (tokenInfo) {
+				if (tokenInfo.bracketType) {
+					const unmatchError = this.#checkBracketMatches(this.tokens[i], bracketStack);
+					if (unmatchError) {
+						const bracketMismatchError = new TokenError(unmatchError, this.tokens[i]);
+						errors.push(bracketMismatchError);
+					}
+				} else if (tokenInfo.quoteType) {
+					this.#checkQuoteMatches(this.tokens[i], quoteStack);
 				}
 			}
 		}
@@ -228,7 +243,27 @@ class CodeAnalyst {
 			errors.push(bracketMismatchError);
 		});
 		
+		// see if we still have unmatched open quotes:
+		quoteStack.forEach(qt => {
+			const quoteMismatchError = new TokenError("Quote is not closed", qt);
+			errors.push(quoteMismatchError);
+		});
+		
 		return errors;
+	}
+	
+	/* 
+		Based on the token we found, get the basic coding elements, such as variable names, strings, and other values.
+		We should be able to find out futher syntax error as the outcome of the parsing.
+	*/
+	syntaxParseOne() {
+		this.#variables = []
+		this.#stringLiterals = []
+		this.#numbers = [];
+		this.#expressions = [];
+		
+		for (let i = 0; i < this.tokens.length; i++) {
+		}
 	}
 	
 	/* tokenize code string, this is the preparation ofr further code analysis. */
@@ -430,6 +465,24 @@ class CodeAnalyst {
 		return errMsg;		
 	}
 	
+	#checkQuoteMatches(token, quoteStack) {
+		const thisTokenInfo = STANDARD_TOKEN_MAP.get(token.name);
+		const stackLen = quoteStack.length;
+		const lastQuote = stackLen > 0 ? quoteStack[stackLen - 1] : null;
+		let matched = false;
+		if (lastQuote) {
+			const lastTokenInfo = STANDARD_TOKEN_MAP.get(lastQuote.name);
+			if (lastTokenInfo.quoteType == thisTokenInfo.quoteType) {
+				quoteStack.pop();
+				matched = true;
+			}
+		}
+		
+		if (!matched) {
+			quoteStack.push(token);
+		}
+	}
+	
 	//onst BRACKET_TYPE_CURLY = 1;
 	//const BRACKET_TYPE_SQUARE = 2;
 	// const BRACKET_TYPE_ROUND = 3;
@@ -447,6 +500,10 @@ class CodeAnalyst {
 	/* geters and setters */
 	
 	get tokens() { return this.#tokens; }
+	get variables() { return this.#variables; }
+	get stringLiterals() { return this.#stringLiterals; }
+	get numbers() { return this.#numbers; }
+	get expressions() { return this.#expressions; }
 }
 
 export {CodeAnalyst}

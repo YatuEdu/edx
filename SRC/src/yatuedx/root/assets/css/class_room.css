@@ -1,23 +1,4 @@
 
-
-.blob-num {
-    width: 1%;
-    min-width: 50px;
-    padding-right: 10px;
-    padding-left: 10px;
-    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 24px;
-    line-height: 30px;
-    color: #000000;
-    text-align: right;
-    white-space: nowrap;
-    vertical-align: top;
-    cursor: pointer;
-    -webkit-user-select: none;
-    user-select: none;
-	background: #C0C0C0;
-}
-
 .blob-code {
 	width: 90%;
     position: relative;
@@ -123,6 +104,12 @@
   background-color: #a9a9a9;
 }
 
+.ta-container {
+	position:relative;
+	height: 600px !important; 
+	width: 100%;
+}
+
 .ta-container-max {
 	position:absolute;
 	left: 0;
@@ -159,13 +146,6 @@
 	z-index: 77 !important;			/* ON TOP */
 }
 
-
-.ta-container {
-	position:relative;
-	height: 600px !important; 
-	width: 100%;
-}
-
 .input-board-teacher {
 	height: 600px !important;       
     overflow-y: auto;    			/* Trigger vertical scroll    */
@@ -194,13 +174,6 @@
 	border-right: outset 4px orange;
 	border-bottom: outset 4px orange;
 	/* border:outset 4px orange; */
-}
-
-.yt-list-panel-right {
-	width: 99.9%;
-	border-top: outset 4px orange;
-	border-right: outset 4px orange;
-	border-bottom: outset 4px orange;
 }
 
 .output-board-teacher {  
@@ -342,9 +315,7 @@
 }
 
 .btn-mail-box-dimention {
-	background-color: #1c87c9;
-	-webkit-border-radius: 60px;
-	border-radius: 50px;
+	background-color: #39ac73;
 	border: none;
 	color: #eeeeee;
 	cursor: pointer;
@@ -463,6 +434,8 @@
 .tool-tbtn-dimention {
 	margin-left:  0 !important;
 	padding-left: 0 !important;
+	margin-right:  0 !important;
+	padding-right: 0 !important;
     float:left;
 }
 
@@ -474,8 +447,8 @@
 }
 
 .selected-tab {
-	background-color: #a9a9a9;
-	color: white; 
+	background-color: #39ac73;
+	color: #ffffff; 
 	border:outset 1px red;
 }
 

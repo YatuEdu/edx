@@ -1,0 +1,110 @@
+.blob-num {
+    padding-right: 10px;
+    padding-left: 10px;
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-size: 18px;
+    line-height: 100%;
+    color: #ff6600;
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: top;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.yt-ta-code-line-numbers {
+	position:relative;
+	left: 0;
+	top: 0;
+	height: 100% !important; 
+	width: 48px !important;
+	overflow-y: hidden;
+	background: #333300;
+}
+
+
+.code-console-container {
+	position:relative;
+	display: flex;
+	height: 608px !important; 
+	width: 99.9%;
+	border:outset 4px orange;
+}
+
+.code-console-container-max {
+	position:absolute;
+	left: 5;
+	top: 0;
+	background-color: grey;	
+	display: flex;
+	width:   98.9%;					
+	height: 3000px;
+	border:outset 4px orange;
+}
+
+.input-board-float {
+	position:relative;
+    top: 0px;
+    left:0px;
+    height: 100% !important; 
+	width: 100%;
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 300;
+	font-size: 18px;
+    line-height: 100%;
+	color: white;
+	background: #274c43;
+}
+
+.code-console-container-dimention {
+	margin-left:  0 !important;
+	padding-left: 0 !important;
+	margin-right:  0 !important;
+	padding-right: 1 !important;
+	float:left;
+
+}
+
+.show-hide-button{
+	position:absolute;
+    top: 0px;
+    right:0px;
+    width: 30px;
+	height: 26px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #d3d3d3;
+	transition: all ease-in-out 0.2s;
+	cursor: pointer;
+	font-weight: 900;
+	z-index: 99 !important;	
+}
+
+.show-hide-button:hover{
+  border: 1px solid #888;
+  background-color: #1aff8c;
+  font-weight: 900;
+}
+
+.output-board-float-container {  
+	position:absolute;
+    top: 300px;
+    left:50px;
+	height: 400px;   
+	width: 97%;	
+	background-color: #d3d3d3;
+	transition: all ease-in-out 0.2s;	
+    overflow-y: auto;    			
+    overflow-x: auto;  			
+	font-family: 'Merriweather';
+    font-weight: 300;
+	font-size: 20px;
+    line-height: 1.5;
+	background: #ffffff !important;
+	color: #B026FF;
+}
+

@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="assets/css/class_room.css"/>
 	<link rel="stylesheet" href="assets/css/yatu-main.css"/>
 	<link rel="stylesheet" href="assets/css/codeManager.css"/>
+	<link rel="stylesheet" href="assets/css/codeInputConsole.css"/>
 	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
 </head>
 
@@ -54,7 +55,7 @@
 			</p>
 		</div>
         <article>
-			<section>
+			<div class="container-fluid">
 				<div class="row mb-4">
 					<div id="yt_col_video_area" class="col-2 tool-tbtn-dimention-left">
 						<div class="row mb-4">
@@ -64,24 +65,8 @@
 					</div>
 					<div id="yt_col_coding_area" class="col-10">
 						<div class="row mb-0">
-							<div class="col-9 tool-tbtn-dimention-left">
-								<div class="ta-container ta-container-zorder-left">
-									<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-left">+</button>
-									<textarea class="input-board"
-									  id="yt_ta_code_board" 
-									  spellcheck="false"
-									  placeholder="Type your code here...."
-									  rows="20"></textarea>
-								</div>
-							</div>
-							<div class="col-3 tool-tbtn-dimention ta-container-zorder-right">
-								<div class="ta-container">
-									<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-right">+</button>							
-									<textarea class="output-board"
-										  id="yt_ta_output_console" 
-										  spellcheck="false" 
-										  placeholder="Output Console"
-										  rows="20"></textarea>
+							<div class="col-12 tool-tbtn-dimention-left">
+								<div id="yt_div_code_editor" data-type="ytComponent">
 								</div>
 							</div>
 						</div>
@@ -97,18 +82,14 @@
 								</div>
 							</div>
 						</div>
-						<div class="row mb-0">
-							<div class="col-12 tool-tbtn-dimention-left">
-								<div id="yt_div_code_manager" data-type="ytComponent" style="display:block">	
-								</div>
-								 <textarea readonly class="msg-board"
-								  style="display:none"
-								  id="yt_ta_msg" 
-								  spellcheck="trye" 
-								  placeholder="Received messages"
-								  rows="20"></textarea>
-							</div>
+						<div id="yt_div_code_manager" data-type="ytComponent" style="display:block">	
 						</div>
+						 <textarea readonly class="msg-board"
+						  style="display:none"
+						  id="yt_ta_msg" 
+						  spellcheck="trye" 
+						  placeholder="Received messages"
+						  rows="20"></textarea>
 						<div class="row mb-0">
 							<div class="col-12 tool-tbtn-dimention-left">
 								<textarea class="msg-board"
@@ -121,7 +102,7 @@
 						</div>
 					</div>
 				</div>	
-			</section>
+			</div>
         </article>
     </main>
 	

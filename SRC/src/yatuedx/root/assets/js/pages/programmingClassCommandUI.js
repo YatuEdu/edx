@@ -248,6 +248,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 	
 	set code(str) {
 		$(this.codeInputTextArea).val(str);
+		$(this.codeInputTextArea).trigger('change');
 	}
 	
 	get videoAreaId() {

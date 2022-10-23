@@ -28,3 +28,16 @@
   background-color: #a9a9a9;
   font-weight: 700;
 }
+
+.yt-list-panel-right {
+	width: 48% !important;
+	margin-right: 0 !important;
+	border-top: outset 4px orange;
+	border-right: outset 4px orange;
+	border-bottom: outset 4px orange;
+}
+
+.yt-list-element {
+	width: 90% !important;
+	
+}

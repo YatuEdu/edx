@@ -4,8 +4,8 @@ import {StringUtil}			from '../../core/util.js';
 //const CODE_LIST_TABLE_TEMPLATE = '
 
 const MY_CODE_LIST_TEMPLATE = `
-<div class="row mb-0" id={codelstDivId}>
-  <div class="col-7 tool-tbtn-dimention-left">
+<div class="row mb-0 yt-list-element" id={codelstDivId}>
+  <div class="col-5 tool-tbtn-dimention-left">
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
   <div class="col-5 tool-tbtn-dimention">
@@ -25,8 +25,8 @@ const TEMPLETE_2 = '
 */
 
 const TEMPLETE = 
-`<div id='yt_div_code_man' class="row mb-0 yt-list-panel-right">
- <div id="yt_col_code_text" class="col-7 tool-tbtn-dimention-left">
+`<div id='yt_div_code_man' class="row mb-0">
+ <div id="yt_col_code_text" class="col-6 tool-tbtn-dimention-left">
   <div class="ta-container ta-container-zorder-lower-left">
 	<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-lower-left">+</button>							
 	<textarea class="msg-board"
@@ -36,7 +36,7 @@ const TEMPLETE =
 		  rows="40"></textarea>
   </div>
  </div>
- <div id="yt_col_code_list" class="col-5 tool-tbtn-dimention">
+ <div id="yt_col_code_list" class="col-6 tool-tbtn-dimention yt-list-panel-right">
 	{codeListHolder}
  </div>
 </div>
@@ -221,6 +221,7 @@ class CodeManContainer extends ComponentBase {
 			if (codeEntry) {
 				// update board text with the selected code
 				$(this.codeInputBoardSelector).val(codeEntry.text);
+				$(this.codeInputBoardSelector).trigger('change');
 			}		
 		}
 	}
