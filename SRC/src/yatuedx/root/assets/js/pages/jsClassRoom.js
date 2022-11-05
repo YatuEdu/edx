@@ -350,6 +350,13 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Handle code execution errors
+	 **/
+	handleCodeError() {
+		alert("gotacha");
+	}
+	
+	/**
 		Periodically passing our code to teacher to examine student's progress.
 	 **/
 	updateCodeBufferAndSync() {
@@ -502,7 +509,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			codeText= this.code;
 		}
 		// then run the new code from teacher
-		super.executeCode(codeText);
+		const errorInfo = super.executeCode(codeText);
+		// display error?
+		if (errorInfo) {
+			this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+		} else {
+			// show output cosole
+			this.#codeInputConsoleComponent.showOutput();
+		}
 	}
 	
 	/**
@@ -549,9 +563,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//obtain code from local "exercise board" and execute it locally
 		this.runCodeFrom();
-		
-		// show output cosole
-		this.#codeInputConsoleComponent.showOutput();
 	}
 	
 	/**

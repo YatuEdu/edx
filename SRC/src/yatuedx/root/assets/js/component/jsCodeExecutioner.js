@@ -5,6 +5,22 @@ import {CodeAnalyst}						from './new/codeAnalyst.js'
 /**
 	This class handles JS Code runner board
 **/
+class CodeError {
+	#exception;
+	#analyticalInfo;
+	
+	constructor(exception, analyticalInfo) {
+		this.#exception = exception;
+		this.#analyticalInfo = analyticalInfo;
+	}
+	
+	get exception() { return this.#exception; }
+	get analyticalInfo() { return this.#analyticalInfo; }
+}
+
+/**
+	This class handles JS Code runner board
+**/
 class JSCodeExecutioner {
 	#consoleId;
 	#vars;
@@ -25,13 +41,13 @@ class JSCodeExecutioner {
 		Run program on the board.
 	 */
 	executeCode(srcTxt) {
-		this.runJSCode_prv(srcTxt);
+		return this.#runJSCode(srcTxt);
 	}
 	
 	/*
 		Run js code 
 	 */
-	runJSCode_prv(src) {
+	#runJSCode(src) {
 		// first cleasr left over globals
 		this.#undefineVars();
 		src = src.trim();
@@ -47,12 +63,14 @@ class JSCodeExecutioner {
 				this.#printvars();
 			}
 			catch (e) {
-				this.#handleErrors(src, e);
+				// return error info to caller 
+				return this.#handleErrors(src, e);
 			}
 		} else {
 			this.#printLine('No code is present')
 		}
-		//console.log(`exe code: ${src}`);
+		// no error 
+		return null;
 	}
 	
 	/**
@@ -60,12 +78,20 @@ class JSCodeExecutioner {
 		diagnostic messagews
 	 **/
 	#handleErrors(codeText, e) {
-		this.#printLine(e);
-		
 		// analyse the code
 		const codeAnalyst = new CodeAnalyst(codeText);
-		const errors = codeAnalyst.shallowInspect();
-		errors.forEach(e  => this.#printLine(e.errorDisplay));
+		const analyticalInfo  = codeAnalyst.shallowInspect();
+		return new CodeError(e, analyticalInfo);
+		
+		/*
+		if (this.#codeErrorCallback && errors.length > 0) {
+			this.#codeErrorCallback(errors);
+		} else {
+			// simply print the error on the console
+			this.#printLine(e);		
+			errors.forEach(e  => this.#printLine(e.errorDisplay));
+		}
+		*/
 	}
 	
 	/*

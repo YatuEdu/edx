@@ -1,9 +1,9 @@
-import {credMan} 						from '../core/credMan.js'
-import {AuthPage} 						from '../core/authPage.js'
-import {JSCodeExecutioner}				from '../component/jsCodeExecutioner.js'
-import {sysConstants, sysConstStrings} 	from '../core/sysConst.js'
-import {CodeSyncManager} 				from '../component/codeSyncManager.js'	
-import {StringUtil, UtilConst}			from '../core/util.js'
+import {credMan} 							from '../core/credMan.js'
+import {AuthPage} 							from '../core/authPage.js'
+import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
+import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
+import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
+import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
 
 class ProgrammingClassCommandUI extends AuthPage {
 	#jsCodeExecutioner;
@@ -22,6 +22,8 @@ class ProgrammingClassCommandUI extends AuthPage {
 		
 		// create js code executioner
 		this.#jsCodeExecutioner =  new JSCodeExecutioner(resultConsolId);
+		
+		// create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
 	}
 	
@@ -185,22 +187,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		Highlight a text selection based on teacher instruction
 	 */
 	highlightSelection(begin, end) {
-		const txt = document.getElementById(this.#codeInputId);
-		if(txt.createTextRange ) {
-		  const selRange = txt.createTextRange();
-		  selRange.collapse(true);
-		  selRange.moveStart('character', begin);
-		  selRange.moveEnd('character', end);
-		  selRange.select();
-		  txt.focus();
-		} else if(txt.setSelectionRange ) {
-		  txt.focus();
-		  txt.setSelectionRange(begin, end);
-		} else if( typeof txt.selectionStart != 'undefined' ) {
-		  txt.selectionStart = begin;
-		  txt.selectionEnd = end;
-		  txt.focus();
-		}
+		PageUtil.highlightSelection(this.#codeInputId, begin, end);
 	}
 	
 	/**
@@ -223,11 +210,11 @@ class ProgrammingClassCommandUI extends AuthPage {
 				document.selection.empty();
 			}
 		}
-		this.executeCode(codeStr);
+		return this.executeCode(codeStr);
 	}
 	
 	executeCode(codeText) {
-		this.#jsCodeExecutioner.executeCode(codeText);
+		return this.#jsCodeExecutioner.executeCode(codeText);
 	}
 	
 	get groupId() {

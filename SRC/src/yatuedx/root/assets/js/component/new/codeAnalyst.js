@@ -26,6 +26,7 @@ const BRACKET_TYPE_SQUARE = 2;
 const BRACKET_TYPE_ROUND = 3;
 const ACTION_OPEN = 1;
 const ACTION_CLOSE = 2;
+const KEY_TYPE_VAR_DECL = 1;
 
 const QUOTE_TYPE_DOUBLE = 1;
 const QUOTE_TYPE_SINGLE = 2;
@@ -44,9 +45,9 @@ const STANDARD_TOKEN_MAP = new Map([
 	['constructor', {type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['get', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
 	['set', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
-	['const', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
-	['let', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
-	['var', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
+	['const', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL }],
+	['let', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL  }],
+	['var', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL  }],
 	['return', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_EXPRESSION }],
 	['break', 		{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
 	['continue', 	{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
@@ -141,6 +142,21 @@ class Token {
 	}
 }
 
+class Variable {
+	#name
+	#tokenId
+	#value
+	
+	constructor(name, tokenId) {
+		this.#name = name;
+		this.#tokenId = tokenId;
+	}
+	
+	get name() { return this.#name; }
+	get tokenId() { return this.#tokenId; }
+	get value() { return this.#value; }
+}
+
 class CodeBlock {
 	#beginLine
 	#endLine
@@ -194,10 +210,13 @@ class CodeAnalyst {
 	#stringLiterals;
 	#numbers;
 	#expressions;
+	#errors
 	
 	constructor(codeStr) {
 		this.#codeStr = codeStr
 		this.#tokens = this.#tokenize(codeStr);
+		this.#errors = [];
+		this.#variables = new Map();
 	}
 	
 	/* public methods */
@@ -257,13 +276,26 @@ class CodeAnalyst {
 		We should be able to find out futher syntax error as the outcome of the parsing.
 	*/
 	syntaxParseOne() {
-		this.#variables = []
 		this.#stringLiterals = []
 		this.#numbers = [];
 		this.#expressions = [];
 		
 		for (let i = 0; i < this.tokens.length; i++) {
+			const tokenInfo = STANDARD_TOKEN_MAP.get(this.tokens[i].name);
+			// VARIABLE DECLARATION?
+			if (tokenInfo.keyType && tokenInfo.keyType === KEY_TYPE_VAR_DECL) {
+				this.#lookForNextNameAsVarDeclaration(i);
+			} else if (tokenInfo.type === TOKEN_TYPE_ASSIGNMENT_OPERATOR) {
+				this.#lookForPreviousNameAsVarAssignment(i);
+			}
 		}
+		
+		// debug for logging all found variables
+		for (let pair of this.variables) {
+			const [key, obj] = pair;
+			console.log("var name:" + key + " = " + obj.value);
+		}
+		
 	}
 	
 	/* tokenize code string, this is the preparation ofr further code analysis. */
@@ -497,6 +529,41 @@ class CodeAnalyst {
 		}
 	}
 	
+	/* the next name is variable */
+	#lookForNextNameAsVarDeclaration(indx) {
+		// skip space
+		let i = indx;
+		for(; i < this.tokens.length; i++) {
+			if (this.tokens[i].type != TOKEN_TYPE_SPACE) {
+				break;
+			}
+		}
+		
+		// the next token must be a name
+		if (i < this.tokens.length) {
+			if (this.tokens[i].type != TOKEN_TYPE_NAME) {
+				// error: 
+				this.error.push(new TokenError("Invalid variable name found", this.tokens[i]));
+			}
+			else {
+				const varNmae = this.tokens[i].name;
+				if (!this.variables.get(varNmae)) {
+					this.error.push(new TokenError(`Variable "${varNmae}" already declared.`, this.tokens[i]));
+				}
+				else {
+					this.variables.put(varNmae, new Variable(varNmae, i));
+				}
+			}
+		}
+		else {
+			// error:
+			this.error.push(new TokenError("Invalid variable declaration syntax", this.tokens[i-1]));
+		}
+	}
+	
+	#lookForPreviousNameAsVarAssignment(indx) {
+	}
+	
 	/* geters and setters */
 	
 	get tokens() { return this.#tokens; }
@@ -504,6 +571,7 @@ class CodeAnalyst {
 	get stringLiterals() { return this.#stringLiterals; }
 	get numbers() { return this.#numbers; }
 	get expressions() { return this.#expressions; }
+	get errors () { return this.#errors; }
 }
 
 export {CodeAnalyst}

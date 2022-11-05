@@ -276,6 +276,42 @@ class PageUtil {
 		}
 		return paramMap;
 	}
+	
+	static highlightSelectionLine(textArealId, lineNum) {
+		// assuming controlId is a textarea, we need to first find its position
+		const text = document.getElementById(textArealId).value;
+		const lines = text.split("\n");
+		let startPos = 0;
+		for(let x = 0; x < lines.length; x++) {
+			if(x == lineNum) {
+				break;
+			}
+			startPos += (lines[x].length+1);
+		}
+		const endPos = lines[lineNum].length + startPos;
+		
+		// now call highlightSelection with begin end parameters
+		PageUtil.highlightSelection(textArealId, startPos, endPos);
+	}
+	
+	static highlightSelection(textArealId, begin, end) {
+		const txt = document.getElementById(textArealId);
+		if(txt.createTextRange ) {
+		  const selRange = txt.createTextRange();
+		  selRange.collapse(true);
+		  selRange.moveStart('character', begin);
+		  selRange.moveEnd('character', end);
+		  selRange.select();
+		  txt.focus();
+		} else if(txt.setSelectionRange ) {
+		  txt.focus();
+		  txt.setSelectionRange(begin, end);
+		} else if( typeof txt.selectionStart != 'undefined' ) {
+		  txt.selectionStart = begin;
+		  txt.selectionEnd = end;
+		  txt.focus();
+		}
+	}
 }
 
 class Dbg {
