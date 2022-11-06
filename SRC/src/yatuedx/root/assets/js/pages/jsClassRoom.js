@@ -502,17 +502,24 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Run JS Code Smaple and print results on the Console
 	**/
 	runCodeFrom(codeText) {
-		// first clear the output console
-		this.prv_clearConsole();
+		let errorInfo = null;
 		if (!codeText) {
-			// run code from local cache, in stead of from teacher
-			codeText= this.code;
+			// run code locally text console
+			errorInfo = super.runCodeFromTextInput();
+		} else {
+			// run code from teacher
+			errorInfo = super.executeCode(codeText);
 		}
-		// then run the new code from teacher
-		const errorInfo = super.executeCode(codeText);
-		// display error?
+		
+		// display error only in self-study mode
 		if (errorInfo) {
-			this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+			if ($(this.resultConsoleControl).prop('readonly')) {
+				// do not show diagnostical dbox since we are not interactive
+				// just print error since teach is gonna fix it, not me
+				$(this.resultConsoleControl).val("error");
+			} else {
+				this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+			}
 		} else {
 			// show output cosole
 			this.#codeInputConsoleComponent.showOutput();

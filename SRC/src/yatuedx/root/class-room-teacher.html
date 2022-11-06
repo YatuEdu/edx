@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
 	<link rel="stylesheet" href="assets/css/class_room.css"/>
+	<link rel="stylesheet" href="assets/css/codeInputConsole.css"/>
+	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
 </head>
 
 <body>
@@ -104,19 +106,8 @@
 							</div>
 						</div>	
 						<div class="row mb-4">
-							<div class="col-8">
-								<textarea class="input-board-teacher"
-										  id="yt_coding_board" 
-										  spellcheck="false"
-										  value=""
-										  rows="20"></textarea>
-							</div>
-							<div class="col-4">
-								<textarea class="output-board-teacher"
-										  id="yt_result_console" 
-										  spellcheck="false"
-										  value=""
-										  rows="20"></textarea>
+							<div class="col-12">
+								<div id="yt_div_code_editor" data-type="ytComponent"></div>
 							</div>
 						</div>
 						<div class="row mb-4">
@@ -165,6 +156,7 @@
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
 	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/jquery-ui/jquery-ui.min.js"></script>
 	<script src="./assets/js/helpers/sha256.js"></script> 	
 	<script type="module" src="./assets/js/pages/jsClassRoomTeacher.js"></script>
 </body>

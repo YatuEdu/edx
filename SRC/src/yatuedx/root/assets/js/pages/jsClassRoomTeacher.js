@@ -8,27 +8,30 @@ import {STUDENT_BOARD_TEMPLATE}				from '../component/studentCommCard.js';
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
+import {CodeInputConsole}					from '../component/new/CodeInputConsole.js';
 
-const TA_CODE_INPUT_CONSOLE = "yt_coding_board";
-const TA_RESULT_CONSOLE 	= "yt_result_console";
-const DIV_VIEDO_AREA 		= "yt_div_video_area";
-const BTN_SHARE_SCREEN 		= "yt_btn_share_screen";
-const DIV_STUDENT_MSG_BOARD = "yt_div_student_textarea";
-const DIV_MSG_RECEIVER_SEL  = "yt_div_msg_receiver_select";
-const TA_NOTES				= "yt_txt_notes_console";
-const BTN_SAVE_NOTES		= "yt_btn_save_notes";
-const BTN_SYNC_BOARD 		= "yt_btn_sync_board"; 
-const BTN_MODE_CHANGE 		= 'yt_btn_switch_mode';
-const BTN_ERASE_BOARD  		= 'yt_btn_erase_board';
-const BTN_ERASE_RESULT 		= "yt_btn_erase_result";
-const BTN_BEAUTIFY_CODE 	= "yt_btn_btfy_code"
-const BTN_RUN_CODE  		= "yt_btn_run_code_on_student_board";
-const SEL_MSG_RECEIVER		= "select_option_msg_rcvr";
-const STUDENT_MESAGE_BUTTON_PREFIX = "yt_btn_std_msg_";
-const STUDENT_MESAGE_CONTAINER_PREFIX = "yt_div_std_msg_ctnr_";
+const DIV_VIEDO_AREA 					= "yt_div_video_area";
+const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
+const DIV_STUDENT_MSG_BOARD 			= "yt_div_student_textarea";
+const DIV_MSG_RECEIVER_SEL  			= "yt_div_msg_receiver_select";
+const TA_NOTES							= "yt_txt_notes_console";
+const BTN_SAVE_NOTES					= "yt_btn_save_notes";
+const BTN_SYNC_BOARD 					= "yt_btn_sync_board"; 
+const BTN_MODE_CHANGE 					= 'yt_btn_switch_mode';
+const BTN_ERASE_BOARD  					= 'yt_btn_erase_board';
+const BTN_ERASE_RESULT 					= "yt_btn_erase_result";
+const BTN_BEAUTIFY_CODE 				= "yt_btn_btfy_code"
+const BTN_RUN_CODE  					= "yt_btn_run_code_on_student_board";
+const SEL_MSG_RECEIVER					= "select_option_msg_rcvr";
+const STUDENT_MESAGE_BUTTON_PREFIX 		= "yt_btn_std_msg_";
+const STUDENT_MESAGE_CONTAINER_PREFIX 	= "yt_div_std_msg_ctnr_";
 const STUDENT_MESAGE_SEND_BUTTON_PREFIX = "yt_btn_std_msg_send_";
-const STUDENT_MESAGE_TA_PREFIX = 'yt_ta_std_msg_';
-const TEACHER_MESAGE_TA_PREFIX = 'yt_ta_tchr_msg_';
+const STUDENT_MESAGE_TA_PREFIX 			= 'yt_ta_std_msg_';
+const TEACHER_MESAGE_TA_PREFIX 			= 'yt_ta_tchr_msg_';
+const YT_DIV_CODE_EDITOR				= "yt_div_code_editor";
+const YT_TA_CODE_BOARD_ID 				= "yt_ta_code_board";
+const YT_TA_OUTPUT_CONSOLE_ID 			= "yt_ta_output_console";
+
 
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CONTAINER_ID = '{console_ctnr_id}'
@@ -73,9 +76,10 @@ const MSG_RECEIVER_OPTION_TEMPLATE = `
 class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
 	#timer;
+	#codeInputConsoleComponent;
 	
     constructor(credMan) {
-		super(credMan, TA_CODE_INPUT_CONSOLE, TA_RESULT_CONSOLE, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
+		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
 		this.init();
 	}
 	
@@ -85,6 +89,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		this.groupId = paramMap.get(sysConstants.UPN_GROUP);
 		//const clssName = 'JS 101 Test';
 		this.#displayBoardTeacher = new DisplayBoardTeacher(this.groupId, this);
+		
+		// create component for code input / editor
+		this.#codeInputConsoleComponent = new CodeInputConsole(
+					"", 
+					YT_DIV_CODE_EDITOR, 
+					YT_DIV_CODE_EDITOR, 
+					YT_TA_CODE_BOARD_ID, 
+					YT_TA_OUTPUT_CONSOLE_ID
+		);
+		
 		
 		// set mode to teaching mode
 		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
@@ -443,10 +457,18 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault(); 
 		
 		// run code locally first
-		super.runCodeFromTextInput();
+		const errorInfo = super.runCodeFromTextInput();
 		
-		// run code for each student second
+		// run code for each student second if we are in teaching mode
 		this.#displayBoardTeacher.runCode();
+		
+		// display error?
+		if (errorInfo) {
+			this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+		} else {
+			// show output cosole
+			this.#codeInputConsoleComponent.showOutput();
+		}
 	}
 	
 	/**
@@ -571,7 +593,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 
 	// result console
 	get resultConsoleControl() {
-		return `#${TA_RESULT_CONSOLE}`;
+		return `#${YT_TA_OUTPUT_CONSOLE_ID}`;
 	}
 	
 	// techer notes for this class
