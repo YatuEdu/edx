@@ -160,7 +160,9 @@ class CodeInputConsole extends ComponentBase {
 								.replace(REPLACMENT_DIAGNOSTIC_ERROR_ENTRY_CLASS, this.errorEntryClass)
 								.replace(REPLACMENT_DIAGNOSTIC_MESSAGE, e.errorDisplay));
 		$(this.diagnoticMsgDivIdSelector).html(errorMsgHtml);
-		$(this.diagnoticExceptionDivIdSelector).html(`<p>${error.exception.name}: ${error.exception.message}</p>`);
+		if (error.exception) {
+			$(this.diagnoticExceptionDivIdSelector).html(`<p>${error.exception.name}: ${error.exception.message}</p>`);
+		}
 		
 		// hook up click handler for each message:
 		$(this.errorEntryClassSelector).click(this.handleErrorSelect.bind(this));

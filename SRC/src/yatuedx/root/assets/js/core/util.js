@@ -222,26 +222,36 @@ class StringUtil {
 			return true;
 		}
 		return false;
-	}
+	}	
+}
+
+class RegexUtil {
+	static YATU_NAME_REGEX = /^[A-Za-z][A-Za-z0-9_]+$/;
+	static NUMBER_REGEX =  /^[\+\-]?\d*\.?\d+(?:[Ee][\+\-]?\d+)?$/;
+	static ALPGANUMERIC_REXP = /^[a-z0-9]+$/;
 	
 	/*
 		yatu name must be alphabet and digit only
 	*/
-	static YATU_NAME_REGEX = /^[A-Za-z][A-Za-z0-9_]+$/;
 	static isValidYatuName(name) {
-		return StringUtil.YATU_NAME_REGEX.test(name);
+		return RegexUtil.YATU_NAME_REGEX.test(name);
+	}
+	
+	/*
+		test if a string contains only a number.
+	 */
+	static isNumberString(str) {
+		return RegexUtil.NUMBER_REGEX.test(str);
 	}
 	
 	/* test is a char is letter or digit */
-	static ALPGANUMERIC_REXP = /^[a-z0-9]+$/;
 	charIsLetter(c) {
 	  if (typeof c !== 'string') {
 		return false;
 	  }
 
-	  return StringUtil.ALPGANUMERIC_REXP.test(c);
+	  return RegexUtil.ALPGANUMERIC_REXP.test(c);
 	}
-	
 }
 
 class PageUtil {
@@ -322,4 +332,4 @@ class Dbg {
 	}
 }
 
-export { TimeUtil, StringUtil, PageUtil, Dbg, UtilConst};
+export { TimeUtil, StringUtil, RegexUtil, PageUtil, Dbg, UtilConst};

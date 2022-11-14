@@ -51,8 +51,21 @@ class JSCodeExecutioner {
 		// first cleasr left over globals
 		this.#undefineVars();
 		src = src.trim();
+		let analyticalInfo = [];
 		if (src) {
-			try {
+			// anaylize code
+			const codeAnalyst = new CodeAnalyst(src);
+			analyticalInfo  = codeAnalyst.shallowInspect();
+		}
+		// we detected error, no need to executeCode
+		if (analyticalInfo.length) {
+			return new CodeError(null, analyticalInfo);
+		}
+		
+		if (src) {
+			// run code
+			try {		
+				// exec code
 				const func = new Function('print', 'printx', src);
 				const res = func(this.#printLine.bind(this), this.#appendMessage.bind(this));
 				if (res) {
@@ -64,7 +77,7 @@ class JSCodeExecutioner {
 			}
 			catch (e) {
 				// return error info to caller 
-				return this.#handleErrors(src, e);
+				return this.#handleErrors(analyticalInfo, e);
 			}
 		} else {
 			this.#printLine('No code is present')
@@ -77,10 +90,8 @@ class JSCodeExecutioner {
 		When errors are encountered, we use our own JS cod analyst to dispply our
 		diagnostic messagews
 	 **/
-	#handleErrors(codeText, e) {
+	#handleErrors(analyticalInfo, e) {
 		// analyse the code
-		const codeAnalyst = new CodeAnalyst(codeText);
-		const analyticalInfo  = codeAnalyst.shallowInspect();
 		return new CodeError(e, analyticalInfo);
 		
 		/*

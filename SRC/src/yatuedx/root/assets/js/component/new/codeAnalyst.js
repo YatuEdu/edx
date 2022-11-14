@@ -1,5 +1,5 @@
 import {languageConstants} 					from '../../core/sysConst.js'
-import {StringUtil}							from '../../core/util.js'
+import {StringUtil, RegexUtil}				from '../../core/util.js'
 
 const TOKEN_TYPE_UNKNOWN = -1;
 const TOKEN_TYPE_SYMBOL = 100;
@@ -7,47 +7,86 @@ const TOKEN_TYPE_SPACE = 99;
 const TOKEN_TYPE_ANY = 0;
 const TOKEN_TYPE_KEY = 1;
 const TOKEN_TYPE_SEPARATOR = 2;
-const TOKEN_TYPE_LOGIC_OPERATOR = 3;
-const TOKEN_TYPE_MATH_OPERATOR = 4;
-const TOKEN_TYPE_FUNC_OPERATOR = 5;
-const TOKEN_TYPE_ASSIGNMENT_OPERATOR = 6;
-const TOKEN_TYPE_NAME = 7;
-const TOKEN_TYPE_STRING = 8;
-const TOKEN_TYPE_STRING_QUOTE = 9;
-const TOKEN_TYPE_NUMBER = 10;
-const TOKEN_TYPE_EXPRESSION = 11;
+const TOKEN_TYPE_OPERATOR = 3;
+const TOKEN_TYPE_NAME = 4;
+const TOKEN_TYPE_STRING = 5;
+const TOKEN_TYPE_NUMBER = 7;
+const TOKEN_TYPE_EXPRESSION = 8;
+const TOKEN_TYPE_COMMENT = 9;
+
+const IF_KEY = 1;
+const ELSE_KEY = 2;
+const NEW_KEY = 3;
+const CONST_KEY = 4;
+const LET_KEY = 5;
+const VAR_KEY = 6;
+const CLASS_KEY = 7;
+const CASE_KEY = 8;
+const FUNC_KEY = 9;
+const CUSTOMER_PRINT = 9;
 
 const TOKEN_SPACE = " ";
 const TOKEN_CR = "\n";
 const TOKEN_TAB = "\t";
+const SPACE_TOKEN_NAME = 'SPC';
+const TAB_TOKEN_NAME = 'TAB';
+const CR_TOKEN_NAME = 'CRT';
+
+const OP_TYPE_LOGIC_OPERATOR = 0;
+const OP_TYPE_MATH_OPERATOR = 1;
+const OP_TYPE_FUNC_OPERATOR = 2;
+const OP_TYPE_ASSIGNMENT_OPERATOR = 3;
+const OP_TYPE_LAMBDA = 4;
+const OP_TYPE_OBJECT_PROPERTY_ACCESSOR = 5;
+
+const DOUBLE_EQUAL = 1;
+const TRIPLE_EQUAL = 2;
+const GREATER_THAN = 3;
+const LESS_THAN = 4;
 
 const BRACKET_TYPE_CURLY = 1;
 const BRACKET_TYPE_SQUARE = 2;
 const BRACKET_TYPE_ROUND = 3;
 const ACTION_OPEN = 1;
 const ACTION_CLOSE = 2;
-const KEY_TYPE_VAR_DECL = 1;
+
+const KEY_SUB_TYPE_VAR_DECL = 1;
 
 const QUOTE_TYPE_DOUBLE = 1;
 const QUOTE_TYPE_SINGLE = 2;
 const QUOTE_TYPE_BACKTICK = 3;
 
+const CM_LINE = 1;
+const CM_BLOCK_BEGIN = 2;
+const CM_BLOCK_END = 3;
+
+const VAR_VALUE_CONST = 0;
+const VAR_VALUE_EXP = 1;
+const VAR_VALUE_FUNCC = 1;
+const VAR_VALUE_OBJ = 3;
+
+const SEMICOLON = 1;
+const COMMA = 2;
+const COLON = 3;
+
 const STANDARD_TOKEN_MAP = new Map([
-	['if', 			{type: TOKEN_TYPE_KEY, followedBy: ['('] } ],
-	['else', 		{type: TOKEN_TYPE_KEY, followedBy: ['{', 'if'] } ],
-	['case', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] } ],
+	['if', 			{type: TOKEN_TYPE_KEY, keyType: IF_KEY, followedBy: ['('] } ],
+	['else', 		{type: TOKEN_TYPE_KEY, keyType: ELSE_KEY, followedBy: ['{', 'if'] } ],
+	['new', 		{type: TOKEN_TYPE_KEY, keyType: NEW_KEY, followedBy: ['{',], includedInside: ["`"] }],
+	['case', 		{type: TOKEN_TYPE_KEY, keyType: CASE_KEY, followedBy: ['('] } ],
 	['switch', 		{type: TOKEN_TYPE_KEY, followedBy: ['{'] } ],
 	['while', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['do', 			{type: TOKEN_TYPE_KEY, followedBy: ['{'] }],
 	['for', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
-	['function', 	{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
-	['class', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
+	['function', 	{type: TOKEN_TYPE_KEY, keyType: FUNC_KEY, followedByType: TOKEN_TYPE_NAME }],
+	['class', 		{type: TOKEN_TYPE_KEY, keyType: CLASS_KEY, followedByType: TOKEN_TYPE_NAME }],
+	['print', 		{type: TOKEN_TYPE_KEY, keyType: CUSTOMER_PRINT, followedByType: TOKEN_TYPE_NAME }],
 	['constructor', {type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['get', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
 	['set', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME }],
-	['const', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL }],
-	['let', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL  }],
-	['var', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME, keyType: KEY_TYPE_VAR_DECL  }],
+	['const', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: CONST_KEY, followedByType: TOKEN_TYPE_NAME, }],
+	['let', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: LET_KEY, followedByType: TOKEN_TYPE_NAME,   }],
+	['var', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: VAR_KEY, followedByType: TOKEN_TYPE_NAME,   }],
 	['return', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_EXPRESSION }],
 	['break', 		{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
 	['continue', 	{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
@@ -59,59 +98,63 @@ const STANDARD_TOKEN_MAP = new Map([
 	["'", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING, quoteType: QUOTE_TYPE_SINGLE}],
 	["`", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING, quoteType: QUOTE_TYPE_BACKTICK }],
 	
-	['{', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, action: ACTION_OPEN   }],
-	['}', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, action: ACTION_CLOSE  }],
-	['(', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, action: ACTION_OPEN   }],
-	[')', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, action: ACTION_CLOSE  }],
-	['[', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, action: ACTION_OPEN  }],
-	[']', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, action: ACTION_CLOSE }],
-	[',', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY }],
-	[';', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY }],
+	['{', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_OPEN   }],
+	['}', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_CLOSE  }],
+	['(', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_OPEN   }],
+	[')', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_CLOSE  }],
+	['[', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_OPEN  }],
+	[']', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
 	
-	['=', 			{type: TOKEN_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_ANY }],	
-	['==', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['===', 		{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['>', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['<', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['>=', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['<=', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['&&', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['||', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA, followedByType: TOKEN_TYPE_ANY }],
+	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY }],
+	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, followedByType: TOKEN_TYPE_ANY }],
 	
-	['+', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['-', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['++', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['--', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['+=', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['-=', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['*', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['*=', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['/', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['/=', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['%', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['**', 			{type: TOKEN_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['&', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
-	['|', 			{type: TOKEN_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_ANY}],	
+	['+=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['-=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['*=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['/=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+
+	['==', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION, op: DOUBLE_EQUAL}],
+	['===', 		{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION, op: TRIPLE_EQUAL }],
+	['>', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION, op: GREATER_THAN }],
+	['<', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION, op: LESS_THAN }],
+	['>=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['<=', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['&&', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['||', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LOGIC_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
 	
-	['=>', 			{type: TOKEN_TYPE_FUNC_OPERATOR, followedByType: TOKEN_TYPE_ANY }],
-	['.', 			{type: TOKEN_TYPE_FUNC_OPERATOR, followedByType: TOKEN_TYPE_NAME }],
+	['+', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['-', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['++', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['--', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['*', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['/', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['%', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['**', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['&', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
+	['|', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_MATH_OPERATOR, followedByType: TOKEN_TYPE_EXPRESSION }],
 	
+	['=>', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_LAMBDA, followedByType: TOKEN_TYPE_ANY }],
+	['.', 			{type: TOKEN_TYPE_OPERATOR, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, followedByType: TOKEN_TYPE_NAME }],
+	
+	['//', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_LINE }],
+	['/*', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_BEGIN }],
+	['*/', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_END }],
 ]);
 
 const COMBINATION_TOKEN_MAP = new Map([
-	['=', 			{canBeFollowedBy: [{token: "=", from: 1, to: 2}, {token: ">", from: 1}] }],	
-	['>', 			{canBeFollowedBy: [{token: "=", from: 1}] }],
-	['<', 			{canBeFollowedBy: [{token: "=", from: 1}] }],
-	['*', 			{canBeFollowedBy: [{token: "*", from: 1}, {token: "=", from: 1} ] }],
-	['+', 			{canBeFollowedBy: [{token: "=", from: 1}, {token: "+", from: 1} ] }],
-	['-', 			{canBeFollowedBy: [{token: "=", from: 1}, {token: "-", from: 1} ] }],
-	['&', 			{canBeFollowedBy: [{token: "=", from: 1}, {token: "&", from: 1} ] }],
-	['|', 			{canBeFollowedBy: [{token: "=", from: 1}, {token: "|", from: 1} ] }],
+	['=', 			{canBeFollowedBy: ["=", ">"]} ],
+	['==', 			{canBeFollowedBy: ["=", ">"]} ],	
+	['>', 			{canBeFollowedBy: ["="] }],
+	['<', 			{canBeFollowedBy: ["="] }],
+	['*', 			{canBeFollowedBy: ["*", "=", "/"] }],
+	['+', 			{canBeFollowedBy: ["=", "+"] }],
+	['-', 			{canBeFollowedBy: ["=", "-"] }],
+	['&', 			{canBeFollowedBy: ["=", "&"] }],
+	['|', 			{canBeFollowedBy: ["=", "|"] }],
+	['/', 			{canBeFollowedBy: ["=", "/", "*"]} ]
 ]);
-
-const SPACE_TOKEN_NAME = 'SPC';
-const TAB_TOKEN_NAME = 'TAB';
-const CR_TOKEN_NAME = 'CRT';
 
 class Token {
 	#name
@@ -125,6 +168,152 @@ class Token {
 		this.#type = type;
 		this.#lineNo = lineNo
 		this.#beginPos = beginPos;
+		// fuether decide the type of the name 
+		this.typeDivide();
+	}
+	
+	static isSpace(c) {
+		return c === TOKEN_CR || c === TOKEN_TAB || c === TOKEN_SPACE;
+	}
+	
+	static getCombinableInfo(c) {
+		return COMBINATION_TOKEN_MAP.get(c);
+	}
+	
+	static isObjectAccessor(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.opType && tokenInfo.opType == OP_TYPE_OBJECT_PROPERTY_ACCESSOR;
+	}
+	
+	static isComment(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type === TOKEN_TYPE_COMMENT;
+	}
+	
+	static getSeperaterType(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		if (tokenInfo && ( tokenInfo.type === TOKEN_TYPE_SEPARATOR ||
+			               tokenInfo.type === TOKEN_TYPE_OPERATOR ))
+		{
+			return tokenInfo.type;
+		}
+		return TOKEN_TYPE_UNKNOWN;
+	}
+	
+	static isQuote(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.quoteType;
+	}
+	
+	static isDoubleQuote(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.quoteType === QUOTE_TYPE_DOUBLE;
+	}
+	
+	static isSingleQuote(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.quoteType === QUOTE_TYPE_SINGLE;
+	}
+	
+	static isBacktickQuote(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.quoteType === QUOTE_TYPE_BACKTICK;
+	}
+	
+	
+	static isBeginBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.type === TOKEN_TYPE_SEPARATOR &&
+				tokenInfo.bracketAction === ACTION_OPEN;
+	}
+	
+	static isEndBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.type === TOKEN_TYPE_SEPARATOR &&
+				tokenInfo.bracketAction === ACTION_CLOSE;
+	}
+	
+	static isBeginCurlyBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_CURLY &&
+				tokenInfo.bracketAction === ACTION_OPEN;
+	}
+	
+	static isEndCurlyBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_CURLY &&
+				tokenInfo.bracketAction === ACTION_CLOSE;
+	}
+	
+	static isBeginRoundBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_ROUND &&
+				tokenInfo.bracketAction === ACTION_OPEN;
+	}
+	
+	static isEndRoundBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_ROUND &&
+				tokenInfo.bracketAction === ACTION_CLOSE;
+	}
+	
+	static isBeginSquareBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_SQUARE &&
+				tokenInfo.bracketAction === ACTION_OPEN;
+	}
+	
+	static isEndSquareBracket(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && 
+				tokenInfo.bracketType === BRACKET_TYPE_SQUARE &&
+				tokenInfo.bracketAction === ACTION_CLOSE;
+	}
+	
+	static isVarDeclaration(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL;
+	}
+	
+	static isConstVarDeclaration(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
+				tokenInfo.keyType === CONST_KEY;
+	}
+
+
+	static isAssignment(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.opType && tokenInfo.opType === OP_TYPE_ASSIGNMENT_OPERATOR;
+	}
+
+	static convertToSpaceChar(name) {
+		switch(name) {
+			case SPACE_TOKEN_NAME:
+				return TOKEN_SPACE;	
+			case TAB_TOKEN_NAME:
+				return TOKEN_TAB;
+			case CR_TOKEN_NAME:
+				return TOKEN_CR; 
+			default: 
+				return "";
+		}
+	}
+	
+	/* for a name, decide if it's number or variables */
+	typeDivide() {
+		if (this.type === TOKEN_TYPE_NAME &&
+			RegexUtil.isNumberString(this.name))
+		{
+			this.#type = TOKEN_TYPE_NUMBER;
+		}		
 	}
 	
 	get displayStr() {
@@ -132,6 +321,13 @@ class Token {
 	}
 	
 	get name() { return this.#name; }
+	get value() { 
+		if (this.isSpace) {
+			return Token.convertToSpaceChar(this.#name);
+		}
+		return this.#name;
+	}
+	
 	get type() { return this.#type; }
 	get lineNo() { return this.#lineNo; }
 	get beginPos() { return this.#beginPos; }
@@ -140,21 +336,50 @@ class Token {
 			   this.type == TOKEN_TYPE_STRING ||
 			   this.type == TOKEN_TYPE_NUMBER;
 	}
+	get isSpace () { return TOKEN_TYPE_SPACE === this.type}
+	get isCR() { return TOKEN_TYPE_SPACE === this.type && this.value === TOKEN_CR}
+	get isSeperater () { return Token.getSeperaterType(this.#name) != TOKEN_TYPE_UNKNOWN }
+	get isBeginBracket () { return Token.isBeginBracket(this.#name) }
+	get isBeginCurlyBracket() { return Token.isBeginCurlyBracket(this.#name) }
+	get isEndCurlyBracket() { return Token.isEndCurlyBracket(this.#name) }
+	get isBeginRoundBracket() { return Token.isBeginRoundBracket(this.#name) }
+	get isEndRoundBracket() { return Token.isEndRoundBracket(this.#name) }
+	get isBeginSquareBracket() { return Token.isBeginSquareBracket(this.#name) }
+	get isEndSquareBracket() { return Token.isEndSquareBracket(this.#name) }
+	get isQuote() { return Token.isQuote(this.#name) }
+	get isDoubleQuote() { return Token.isDoubleQuote(this.#name) }
+	get isSingleQuote() { return Token.isSingleQuote(this.#name) }
+	get isBacktickQuote() { return Token.isBacktickQuote(this.#name) }	
+	get getCombinableInfo() { return Token.getCombinableInfo(this.#name) }
+	get isName() { return this.type === TOKEN_TYPE_NAME }
+	get isComment() { return Token.isComment(this.#name) }
+	get isPunctuation() { return typeof this.punctuationType !== 'undefined'; }
+	get isVarDeclaration() { return Token.isVarDeclaration(this.#name); }
+	get isConstVarDeclaration() { return Token.isConstVarDeclaration(this.#name); }
+	get isAssignment() { return Token.isAssignment(this.#name); }
+	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 }
 
 class Variable {
-	#name
-	#tokenId
+	#token
 	#value
+	#type
+	#isLocal
+	#isConst
 	
-	constructor(name, tokenId) {
-		this.#name = name;
-		this.#tokenId = tokenId;
+	constructor(token, value, type, isLocal, isConst) {
+		this.#token = token;
+		this.#value = value;
+		this.#type = type;
+		this.#isLocal = isLocal;
+		this.#isConst = isConst;
 	}
 	
-	get name() { return this.#name; }
-	get tokenId() { return this.#tokenId; }
+	get token() { return this.#token; }
 	get value() { return this.#value; }
+	get type() { return this.#type; }
+	get isLocal() { return this.#isLocal; }
+	get isConst() { return this.#isConst; }
 }
 
 class CodeBlock {
@@ -200,9 +425,10 @@ class TokenError {
 
 class CodeAnalyst {
 	#beginLine;
-	#endLine
-	#codeBlocks
-	#tokens
+	#endLine;
+	#codeBlocks;
+	#tokens;
+	#meaningfulTokens;
 	#codeStr;
 	
 	// syntax parsing one outcome
@@ -214,7 +440,8 @@ class CodeAnalyst {
 	
 	constructor(codeStr) {
 		this.#codeStr = codeStr
-		this.#tokens = this.#tokenize(codeStr);
+		this.#tokenize(codeStr);
+		
 		this.#errors = [];
 		this.#variables = new Map();
 	}
@@ -222,8 +449,8 @@ class CodeAnalyst {
 	/* public methods */
 	
 	/* display tokens for debugging purpose */
-	displayAll() {
-		this.tokens.forEach(t => print(t.displayStr));
+	#displayAll(tokens) {
+		tokens.forEach(t => console.log(t.displayStr));
 	}
 	
 	/* 
@@ -231,7 +458,6 @@ class CodeAnalyst {
 		such as no closing { or ( or [
 	*/
 	shallowInspect() {
-		const errors = []
 		const bracketStack = [];
 		const quoteStack = [];
 		for (let i = 0; i < this.tokens.length; i++) {
@@ -239,7 +465,7 @@ class CodeAnalyst {
 			const followedByInfo = this.#canBeFollowed(i);
 			if (followedByInfo.result === false) {
 				const invalidGrammer = new TokenError("Invalid symbol found", followedByInfo.token);
-				errors.push(invalidGrammer);
+				this.errors.push(invalidGrammer);
 			}
 			
 			// INSPECT BRACKET matches
@@ -248,7 +474,7 @@ class CodeAnalyst {
 					const unmatchError = this.#checkBracketMatches(this.tokens[i], bracketStack);
 					if (unmatchError) {
 						const bracketMismatchError = new TokenError(unmatchError, this.tokens[i]);
-						errors.push(bracketMismatchError);
+						this.errors.push(bracketMismatchError);
 					}
 				} else if (tokenInfo.quoteType) {
 					this.#checkQuoteMatches(this.tokens[i], quoteStack);
@@ -259,35 +485,60 @@ class CodeAnalyst {
 		// see if we still have unmatched open brackets:
 		bracketStack.forEach(bt => {
 			const bracketMismatchError = new TokenError("Bracket is not closed", bt);
-			errors.push(bracketMismatchError);
+			this.errors.push(bracketMismatchError);
 		});
 		
 		// see if we still have unmatched open quotes:
 		quoteStack.forEach(qt => {
 			const quoteMismatchError = new TokenError("Quote is not closed", qt);
-			errors.push(quoteMismatchError);
+			this.errors.push(quoteMismatchError);
 		});
 		
-		return errors;
+		this.#syntaxParseOne()
+		
+		return this.errors;
 	}
 	
 	/* 
 		Based on the token we found, get the basic coding elements, such as variable names, strings, and other values.
 		We should be able to find out futher syntax error as the outcome of the parsing.
 	*/
-	syntaxParseOne() {
+	#syntaxParseOne() {
 		this.#stringLiterals = []
 		this.#numbers = [];
 		this.#expressions = [];
 		
-		for (let i = 0; i < this.tokens.length; i++) {
-			const tokenInfo = STANDARD_TOKEN_MAP.get(this.tokens[i].name);
-			// VARIABLE DECLARATION?
-			if (tokenInfo.keyType && tokenInfo.keyType === KEY_TYPE_VAR_DECL) {
-				this.#lookForNextNameAsVarDeclaration(i);
-			} else if (tokenInfo.type === TOKEN_TYPE_ASSIGNMENT_OPERATOR) {
-				this.#lookForPreviousNameAsVarAssignment(i);
+		let i = 0;
+		while (i < this.meaningfulTokens.length) {
+			const token = this.meaningfulTokens[i];
+			let nextToken = null;
+			if (i + 1 < this.meaningfulTokens.length) {
+				nextToken = this.meaningfulTokens[i+1];
 			}
+			
+			// var declaration?
+			let keepGoing = true;
+			if (token.isVarDeclaration) {
+				keepGoing = this.#lookForNextNameAsVarDeclaration(i+1, token);
+				i += 2;
+			} else if (token.isAssignment) {
+				keepGoing = this.#lookForNextNameAsVarDeclaration(i-1, token);
+			} else if (token.isObjectAccessor) {
+				// next token is likely property name, skip for this round
+				++i;
+			}
+			else if (token.isName && (!nextToken || !nextToken.isAssignment)) {
+				// encountered possibly a variable, check if it is declared earlier:
+				if (!this.variables.get(token.name)) {
+					const varNotDeclaredError = new TokenError("Variable was not declared", token);
+					this.errors.push(varNotDeclaredError);
+				}
+			} 
+			
+			if (!keepGoing) {
+				return;
+			}
+			++i;
 		}
 		
 		// debug for logging all found variables
@@ -305,14 +556,13 @@ class CodeAnalyst {
 		let currentStrPos = 0;
 		let tokenBegin = -1;
 		let tokenEnd = -1;
-		const errors = [];
 		const tokens = [];
 		while(currentStrPos < codeStr.length) {
 			// skip space, cr, and tab
 			const currentChar = codeStr.charAt(currentStrPos);
 			let hasSpace = false;
 			let spaceName = null;
-			if (this.#isSpace(currentChar)) { 
+			if (Token.isSpace(currentChar)) { 
 				spaceName = SPACE_TOKEN_NAME;
 				if (currentChar === TOKEN_TAB)  {
 					spaceName = TAB_TOKEN_NAME
@@ -329,19 +579,19 @@ class CodeAnalyst {
 			}
 			
 			// found a seperator?
-			const seperater = this.#isSeperater(currentChar);
+			const seperater = Token.getSeperaterType(currentChar);
 			if (seperater != TOKEN_TYPE_UNKNOWN) {
 				// a seperator also marks the end of a token (if any)
 				tokenEnd = currentStrPos;	
 			}					
 			
 			// found a new token?
-			let tokenEded = false;
+			let tokenEnded = false;
 			if (tokenBegin != -1 && tokenEnd != -1 ) {
 				// new token name
 				const token = this.#newToken(codeStr, tokenBegin, tokenEnd, currentLine);
 				tokens.push(token);
-				tokenEded = true;
+				tokenEnded = true;
 			} 
 			
 			// add seperator or space token
@@ -369,7 +619,7 @@ class CodeAnalyst {
 					tokenBegin = currentStrPos;
 					tokenEnd = -1;
 				} 
-				else if (tokenEded) {
+				else if (tokenEnded) {
 					// ended a new token, reset and start all-over
 					tokenBegin = -1;
 					tokenEnd = -1;
@@ -391,8 +641,117 @@ class CodeAnalyst {
 			++currentStrPos;
 		}
 		
+		// in case the last token hs not been closed (this happens when we did not end the program with
+		// white space or cr any punctuation:
+		if (tokenBegin != -1 ) {
+			const token = this.#newToken(codeStr, tokenBegin, codeStr.length, currentLine);
+			tokens.push(token);
+			tokenBegin = -1;
+		} 
+		
+		this.#tokens = tokens;
+		
 		console.log(`number of Line: ${currentLine}, number of tokens: ${tokens.length}`);
-		return tokens;
+		// display all tokens
+		this.#displayAll(this.#tokens);
+		
+		// now conbine tokens into meaningful tokens
+		this.#combineTokens()
+		
+		console.log(`number of meaningful tokens: ${this.#meaningfulTokens.length}`);
+		// display all tokens
+		this.#displayAll(this.#meaningfulTokens);
+		
+	}
+	
+	/**
+		This methods essentialy does two things:
+		1) combine tokens: for example, = and = together becomes ==, etc.
+		2) get rid of white spaces, for example. x = y becomes x=y
+	 **/
+	#combineTokens() {
+		const meaningfulTokens = [];
+		let combinableToken = null;
+		let openQuote = null;
+		let currentString = "";
+		
+		// enumerate tokens
+		for(let i = 0; i < this.#tokens.length; i++) {
+			const t = this.#tokens[i];
+			const isQuote = t.isQuote;
+			
+			// got quote?
+			if (openQuote) {
+				if (t.name === openQuote.name) {
+					// quote closed, gathered a string
+					const strToken =  new Token(currentString, TOKEN_TYPE_STRING, openQuote.lineNo, openQuote.beginPos);
+					meaningfulTokens.push(strToken);
+					openQuote = null;
+				} else {
+					// note that here we don't use name but value due to the symbolic nature of space chars
+					currentString += t.value;
+				}
+				continue;
+			} else if (isQuote) {
+				// got an open quote, wait for close quote
+				openQuote = t;
+				continue;
+			}
+			
+			// got space? skip
+			if (t.isSpace) {
+				if (combinableToken) {
+					// last combinable token closed
+					meaningfulTokens.push(combinableToken);
+					combinableToken = null;
+				}
+				
+				// only add CR token since it serves as statement delimitor
+				if (t.isCR) {
+					meaningfulTokens.push(t);
+				}
+				continue;
+			}
+			
+			// combine the new token with existing tokens?
+			if (combinableToken) {
+				const newToken = this.#combineTowTokens(combinableToken, t);
+				if (newToken) {
+					combinableToken = newToken;
+					continue;
+					
+				} else {
+					meaningfulTokens.push(combinableToken);
+					combinableToken = null;	
+				}						
+			}
+			
+			// t is still not absorbed
+			if (t.getCombinableInfo) {
+				// if t is a combinable token, save it
+				combinableToken = t;
+			} else {
+				// a non-space, non-combinable token, push it
+				meaningfulTokens.push(t);
+			}
+		}
+		
+		this.#meaningfulTokens = meaningfulTokens;
+	}
+	
+	/*
+		combine a group of tokens and a new token together.
+		returns true if the new token is absorbed, false if the new token
+		is not absorbed.
+	 */
+	#combineTowTokens(token1, token2) {
+		const combinedTokenStr = token1.name + token2.name;
+		const combinedTokenInfo = STANDARD_TOKEN_MAP.get(combinedTokenStr);
+		if (combinedTokenInfo) {
+			return new Token(combinedTokenStr, combinedTokenInfo.type, token1.lineNo, token1.beginPos);
+		}
+		
+		return null;
 	}
 	
 	#newToken(codeStr, begin, end, line) {
@@ -409,27 +768,6 @@ class CodeAnalyst {
 		
 		const token = new Token(name, tt, line, begin);
 		return token;
-	}
-	
-	#isSpace(c) {
-		if (c === TOKEN_CR || c === TOKEN_TAB || c === TOKEN_SPACE ) {
-			return true;
-		}
-		return false;
-	}
-	
-	#isSeperater(c) {
-		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
-		if (tokenInfo && (
-			tokenInfo.type === TOKEN_TYPE_SEPARATOR ||
-			tokenInfo.type === TOKEN_TYPE_ASSIGNMENT_OPERATOR || 
-			tokenInfo.type === TOKEN_TYPE_STRING_QUOTE ||
-			tokenInfo.type === TOKEN_TYPE_LOGIC_OPERATOR ||
-			tokenInfo.type === TOKEN_TYPE_MATH_OPERATOR ||
-			tokenInfo.type === TOKEN_TYPE_FUNC_OPERATOR)) {
-				return tokenInfo.type;
-			}
-		return TOKEN_TYPE_UNKNOWN;
 	}
 	
 	/**
@@ -473,7 +811,7 @@ class CodeAnalyst {
 		let errMsg = "";
 		const bracketName = this.#bracketTypeToName(thisTokenInfo.bracketType);
 		let hasErro = false;
-		if (thisTokenInfo.action === ACTION_CLOSE) {
+		if (thisTokenInfo.bracketAction === ACTION_CLOSE) {
 			if (bracketStack.length === 0 ) {
 				hasErro = true;
 			}
@@ -530,43 +868,68 @@ class CodeAnalyst {
 	}
 	
 	/* the next name is variable */
-	#lookForNextNameAsVarDeclaration(indx) {
-		// skip space
-		let i = indx;
-		for(; i < this.tokens.length; i++) {
-			if (this.tokens[i].type != TOKEN_TYPE_SPACE) {
-				break;
-			}
-		}
-		
-		// the next token must be a name
-		if (i < this.tokens.length) {
-			if (this.tokens[i].type != TOKEN_TYPE_NAME) {
+	#lookForNextNameAsVarDeclaration(indx, actionToken) {
+		let keepGoing = true;
+		if (indx < this.meaningfulTokens.length - 1) {
+			const token = this.meaningfulTokens[indx];
+			const valueToken = this.meaningfulTokens[indx+1];
+			
+			if (!token.isName) {
 				// error: 
-				this.error.push(new TokenError("Invalid variable name found", this.tokens[i]));
+				this.errors.push(new TokenError("Invalid variable name found", token));
 			}
 			else {
-				const varNmae = this.tokens[i].name;
-				if (!this.variables.get(varNmae)) {
-					this.error.push(new TokenError(`Variable "${varNmae}" already declared.`, this.tokens[i]));
+				// the variable has been declared or assigned earlier, can we proceed?
+				const x = this.variables.get(token.name);
+				if (x) {
+					// const variables cannot be re-assigned
+					if (x.isConst && actionToken.isAssignment) {
+						this.errors.push(new TokenError(`Const variable "${token.name}" cannot be changed.`, token));
+						keepGoing = false;
+					} 
+					// local variable cannot be re-declared in the same scope (to do: check scope)
+					else if (x.isLocal && actionToken.isVarDeclaration) {
+						this.errors.push(new TokenError(`Variable "${token.name}" has already been declared.`, token));
+						keepGoing = false;
+					}
 				}
 				else {
-					this.variables.put(varNmae, new Variable(varNmae, i));
+					// todo: add variable scope later
+					this.variables.set(token.name, new Variable(token, valueToken, null, actionToken.isVarDeclaration, actionToken.isConstVarDeclaration));
 				}
 			}
 		}
 		else {
 			// error:
-			this.error.push(new TokenError("Invalid variable declaration syntax", this.tokens[i-1]));
+			this.errors.push(new TokenError("Invalid variable declaration syntax", this.tokens[i-1]));
+			keepGoing = false;
 		}
+		
+		return keepGoing;
 	}
 	
-	#lookForPreviousNameAsVarAssignment(indx) {
+	// find the end of this statement
+	#toNextStatement(i) {
+		while (i < this.meaningfulTokens.length) {
+			const token = this.meaningfulTokens[i];
+			if (token.isPunctuation	|| token.isCR) {
+				return i + 1;
+			}
+			
+			// adding variables?
+			
+			++i;
+		}
+		
+		// error:
+		return i;
 	}
+	
 	
 	/* geters and setters */
 	
 	get tokens() { return this.#tokens; }
+	get meaningfulTokens() { return this.#meaningfulTokens; }
 	get variables() { return this.#variables; }
 	get stringLiterals() { return this.#stringLiterals; }
 	get numbers() { return this.#numbers; }

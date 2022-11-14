@@ -6,7 +6,7 @@ import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
-import {PageUtil, StringUtil}				from '../core/util.js';
+import {PageUtil, StringUtil,RegexUtil}		from '../core/util.js';
 import {Net}			    				from "../core/net.js"
 import {CodeManContainer}					from '../component/new/codeManager.js'
 import {CodeInputConsole}					from '../component/new/CodeInputConsole.js';
@@ -216,7 +216,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		}
 		
-		if (!StringUtil.isValidYatuName(codeName)) {
+		if (!RegexUtil.isValidYatuName(codeName)) {
 			alert("Code name must start with an alphabet and contains only alphanumeric chars without space or special chars!");
 			return;
 		}
