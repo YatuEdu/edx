@@ -239,39 +239,41 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Add student Console for receiving student message and coding text
 	 **/
 	addStudentConsole(student) {
-		if ($(this.stdentTextAreaDiv).find(this.getStudentConsoleIdSelector(student)).length) {	
-			return;
+		// add an area to contain student's video and blackboard
+		if (!$(this.stdentTextAreaDiv).find(this.getStudentConsoleIdSelector(student)).length) {	
+			// add student console
+			const sconsoleHtml = STUDENT_BOARD_TEMPLATE
+									.replace(REPLACEMENT_LB, student)
+									.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
+									.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
+									.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
+									.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
+									.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
+									.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
+									.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
+									.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student))
+									.replace(REPLACEMENT_TA_TCHR_MSG_ID, this.getTeacherMessageTaId(student));
+
+			$(this.stdentTextAreaDiv).append(sconsoleHtml);
+			
+			// handle toggle code console event
+			$(this.getstudentConsoleToggleButtonSelector(student)).click(this.showStudentConsole.bind(this));	
+			
+			// handle run-code clicking event
+			$(this.getstudentConsoleRunCodeButtonSelector(student)).click(this.runStudentCode.bind(this));	
+			
+			// handle toggle message button event
+			$(this.getStudentMessageButtonSelector(student)).click(this.showStudentMessageContainer.bind(this));	
+			
+			// handle hide student board click
+			$(this.StudentBoardHideButtoncClassSelector).click(this.hideStudentContainer.bind(this));	
+
+			// handle sending message to student
+			$(this.getStudentMessageSendBtnIdSelector).click(this.sendMessageToStudent.bind(this));
 		}
-		
-		// add student console
-		const sconsoleHtml = STUDENT_BOARD_TEMPLATE
-								.replace(REPLACEMENT_LB, student)
-								.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
-								.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
-								.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
-								.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
-								.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
-								.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
-								.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
-								.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student))
-								.replace(REPLACEMENT_TA_TCHR_MSG_ID, this.getTeacherMessageTaId(student));
-
-		$(this.stdentTextAreaDiv).append(sconsoleHtml);
-		
-		// handle toggle code console event
-		$(this.getstudentConsoleToggleButtonSelector(student)).click(this.showStudentConsole.bind(this));	
-		
-		// handle run-code clicking event
-		$(this.getstudentConsoleRunCodeButtonSelector(student)).click(this.runStudentCode.bind(this));	
-		
-		// handle toggle message button event
-		$(this.getStudentMessageButtonSelector(student)).click(this.showStudentMessageContainer.bind(this));	
-		
-		// handle hide student board click
-		$(this.StudentBoardHideButtoncClassSelector).click(this.hideStudentContainer.bind(this));	
-
-		// handle sending message to student
-		$(this.getStudentMessageSendBtnIdSelector).click(this.sendMessageToStudent.bind(this));
+		// set class mode for the new student 
+		const currentModeStr = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
+		this.#displayBoardTeacher.setMode(currentModeStr, student);
 	}
 	
 	/**

@@ -58,9 +58,9 @@ class JSCodeExecutioner {
 			analyticalInfo  = codeAnalyst.shallowInspect();
 		}
 		// we detected error, no need to executeCode
-		if (analyticalInfo.length) {
-			return new CodeError(null, analyticalInfo);
-		}
+		//if (analyticalInfo.length) {
+		//	return new CodeError(null, analyticalInfo);
+		//}
 		
 		if (src) {
 			// run code

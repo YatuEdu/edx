@@ -287,7 +287,18 @@ class Token {
 		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
 				tokenInfo.keyType === CONST_KEY;
 	}
-
+	
+	static isLetVarDeclaration(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
+				tokenInfo.keyType === LET_KEY;
+	}
+	
+	static isVarVarDeclaration(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
+				tokenInfo.keyType === VAR_KEY;
+	}
 
 	static isAssignment(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
@@ -356,6 +367,8 @@ class Token {
 	get isPunctuation() { return typeof this.punctuationType !== 'undefined'; }
 	get isVarDeclaration() { return Token.isVarDeclaration(this.#name); }
 	get isConstVarDeclaration() { return Token.isConstVarDeclaration(this.#name); }
+	get isLetVarDeclaration() { return Token.isLetVarDeclaration(this.#name); }
+	get isVarVarDeclaration() { return Token.isVarVarDeclaration(this.#name); }
 	get isAssignment() { return Token.isAssignment(this.#name); }
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 }
@@ -382,30 +395,6 @@ class Variable {
 	get isConst() { return this.#isConst; }
 }
 
-class CodeBlock {
-	#beginLine
-	#endLine
-	#beginPosition
-	#endPosition
-	#statements
-	#codeBlocks
-	
-	constructor() {
-		
-	}
-	
-	/* getters and setters */
-	
-	get beginLine() { return this.#beginLine; }
-	set beginLine(b) { this.#beginLine = b; }
-	
-	get endLine() { return this.#endLine; }
-	set endLine(e) { this.#endLine = e; }
-	
-	get statements() { return this.#statements; }
-	set statements(s) { this.#statements = s; }
-}
-
 class TokenError {
 	#token
 	#msg
@@ -420,6 +409,341 @@ class TokenError {
 	
 	get errorDisplay() {
 		return `Error: ${this.msg} at line: ${this.token.lineNo}, position: ${this.token.beginPos}, found token <<< ${this.token.name} >>>`;
+	}
+}
+
+class StateMachine {
+	static STATE_NAMES = {
+		CodeBlockState: "CodeBlockState",
+		IfExpressionState: "IfExpressionState",
+		ExpressionState: "ExpressionState",
+		AssignmentState: "AssignmentState",
+		VarDeclarationState: "VarDeclarationState",
+		IfState: "IfState",
+		
+	};
+	
+	static createState(newState, pos, beginToken, scope, analyst, extraParam) {
+		switch(newState) {
+			case StateMachine.STATE_NAMES.CodeBlockState:
+				return new CodeBlockState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.IfExpressionState: 
+				return new IfExpressionState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.ExpressionState:
+				return new ExpressionState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.AssignmentState:
+				return new AssignmentState(pos, beginToken, scope, analyst, extraParam);
+			case StateMachine.STATE_NAMES.VarDeclarationState:
+				return new VarDeclarationState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.IfState:
+				return new IfState(pos, beginToken, scope, analyst);				
+		}
+	}
+}
+
+class Scope {
+	#variableMap;
+	#parentScope;
+	
+	constructor(parentScope) {
+		this.#parentScope = parentScope;
+		this.#variableMap = new Map();
+	}
+	
+	/* public methods */
+	findVariable(varName, inSameScope) {
+		let foundVar = null;
+		let scope = this;
+		do {
+			foundVar = scope.variableMap.get(varName);
+			scope = scope.parentScope;
+		} while(!inSameScope && scope && !foundVar);
+		return foundVar;
+			
+	}
+	
+	/* getters and setters */
+	get parentScope() { return this.#parentScope; }
+	get variableMap() { return this.#variableMap; }
+}
+	
+class StateAction {
+	#newState
+	#error
+	#stateEnded
+	
+	constructor(newState, error, stateEnded) {
+		this.#newState = newState;
+		this.#error = error;
+		this.#stateEnded = stateEnded;
+	}
+	
+	get newState() { return this.#newState; }
+	get error() { return this.#error; }
+	set error(err) { this.#error = err; }
+	get stateEnded() { return this.#stateEnded; }
+}
+
+class ParsingState {
+	#beginPos
+	#beginToken
+	#stage
+	#codeAnalyst
+	#errroExit
+	#scope
+	#error;
+	
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		this.#beginPos = beginPos;
+		this.#beginToken = beginToken;
+		this.#stage = 0;
+		this.#codeAnalyst = codeAnalyst;
+		this.#scope = scope;
+	}
+	
+	/**
+		This happens when one state ended and we got this state from the state stack.
+		We resume the current state using the popped state and set its stage to the next one:
+	 **/
+	nextStage(addStage) {
+		this.#stage += addStage;
+	}
+	
+	advance(nextToken, pos) {
+		throw new Error('nextState: sub-class-should-overload-this method'); 
+	}
+	
+	get beginPos() { return this.#beginPos; }
+	get stage() { return this.#stage; }
+	set stage(s) { this.#stage = s; }
+	get scope() { return this.#scope; }
+	get beginToken() { return this.#beginToken; }
+	get codeAnalyst() { return this.#codeAnalyst; }
+	get error() { return this.#error; }
+	set error(e) { this.#error = e; }
+	
+}
+
+class CodeBlockState extends ParsingState {
+	
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+	}
+	
+	advance(nextToken, pos) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(nextToken.name);
+				
+		// current code block ended:
+		if (nextToken.isEndCurlyBracket) {
+			return new StateAction(null, null, true);
+		}
+		
+		// IF statement encountered:
+		if (tokenInfo && tokenInfo.keyType === IF_KEY) {
+			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.IfState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst);
+			return new StateAction(nextState, null, false);
+		}		
+		
+		// assignment encounteed
+		if (nextToken.isAssignment ) {
+			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.AssignmentState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst, false);
+			return new StateAction(nextState, null, false);
+		}
+		
+		// variable declaration encounteed
+		if (nextToken.isVarDeclaration ) {
+			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.VarDeclarationState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst);
+			return new StateAction(nextState, null, false);
+									
+		}
+		
+		// if we come here, we are still in the same code block, keep probing ahead
+		return new StateAction(null, null, false);
+	}
+}
+
+class IfExpressionState extends ParsingState {
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+	}
+	
+	advance(nextToken, pos) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(nextToken.name);
+		
+		// expression ends?
+		if (nextToken.isEndRoundBracket ) {
+			return new StateAction(null, null, true);
+		}
+		
+		// to be decided
+		// if we come here, we are still in the same code block, keep probing ahead
+		return new StateAction(null, null, false);			
+	}
+	
+}
+
+class ExpressionState extends ParsingState {
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+	}
+	
+	advance(nextToken, pos) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(nextToken.name);
+		
+		// expression ends?
+		if (nextToken.isPunctuation || nextToken.isCR || nextToken.isEndRoundBracket ) {
+			return new StateAction(null, null, true);
+		}
+		
+		// to be decided
+		// if we come here, we are still in the same code block, keep probing ahead
+		return new StateAction(null, null, false);			
+	}
+	
+}
+
+class AssignmentState extends ParsingState {
+	
+	constructor(beginPos, beginToken, scope, codeAnalyst, declarative) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+		if (beginPos === 0) {
+			// INVALID ASSIGNMENT 
+			this.error = new TokenError("Invalid symbol found", beginToken);
+		} else {
+			const varToken = codeAnalyst.meaningfulTokens[beginPos - 1];
+			if (!varToken.isName) {
+				this.error = new TokenError("Invalid variable name found", varToken);
+			} else if (!declarative) {
+				const v = scope.findVariable(varToken.name, false);
+				if (!v) {
+					this.error = new TokenError("Variable not declared", varToken);
+				} else if (v.isConst) {
+					this.error = new TokenError("Const variable can not be changed", varToken);
+				}
+			}
+		}
+		
+		if (this.error) {
+			codeAnalyst.errors.push(this.error);
+		}
+	}
+	
+	advance(nextToken, pos) {
+		if (this.error) {
+			return new StateAction(null, this.error, true)
+		}
+		
+		// go to expression state		
+		const nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+															pos, nextToken, 
+															this.scope, 
+															this.codeAnalyst);
+		return new StateAction(nextState, null, true);			
+	}
+}
+
+class VarDeclarationState extends ParsingState {
+	#varToken
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+	}
+	
+	// next token must be a variable name
+	advance(nextToken, pos) {
+		if (this.stage == 0) {
+			// declared before?
+			let error = null;
+			let action = null;
+			
+			if (!nextToken.isName) {
+				error = new TokenError("Invalid variable name found", nextToken)
+				action = new StateAction(null, error, true);
+			} else if (this.scope.findVariable(nextToken.name, true)) {
+				error = new TokenError(`Variable "${nextToken.name}" has already been declared in the same scope.`, nextToken)
+				action = new StateAction(null, error, true);
+			}
+			
+			if (error) {
+				this.codeAnalyst.errors.push(error);
+				return action;
+			}
+			
+			// add a new variable
+			const newVar = new Variable(nextToken, null, null, 
+										this.beginToken.isVarDeclaration, 
+										this.beginToken.isConstVarDeclaration);
+			this.scope.variableMap.set(nextToken.name, newVar); 
+			this.stage = 1;
+			return new StateAction(null, null, false);
+		}
+		
+		if (this.stage == 1) {
+			if (nextToken.isAssignment) {
+				// ended declaration
+				this.stage = 2;
+				const nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+															pos, nextToken, 
+															this.scope, 
+															this.codeAnalyst);
+				return new StateAction(nextState, null, true);
+			}
+			
+			// error if const var is not assigned
+			if (this.beginToken.isConstVarDeclaration) {
+				const error = new TokenError(`Variable "${beginToken.name}" needs to be assigned.`, this.beginToken);
+				this.codeAnalyst.errors.push(error);
+				return new StateAction(null, error, true);
+			}
+			
+		}
+	} 
+	
+}
+
+class IfState extends ParsingState {
+	
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+	}
+	
+	advance(nextToken, pos) {
+		if (nextToken.isBeginRoundBracket && this.stage == 0) {
+			this.stage = 1;
+			// entering expression state, push this state to stack
+			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.IfExpressionState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst);
+			return new StateAction(nextState, null, false);
+		}		
+		
+		if (nextToken.isBeginCurlyBracket && this.stage == 1) {
+			this.stage = 3;
+			// IF-state ended nicely, enter a new code block:
+			const nextState = StateMachine.createState(
+										StateMachine.STATE_NAMES.CodeBlockState, 
+										pos, 					// current token position
+										nextToken, 				// starting token
+										new Scope(this.scope), 	// new scope spawned from the current one
+										this.codeAnalyst);		
+			return new StateAction(nextState, null, true);
+		}
+		
+		// if without {}, enter unknow state
+		if (this.stage == 2) {
+			this.stage = 3;
+			// IF-state ended nicely
+			return new StateAction(null, null, true);
+		}
+		
+		// if we come here, we run into unknown token
+		const error = new TokenError("Invalid state in 'if' statement.", nextToken);
+		return new StateAction(null, error, true);
 	}
 }
 
@@ -441,10 +765,20 @@ class CodeAnalyst {
 	constructor(codeStr) {
 		this.#codeStr = codeStr
 		this.#tokenize(codeStr);
-		
+		this.#codeBlocks = [];
 		this.#errors = [];
 		this.#variables = new Map();
 	}
+	
+	/* geters and setters */
+	get tokens() { return this.#tokens; }
+	get meaningfulTokens() { return this.#meaningfulTokens; }
+	get variables() { return this.#variables; }
+	get stringLiterals() { return this.#stringLiterals; }
+	get numbers() { return this.#numbers; }
+	get expressions() { return this.#expressions; }
+	get errors () { return this.#errors; }
+	get codeBlocks() { return this.#codeBlocks }
 	
 	/* public methods */
 	
@@ -507,44 +841,43 @@ class CodeAnalyst {
 		this.#stringLiterals = []
 		this.#numbers = [];
 		this.#expressions = [];
-		
+		const stateStack = [];
 		let i = 0;
+		let currentState = StateMachine.createState(StateMachine.STATE_NAMES.CodeBlockState, 
+													i, 					// current token position
+													null, 				// starting token
+													new Scope(null), 	// root scope
+													this);				// analyst
+		this.codeBlocks.push(currentState);
 		while (i < this.meaningfulTokens.length) {
 			const token = this.meaningfulTokens[i];
-			let nextToken = null;
-			if (i + 1 < this.meaningfulTokens.length) {
-				nextToken = this.meaningfulTokens[i+1];
+			
+			// get next state
+			const action = currentState.advance(token, i);
+			const nextState = action.newState;
+			
+			// error? exit
+			if (action.error) {
+				break;
 			}
 			
-			// var declaration?
-			let keepGoing = true;
-			if (token.isVarDeclaration) {
-				keepGoing = this.#lookForNextNameAsVarDeclaration(i+1, token);
-				i += 2;
-			} else if (token.isAssignment) {
-				keepGoing = this.#lookForNextNameAsVarDeclaration(i-1, token);
-			} else if (token.isObjectAccessor) {
-				// next token is likely property name, skip for this round
-				++i;
-			}
-			else if (token.isName && (!nextToken || !nextToken.isAssignment)) {
-				// encountered possibly a variable, check if it is declared earlier:
-				if (!this.variables.get(token.name)) {
-					const varNotDeclaredError = new TokenError("Variable was not declared", token);
-					this.errors.push(varNotDeclaredError);
+			if (nextState) { 
+				// save if the new state is a block
+				if (nextState instanceof CodeBlockState) {
+					this.codeBlocks.push(nextState);
 				}
+				if (!action.stateEnded) {
+					// current state has not ended, save it
+					stateStack.push(currentState);
+				}
+				
+				// nter the next state
+				currentState = nextState;
+			} else if (action.stateEnded) {
+				currentState = stateStack.pop();
 			} 
-			
-			if (!keepGoing) {
-				return;
-			}
+						
 			++i;
-		}
-		
-		// debug for logging all found variables
-		for (let pair of this.variables) {
-			const [key, obj] = pair;
-			console.log("var name:" + key + " = " + obj.value);
 		}
 		
 	}
@@ -926,15 +1259,8 @@ class CodeAnalyst {
 	}
 	
 	
-	/* geters and setters */
+	variableToken(name) { this.variables.get(token.name); }
 	
-	get tokens() { return this.#tokens; }
-	get meaningfulTokens() { return this.#meaningfulTokens; }
-	get variables() { return this.#variables; }
-	get stringLiterals() { return this.#stringLiterals; }
-	get numbers() { return this.#numbers; }
-	get expressions() { return this.#expressions; }
-	get errors () { return this.#errors; }
 }
 
 export {CodeAnalyst}
