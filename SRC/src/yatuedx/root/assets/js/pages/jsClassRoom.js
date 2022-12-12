@@ -101,6 +101,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.columnVideoAreaSelector).hide();
 			$(this.columnCodingAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
 			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
+
 			
 		} else {
 			// show video if we are in class mode	
@@ -109,7 +110,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		// itialize code manager
-		this.initCodeDepot();
+		//this.initCodeDepot();
 		
 		// initialize code editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(

@@ -13,6 +13,9 @@ class AuthPage {
 		Check if we are loggin in
 	 **/
 	 async authCheck() {
+		 // xxx
+		 return true;
+		 
 		const loggedIn = await credMan.hasLoggedIn();
 		if (!loggedIn) {
 			// go to login page (todo: append target url): extract the file name
