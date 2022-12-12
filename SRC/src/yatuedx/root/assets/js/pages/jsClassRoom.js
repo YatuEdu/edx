@@ -110,7 +110,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		// itialize code manager
-		//this.initCodeDepot();
+		this.initCodeDepot();
 		
 		// initialize code editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(

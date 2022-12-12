@@ -13,8 +13,6 @@ class AuthPage {
 		Check if we are loggin in
 	 **/
 	 async authCheck() {
-		 // xxx
-		 return true;
 		 
 		const loggedIn = await credMan.hasLoggedIn();
 		if (!loggedIn) {
