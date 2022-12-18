@@ -650,18 +650,16 @@ class ExpressionState extends ParsingState {
 
 class AssignmentState extends ParsingState {
 	
-	constructor(beginPos, beginToken, scope, codeAnalyst, declarative) {
-		super(beginPos, beginToken, scope, codeAnalyst);
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		
+		super(beginPos, beginToken, scope, codeAnalyst);
 		if (!beginToken.isName) {
 			this.error = new TokenError("Invalid variable name found", beginToken);
-		} else if (!declarative) {
+			
+		} else {
+			// assignment to const is not allowed
 			const v = scope.findVariable(beginToken.name, false);
-			if (!v) {
-				// Implicit variable declaration as global (windows) variable
-				const newVar = new Variable(beginToken, TokenConst.VAR_TYPE_WINDOW);
-				this.scope.addWindowsVariable(beginToken.name, newVar); 
-			} else if (v.isConst) {
+			if (v && v.isConst) {
 				this.error = new TokenError("Const variable can not be changed", beginToken);
 			}
 		}
@@ -679,6 +677,7 @@ class AssignmentState extends ParsingState {
 		
 		
 		let nextState = null;
+		let advanceToNext = false;
 		do {
 			if (0 === this.stage) {
 				if (!nextToken.isAssignment) {
@@ -691,13 +690,32 @@ class AssignmentState extends ParsingState {
 															pos, nextToken, 
 															this.scope, 
 															this.codeAnalyst);
+				advanceToNext = true;
 				break;
 			}
+			
+			if (1 === this.stage) {
+				// expression state ended, we can add the new variable now if not already added
+				const v = this.scope.findVariable(this.beginToken.name, false);
+				if (!v) {
+					// Implicit variable declaration as global (windows) variable
+					const newVar = new Variable(this.beginToken, TokenConst.VAR_TYPE_WINDOW);
+					this.scope.addWindowsVariable(this.beginToken.name, newVar); 
+				}
+				this.stage = 2;
+				break;
+			}
+			
+			if (2 === this.stage) {
+				this.stateEnded = true;
+				break;
+			}
+		
 		}
 		while(false);
 		
 		// go to expression state		 
-		return new StateAction(nextState, this.error, nextState != null);			
+		return new StateAction(nextState, this.error, this.stateEnded, advanceToNext);			
 	}
 }
 
@@ -705,51 +723,52 @@ class VarDeclarationState extends ParsingState {
 	#varToken
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		super(beginPos, beginToken, scope, codeAnalyst);
+		this.stage = 0
 	}
 	
 	// next token must be a variable name
-	advance(nextToken, pos) {
+	advance(token, pos) {
 		let nextState = null;
-		let stateEnded = false;
+		let skipNextToken = false;
 		do {
-			if (!this.stage) {
-					this.stage = 0;
-					break;
-			}
 				
 			if (this.stage == 0) {
-				// declared before?
-				let action = null;
-				
-				if (!nextToken.isName) {
-					this.error = new TokenError("Invalid variable name found", nextToken)
-				} else if (this.scope.findVariable(nextToken.name, true)) {
-					this.error = new TokenError(`Variable "${nextToken.name}" has already been declared in the same scope.`, nextToken)
-				}
-				
-				// add a new variable
-				const newVar = new Variable(nextToken, this.beginToken.varType);
-				this.scope.variableMap.set(nextToken.name, newVar); 
 				this.stage = 1;
+				
+				// invalid variable name or variable was declared before?
+				if (!token.isName) {
+					this.error = new TokenError("Invalid variable name found", token)
+				} else if (this.scope.findVariable(token.name, true)) {
+					this.error = new TokenError(`Variable "${token.name}" has already been declared in the same scope.`, token)
+				}
+				this.#varToken = token;
 				break;
 			}
 			
 			if (this.stage == 1) {
-				stateEnded = true;
-				if (nextToken.isAssignment) {
-					// ended declaration
+				if (token.isAssignment) {
+					// enter expression state
 					this.stage = 2;
 					nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
-																pos, nextToken, 
+																pos, token, 
 																this.scope, 
 																this.codeAnalyst);
-					
+				} else {
+					// error if const var is not assigned
+					if (this.beginToken.isConstVarDeclaration) {
+						this.error = new TokenError(`Variable "${this.beginToken.name}" needs to be assigned.`, this.beginToken);
+						break;
+					}
+					this.stateEnded = true;
 				}
-				
-				// error if const var is not assigned
-				if (this.beginToken.isConstVarDeclaration) {
-					this.error = new TokenError(`Variable "${beginToken.name}" needs to be assigned.`, this.beginToken);
-				}
+				break;
+			}
+			
+			if (this.stage == 2) {
+				// add a new variable
+				const newVar = new Variable(this.#varToken, this.#varToken.varType);
+				this.scope.variableMap.set(this.#varToken.name, newVar); 
+				this.stateEnded = true;
 				break;
 			}
 		} while(false);
@@ -757,7 +776,7 @@ class VarDeclarationState extends ParsingState {
 		if (this.error) {
 			this.codeAnalyst.errors.push(this.error);
 		}
-		return new StateAction(nextState, this.error, stateEnded);
+		return new StateAction(nextState, this.error, this.stateEnded);
 	} 
 	
 }

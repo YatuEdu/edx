@@ -1,5 +1,7 @@
 import {TokenConst, Token}		from './token.js'
 import {ExpressionElement}		from './expressionElement.js'
+import {Operator} 				from './operator.js'
+
 
 class Operand extends ExpressionElement {
 	#binaryOperatorRight

@@ -1,0 +1,14 @@
+1) function call in expression: 100%
+2) x = 12;
+if (x >= (y / 4)) { <<= detect y not defined
+	x = foobar();
+}
+3) const x = 12;
+x = 100
+	
+
+principal: a. resolve asap: a
+A: when op2 .priority > op1 
+B: whe ")" is met, resolve back till "(" 
+C: if unary_back is met, resolve backward immeditately
+D: IF UNARY FRONT IS MET, push var, and wait to see the next 

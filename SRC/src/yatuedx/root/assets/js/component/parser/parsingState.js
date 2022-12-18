@@ -11,7 +11,7 @@ class StateAction {
 		
 		// when starting a new state, we need to know if the 1st token starts
 		// from the current position or from the next position
-		if (newState && typeof advanceToNextToken !== 'undefined') {
+		if (typeof advanceToNextToken !== 'undefined') {
 			this.#advanceToNextToken = advanceToNextToken;
 		} else {
 			this.#advanceToNextToken = true;
@@ -74,7 +74,7 @@ class ParsingState {
 		}
 		
 		const funcName = this.codeAnalyst.meaningfulTokens[pos];
-		if (!funcName.isName) {
+		if (!funcName.isName && !funcName.isKnownFunctionName) {
 			return false;
 		}
 		

@@ -66,7 +66,7 @@ class TokenConst {
 	static get CASE_KEY() {return 8}
 	static get FUNC_KEY() {return 9}
 	static get RETURN_KEY() {return 10}
-	static get CUSTOMER_PRINT() {return 11}
+	static get KNOWN_FUNCTION_NAME() {return 11}
 
 	static get VAR_TYPE_UNKNOWN() { return 0}
 	static get VAR_TYPE_CONST() { return 1}
@@ -98,7 +98,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	['for', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['function', 	{type: TOKEN_TYPE_KEY, keyType: TokenConst.FUNC_KEY, followedByType: TOKEN_TYPE_NAME_ }],
 	['class', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.CLASS_KEY, followedByType: TOKEN_TYPE_NAME_ }],
-	['print', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.CUSTOMER_PRINT, followedByType: TOKEN_TYPE_NAME_ }],
+	['print', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.KNOWN_FUNCTION_NAME, followedByType: TOKEN_TYPE_NAME_ }],
 	['constructor', {type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['get', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME_ }],
 	['set', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME_ }],
@@ -243,6 +243,11 @@ class Token {
 		return Token.isComma(c) || Token.isSemicolon(c) || Token.isCloseCurlyBracket(c);
 	}
 	
+	static isKnownFunctionName(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType == TokenConst.KNOWN_FUNCTION_NAME;
+	}
+	
 	static isComma(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.punctuationType && tokenInfo.punctuationType == COMMA;
@@ -358,7 +363,7 @@ class Token {
 	static isConstVarDeclaration(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
-				tokenInfo.keyType === CONST_KEY;
+				tokenInfo.keyType === TokenConst.CONST_KEY;
 	}
 	
 	static isLetVarDeclaration(c) {
@@ -492,6 +497,8 @@ class Token {
 	get isAssignment() { return Token.isAssignment(this.#name); }
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 	get isReturn() {return Token.isReturn(this.#name)}
+	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
+	
 }
 
 class TokenError {
