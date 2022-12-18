@@ -47,10 +47,18 @@ class FunctionDefState extends ParsingState {
 		this.stage = 0;
 	}
 	
+	static get FUNCTION_NAME_STATE() {return 0; }
+	static get OPEN_BRACKET_STATE() {return 1; }
+	static get ARGUMENT_STATE() {return 2; }
+	static get ARGUMENT_SEPERATOR_STATE() {return 3; }
+	static get FUNCTION_SIGNATURE_ENDED_STATE() {return 4; }
+	static get FUNCTION_BODY_STATE() {return 5; }
+	
 	advance(nextToken, pos) {
-		let ended = false;
+		let bodyStarted = false;
+		let nextState = null;
 		do {
-			if (this.stage === 0) {
+			if (this.stage === FunctionDefState.FUNCTION_NAME_STATE) {
 				// check function name
 				if (!nextToken.isName) {
 					this.error = new TokenError("Invalid function name found", nextToken);
@@ -63,25 +71,25 @@ class FunctionDefState extends ParsingState {
 					break;
 				}
 				this.#funcName = nextToken;
-				this.stage = 1;
+				this.stage = FunctionDefState.OPEN_BRACKET_STATE;
 				break;
 			}
 			
-			if (this.stage === 1) {
+			if (this.stage === FunctionDefState.OPEN_BRACKET_STATE) {
 				// check "("
 				if (!nextToken.isOpenRoundBracket) {
 					this.error = new TokenError("Invalid function syntax. '(' expected", nextToken);
 					break;
 				}
 					
-				this.stage = 2;
+				this.stage = FunctionDefState.ARGUMENT_STATE;
 				break;
 			}
 			
-			if (this.stage === 2) {
+			if (this.stage === FunctionDefState.ARGUMENT_STATE) {
 				// check if definition ended
 				if (nextToken.isCloseRoundBracket) {
-					ended = true;
+					this.stage = FunctionDefState.FUNCTION_SIGNATURE_ENDED_STATE;
 					break;
 				}
 				
@@ -94,14 +102,14 @@ class FunctionDefState extends ParsingState {
 				// add argument
 				this.#addNewArgument(nextToken);
 				
-				this.stage = 3;
+				this.stage = FunctionDefState.ARGUMENT_SEPERATOR_STATE;
 				break;
 			}
 			
-			if (this.stage === 3) {
+			if (this.stage === FunctionDefState.ARGUMENT_SEPERATOR_STATE) {
 				// check if definition ended
 				if (nextToken.isCloseRoundBracket) {
-					ended = true;
+					this.stage = FunctionDefState.FUNCTION_SIGNATURE_ENDED_STATE;;
 					break;
 				}
 				
@@ -111,22 +119,35 @@ class FunctionDefState extends ParsingState {
 					break;
 				}
 					
-				this.stage = 4;
+				this.stage = FunctionDefState.ARGUMENT_STATE;
 				break;
 			}
 			
-			if (this.stage === 4) {
-				// check if a argument is seen, or error
-				if (!nextToken.isName) {
-					this.error = new TokenError("Invalid function definition. A variable name is expected", nextToken);
+			// Expecting function "{}" Block
+			if (this.stage === FunctionDefState.FUNCTION_SIGNATURE_ENDED_STATE) {
+				// check if definition ended
+				if (!nextToken.isOpenCurlyBracket) {
+					this.error = new TokenError("Invalid function definition syntax.'{' is expected", nextToken);
 					break;
 				}
 				
-				// add argument
-				this.#addNewArgument(nextToken);
-					
-				// go back to stage 2
-				this.stage = 2;
+				// add all function arguments into the function block scope if any
+				let funcScope = this.scope;
+				if (this.#funcArgumentMap.size > 0) {
+					funcScope = new Scope(this.scope);
+					this.#funcArgumentMap.forEach((v,k) => funcScope.addLocalVariable(k, new Variable(v, TokenConst.VAR_TYPE_FUNC_PARAMETER)));
+				}
+				this.stage === FunctionDefState.FUNCTION_BODY_STATE;
+				
+				// entering function body block state
+				nextState = StateMachine.createState(
+										StateMachine.STATE_NAMES.CodeBlockState, 
+										pos, 					// current token position
+										nextToken, 				// starting token
+										funcScope, 				// new scope spawned from the current one
+										this.codeAnalyst);	
+				nextState.parentState = this;
+				this.stage = FunctionDefState.FUNCTION_BODY_STATE;
 				break;
 			}
 			
@@ -139,28 +160,18 @@ class FunctionDefState extends ParsingState {
 			this.codeAnalyst.errors.push(this.error);
 		}
 		
-		// ended and add the new function to variable map
-		let funcScope = this.scope;
-		if (ended && !this.error) {
+		return new StateAction(nextState, this.error, this.stateEnded);
+	}
+	
+	// function block end?
+	isTheLastToken(token) {
+		// functiona body ends, so we are completely done
+		if (this.stage === FunctionDefState.FUNCTION_BODY_STATE && token.isCloseCurlyBracket) {
 			const newFunction = new Variable(this.#funcName, TokenConst.VAR_TYPE_FUNCTION);
 			this.scope.addWindowsVariable(this.#funcName.name, newFunction); 
-			
-			// create a new scope for the function
-			if (this.#funcArgumentMap.size > 0) {
-				funcScope = new Scope(this.scope);
-				this.#funcArgumentMap.forEach((v,k) => funcScope.addLocalVariable(k, new Variable(v, TokenConst.VAR_TYPE_FUNC_PARAMETER)));
-			}
-			// entering function body block state
-			const nextState = StateMachine.createState(
-									StateMachine.STATE_NAMES.CodeBlockState, 
-									pos, 					// current token position
-									nextToken, 				// starting token
-									funcScope, 				// new scope spawned from the current one
-									this.codeAnalyst);		
-			return new StateAction(nextState, null, true, true);
+			this.stateEnded = true;
 		}
-		
-		return new StateAction(null, this.error, ended);
+		return this.stateEnded;	
 	}
 
 	// add an argument
@@ -240,13 +251,34 @@ class CodeBlockState extends ParsingState {
 	
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		super(beginPos, beginToken, scope, codeAnalyst);
+		if (beginToken && !beginToken.isOpenCurlyBracket) {
+			this.error = new TokenError("Invalid cpde block: '{' expected", beginToken);
+			codeAnalyst.errors.push(this.error);
+		}
 	}
 	
 	advance(nextToken, pos) {
 		const tokenInfo = Token.getTokenInfo(nextToken.name);
 				
+		// enering a new code block:
+		if (nextToken.isOpenCurlyBracket) {
+			const newScope = new Scope(this.scope);	
+			// entering a nested block state
+			const nextState = StateMachine.createState(
+									StateMachine.STATE_NAMES.CodeBlockState, 
+									pos, 					// current token position
+									nextToken, 				// starting token
+									funcScope, 				// new scope spawned from the current one
+									this.codeAnalyst);	
+			return new StateAction(nextState, null, false);
+		}
+		
 		// current code block ended:
 		if (nextToken.isCloseCurlyBracket) {
+			// also set parent state to finish if any
+			if (this.parentState) {
+				this.parentState.isTheLastToken(nextToken);
+			}
 			return new StateAction(null, null, true);
 		}
 		
