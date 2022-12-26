@@ -15,6 +15,9 @@ class StateMachine {
 		IfState: "IfState",
 		FunctionDefState: "FunctionDefState",
 		FunctionCallState: "FunctionCallState",
+		ForLoopState: "ForLoopState",
+		ArrayDefState: "ArrayDefState",
+		ArraySubscriptionState: "ArraySubscriptionState",
 	};
 	
 	static createState(newState, pos, beginToken, scope, analyst, extraParam) {
@@ -32,7 +35,13 @@ class StateMachine {
 			case StateMachine.STATE_NAMES.VarDeclarationState:
 				return new VarDeclarationState(pos, beginToken, scope, analyst);
 			case StateMachine.STATE_NAMES.IfState:
-				return new IfState(pos, beginToken, scope, analyst);				
+				return new IfState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.ForLoopState:
+				return new ForLoopState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.ArrayDefState:
+				return new ArrayDefState(pos, beginToken, scope, analyst);
+			case StateMachine.STATE_NAMES.ArraySubscriptionState:
+				return new ArraySubscriptionState(pos, beginToken, scope, analyst);
 		}
 	}
 }
@@ -44,7 +53,7 @@ class FunctionDefState extends ParsingState {
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		super(beginPos, beginToken, scope, codeAnalyst);
 		this.#funcArgumentMap = new Map();
-		this.stage = 0;
+		this.stage = FunctionDefState.FUNCTION_NAME_STATE;
 	}
 	
 	static get FUNCTION_NAME_STATE() {return 0; }
@@ -247,6 +256,233 @@ class FunctionCallState extends ParsingState {
 	}
 }
 
+class ForLoopState extends ParsingState {
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+		this.stage = ForLoopState.BEGIN_STATE;
+	}
+	
+	static get BEGIN_STATE() {return 0; }
+	static get INIT_EXPR_STATE() {return 1; }
+	static get INIT_EXPR_BODY_STATE() {return 2; }
+	static get EXIT_CONDTION_EXPR_STATE() {return 3; }
+	static get ITERATION_EXPR_STATE() {return 4; }
+	
+	advance(nextToken, pos) {
+		let bodyStarted = false;
+		let nextState = null;
+		let stateEnded = false;
+		let skipNextToken = true;
+		do {
+			if (this.stage === ForLoopState.BEGIN_STATE) {
+				// check function name
+				if (!nextToken.isOpenRoundBracket) {
+					this.error = new TokenError("Invalid token found, expecting '(' ", nextToken);
+					break;
+				}
+				
+				this.stage = ForLoopState.INIT_EXPR_STATE;
+				break;
+			}	
+			
+			if (this.stage === ForLoopState.INIT_EXPR_STATE) {
+				// definition of loop variable
+				
+				// empty initialization?
+				if (nextToken.isSemicolon) {
+					this.stage = ForLoopState.EXIT_CONDTION_EXPR_STATE;
+					nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+																pos, nextToken, this.scope, 
+																this.codeAnalyst, false);
+					break;
+				}
+				
+				// assignment encounteed
+				if (this.matchTokenName(pos+1, '=') ) {
+					nextState = StateMachine.createState(StateMachine.STATE_NAMES.AssignmentState, 
+																pos, nextToken, this.scope, 
+																this.codeAnalyst, false);
+					this.stage = ForLoopState.INIT_EXPR_BODY_STATE;
+					break;
+				}
+				
+				// variable declaration encounteed
+				if (nextToken.isVarDeclaration ) {
+					nextState = StateMachine.createState(StateMachine.STATE_NAMES.VarDeclarationState, 
+																pos, nextToken, this.scope, 
+																this.codeAnalyst);
+					this.stage = ForLoopState.INIT_EXPR_BODY_STATE;
+					break;						
+				}
+			
+				break;
+			}
+
+			if (this.stage === ForLoopState.INIT_EXPR_BODY_STATE) {
+				this.stage = ForLoopState.EXIT_CONDTION_EXPR_STATE;
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+																pos, nextToken, this.scope, 
+																this.codeAnalyst, false);
+				skipNextToken = false;	
+				break;
+			}
+			
+			if (this.stage === ForLoopState.EXIT_CONDTION_EXPR_STATE ) {
+				this.stage = ForLoopState.ITERATION_EXPR_STATE;
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+													pos, nextToken, this.scope, 
+													this.codeAnalyst, false);
+				skipNextToken = false;	
+				break;
+			}
+			
+		} while(false);
+		
+		if (this.error) {
+			this.codeAnalyst.errors.push(this.error);
+		}
+		
+		if (nextState) {
+			nextState.parentState = this;
+		}
+		return new StateAction(nextState, this.error, stateEnded, skipNextToken);
+	}
+	
+	isTheLastToken(token) {
+		let hasError = false;
+		if (this.stage === ForLoopState.EXIT_CONDTION_EXPR_STATE) {
+			if (!token.isSemicolon) {
+				hasError = true;
+			}
+		} 
+		else if (this.stage === ForLoopState.ITERATION_EXPR_STATE) {
+			if (token.isCloseRoundBracket) {
+				this.stateEnded = true;
+			} else {
+				hasError = true;	
+			}
+		}
+
+		if (hasError) {	
+			this.error = new TokenError("Invalid token found inside 'for' statement", token);	
+			this.codeAnalyst.errors.push(this.error);
+		}
+		return this.stateEnded;	
+	}
+}
+
+class ArrayDefState extends ParsingState {
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+		this.stage = ArrayDefState.BEGIN_STATE;
+	}
+	
+	static get BEGIN_STATE() {return 0; }
+	static get EXPR_STATE() {return 1; }
+	
+	advance(nextToken, pos) {
+		let bodyStarted = false;
+		let nextState = null;
+		let stateEnded = false;
+		let skipNextToken = false;
+		do {
+			if (this.stage === ArrayDefState.BEGIN_STATE || this.stage === ArrayDefState.EXPR_STATE) {
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+																pos, nextToken, 
+																this.scope, 
+																this.codeAnalyst);
+				this.stage = ArrayDefState.EXPR_STATE;
+				break;
+			}	
+		} while (false);
+		
+		if (nextState) {
+			nextState.parentState = this;
+		}
+		return new StateAction(nextState, this.error, stateEnded, skipNextToken);
+	}
+	
+	isTheLastToken(token) {
+		let hasError = false;
+		if (token.isComma) {
+			this.stage = ArrayDefState.EXPR_STATE;
+		} 
+		else if (token.isCloseSquareBracket) {
+			this.stateEnded = true;
+			
+		} else {
+			this.error = new TokenError("Invalid array syntax", token);	
+			this.codeAnalyst.errors.push(this.error);
+		}
+
+		return this.stateEnded;	
+	}
+}
+
+class ArraySubscriptionState extends ParsingState {
+	constructor(beginPos, beginToken, scope, codeAnalyst) {
+		super(beginPos, beginToken, scope, codeAnalyst);
+		this.stage = ArraySubscriptionState.BEGIN_STATE;
+		if (!beginToken.isName) {
+			this.error = new TokenError("Invalid array subscription syntax.", beginToken);
+			
+		} else {
+			// array must be initialized
+			const v = scope.findVariable(beginToken.name, false);
+			if (!v) {
+				this.error = new TokenError(`Array '${beginToken.name}' not defined`, beginToken);
+			}
+		}
+		
+		if (this.error) {
+			codeAnalyst.errors.push(this.error);
+		}
+		this.stage = ArraySubscriptionState.BEGIN_STATE;
+	}
+	
+	static get BEGIN_STATE() {return 0; }
+	static get EXPR_STATE() {return 1; }
+	
+	advance(nextToken, pos) {
+		let bodyStarted = false;
+		let nextState = null;
+		let stateEnded = false;
+		let skipNextToken = true;
+		do {
+			if (this.stage === ArraySubscriptionState.BEGIN_STATE) {
+				if (!nextToken.isOpenSquareBracket) {
+					this.error = new TokenError("Invalid array subscription syntax.", nextToken);
+					break;
+				}
+				
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
+																pos, nextToken, 
+																this.scope, 
+																this.codeAnalyst);
+				this.stage = ArrayDefState.EXPR_STATE;
+				break;
+			}	
+		} while (false);
+		
+		if (nextState) {
+			nextState.parentState = this;
+		}
+		return new StateAction(nextState, this.error, stateEnded, skipNextToken);
+	}
+	
+	
+	isTheLastToken(token) {
+		if (token.isCloseSquareBracket) {
+			this.stateEnded = true;
+		} else {
+			this.error = new TokenError("Invalid array syntax", token);	
+			this.codeAnalyst.errors.push(this.error);
+		}
+
+		return this.stateEnded;	
+	}
+}
+
 class CodeBlockState extends ParsingState {
 	
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
@@ -268,7 +504,7 @@ class CodeBlockState extends ParsingState {
 									StateMachine.STATE_NAMES.CodeBlockState, 
 									pos, 					// current token position
 									nextToken, 				// starting token
-									funcScope, 				// new scope spawned from the current one
+									newScope, 				// new scope spawned from the current one
 									this.codeAnalyst);	
 			return new StateAction(nextState, null, false);
 		}
@@ -282,6 +518,14 @@ class CodeBlockState extends ParsingState {
 			return new StateAction(null, null, true);
 		}
 		
+		// if it is a "for" loop statement
+		if (this.isForLoop(pos)) {
+			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.ForLoopState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst, false);
+			return new StateAction(nextState, null, false);
+		}
+		
 		// if it is a function definition statement
 		if (this.isFunctionDefinition(pos)) {
 			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.FunctionDefState, 
@@ -292,7 +536,7 @@ class CodeBlockState extends ParsingState {
 		
 		// return statement
 		if (nextToken.isReturn) {
-				// go to expression state		
+			// go to expression state		
 			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.ExpressionState, 
 																pos, nextToken, 
 																this.scope, 
@@ -319,7 +563,7 @@ class CodeBlockState extends ParsingState {
 		}		
 		
 		// assignment encounteed
-		if (this.#matchTokenName(pos+1, '=') ) {
+		if (this.matchTokenName(pos+1, '=') ) {
 			const nextState = StateMachine.createState(StateMachine.STATE_NAMES.AssignmentState, 
 														pos, nextToken, this.scope, 
 														this.codeAnalyst, false);
@@ -338,13 +582,7 @@ class CodeBlockState extends ParsingState {
 		// if we come here, we are still in the same code block, keep probing ahead
 		return new StateAction(null, null, false);
 	}
-	
-	#matchTokenName(pos, name) {
-		return this.codeAnalyst.meaningfulTokens.length >= pos + 1 &&
-			   this.codeAnalyst.meaningfulTokens[pos].name === name;
-	}
 }
-
 
 class ExpressionState extends ParsingState {
 	#operandStack;		// Variable stack
@@ -378,6 +616,30 @@ class ExpressionState extends ParsingState {
 				
 				// go to function calling state
 				nextState = StateMachine.createState(StateMachine.STATE_NAMES.FunctionCallState, 
+														pos, nextToken, this.scope, 
+														this.codeAnalyst, false);
+				break;
+			}
+			
+			// array subscription syntax?
+			if (Operand.isOperand(nextToken) && this.matchTokenName(pos+1, "[")){
+				// treat function call as a value
+				newElement = this.#addTempOprand("arraryElement");
+				
+				// go to array state
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ArraySubscriptionState, 
+													 pos, nextToken, this.scope, 
+													 this.codeAnalyst, false);
+				break;
+			}
+			
+			// is array assignment syntax?
+			if (this.matchTokenName(pos, "[")){
+				// treat function call as a value
+				newElement = this.#addTempOprand("arrary");
+				
+				// go to array state
+				nextState = StateMachine.createState(StateMachine.STATE_NAMES.ArrayDefState, 
 														pos, nextToken, this.scope, 
 														this.codeAnalyst, false);
 				break;
@@ -519,12 +781,18 @@ class ExpressionState extends ParsingState {
 	
 	#addOperand(token) {
 		// eat unary operator if applicable:
-		if (this.#currentOperator && !this.#currentOperator.isUnaryFront) {
-			this.error = new TokenError("Invalid operator found", this.#currentOperator.token);
-			return;
+		if (this.#currentOperator) {
+			if (this.#currentOperator.isUnaryFront) {
+				// the unary front operator can be eaten by this operand
+				this.#currentOperator = null;
+			} else {
+				this.error = new TokenError("Invalid operator found", this.#currentOperator.token);
+				return;
+			}
 		}
 		const lastOperand = this.#peek();
 		const newOperand = new CodeOperand(token); 
+		
 		// if it is a varaible and not defined, error:
 		if (newOperand.isVariable) {
 			const v = this.scope.findVariable(token.name, false);
@@ -558,11 +826,12 @@ class ExpressionState extends ParsingState {
 		if (!lastOperand) {
 			if (newOp.isUnaryFront) {
 				this.#currentOperator = newOp;
-				return;
+				return newOp;
 			}
 			
 			// ophan operator found
 			this.error = new TokenError("Ophan operator found", token);
+			return;
 		}
 		
 		// eat unary rear operator if applicable, or error
@@ -572,7 +841,7 @@ class ExpressionState extends ParsingState {
 				if (lastOperand.isConst) {
 					this.error = new TokenError("Invalid operator found", token);
 				}
-				return;
+				return newOp;
 			}
 			
 			// associate with the last operand
@@ -633,7 +902,7 @@ class ExpressionState extends ParsingState {
 	// resolve the left operand in the stack
 	#resolve() {
 		if (this.#currentOperator) {
-			this.error = new TokenError("Ophaned operator found", token);
+			this.error = new TokenError("Ophaned operator found", this.#currentOperator);
 			return;
 		}
 		let roundBracketNum = 0;
@@ -676,8 +945,6 @@ class ExpressionState extends ParsingState {
 		
 		return null;
 	}
-		
-	
 }
 
 class AssignmentState extends ParsingState {
@@ -785,6 +1052,7 @@ class VarDeclarationState extends ParsingState {
 																pos, token, 
 																this.scope, 
 																this.codeAnalyst);
+					nextState.parentState = this;
 				} else {
 					// error if const var is not assigned
 					if (this.beginToken.isConstVarDeclaration) {
@@ -796,13 +1064,6 @@ class VarDeclarationState extends ParsingState {
 				break;
 			}
 			
-			if (this.stage == 2) {
-				// add a new variable
-				const newVar = new Variable(this.#varToken, this.#varToken.varType);
-				this.scope.variableMap.set(this.#varToken.name, newVar); 
-				this.stateEnded = true;
-				break;
-			}
 		} while(false);
 		
 		if (this.error) {
@@ -810,6 +1071,20 @@ class VarDeclarationState extends ParsingState {
 		}
 		return new StateAction(nextState, this.error, this.stateEnded);
 	} 
+	
+	// assignment is done, can add a new variable
+	isTheLastToken(token) {
+		if (this.stage == 2) {
+			// add a new variable
+			const newVar = new Variable(this.#varToken, this.#varToken.varType);
+			this.scope.variableMap.set(this.#varToken.name, newVar); 
+			this.stateEnded = true;
+		} else {
+			this.error = new TokenError("Variable declaration invalid state encountered");
+			this.codeAnalyst.errors.push(this.error);
+		}
+		return this.stateEnded;	
+	}
 	
 }
 

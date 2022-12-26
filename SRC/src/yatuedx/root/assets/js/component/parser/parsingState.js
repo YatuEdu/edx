@@ -123,6 +123,30 @@ class ParsingState {
 		return true;
 	}
 	
+	isForLoop(pos) {
+		const token = this.codeAnalyst.meaningfulTokens[pos];
+		return token.isForLoop;
+	}	
+	
+	/**
+		Look forward or backforward for a token name match
+	 **/
+	matchTokenName(pos, name) {
+		return 	pos >= 0 
+				&& this.codeAnalyst.meaningfulTokens.length > pos 
+				&& this.codeAnalyst.meaningfulTokens[pos].name === name;
+	}
+	
+	/**
+		Look forward or backforward for a token
+	 **/
+	getTokenByPosition(pos) {
+		if (pos >= 0 && this.codeAnalyst.meaningfulTokens.length > pos) {
+			return this.codeAnalyst.meaningfulTokens[pos];
+		}
+		return null;
+	}
+	
 	get beginPos() { return this.#beginPos; }
 	get stage() { return this.#stage; }
 	set stage(s) { this.#stage = s; }

@@ -12,6 +12,7 @@ const TOKEN_TYPE_STRING_ = 5;
 const TOKEN_TYPE_NUMBER_ = 6;
 const TOKEN_TYPE_EXPRESSION = 7;
 const TOKEN_TYPE_COMMENT = 8;
+const TOKEN_TYPE_KNOWN_PROP_ = 9;
 
 const TOKEN_SPACE_ = " ";
 const TOKEN_CR_ = "\n";
@@ -55,6 +56,10 @@ const SEMICOLON = 1;
 const COMMA = 2;
 const COLON = 3;
 
+const DATA_TYPE_INT_ = 1;
+const DATA_TYPE_STRING_ = 2;
+const DATA_TYPE_BOOL_ = 3;
+
 class TokenConst {
 	static get IF_KEY() {return 1}
 	static get ELSE_KEY() {return 2}
@@ -66,7 +71,8 @@ class TokenConst {
 	static get CASE_KEY() {return 8}
 	static get FUNC_KEY() {return 9}
 	static get RETURN_KEY() {return 10}
-	static get KNOWN_FUNCTION_NAME() {return 11}
+	static get FOR_KEY() {return 11}
+	static get KNOWN_FUNCTION_NAME() {return 20}	
 
 	static get VAR_TYPE_UNKNOWN() { return 0}
 	static get VAR_TYPE_CONST() { return 1}
@@ -95,8 +101,8 @@ const STANDARD_TOKEN_MAP = new Map([
 	['switch', 		{type: TOKEN_TYPE_KEY, followedBy: ['{'] } ],
 	['while', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
 	['do', 			{type: TOKEN_TYPE_KEY, followedBy: ['{'] }],
-	['for', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
-	['function', 	{type: TOKEN_TYPE_KEY, keyType: TokenConst.FUNC_KEY, followedByType: TOKEN_TYPE_NAME_ }],
+	['for', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.FOR_KEY } ],
+	['function', 	{type: TOKEN_TYPE_KEY, keyType: TokenConst.FUNC_KEY }],
 	['class', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.CLASS_KEY, followedByType: TOKEN_TYPE_NAME_ }],
 	['print', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.KNOWN_FUNCTION_NAME, followedByType: TOKEN_TYPE_NAME_ }],
 	['constructor', {type: TOKEN_TYPE_KEY, followedBy: ['('] }],
@@ -168,14 +174,16 @@ const STANDARD_TOKEN_MAP = new Map([
 	["instanceof",  {type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_BINARY_, priority: 6 }], 
 	['typeof', 		{type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_UNARY_FRONT_, priority: 6 }],
 	['++', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],
-	['--', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 6 }],	
+	['--', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
 	
 	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA, followedByType: TOKEN_TYPE_ANY }],
-	['.', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, followedByType: TOKEN_TYPE_NAME_ }],
+	['.', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
 	
 	['//', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_LINE }],
 	['/*', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_BEGIN }],
 	['*/', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_END }],
+	
+	['length',		{type: TOKEN_TYPE_KNOWN_PROP_, propDataType: DATA_TYPE_INT_ }],
 ]);
 
 const COMBINATION_TOKEN_MAP = new Map([
@@ -220,6 +228,7 @@ class Token {
 	static get TOKEN_TYPE_NUMBER() { return TOKEN_TYPE_NUMBER_ }
 	static get TOKEN_TYPE_STRING() { return TOKEN_TYPE_STRING_}
 	static get TOKEN_TYPE_OPERATOR() { return TOKEN_TYPE_OPERATOR_ }
+	static get TOKEN_TYPE_KNOWN_PROP() { return TOKEN_TYPE_KNOWN_PROP_ }
 	
 	static get OP_MODE_BINARY() { return OP_MODE_BINARY_}
 	static get OP_MODE_UNARY_FRONT() { return OP_MODE_UNARY_FRONT_}
@@ -240,12 +249,17 @@ class Token {
 	}
 	
 	static isExpressionEnd(c) {
-		return Token.isComma(c) || Token.isSemicolon(c) || Token.isCloseCurlyBracket(c);
+		return Token.isComma(c) || Token.isSemicolon(c) || Token.isCloseCurlyBracket(c) || Token.isCloseSquareBracket(c);
 	}
 	
 	static isKnownFunctionName(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType == TokenConst.KNOWN_FUNCTION_NAME;
+	}
+	
+	static isKnownProperty(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type && tokenInfo.type == Token.TOKEN_TYPE_KNOWN_PROP;
 	}
 	
 	static isComma(c) {
@@ -341,14 +355,14 @@ class Token {
 				tokenInfo.bracketAction === ACTION_CLOSE;
 	}
 	
-	static isBeginSquareBracket(c) {
+	static isOpenSquareBracket(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && 
 				tokenInfo.bracketType === BRACKET_TYPE_SQUARE &&
 				tokenInfo.bracketAction === ACTION_OPEN;
 	}
 	
-	static isEndSquareBracket(c) {
+	static isCloseSquareBracket(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && 
 				tokenInfo.bracketType === BRACKET_TYPE_SQUARE &&
@@ -391,6 +405,11 @@ class Token {
 	static isFunction(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.FUNC_KEY;
+	}
+	
+	static isForLoop(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.FOR_KEY;
 	}
 	
 	static isReturn(c) {
@@ -463,8 +482,8 @@ class Token {
 	get isOpenRoundBracket() { return Token.isOpenRoundBracket(this.#name) }
 	get isCloseRoundBracket() { return Token.isCloseRoundBracket(this.#name) }
 	get isRoundBracket() { return Token.isCloseRoundBracket(this.#name) || Token.isOpenRoundBracket(this.#name) }
-	get isBeginSquareBracket() { return Token.isBeginSquareBracket(this.#name) }
-	get isEndSquareBracket() { return Token.isEndSquareBracket(this.#name) }
+	get isOpenSquareBracket() { return Token.isOpenSquareBracket(this.#name) }
+	get isCloseSquareBracket() { return Token.isCloseSquareBracket(this.#name) }
 	get isQuote() { return Token.isQuote(this.#name) }
 	get isDoubleQuote() { return Token.isDoubleQuote(this.#name) }
 	get isSingleQuote() { return Token.isSingleQuote(this.#name) }
@@ -472,6 +491,7 @@ class Token {
 	get getCombinableInfo() { return Token.getCombinableInfo(this.#name) }
 	get isName() { return this.type === TOKEN_TYPE_NAME_ }
 	get isComma() { return Token.isComma(this.#name) }
+	get isSemicolon() { return Token.isSemicolon(this.#name) }
 	get isComment() { return Token.isComment(this.#name) }
 	get isExpressionEnd() { return Token.isExpressionEnd(this.#name) }
 	get isVarDeclaration() { return Token.isVarDeclaration(this.#name); }
@@ -494,10 +514,12 @@ class Token {
 		return TokenConst.VAR_TYPE_UNKNOWN;
 	}
 	get isFunction() { return Token.isFunction(this.#name); }
+	get isForLoop() { return Token.isForLoop(this.#name); }
 	get isAssignment() { return Token.isAssignment(this.#name); }
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 	get isReturn() {return Token.isReturn(this.#name)}
 	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
+	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
 	
 }
 

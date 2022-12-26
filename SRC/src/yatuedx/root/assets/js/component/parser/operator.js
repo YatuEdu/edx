@@ -27,23 +27,41 @@ class Operator extends ExpressionElement {
 	}
 	
 	get isUnaryFront() { 
-		return  this.#tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT_AND_BINARY ||
-				this.#tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT ||
-				this.#tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
+		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT_AND_BINARY ||
+				this.tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT ||
+				this.tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
 	}
 	
 	
 	get isUnaryRear() { 
-		return  this.#tokenInfo.opMode === Token.OP_MODE_UNARY_REAR ||
-				this.#tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
+		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_REAR ||
+				this.tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
 	}
 	
 	get isBinary() { 
-		return  this.#tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT_AND_BINARY ||
-				this.#tokenInfo.opMode === Token.OP_MODE_BINARY
+		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT_AND_BINARY ||
+				this.tokenInfo.opMode === Token.OP_MODE_BINARY
 	}
 	
 	get priority() { return this.#tokenInfo.priority; }
+	get tokenInfo() { return this.#tokenInfo; }
+}
+
+// "." operator can be followed by some known properties (such as length) 
+// and known function names such as 'forEach'
+class DotOperator extends Operator {
+	#tokenInfo
+
+	constructor(token) {
+		super(token);
+	}
+	
+	// a binary operator can only be followed by an operand
+	// a front unary operator can only be followed by a none "()" operand
+	//a rear unary operator can only be follwed by another operator or nothing
+	canBeFollowedBy(another) { 
+		return 	nother instanceof Operand;
+	}
 }
 
 export {Operator}

@@ -12,7 +12,7 @@ class CodeAnalyst {
 	
 	// syntax parsing one outcome
 	#variables;
-	#stringLiterals;
+	#calledFunctions;
 	#numbers;
 	#expressions;
 	#errors
@@ -28,7 +28,7 @@ class CodeAnalyst {
 	get tokens() { return this.#tokens; }
 	get meaningfulTokens() { return this.#meaningfulTokens; }
 	get variables() { return this.#variables; }
-	get stringLiterals() { return this.#stringLiterals; }
+	get calledFunctions() { return this.#calledFunctions; }
 	get numbers() { return this.#numbers; }
 	get expressions() { return this.#expressions; }
 	get errors () { return this.#errors; }
@@ -91,7 +91,7 @@ class CodeAnalyst {
 		We should be able to find out futher syntax error as the outcome of the parsing.
 	*/
 	#syntaxParseOne() {
-		this.#stringLiterals = []
+		this.#calledFunctions = []
 		this.#numbers = [];
 		this.#expressions = [];
 		const stateStack = [];
