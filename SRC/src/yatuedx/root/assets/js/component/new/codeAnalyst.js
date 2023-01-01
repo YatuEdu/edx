@@ -1,7 +1,7 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
 import {Token, TokenError}					from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
-import {StateMachine}						from '../parser/stateMachine.js'
+import {CodeBlockState}						from '../parser/CodeBlockState.js'
 
 class CodeAnalyst {
 	#beginLine;
@@ -96,11 +96,7 @@ class CodeAnalyst {
 		this.#expressions = [];
 		const stateStack = [];
 		let i = 0;
-		let currentState = StateMachine.createState(StateMachine.STATE_NAMES.CodeBlockState, 
-													i, 					// current token position
-													null, 				// starting token
-													new Scope(null), 	// root scope
-													this);				// analyst
+		let currentState = new CodeBlockState(i, null, new Scope(null), this);
 		while (i < this.meaningfulTokens.length) {
 			const token = this.meaningfulTokens[i];
 			

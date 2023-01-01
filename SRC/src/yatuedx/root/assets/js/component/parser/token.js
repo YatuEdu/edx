@@ -267,6 +267,11 @@ class Token {
 		return tokenInfo && tokenInfo.punctuationType && tokenInfo.punctuationType == COMMA;
 	}
 	
+	static isColon(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.punctuationType && tokenInfo.punctuationType == COLON;
+	}
+	
 	static isSemicolon(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.punctuationType && tokenInfo.punctuationType == SEMICOLON;
@@ -491,6 +496,7 @@ class Token {
 	get getCombinableInfo() { return Token.getCombinableInfo(this.#name) }
 	get isName() { return this.type === TOKEN_TYPE_NAME_ }
 	get isComma() { return Token.isComma(this.#name) }
+	get isColon() { return Token.isColon(this.#name) }
 	get isSemicolon() { return Token.isSemicolon(this.#name) }
 	get isComment() { return Token.isComment(this.#name) }
 	get isExpressionEnd() { return Token.isExpressionEnd(this.#name) }
