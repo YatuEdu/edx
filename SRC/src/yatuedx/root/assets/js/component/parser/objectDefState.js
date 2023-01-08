@@ -34,7 +34,6 @@ class ObjectDefState extends ParsingState {
 				if (nextToken.isColon) {
 					this.stage = ObjectDefState.PROP_VALUE_STATE;
 					nextState = new ExpressionState(pos, nextToken, this.scope, this.codeAnalyst);
-					advanceToNextToken = false;
 					break;
 				}
 				

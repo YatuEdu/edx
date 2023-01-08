@@ -19,7 +19,16 @@ print (x + t) // error: t is not defined
 let x = 1;
 let y = 2;
 x = 10;
-print(x+ (y * (x + y) * 2))   // = 58
+z = x+ (y * (x + y) * 2) // z = 58
+
+let x = 1;
+let y = 2;
+x = 10;
+z = x+ (y * (x + y) * 2) + w;  // w not defined error
+
+let x = 1;
+let y = 2;
+print(x+ (y * (x + y) * 2))   // 13
 
 let x = 1;
 let y = 2;
@@ -29,7 +38,7 @@ print(x+ (y * * (x + y) * 2))   // Invalid expression element found: *
 // known property 'length'
 const a = [1, 2, 3];
 const b = a.length + 10;
-print (b)
+print (b) // 13
 
 
 let x = 1;
@@ -68,4 +77,45 @@ function foo(x, y) {
 	return z;
 }
 print(foo(2, 3)) // w is undefined
+
+function foo(x, y) {
+	let z = x * y ;
+	return z;
+}
+x = 10;
+y = 2;
+print(foo(x * (y + 1), 3)) // 90
+
+function foo(x, y) {
+	let z = x * y ;
+	return z;
+}
+x = 10;
+y = 2;
+print(foo(x * (y + 1), x + (y +x * y))) // 960
+
+
+///////////// error case
+function foo(x, y) {
+	let z = x * y ;
+	return z;
+}
+x = foo(1, 3) + y; // y is not defined
+
+function foo(x, y) {
+	let z = x * y ;
+	return z;
+}
+x = foo(1, 3) + y // y is not defined
+
+function foo(x, y) {
+	let z = x * y ;
+	return z;
+}
+x = foo(1, 3) + 4 * // * invalid operator
+
+let x = 1;
+let y = 2;
+x = 10;
+z = u + x+ y		// undefined variable "u"
 

@@ -24,6 +24,29 @@ function foo(a) {
 }
 x = foo([10, 12, 3])  // 10, 12, 3
 
+// function def, array, for loop, expression, combined
+function foo(a) {
+	let r = 0;
+   	for(let i = 0; i < a.length; i++) {
+		(r += a[i]) 
+	}
+	return r;
+}
+x = foo([10, 12, 3])  + [1, 2, 3, 4].length;
+print (x * (x +y))				// 29
+
+// combination
+function foo(a) {
+	let r = 0;
+   	for(let i = 0; i < a.length; i++) {
+		(r += a[i]) 
+	}
+	return r;
+}
+x = foo([10, 12, 3])  + [1, 2, 3, 4].length; // 29
+y = 0;
+print (x * (x +y))					// 841
+
 // array subscription inside an expresion
 x= [10, 11];
 y = 10 + x[0] * 2;

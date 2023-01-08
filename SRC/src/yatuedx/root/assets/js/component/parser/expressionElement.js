@@ -6,6 +6,7 @@ class ExpressionElement {
 	}
 	
 	get token() { return this.#token}
+	get name() { return this.#token.name }
 	
 	// overridable methods
 	

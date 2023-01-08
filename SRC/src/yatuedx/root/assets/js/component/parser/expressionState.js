@@ -1,14 +1,16 @@
 import {TokenConst, Token, TokenError}		from './token.js'
 import {StateAction, ParsingState}			from './parsingState.js'
-import {Operator}							from './operator.js'
+import {Operator, DotOperator}				from './operator.js'
 import {Operand, TempOperand, OpenRoundBrachetOperand, CloseRoundBrachetOperand, CodeOperand} from './oprand.js'
 import {FunctionCallState}					from './functionCallState.js'
 import {ArraySubscriptionState}				from './arraySubscriptionState.js'
 import {ArrayDefState}						from './arrayDefState.js'
 import {ObjectDefState}						from './objectDefState.js'
 
+const ERROR_UNDEFINED_VARIABLE_FOUND = "Undefined valrable found";
+
 class ExpressionState extends ParsingState {
-	#operandStack;		// Variable stack
+	#operandStack;	
 	#currentOperator;
 	#lastElement
 	#numberOfTemp 
@@ -74,7 +76,7 @@ class ExpressionState extends ParsingState {
 		
 			// expression ended?
 			if (nextToken.isExpressionEnd || this.#expressionEnded(nextToken, pos)) {
-				this.#resolve();
+				this.#handleSubExpressionClose(nextToken);
 				this.stateEnded = true;
 				changeState = true;
 				break;
@@ -91,9 +93,12 @@ class ExpressionState extends ParsingState {
 				break;
 			}
 			
-			// add end round bracket?
+			// resolve round bracket into one temporary operand
 			if (nextToken.isCloseRoundBracket) {
-				newElement = this.#addCloseRoundBracket(nextToken);
+				newElement = this.#handleSubExpressionClose(nextToken);
+				if (this.stateEnded) {
+					changeState = true;
+				}
 				break;
 			}
 			
@@ -111,41 +116,55 @@ class ExpressionState extends ParsingState {
 						
 		} while(false);
 		
-		// no expression element found
-		if (!changeState && !nextState) {
-			if (!this.stateEnded && !newElement) {
-				this.error = new TokenError("Invalid expression element found", nextToken);
+		do {
+			if (this.error) {
+				break;
 			}
-		}
-		
-		// can the new element follow the last element?
-		if (newElement) {
-			if (this.#lastElement && !this.#lastElement.canBeFollowedBy(newElement)) {
-				this.error = new TokenError("Invalid token found", nextToken);
-			}			
-			this.#lastElement = newElement;
-			newElement = null;
-		}
+			
+			// no expression element found
+			if (!changeState && !nextState) {
+				if (!this.stateEnded && !newElement) {
+					this.error = new TokenError("Invalid expression element found", nextToken);
+					break;
+				}
+			}
+			
+			// can the new element follow the last element?
+			if (newElement) {
+				if (this.#lastElement && !this.#lastElement.canBeFollowedBy(newElement)) {
+					this.error = new TokenError("Invalid token found", nextToken);
+					break;
+				}			
+				this.#lastElement = newElement;
+				newElement = null;
+			}
+				
+			if (this.stateEnded) {
+				changeState = true;
+				// also set parent state to finish if any
+				if (this.parentState) {
+					this.parentState.isTheLastToken(nextToken);
+				}
+			}
+		} while(false);
 		
 		if (this.error) {
 			this.codeAnalyst.errors.push(this.error);
 		}
-		
-		if (this.stateEnded) {
-			changeState = true;
-			// also set parent state to finish if any
-			if (this.parentState) {
-				this.parentState.isTheLastToken(nextToken);
-			}
-		}
-		
 		return new StateAction(nextState, this.error, changeState);			
 	}
 	
 	// parsing ended, resolve all operands in the stack
+
 	complete() {
-		this.#resolve();
+		if (!this.error) {
+			this.#handleSubExpressionClose(null);
+			if (this.error) {
+				this.codeAnalyst.errors.push(this.error);
+			}
+		}
 	}
+
 	
 	// if we started a new line, we might start a new expression or continue the current one.
 	// it is complicated. For now we look for "=" only.
@@ -194,18 +213,6 @@ class ExpressionState extends ParsingState {
 		return newOperand;
 	}
 	
-	#addCloseRoundBracket(token) {
-		// we are ended	or errored
-		if (this.#totalOpenRoundBracket < this.#totalCloseRoundBracket +1) {
-			this.stateEnded = true;
-			return null;
-		}
-		const newOperand = new CloseRoundBrachetOperand(token); 
-		this.#operandStack.push(newOperand);
-		++this.#totalCloseRoundBracket;
-		return newOperand;
-	}
-	
 	#addOperand(token) {
 		// eat unary operator if applicable:
 		if (this.#currentOperator) {
@@ -219,15 +226,6 @@ class ExpressionState extends ParsingState {
 		}
 		const lastOperand = this.#peek();
 		const newOperand = new CodeOperand(token); 
-		
-		// if it is a varaible and not defined, error:
-		if (newOperand.isVariable) {
-			const v = this.scope.findVariable(token.name, false);
-			if (!v) {
-				this.error = new TokenError("Undefined valrable operator found", token);
-				return newOperand;
-			}
-		}
 	
 		// associate the binary op with the last oprand:
 		if (lastOperand) {
@@ -246,7 +244,13 @@ class ExpressionState extends ParsingState {
 			return;
 		}
 		
-		const newOp = new Operator(token);
+		let newOp = null;
+		if (token.isObjectAccessor) {
+			newOp = new DotOperator(token);
+		} else {
+			newOp = new Operator(token);
+		}
+		
 		const lastOperand = this.#peek();
 		
 		// wait for the next operand 
@@ -280,19 +284,19 @@ class ExpressionState extends ParsingState {
 		}
 		
 		// compare with the last operator, if lower priority, resove the last operator firstChild
-		/*
 		if (lastOperand.binaryOperatorLeft && newOp.priority <= lastOperand.binaryOperatorLeft.priority) {
 			const tempOperand = this.#resolveBinary(newOp);
 			if (!tempOperand) {
 				// error occurred
 				return;
 			}
-			if (tempOperand.binaryOperator !== newOp) {
+			if (tempOperand.binaryOperatorRight !== newOp) {
 				// new operator has not been absorbed yet
-				this.#currentOperator = newOp;
+				//this.#currentOperator = newOp;
+				this.error = new TokenError("Invalid extra operator found", token);
+				return;
 			}			
 		}
-		*/
 		
 		return newOp;
 	}
@@ -302,9 +306,9 @@ class ExpressionState extends ParsingState {
 		const lastOperand = this.#peek();
 		if (lastOperand) {
 			temp.binaryOperatorLeft = lastOperand.binaryOperatorRight; 
-			if (newOp) {
-				temp.binaryOperatorRight = newOp;
-			}
+		}
+		if (newOp) {
+			temp.binaryOperatorRight = newOp;
 		}
 		this.#operandStack.push(temp);
 		return temp;
@@ -312,56 +316,120 @@ class ExpressionState extends ParsingState {
 	
 	// resolve two operand as a result of a binary operation
 	#resolveBinary(newOp) {
-		if (this.#operandStack.length < 2) {
+		if (newOp && this.#operandStack.length < 2) {
 			this.error = new TokenError("Invalid operator found", newOp.token);
 			return;
 		}
 		
 		const oprandR = this.#operandStack.pop();
 		const oprandL = this.#operandStack.pop();
-		if (oprandL.binaryOperator != oprandR.binaryOperator) {
+		if (oprandL.binaryOperatorRight != oprandR.binaryOperatorLeft) {
 			this.error = new TokenError("Invalid expression state encounteed", newOp.token);
 			return;
 		}
-		this.#addTempOprand("T"+ this.#numberOfTemp++, newOp) 
+		
+		// operator left variable needs to be defined
+		if (oprandL.isVariable) {
+			const v = this.scope.findVariable(oprandL.name, false);
+			if (!v) {
+				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprandL.token);
+				return null;
+			}
+		}
+		// operator right needs to be defined unless the operator is "."
+		if (oprandR.isVariable && !(oprandR.binaryOperatorLeft instanceof DotOperator)) {
+			const v = this.scope.findVariable(oprandR.name, false);
+			if (!v) {
+				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprandR.token);
+				return null;
+			}
+		}
+		
+		return this.#addTempOprand("T"+ this.#numberOfTemp++, newOp) 
 	}
 	
-	// resolve the left operand in the stack
-	#resolve() {
-		if (this.#currentOperator) {
-			this.error = new TokenError("Ophaned operator found", this.#currentOperator);
-			return;
+	/**
+		Handling Expression closing (or partialy closing).
+		This METHOD handles two scenarios: 
+		1) resolving partial expression ending marked by ")"
+		2) resolving entire expression ending marked by ';" or other ending methods
+	 
+		Each of the two scenarios requires slightly different handling, thus makes this 
+		methd not single purpose.  We will modify it later with better patterns.
+	**/
+	#handleSubExpressionClose(token) {
+		if (!token) {
+			// create an ending token:
+			token = Token.createExpressionEndToken();
 		}
-		let roundBracketNum = 0;
-		let firstToken = null;
-		let oprandR = null;
-		let operandL = null;
-		while(this.#operandStack.length > 0) {
-			let currentOperand = this.#operandStack.pop();
-			if (!oprandR) {
-				oprandR = currentOperand;
+		
+		// we are ended	or errored
+		if (token.isCloseRoundBracket && this.#totalOpenRoundBracket === 0) {
+			// We encountered a ")" which has no "(", we think this is from a parent state, so we end here
+			this.stateEnded = true;
+			return null;
+		}
+		
+		// resolve all operands til the open round bracket
+		let oprandRight = null;
+		let lastLeftOperator = null;
+		let oprand = null;
+		do {
+			oprand = this.#operandStack.pop();
+			
+			// we have an error because we would have seen "(" first
+			if (token.isCloseRoundBracket) {
+				if (!oprand) {
+					this.error = new TokenError("Invalid ')' found", token);
+					break;
+				}
+				
+				// we are done
+				if (oprand.token && oprand.token.isOpenRoundBracket) {
+					lastLeftOperator = oprand.binaryOperatorLeft;
+					break;
+				}
+			} 
+			
+			// un-used operator found
+			if (oprandRight) {
+				// combine this operand (left) with the last operand (right)
+				if (oprand) {
+					if (oprandRight.binaryOperatorLeft !== oprand.binaryOperatorRight) {
+						this.error = new TokenError("Unmatched operator found", oprand.token);
+						break;
+					}
+				}	
 			} else {
-				operandL = currentOperand;
+				// The right most operand should not have a right operator in it
+				if (oprand && oprand.binaryOperatorRight ) {
+					this.error = new TokenError("Invalid operator found", oprand.binaryOperatorRight.token);
+					break;
+				}
 			}
 			
-			if (!firstToken) {
-				firstToken = currentOperand.token;
+			// oprandRight needs to be defined unless the operator is "."
+			if (oprand && oprand.isVariable && !(oprand.binaryOperatorLeft instanceof DotOperator)) {
+				const v = this.scope.findVariable(oprand.name, false);
+				if (!v) {
+					this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprand.token);
+					break;
+				}
 			}
-			// resolve ")"
-			if (currentOperand.isCloseRoundBracket) {
-				++roundBracketNum;
-				continue;
-			}
-			// resolve "("
-			if (currentOperand.isOpenRoundBracket) {
-				--roundBracketNum;
-				continue;
-			}
-			
+			oprandRight = oprand;
+		} while (oprand);
+		
+		// resolve (x y z) to one temp operand
+		if (token.isCloseRoundBracket && !this.error) {
+			const temp = new TempOperand("resolved_sub_exp", "tbd");
+			temp.binaryOperatorLeft = lastLeftOperator; 
+			this.#operandStack.push(temp);
+			--this.#totalOpenRoundBracket;
+			return new CloseRoundBrachetOperand(token);
 		}
-		if (roundBracketNum !== 0) {
-			this.error = new TokenError("Unmatched '()' found", firstToken);
-		}
+		
+		// entire expression ended
+		return null;
 	}
 	
 	#peek() {

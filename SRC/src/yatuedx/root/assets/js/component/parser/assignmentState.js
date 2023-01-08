@@ -1,6 +1,7 @@
 import {StateAction, ParsingState}		from './parsingState.js'
 import {ExpressionState}				from './expressionState.js'
 import {TokenConst, TokenError}			from './token.js'
+import {Variable}						from './variable.js'
 
 class AssignmentState extends ParsingState {
 	

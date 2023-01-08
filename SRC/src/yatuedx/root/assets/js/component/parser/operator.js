@@ -50,7 +50,6 @@ class Operator extends ExpressionElement {
 // "." operator can be followed by some known properties (such as length) 
 // and known function names such as 'forEach'
 class DotOperator extends Operator {
-	#tokenInfo
 
 	constructor(token) {
 		super(token);
@@ -60,8 +59,8 @@ class DotOperator extends Operator {
 	// a front unary operator can only be followed by a none "()" operand
 	//a rear unary operator can only be follwed by another operator or nothing
 	canBeFollowedBy(another) { 
-		return 	nother instanceof Operand;
+		return another instanceof Operand;
 	}
 }
 
-export {Operator}
+export {Operator, DotOperator}

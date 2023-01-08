@@ -215,6 +215,10 @@ class Token {
 		this.typeDivide();
 	}
 	
+	static createExpressionEndToken(pos) {
+		return new Token(";", TOKEN_TYPE_SEPARATOR, -1, -1);
+	}
+	
 	static get TOKEN_CR () { return TOKEN_CR_; }
 	static get TOKEN_TAB () { return TOKEN_TAB_; }
 	static get TAB_TOKEN_NAME() { return TAB_TOKEN_NAME_; }
