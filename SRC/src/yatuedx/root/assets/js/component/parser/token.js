@@ -4,7 +4,7 @@ const TOKEN_TYPE_UNKNOWN_ = -1;
 const TOKEN_TYPE_SYMBOL = 100;
 const TOKEN_TYPE_SPACE_ = 99;
 const TOKEN_TYPE_ANY = 0;
-const TOKEN_TYPE_KEY = 1;
+const TOKEN_TYPE_KEY_ = 1;
 const TOKEN_TYPE_SEPARATOR = 2;
 const TOKEN_TYPE_OPERATOR_ = 3;
 const TOKEN_TYPE_NAME_ = 4;
@@ -94,30 +94,30 @@ class TokenConst {
 }
 
 const STANDARD_TOKEN_MAP = new Map([
-	['if', 			{type: TOKEN_TYPE_KEY, keyType: TokenConst.IF_KEY, followedBy: ['('] } ],
-	['else', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.ELSE_KEY, followedBy: ['{', 'if'] } ],
-	['new', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.NEW_KEY, followedBy: ['{',], includedInside: ["`"] }],
-	['case', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.CASE_KEY, followedBy: ['('] } ],
-	['switch', 		{type: TOKEN_TYPE_KEY, followedBy: ['{'] } ],
-	['while', 		{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
-	['do', 			{type: TOKEN_TYPE_KEY, followedBy: ['{'] }],
-	['for', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.FOR_KEY } ],
-	['function', 	{type: TOKEN_TYPE_KEY, keyType: TokenConst.FUNC_KEY }],
-	['class', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.CLASS_KEY, followedByType: TOKEN_TYPE_NAME_ }],
-	['print', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.KNOWN_FUNCTION_NAME, followedByType: TOKEN_TYPE_NAME_ }],
-	['constructor', {type: TOKEN_TYPE_KEY, followedBy: ['('] }],
-	['get', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME_ }],
-	['set', 		{type: TOKEN_TYPE_KEY, followedByType: TOKEN_TYPE_NAME_ }],
-	['const', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.CONST_KEY, followedByType: TOKEN_TYPE_NAME_, }],
-	['let', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.LET_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
-	['var', 		{type: TOKEN_TYPE_KEY, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.VAR_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
-	['return', 		{type: TOKEN_TYPE_KEY, keyType: TokenConst.RETURN_KEY}],
-	['break', 		{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
-	['continue', 	{type: TOKEN_TYPE_KEY, followedBy: [';'] }],
-	['forEach', 	{type: TOKEN_TYPE_KEY, followedBy: ['('] }],
-	['this', 		{type: TOKEN_TYPE_KEY, followedBy: ['.', ';'] }],
-	['$', 			{type: TOKEN_TYPE_KEY, followedBy: ['{',], includedInside: ["`"] }],
-	['$', 			{type: TOKEN_TYPE_KEY, followedBy: ['{',], includedInside: ["`"] }],
+	['if', 			{type: TOKEN_TYPE_KEY_, keyType: TokenConst.IF_KEY, followedBy: ['('] } ],
+	['else', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.ELSE_KEY, followedBy: ['{', 'if'] } ],
+	['new', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.NEW_KEY, followedBy: ['{',], includedInside: ["`"] }],
+	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY, followedBy: ['('] } ],
+	['switch', 		{type: TOKEN_TYPE_KEY_, followedBy: ['{'] } ],
+	['while', 		{type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
+	['do', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{'] }],
+	['for', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FOR_KEY } ],
+	['function', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FUNC_KEY }],
+	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY, followedByType: TOKEN_TYPE_NAME_ }],
+	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, followedByType: TOKEN_TYPE_NAME_ }],
+	['constructor', {type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
+	['get', 		{type: TOKEN_TYPE_KEY_, followedByType: TOKEN_TYPE_NAME_ }],
+	['set', 		{type: TOKEN_TYPE_KEY_, followedByType: TOKEN_TYPE_NAME_ }],
+	['const', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.CONST_KEY, followedByType: TOKEN_TYPE_NAME_, }],
+	['let', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.LET_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
+	['var', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.VAR_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
+	['return', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.RETURN_KEY}],
+	['break', 		{type: TOKEN_TYPE_KEY_, followedBy: [';'] }],
+	['continue', 	{type: TOKEN_TYPE_KEY_, followedBy: [';'] }],
+	['forEach', 	{type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
+	['this', 		{type: TOKEN_TYPE_KEY_, followedBy: ['.', ';'] }],
+	['$', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{',], includedInside: ["`"] }],
+	['$', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{',], includedInside: ["`"] }],
 
 	['"', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING_, quoteType: QUOTE_TYPE_DOUBLE }],
 	["'", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING_, quoteType: QUOTE_TYPE_SINGLE}],
@@ -131,7 +131,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	[']', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
 	
 	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA, followedByType: TOKEN_TYPE_ANY }],
-	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY }],
+	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY, shouldStartNewLine: true }],
 	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, followedByType: TOKEN_TYPE_ANY }],
 	
 	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_ANY}],	
@@ -228,6 +228,7 @@ class Token {
 	static get SPACE_TOKEN_NAME() { return SPACE_TOKEN_NAME_; }
 	
 	static get TOKEN_TYPE_UNKNOWN() { return TOKEN_TYPE_UNKNOWN_}
+	static get TOKEN_TYPE_KEY() { return TOKEN_TYPE_KEY_ }
 	static get TOKEN_TYPE_NAME() { return TOKEN_TYPE_NAME_}
 	static get TOKEN_TYPE_NUMBER() { return TOKEN_TYPE_NUMBER_ }
 	static get TOKEN_TYPE_STRING() { return TOKEN_TYPE_STRING_}
@@ -426,7 +427,6 @@ class Token {
 		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.RETURN_KEY;
 	}
 	
-	
 	static bracketTypeToName(type) {
 		switch(type) {
 			case BRACKET_TYPE_CURLY:
@@ -449,6 +449,11 @@ class Token {
 			default: 
 				return "";
 		}
+	}
+	
+	static shouldStartNewLine(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.shouldStartNewLine;
 	}
 	
 	/* for a name, decide if it's number or variables */
@@ -530,7 +535,7 @@ class Token {
 	get isReturn() {return Token.isReturn(this.#name)}
 	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
-	
+	get shouldStartNewLine() { return Token.shouldStartNewLine(this.#name);}
 }
 
 class TokenError {

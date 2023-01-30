@@ -22,5 +22,5 @@ print(x)				// should be "y"  is not defined
 
 const s ={txt:  "abc", txt2: 'def'}
 let x = s.txt+ s.txt2;
-print(x)
+print(x)				// abcdef
 

@@ -35,16 +35,21 @@ class CodeAnalyst {
 	
 	/* public methods */
 	
-	/* display tokens for debugging purpose */
-	#displayAll(tokens) {
-		tokens.forEach(t => console.log(t.displayStr));
-	}
 	
 	/* 
 		Diagnotic methods for shallow error discovery. For this method we only display errors
 		such as no closing { or ( or [
 	*/
 	shallowInspect() {
+		this.bracketMatchInspection();
+		if (this.errors.length === 0) {		
+			this.#syntaxParseOne();
+		}
+		
+		return this.errors;
+	}
+	
+	bracketMatchInspection() {
 		const bracketStack = [];
 		const quoteStack = [];
 		for (let i = 0; i < this.tokens.length; i++) {
@@ -80,10 +85,118 @@ class CodeAnalyst {
 			const quoteMismatchError = new TokenError("Quote is not closed", qt);
 			this.errors.push(quoteMismatchError);
 		});
+	}
+	
+	/**
+		Formattting code according to JS coding style.
+	 **/
+	formatCode() {
+		this.bracketMatchInspection();
+		// if error, advice to fix error first
+		if (this.errors.length > 0) {
+			return {err: true, newSrc: this.errors[0].errorDisplay()};
+		}
 		
-		this.#syntaxParseOne()
+		let newSrc = '';
+		let nestLevel = 0;
+		const newTokens = [];
+		for (let i = 0; i < this.meaningfulTokens.length; i++) {
+			const current = this.meaningfulTokens[i];
+			const before = this.meaningfulTokens[i-1];
+			const after = this.meaningfulTokens[i+1];
+			
+			// make "{" followed by line break
+			if (current.isOpenCurlyBracket) {
+				// add nest level
+				++nestLevel;
+				
+				// start a new line if not 
+				newSrc += ' ' + current.name;
+				if (after && !after.isCR) {
+					newSrc += this.addRcAndTabs(nestLevel);
+				}			
+				
+				continue;
+			}
+			
+			// make "}" line break with tabs
+			if (current.isCloseCurlyBracket) {
+				// reduce nest level
+				--nestLevel;
+				
+				// start a new line if not 
+				if (!before.isCR) {
+					newSrc += this.addRcAndTabs(nestLevel);
+				}
+				newSrc += current.name;
+				
+				// "}" must be FLOOWED BY NEW CR and tabs
+				if (after && !after.isCR) {
+					newSrc += this.addRcAndTabs(nestLevel);
+				}
+				continue;
+			}
+			
+			// add tabs according to nest level
+			if (current.isCR ) { 
+				newSrc += Token.TOKEN_CR 
+				// add tabs after CR
+				if (after && !after.isCloseCurlyBracket) {
+					newSrc += this.addTabs(nestLevel);
+				} else if (after && after.isCloseCurlyBracket) {
+					newSrc += this.addTabs(nestLevel-1)
+				}
+				continue;
+			}	
+			
+			// operator needs to be spaced
+			if (current.type === Token.TOKEN_TYPE_OPERATOR) {
+				newSrc += " " + current.name + " ";
+				continue;
+			}
+			
+			// key words needs to be space FOLLOWED
+			if (current.type === Token.TOKEN_TYPE_KEY) {
+				newSrc += current.name + " ";
+				continue;
+			}
+			
+			// quote a string (todo: need to know the quote type, for now use single quote:
+			if (current.type === Token.TOKEN_TYPE_STRING) {
+				newSrc += "'" + current.name + "'";
+				continue;
+			}
+			
+			// add REGULAR text
+			newSrc += current.name;
+			if (current.shouldStartNewLine && after && !after.isCR) {
+				// add new line and tabs
+				newSrc += this.addRcAndTabs(nestLevel);
+			}
+			
+		}
+		return {err: false, newSrc: newSrc};
+	}
+	
+	/* private methods */
 		
-		return this.errors;
+	/* add CR and preceded by tabs */
+	addRcAndTabs(n) {
+		return Token.TOKEN_CR + this.addTabs(n);
+	}
+	
+	/* add (n) tabs before a token */
+	addTabs(n) {
+		let tabs = '';
+		for (let i = 0; i < n; i++) {
+			tabs += Token.TOKEN_TAB;
+		}
+		return tabs;
+	}
+	
+	/* display tokens for debugging purpose */
+	#displayAll(tokens) {
+		tokens.forEach(t => console.log(t.displayStr));
 	}
 	
 	/* 
@@ -274,6 +387,7 @@ class CodeAnalyst {
 					const strToken =  new Token(currentString, Token.TOKEN_TYPE_STRING, openQuote.lineNo, openQuote.beginPos);
 					meaningfulTokens.push(strToken);
 					openQuote = null;
+					currentString = "";
 				} else {
 					// note that here we don't use name but value due to the symbolic nature of space chars
 					currentString += t.value;

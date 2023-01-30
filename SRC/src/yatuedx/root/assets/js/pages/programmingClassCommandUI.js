@@ -213,6 +213,16 @@ class ProgrammingClassCommandUI extends AuthPage {
 		return this.executeCode(codeStr);
 	}
 	
+	/**
+		Formatting JS code from UI text area
+	**/
+	formatCode() {
+		const codeStr = $(this.codeInputTextArea).val();
+		if (codeStr) {
+			return this.#jsCodeExecutioner.formatCode(codeStr);	
+		}
+	}
+	
 	executeCode(codeText) {
 		return this.#jsCodeExecutioner.executeCode(codeText);
 	}

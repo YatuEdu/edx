@@ -19,6 +19,7 @@ const YT_DIV_CODE_EDITOR					= "yt_div_code_editor";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
+const YT_BTN_FORMAT_CODE_ID 				= 'yt_btn_format_code';
 const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
@@ -136,6 +137,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
+		// handle format Code
+		$(this.formatCodeButton).click(this.handleCodeFormatting.bind(this));
 		// handle copy code to notes
 		$(this.copyAndSaveCodeButtonSelector).click(this.handleCopyAndSaveCodeToDb.bind(this));
 		// handle erase result board
@@ -574,6 +577,19 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Hnandle code formatting text from code baord
+	**/
+	handleCodeFormatting(e) {
+		e.preventDefault(); 
+		
+		//obtain code from local "exercise board" and execute it locally
+		const newCodeSrc = super.formatCode();
+		if (newCodeSrc) {
+			$(this.codeBoardTextArea).val(newCodeSrc);
+		}
+	}
+	
+	/**
 		Hnandle copy code to from code console to memory and eventually save to DB
 	**/
 	handleCopyAndSaveCodeToDb(e) {
@@ -685,6 +701,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	get runCodeButton() {
 		return `#${YT_BTN_RUN_CODE_ID}`;
 	}
+	
+	get formatCodeButton() {
+		return `#${YT_BTN_FORMAT_CODE_ID}`;
+	}	
 	
 	get videoScreenSelector() {
 		return `#${VD_VIEDO_AREA}`;

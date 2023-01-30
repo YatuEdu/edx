@@ -45,6 +45,19 @@ class JSCodeExecutioner {
 	}
 	
 	/*
+		Format program on the board.
+	 */
+	formatCode(src) {
+		const codeAnalyst = new CodeAnalyst(src);
+		const retObj = codeAnalyst.formatCode();
+		if (retObj.err) {
+			return `/* ${retObj.newSrc} */` + '\n' + src;
+		}
+		
+		return retObj.newSrc;
+	}
+	
+	/*
 		Run js code 
 	 */
 	#runJSCode(src) {
