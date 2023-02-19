@@ -52,12 +52,21 @@ class ParsingState {
 		this.stage += addStage;
 	}
 	
+	/* overloadables */
+		
 	advance(nextToken, pos) {
 		throw new Error('advance: sub-class-should-overload-this method'); 
 	}
 	
 	isTheLastToken(token) {
 		throw new Error('isTheLastToken: sub-class-should-overload-this method'); 
+	}
+	
+	/*
+		Does CR mean anything for this state?  By default CR does not affect the syntax at all.
+	 */
+	ignoreCR() {
+		return true;
 	}
 	
 	complete() {
@@ -147,6 +156,8 @@ class ParsingState {
 		return null;
 	}
 	
+	/* getters and setter */
+	
 	get beginPos() { return this.#beginPos; }
 	get stage() { return this.#stage; }
 	set stage(s) { this.#stage = s; }
@@ -159,6 +170,7 @@ class ParsingState {
 	set stateEnded(e) { this.#stateEnded = e }
 	get parentState() { return this.#parentState}
 	set parentState(ps) { this.#parentState =  ps}
+	
 }
 
 export {StateAction, ParsingState}

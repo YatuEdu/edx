@@ -11,12 +11,14 @@ const TOKEN_TYPE_NAME_ = 4;
 const TOKEN_TYPE_STRING_ = 5;
 const TOKEN_TYPE_NUMBER_ = 6;
 const TOKEN_TYPE_EXPRESSION = 7;
-const TOKEN_TYPE_COMMENT = 8;
-const TOKEN_TYPE_KNOWN_PROP_ = 9;
+const TOKEN_TYPE_COMMENT_MARK_ = 8;
+const TOKEN_TYPE_COMMENT_BLOCK_ = 9;
+const TOKEN_TYPE_KNOWN_PROP_ = 10;
 
 const TOKEN_SPACE_ = " ";
 const TOKEN_CR_ = "\n";
 const TOKEN_TAB_ = "\t";
+const TOKEN_STAR_ = "*";
 const SPACE_TOKEN_NAME_ = 'SPC';
 const TAB_TOKEN_NAME_ = 'TAB';
 const CR_TOKEN_NAME_ = 'CRT';
@@ -49,8 +51,8 @@ const QUOTE_TYPE_SINGLE = 2;
 const QUOTE_TYPE_BACKTICK = 3;
 
 const CM_LINE = 1;
-const CM_BLOCK_BEGIN = 2;
-const CM_BLOCK_END = 3;
+const CM_BLOCK_OPEN = 2;
+const CM_BLOCK_CLOSE = 3;
 
 const SEMICOLON = 1;
 const COMMA = 2;
@@ -91,6 +93,12 @@ class TokenConst {
 	static get VAR_DATA_CLASS_OBJ() { return 5}
 	static get VAR_DATA_FUNC() { return 6}
 	static get VAR_DATA_NUMBER_OR_STRING() { return 7}
+	
+	static get BLOCK_TAG_FOR_LOOP_START() { return 1; }
+	static get BLOCK_TAG_FOR_LOOP_END() { return 2; }
+	static get BLOCK_TAG_OBJECT_START() { return 3; }
+	static get BLOCK_TAG_OBJECT_END() { return 4; }
+	static get BLOCK_TAG_OBJECT_COMMA() { return 5; }
 }
 
 const STANDARD_TOKEN_MAP = new Map([
@@ -131,7 +139,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	[']', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
 	
 	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA, followedByType: TOKEN_TYPE_ANY }],
-	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY, shouldStartNewLine: true }],
+	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY }],
 	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, followedByType: TOKEN_TYPE_ANY }],
 	
 	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_ANY}],	
@@ -179,9 +187,9 @@ const STANDARD_TOKEN_MAP = new Map([
 	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA, followedByType: TOKEN_TYPE_ANY }],
 	['.', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
 	
-	['//', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_LINE }],
-	['/*', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_BEGIN }],
-	['*/', 			{type: TOKEN_TYPE_COMMENT, cmType: CM_BLOCK_END }],
+	['//', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_LINE }],
+	['/*', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_BLOCK_OPEN }],
+	['*/', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_BLOCK_CLOSE }],
 	
 	['length',		{type: TOKEN_TYPE_KNOWN_PROP_, propDataType: DATA_TYPE_INT_ }],
 ]);
@@ -205,12 +213,16 @@ class Token {
 	#beginPos;
 	#type
 	#canBeExpression
+	#blockTag;
+	#extraData;
 	
-	constructor(name, type, lineNo, beginPos) {
+	constructor(name, type, lineNo, beginPos, extraData) {
 		this.#name = name;
 		this.#type = type;
 		this.#lineNo = lineNo
 		this.#beginPos = beginPos;
+		this.#extraData = extraData;
+		
 		// fuether decide the type of the name 
 		this.typeDivide();
 	}
@@ -234,6 +246,8 @@ class Token {
 	static get TOKEN_TYPE_STRING() { return TOKEN_TYPE_STRING_}
 	static get TOKEN_TYPE_OPERATOR() { return TOKEN_TYPE_OPERATOR_ }
 	static get TOKEN_TYPE_KNOWN_PROP() { return TOKEN_TYPE_KNOWN_PROP_ }
+	static get TOKEN_TYPE_COMMENT_MARK() { return TOKEN_TYPE_COMMENT_MARK_ }
+	static get TOKEN_TYPE_COMMENT_BLOCK() { return TOKEN_TYPE_COMMENT_BLOCK_ }
 	
 	static get OP_MODE_BINARY() { return OP_MODE_BINARY_}
 	static get OP_MODE_UNARY_FRONT() { return OP_MODE_UNARY_FRONT_}
@@ -267,6 +281,10 @@ class Token {
 		return tokenInfo && tokenInfo.type && tokenInfo.type == Token.TOKEN_TYPE_KNOWN_PROP;
 	}
 	
+	static isStar(c) {
+		return c === TOKEN_STAR_;
+	}
+	
 	static isComma(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.punctuationType && tokenInfo.punctuationType == COMMA;
@@ -287,9 +305,24 @@ class Token {
 		return tokenInfo && tokenInfo.opType && tokenInfo.opType == OP_TYPE_OBJECT_PROPERTY_ACCESSOR;
 	}
 	
-	static isComment(c) {
+	static isCommentMark(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
-		return tokenInfo && tokenInfo.type === TOKEN_TYPE_COMMENT;
+		return tokenInfo && tokenInfo.type === Token.TOKEN_TYPE_COMMENT_MARK;
+	}
+	
+	static isLineCommentMark(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type === Token.TOKEN_TYPE_COMMENT_MARK && tokenInfo.cmType === CM_LINE;
+	}
+	
+	static isBlockCommentOpenMark(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type === Token.TOKEN_TYPE_COMMENT_MARK && tokenInfo.cmType === CM_BLOCK_OPEN;
+	}
+	
+	static isBlockCommentCloseMark(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type === Token.TOKEN_TYPE_COMMENT_MARK && tokenInfo.cmType === CM_BLOCK_CLOSE;
 	}
 	
 	static getSeperaterType(c) {
@@ -451,11 +484,6 @@ class Token {
 		}
 	}
 	
-	static shouldStartNewLine(c) {
-		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
-		return 	tokenInfo && tokenInfo.shouldStartNewLine;
-	}
-	
 	/* for a name, decide if it's number or variables */
 	typeDivide() {
 		if (this.type === TOKEN_TYPE_NAME_ &&
@@ -486,6 +514,7 @@ class Token {
 			   this.type == TOKEN_TYPE_NUMBER_;
 	}
 	get isSpace () { return TOKEN_TYPE_SPACE_ === this.type}
+	get isStar() { return Token.isStar(this.#name)}
 	get isCR() { return TOKEN_TYPE_SPACE_ === this.type && this.value === TOKEN_CR_}
 	get isConst() { return  this.type === TOKEN_TYPE_NUMBER_ || this.type === TOKEN_TYPE_STRING_ }
 	get isSeperater () { return Token.getSeperaterType(this.#name) != TOKEN_TYPE_UNKNOWN_ }
@@ -507,7 +536,10 @@ class Token {
 	get isComma() { return Token.isComma(this.#name) }
 	get isColon() { return Token.isColon(this.#name) }
 	get isSemicolon() { return Token.isSemicolon(this.#name) }
-	get isComment() { return Token.isComment(this.#name) }
+	get isCommentBlock() { return this.type === Token.TOKEN_TYPE_COMMENT_BLOCK }
+	get isLineCommentMark() {return Token.isLineCommentMark(this.#name)}
+	get isBlockCommentOpenMark()  {return Token.isBlockCommentOpenMark(this.#name)}
+	get isBlockCommentCloseMark() {return Token.isBlockCommentCloseMark(this.#name)}
 	get isExpressionEnd() { return Token.isExpressionEnd(this.#name) }
 	get isVarDeclaration() { return Token.isVarDeclaration(this.#name); }
 	get isConstVarDeclaration() { return Token.isConstVarDeclaration(this.#name); }
@@ -535,20 +567,36 @@ class Token {
 	get isReturn() {return Token.isReturn(this.#name)}
 	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
-	get shouldStartNewLine() { return Token.shouldStartNewLine(this.#name);}
+	
+	get blockTag() { return this.#blockTag }
+	// #within can be set
+	set blockTag(tag) { this.#blockTag = tag}
 }
 
 class TokenError {
 	#token
 	#msg
+	#code
 	
-	constructor(msg, token) {
+	constructor(msg, token, code) {
 		this.#msg = msg;
 		this.#token = token;
+		if (!code) {
+			this.#code = TokenError.ERR_UNKNOWN;
+		} else {
+			this.#code = code;
+		}
+		
 	}
 	
+	// error code
+	static get ERR_UNKNOWN () { return -1; }
+	static get ERR_OPEN_CLOSE () { return -2; }
+	
+	// properties
 	get msg() { return this.#msg; }
 	get token() { return this.#token; }
+	get code() { return this.#code; }
 	
 	get errorDisplay() {
 		return `Error: ${this.msg} at line: ${this.token.lineNo}, position: ${this.token.beginPos}, found token <<< ${this.token.name} >>>`;

@@ -1,5 +1,5 @@
 import {StateAction, ParsingState}			from './parsingState.js'
-import {TokenError}							from './token.js'
+import {TokenError, TokenConst}				from './token.js'
 import {ExpressionState}					from './expressionState.js'
 
 const errorMsg = "Invalid object definition syntax";
@@ -61,6 +61,9 @@ class ObjectDefState extends ParsingState {
 			this.codeAnalyst.errors.push(this.error);
 		} else {
 			this.stage = ObjectDefState.PROP_NAME_STATE;
+			
+			// Tag the comma
+			token.blockTag = TokenConst.BLOCK_TAG_OBJECT_COMMA;
 		}
 
 		return this.stateEnded;	

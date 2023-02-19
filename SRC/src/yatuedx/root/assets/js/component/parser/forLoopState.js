@@ -2,7 +2,7 @@ import {StateAction, ParsingState}			from './parsingState.js'
 import {ExpressionState} 					from './expressionState.js'
 import {AssignmentState}					from './assignmentState.js'
 import {VarDeclarationState}				from './varDeclarationState.js'
-import {TokenError}							from './token.js'
+import {TokenError, TokenConst}				from './token.js'
 
 class ForLoopState extends ParsingState {
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
@@ -30,6 +30,8 @@ class ForLoopState extends ParsingState {
 				}
 				
 				this.stage = ForLoopState.INIT_EXPR_STATE;
+				// mark this token as THE BEGINING OF A FOR LOOP
+				nextToken.blockTag = TokenConst.BLOCK_TAG_FOR_LOOP_START;
 				break;
 			}	
 			
@@ -96,6 +98,8 @@ class ForLoopState extends ParsingState {
 		else if (this.stage === ForLoopState.ITERATION_EXPR_STATE) {
 			if (token.isCloseRoundBracket) {
 				this.stateEnded = true;
+				// mark this token as THE END  OF A FOR LOOP
+				token.blockTag = TokenConst.BLOCK_TAG_FOR_LOOP_END;
 			} else {
 				hasError = true;	
 			}

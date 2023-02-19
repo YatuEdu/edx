@@ -21,7 +21,7 @@ class CodeBlockState extends ParsingState {
 	
 	advance(nextToken, pos) {
 		const tokenInfo = Token.getTokenInfo(nextToken.name);
-				
+			
 		// enering a new code block:
 		if (nextToken.isOpenCurlyBracket) {
 			const newScope = new Scope(this.scope);	

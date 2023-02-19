@@ -1,5 +1,5 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
-import {Token, TokenError}					from '../parser/token.js'
+import {Token, TokenConst, TokenError}		from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
 import {CodeBlockState}						from '../parser/CodeBlockState.js'
 
@@ -76,13 +76,13 @@ class CodeAnalyst {
 		
 		// see if we still have unmatched open brackets:
 		bracketStack.forEach(bt => {
-			const bracketMismatchError = new TokenError("Bracket is not closed", bt);
+			const bracketMismatchError = new TokenError("Bracket is not closed", bt, TokenError.ERR_OPEN_CLOSE);
 			this.errors.push(bracketMismatchError);
 		});
 		
 		// see if we still have unmatched open quotes:
 		quoteStack.forEach(qt => {
-			const quoteMismatchError = new TokenError("Quote is not closed", qt);
+			const quoteMismatchError = new TokenError("Quote is not closed", qt, TokenError.ERR_OPEN_CLOSE);
 			this.errors.push(quoteMismatchError);
 		});
 	}
@@ -91,10 +91,12 @@ class CodeAnalyst {
 		Formattting code according to JS coding style.
 	 **/
 	formatCode() {
-		this.bracketMatchInspection();
+		// remove parser added comments if found
+		
+		this.shallowInspect();
 		// if error, advice to fix error first
 		if (this.errors.length > 0) {
-			return {err: true, newSrc: this.errors[0].errorDisplay()};
+			return {err: true, newSrc: this.errors[0].errorDisplay};
 		}
 		
 		let newSrc = '';
@@ -137,6 +139,18 @@ class CodeAnalyst {
 				continue;
 			}
 			
+			// object separator "," should be followed by CR and tabs
+			/*
+				todo: gather all such tokens and refactor into a methos
+			*/
+			if (current.blockTag === TokenConst.BLOCK_TAG_OBJECT_COMMA) {
+				newSrc += current.name;
+				if (after && !after.isCR) {
+					newSrc += this.addRcAndTabs(nestLevel);
+				}
+				continue;
+			}
+			
 			// add tabs according to nest level
 			if (current.isCR ) { 
 				newSrc += Token.TOKEN_CR 
@@ -149,14 +163,21 @@ class CodeAnalyst {
 				continue;
 			}	
 			
-			// operator needs to be spaced
+			// Most operator needs to be spaced. Some operatord (such alike ".") need not to be spaced
 			if (current.type === Token.TOKEN_TYPE_OPERATOR) {
-				newSrc += " " + current.name + " ";
+				let space = " ";
+				if (current.isObjectAccessor) {
+					space = "";
+				}
+				newSrc += space + current.name + space;
 				continue;
 			}
 			
-			// key words needs to be space FOLLOWED
-			if (current.type === Token.TOKEN_TYPE_KEY) {
+			// key words needs to be followed by space
+			/*
+				todo: refactor when we gathered everything that should be followed by space.
+			 */
+			if (current.type === Token.TOKEN_TYPE_KEY || current.isColon) {
 				newSrc += current.name + " ";
 				continue;
 			}
@@ -169,13 +190,37 @@ class CodeAnalyst {
 			
 			// add REGULAR text
 			newSrc += current.name;
-			if (current.shouldStartNewLine && after && !after.isCR) {
-				// add new line and tabs
-				newSrc += this.addRcAndTabs(nestLevel);
-			}
-			
+			newSrc += this.addSpaceOrNewLine(i, nestLevel);
 		}
 		return {err: false, newSrc: newSrc};
+	}
+	
+	/* semicolon not inside 'for' statement shall start from a new line */
+	addSpaceOrNewLine(pos, nestLevel) {
+		let forEnd = false;
+		let startNewLine = false;
+		let addSpace = "";
+		const current = this.meaningfulTokens[pos];
+		const after = this.meaningfulTokens[pos+1];
+		if (current.isSemicolon) {
+			addSpace = " ";
+			startNewLine = after && !after.isCR;
+			// see if this semicolon is within a for loop
+			for (let i = pos-1; i >= 0; i--) {
+				const token = this.meaningfulTokens[i];
+				if (token.blockTag === TokenConst.BLOCK_TAG_FOR_LOOP_END) {
+					break;
+				}
+				
+				// encountered "for" but not "end of for", break;
+				if (token.blockTag === TokenConst.BLOCK_TAG_FOR_LOOP_START) {
+					startNewLine = false;
+					break;
+				}
+			}
+		}
+		
+		return startNewLine ? this.addRcAndTabs(nestLevel) : addSpace;
 	}
 	
 	/* private methods */
@@ -212,6 +257,18 @@ class CodeAnalyst {
 		let currentState = new CodeBlockState(i, null, new Scope(null), this);
 		while (i < this.meaningfulTokens.length) {
 			const token = this.meaningfulTokens[i];
+			
+			// throw CR if the state-machine does not care about it
+			if (token.isCR && currentState.ignoreCR) {
+				++i;
+				continue;
+			}
+			
+			// skip comment]
+			if (token.isCommentBlock) {
+				++i;
+				continue;
+			}
 			
 			// get next state
 			const action = currentState.advance(token, i);
@@ -358,6 +415,9 @@ class CodeAnalyst {
 		// now conbine tokens into meaningful tokens
 		this.#combineTokens()
 		
+		// consolidate comments inside code into one tokens if any
+		this.#consolidateComments();
+		
 		console.log(`number of meaningful tokens: ${this.#meaningfulTokens.length}`);
 		// display all tokens
 		this.#displayAll(this.#meaningfulTokens);
@@ -379,12 +439,13 @@ class CodeAnalyst {
 		for(let i = 0; i < this.#tokens.length; i++) {
 			const t = this.#tokens[i];
 			const isQuote = t.isQuote;
+			const quoteName = t.name;
 			
 			// got quote?
 			if (openQuote) {
 				if (t.name === openQuote.name) {
 					// quote closed, gathered a string
-					const strToken =  new Token(currentString, Token.TOKEN_TYPE_STRING, openQuote.lineNo, openQuote.beginPos);
+					const strToken =  new Token(currentString, Token.TOKEN_TYPE_STRING, openQuote.lineNo, openQuote.beginPos, t.name);
 					meaningfulTokens.push(strToken);
 					openQuote = null;
 					currentString = "";
@@ -416,7 +477,7 @@ class CodeAnalyst {
 			
 			// combine the new token with existing tokens?
 			if (combinableToken) {
-				const newToken = this.#combineTowTokens(combinableToken, t);
+				const newToken = this.#combineTowTokens(combinableToken, t, meaningfulTokens);
 				if (newToken) {
 					combinableToken = newToken;
 					continue;
@@ -445,13 +506,66 @@ class CodeAnalyst {
 		this.#meaningfulTokens = meaningfulTokens;
 	}
 	
+	/**
+		This methods essentialy does one thing:
+			It combine comment tokens, such as // this is a comment, into one comment token
+	 **/
+	#consolidateComments() {
+		const tokensWithConsolidatedComments = [];
+		let openBlockComment = null;
+		let openLineComment = null;
+		let currentString = "";
+		
+		// enumerate meaningful tokens
+		for(let i = 0; i < this.#meaningfulTokens.length; i++) {
+			const t = this.#meaningfulTokens[i];
+			
+			// got block comment closing?
+			if (openBlockComment) {
+				if (t.isBlockCommentCloseMark) {
+					// quote closed, gathered a string
+					const commentToken =  new Token(`${openBlockComment.name}${currentString}${t.name}`, // code comment 
+												Token.TOKEN_TYPE_COMMENT_BLOCK, 
+												openBlockComment.lineNo, 
+												openBlockComment.beginPos);
+					tokensWithConsolidatedComments.push(commentToken);
+					openBlockComment = null;
+					currentString = "";
+				} else {
+					// note that here we don't use Token.name but Token.value due to 
+					// the symbolic nature of space chars
+					currentString += " " + t.value;
+				}
+				continue;
+			} else if (t.isBlockCommentOpenMark) {
+				openBlockComment = t;
+				continue;
+			} 
+			
+			// not comments
+			tokensWithConsolidatedComments.push(t);
+		}
+		
+		this.#meaningfulTokens = tokensWithConsolidatedComments;
+	}
+	
 	/*
 		combine a group of tokens and a new token together.
 		returns true if the new token is absorbed, false if the new token
 		is not absorbed.
 	 */
-	#combineTowTokens(token1, token2) {
+	#combineTowTokens(token1, token2, previousTokens) {
 		const combinedTokenStr = token1.name + token2.name;
+		const openComment = previousTokens.find(t => t.isBlockCommentOpenMark);
+		const closeComment = previousTokens.find(t => t.isBlockCommentCloseMark);
+		const inComment = openComment && openComment.beginPos >= 0 
+						  && (!closeComment || closeComment.beginPos < openComment.beginPos);
+						  
+		// in comment do not wash out * token
+		if (inComment && token2.isStar) {
+			return null;
+		}
+		
 		const combinedTokenInfo = Token.getTokenInfo(combinedTokenStr);
 		if (combinedTokenInfo) {
 			return new Token(combinedTokenStr, combinedTokenInfo.type, token1.lineNo, token1.beginPos);

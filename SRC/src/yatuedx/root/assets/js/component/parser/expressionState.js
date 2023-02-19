@@ -165,6 +165,12 @@ class ExpressionState extends ParsingState {
 		}
 	}
 
+	/*
+		Does CR mean anything for this state?  By default CR does not affect the syntax at all.
+	 */
+	ignoreCR() {
+		return false;
+	}
 	
 	// if we started a new line, we might start a new expression or continue the current one.
 	// it is complicated. For now we look for "=" only.

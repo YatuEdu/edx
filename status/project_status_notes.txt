@@ -6,9 +6,43 @@ if (x >= (y / 4)) { <<= detect y not defined
 3) const x = 12;
 x = 100
 	
-
+Parsing Issues
+---------------
 principal: a. resolve asap: a
 A: when op2 .priority > op1 
 B: whe ")" is met, resolve back till "(" 
 C: if unary_back is met, resolve backward immeditately
 D: IF UNARY FRONT IS MET, push var, and wait to see the next 
+E: Skip comments
+
+Code formatter issues:
+--------------------------
+1:  remove parser added comments: /* #$%^&*: blabla */
+2:  maintain quote type
+
+
+Needed features:
+---------------------------
+1) teacher notes per class
+2) teacher set invisible coe (for testing purpose)
+
+Teaching content:
+------------------------
+Varaible, value, and data type
+  value: "abc" - string type
+		 'abc' - string type
+		 `abc` - string type
+	      100  - integer number type
+		  1.245 - float number type
+		  [1, 2, 3] - array type
+		  {name: 'Kevin Yang', age: 12} - object type
+comment:
+	/* */ and //
+	
+seperator:
+	CR, , ; : 
+CODE BLOCK: () -> EXPRESSION
+{ } -> BLOCK SCOPE
+
+		  
+Teach this after students can werite simple code, before function is introduced
