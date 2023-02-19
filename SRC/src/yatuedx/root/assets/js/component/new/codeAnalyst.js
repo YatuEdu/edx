@@ -1,7 +1,7 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
 import {Token, TokenConst, TokenError}		from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
-import {CodeBlockState}						from '../parser/CodeBlockState.js'
+import {CodeBlockState}						from '../parser/codeBlockState.js'
 
 class CodeAnalyst {
 	#beginLine;
