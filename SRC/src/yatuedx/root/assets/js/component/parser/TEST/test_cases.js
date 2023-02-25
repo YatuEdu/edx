@@ -119,3 +119,7 @@ let y = 2;
 x = 10;
 z = u + x+ y		// undefined variable "u"
 
+/* Error: Bracket is not closed at line: 1, position: 8, found token <<< ( >>> */
+/* this ( */
+const x = 1;
+y = x ** 2 * 5 * (10)  -> 50, ignoring the comments

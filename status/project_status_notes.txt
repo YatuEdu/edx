@@ -17,9 +17,43 @@ E: Skip comments
 
 Code formatter issues:
 --------------------------
-1:  remove parser added comments: /* #$%^&*: blabla */
-2:  maintain quote type
+1:  remove parser added comments: /* #$%^&*: blabla */ (100%)
+2:  maintain quote type									(100%)
+3:  the following statement compplains error:
+x =  {
+	x: 1,
+	y: 2
+}
+print (x)
+-------------> 
+/* noneedtokeet Error: Undefined valrable found at line: 5, position: 29, found token <<< x >>> */
+x =  {
+	x: 1,
+	y: 2
+}
+print (x)
+4: x = ++a +  + b  // should have no space between + and b
 
+
+
+BUGS:
+-----------------------------
+1) (Fixed) IF STATEMENT does not compplain about undefiend variables
+   - cause: variable check is only in binary resolver
+   - fix: make sure assignment still works after this
+
+2) (Fixed) const x = 1;
+let y = 2;
+x = 10;			// error for const assignment
+print(x+y)
+
+got weir error message: expecting "("
+
+3) (Fixed) INORE Grammar check inside /* */
+
+4) (Fixed) ! operator does not work for parser: x = a ! b => should be invalid
+
+5) save exception
 
 Needed features:
 ---------------------------

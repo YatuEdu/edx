@@ -6,8 +6,11 @@ import {ExpressionState} 				from './expressionState.js'
 
 class VarDeclarationState extends ParsingState {
 	#varToken
+	#varType
+	
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		super(beginPos, beginToken, scope, codeAnalyst);
+		this.#varType = beginToken.varType;
 		this.stage = 0
 	}
 	
@@ -59,7 +62,7 @@ class VarDeclarationState extends ParsingState {
 	isTheLastToken(token) {
 		if (this.stage == 2) {
 			// add a new variable
-			const newVar = new Variable(this.#varToken, this.#varToken.varType);
+			const newVar = new Variable(this.#varToken, this.#varType);
 			this.scope.variableMap.set(this.#varToken.name, newVar); 
 			this.stateEnded = true;
 		} else {

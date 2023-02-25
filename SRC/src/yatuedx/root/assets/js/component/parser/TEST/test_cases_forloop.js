@@ -6,7 +6,7 @@ for (let i = 0; i < 10; i+=2) {
 
 for (i = 0; i < 10; i+=2) {
 	print(i);
-}			// print 0, 2, 4, 6, 8
+}			// print 0, 2, 4, 6, 8 x = 10
 
 
 let j = 0;

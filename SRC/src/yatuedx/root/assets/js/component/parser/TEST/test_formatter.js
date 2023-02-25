@@ -18,7 +18,21 @@ function compose(xArray, y) {
         }
 		}
 		}
-		
+
+---------------------------
+y=1 +9; 
+if(!y) {
+	y = 1;
+	return""; 
+}
+=>
+y = 1 + 9; 
+if (!y) {
+	y = 1;
+	return ""; 
+}
+
+---------------------------		
 		
 const invalid = "*";
 
@@ -55,6 +69,34 @@ x =  {
 		y: 2
 	}	
 }
+
+// test case:
+x =  {
+	x: 1,
+	y: 'abc " ',
+	z: 3, w:  { x: 1, y: 2
+	}
+	
+}
+print(x)
+
+result:
+
+x =  {
+	x: 1,
+	y: 'abc " ',
+	z: 3,
+	w:  {
+		x: 1,
+		y: 2
+	}
+	
+}
+
+test what? - formettesd correctly 
+			- string quotes preserved
+			
+bug: = : needs only one space
 
 /* comment needs to be preserverd */
 x = 10

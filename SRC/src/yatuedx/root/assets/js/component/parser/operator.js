@@ -21,7 +21,7 @@ class Operator extends ExpressionElement {
 	// a front unary operator can only be followed by a none "()" operand
 	//a rear unary operator can only be follwed by another operator or nothing
 	canBeFollowedBy(another) { 
-		return 	this.isBinary && (another instanceof Operand) && !(another instanceof CloseRoundBrachetOperand) ||
+		return 	this.isBinary && (another instanceof Operand || another.isUnaryFront) && !(another instanceof CloseRoundBrachetOperand) ||
 		        this.isUnaryFront && (another instanceof Operand) && !(another.token.isRoundBracket) || 
 				this.isUnaryRear  && (another instanceof Operator)
 	}
@@ -32,15 +32,26 @@ class Operator extends ExpressionElement {
 				this.tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
 	}
 	
+	get isUnaryFrontOnly() { 
+		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT;
+	}
 	
 	get isUnaryRear() { 
 		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_REAR ||
 				this.tokenInfo.opMode === Token.OP_MODE_UNARY_BOTH
 	}
 	
+	get isUnaryRearOnLy() { 
+		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_REAR;
+	}
+	
 	get isBinary() { 
 		return  this.tokenInfo.opMode === Token.OP_MODE_UNARY_FRONT_AND_BINARY ||
 				this.tokenInfo.opMode === Token.OP_MODE_BINARY
+	}
+	
+	get isBinaryOnly() { 
+		return this.tokenInfo.opMode === Token.OP_MODE_BINARY
 	}
 	
 	get priority() { return this.#tokenInfo.priority; }

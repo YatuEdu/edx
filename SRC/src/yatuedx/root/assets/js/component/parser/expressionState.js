@@ -110,7 +110,7 @@ class ExpressionState extends ParsingState {
 			
 			// add a new operator?
 			if (Operator.isOperator(nextToken)) {
-				newElement = this.#addOperator(nextToken);
+				newElement = this.#addOperator(nextToken, pos);
 				break;
 			}
 						
@@ -233,6 +233,14 @@ class ExpressionState extends ParsingState {
 		const lastOperand = this.#peek();
 		const newOperand = new CodeOperand(token); 
 	
+		// operand must be defined prior
+		if (newOperand.isVariable) {
+			const v = this.scope.findVariable(newOperand.name, false);
+			if (!v) {
+				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, newOperand.token);
+				return null;
+			}
+		}
 		// associate the binary op with the last oprand:
 		if (lastOperand) {
 			if (lastOperand.binaryOperatorRight) {
@@ -244,7 +252,7 @@ class ExpressionState extends ParsingState {
 		return newOperand;
 	}
 	
-	#addOperator(token) {
+	#addOperator(token, pos) {
 		if (this.#currentOperator) {
 			this.error = new TokenError("Ophaned operator found", token);
 			return;
@@ -259,28 +267,30 @@ class ExpressionState extends ParsingState {
 		
 		const lastOperand = this.#peek();
 		
-		// wait for the next operand 
-		if (!lastOperand) {
-			if (newOp.isUnaryFront) {
+		// for unary front operator
+		if (this.#shouldBeUnaryFrontOperator(lastOperand, newOp, pos)) {
+			if (!this.error) {
+				// leave front operator un-associated until next token
 				this.#currentOperator = newOp;
-				return newOp;
-			}
+			} 
 			
-			// ophan operator found
-			this.error = new TokenError("Ophan operator found", token);
-			return;
+			return newOp;
 		}
 		
-		// eat unary rear operator if applicable, or error
-		if (!lastOperand.binaryOperatorRight) {
-			if (newOp.isUnaryRear) {
-				// todo: is there a rear operator that work on constant?
+		// / for unary rear operator
+		if (this.#shouldBeUnaryRearOperator(lastOperand, newOp, pos)) {
+			if (!this.error) {
 				if (lastOperand.isConst) {
+					// todo: is there a rear operator that work on constant?
 					this.error = new TokenError("Invalid operator found", token);
 				}
-				return newOp;
 			}
-			
+			//eat unary rear operator	
+			return newOp;
+		}
+		
+		// binary operator
+		if (lastOperand && !lastOperand.binaryOperatorRight) {
 			// associate with the last operand
 			lastOperand.binaryOperatorRight = newOp;
 		} else {
@@ -352,6 +362,71 @@ class ExpressionState extends ParsingState {
 		}
 		
 		return this.#addTempOprand("T"+ this.#numberOfTemp++, newOp) 
+	}
+	
+	/**
+		PREDICATE for telling if the given operator (newOp) is a unary front operator.
+		The complexity comes from operators such as ++ can be either front or rear operator,
+		and operator such as + and - can be both unary font or binary operator.
+	 **/
+	#shouldBeUnaryFrontOperator(lastOperand, newOp, pos) {
+		let shouldBe = false;
+		if (newOp.isUnaryFrontOnly) {
+			shouldBe = true;
+		}
+		const noLeftOperand = !lastOperand || lastOperand.binaryOperatorRight;
+		
+		if (shouldBe) {
+			// error found
+			if (!noLeftOperand) {
+				this.error = new TokenError("Invalid expression state encounteed", newOp.token);
+				return false;
+			}
+			
+			return true;
+		}
+		return noLeftOperand && newOp.isUnaryFront 
+				&& this.codeAnalyst.meaningfulTokens.length > pos + 1 
+					&& Operand.isOperand(this.codeAnalyst.meaningfulTokens[pos + 1]);
+	}
+	
+	/**
+		PREDICATE for telling if the given operator (newOp) is a unary rear operator.
+		The complexity comes from operators such as ++ can be either front or rear operator,
+	 **/
+	#shouldBeUnaryRearOperator(lastOperand, newOp, pos) {
+		let shouldBe = false;
+		if (newOp.isUnaryRearOnly) {
+			shouldBe = true;
+		}
+		const hasLeftOperand = lastOperand && !lastOperand.binaryOperatorRight;
+	
+		if (shouldBe) {
+			// error found
+			if (!hasLeftOperand) {
+				this.error = new TokenError("Invalid expression state encounteed", newOp.token);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		
+		if (hasLeftOperand && newOp.isUnaryRear) {
+			// reached end
+			if (this.codeAnalyst.meaningfulTokens.length <= pos + 1 ||
+				this.codeAnalyst.meaningfulTokens[pos + 1].isSeperater ||
+				this.codeAnalyst.meaningfulTokens[pos + 1].isCR) {
+				return true;
+			}
+			
+			// next token is operator so this one must be rear operator
+			if (Operator.isOperator(this.codeAnalyst.meaningfulTokens[pos + 1])) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

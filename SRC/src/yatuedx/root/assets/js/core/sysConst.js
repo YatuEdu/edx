@@ -45,7 +45,7 @@ const sysConstStrings = Object.freeze({
 	ATTR_MODE: 'mode',
 	TAB_STRING: '\t',
 	
-	TAG_PARSER_ADDED_COMMENT: '#$%^&*:DO-N0T-REMOVE'
+	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment'
 });
 
 const languageConstants = Object.freeze({

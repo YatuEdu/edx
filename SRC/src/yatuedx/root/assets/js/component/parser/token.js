@@ -99,50 +99,50 @@ class TokenConst {
 	static get BLOCK_TAG_OBJECT_START() { return 3; }
 	static get BLOCK_TAG_OBJECT_END() { return 4; }
 	static get BLOCK_TAG_OBJECT_COMMA() { return 5; }
+	static get BLOCK_TAG_IF_START() { return 6; }
 }
 
 const STANDARD_TOKEN_MAP = new Map([
-	['if', 			{type: TOKEN_TYPE_KEY_, keyType: TokenConst.IF_KEY, followedBy: ['('] } ],
-	['else', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.ELSE_KEY, followedBy: ['{', 'if'] } ],
-	['new', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.NEW_KEY, followedBy: ['{',], includedInside: ["`"] }],
-	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY, followedBy: ['('] } ],
-	['switch', 		{type: TOKEN_TYPE_KEY_, followedBy: ['{'] } ],
-	['while', 		{type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
-	['do', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{'] }],
+	['if', 			{type: TOKEN_TYPE_KEY_, keyType: TokenConst.IF_KEY } ],
+	['else', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.ELSE_KEY } ],
+	['new', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.NEW_KEY }],
+	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY } ],
+	['switch', 		{type: TOKEN_TYPE_KEY_ }],
+	['while', 		{type: TOKEN_TYPE_KEY_ }],
+	['do', 			{type: TOKEN_TYPE_KEY_ }],
 	['for', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FOR_KEY } ],
 	['function', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FUNC_KEY }],
-	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY, followedByType: TOKEN_TYPE_NAME_ }],
-	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, followedByType: TOKEN_TYPE_NAME_ }],
-	['constructor', {type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
-	['get', 		{type: TOKEN_TYPE_KEY_, followedByType: TOKEN_TYPE_NAME_ }],
-	['set', 		{type: TOKEN_TYPE_KEY_, followedByType: TOKEN_TYPE_NAME_ }],
-	['const', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.CONST_KEY, followedByType: TOKEN_TYPE_NAME_, }],
-	['let', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.LET_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
-	['var', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.VAR_KEY, followedByType: TOKEN_TYPE_NAME_,   }],
+	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY}],
+	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME}],
+	['constructor', {type: TOKEN_TYPE_KEY_ }],
+	['get', 		{type: TOKEN_TYPE_KEY_}],
+	['set', 		{type: TOKEN_TYPE_KEY_}],
+	['const', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.CONST_KEY }],
+	['let', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.LET_KEY   }],
+	['var', 		{type: TOKEN_TYPE_KEY_, subType: KEY_SUB_TYPE_VAR_DECL, keyType: TokenConst.VAR_KEY   }],
 	['return', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.RETURN_KEY}],
-	['break', 		{type: TOKEN_TYPE_KEY_, followedBy: [';'] }],
-	['continue', 	{type: TOKEN_TYPE_KEY_, followedBy: [';'] }],
-	['forEach', 	{type: TOKEN_TYPE_KEY_, followedBy: ['('] }],
-	['this', 		{type: TOKEN_TYPE_KEY_, followedBy: ['.', ';'] }],
-	['$', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{',], includedInside: ["`"] }],
-	['$', 			{type: TOKEN_TYPE_KEY_, followedBy: ['{',], includedInside: ["`"] }],
+	['break', 		{type: TOKEN_TYPE_KEY_ }],
+	['continue', 	{type: TOKEN_TYPE_KEY_ }],
+	['forEach', 	{type: TOKEN_TYPE_KEY_ }],
+	['this', 		{type: TOKEN_TYPE_KEY_ }],
+	['$', 			{type: TOKEN_TYPE_KEY_ }],
 
-	['"', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING_, quoteType: QUOTE_TYPE_DOUBLE }],
-	["'", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING_, quoteType: QUOTE_TYPE_SINGLE}],
-	["`", 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_STRING_, quoteType: QUOTE_TYPE_BACKTICK }],
+	['"', 			{type: TOKEN_TYPE_SEPARATOR, quoteType: QUOTE_TYPE_DOUBLE }],
+	["'", 			{type: TOKEN_TYPE_SEPARATOR, quoteType: QUOTE_TYPE_SINGLE}],
+	["`", 			{type: TOKEN_TYPE_SEPARATOR, quoteType: QUOTE_TYPE_BACKTICK }],
 	
-	['{', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_OPEN   }],
-	['}', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_CLOSE  }],
-	['(', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_OPEN   }],
-	[')', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_CLOSE  }],
-	['[', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_OPEN  }],
-	[']', 			{type: TOKEN_TYPE_SEPARATOR, followedByType: TOKEN_TYPE_ANY, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
+	['{', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_OPEN   }],
+	['}', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_CURLY, bracketAction: ACTION_CLOSE  }],
+	['(', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_OPEN   }],
+	[')', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_ROUND, bracketAction: ACTION_CLOSE  }],
+	['[', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_OPEN  }],
+	[']', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
 	
-	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA, followedByType: TOKEN_TYPE_ANY }],
-	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON, followedByType: TOKEN_TYPE_ANY }],
-	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, followedByType: TOKEN_TYPE_ANY }],
+	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA }],
+	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON }],
+	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON }],
 	
-	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR, followedByType: TOKEN_TYPE_ANY}],	
+	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR}],	
 	
 	['+=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_ASSIGNMENT_OPERATOR, opMode: OP_MODE_BINARY_, priority: 0 }],
 	['-=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_ASSIGNMENT_OPERATOR, opMode: OP_MODE_BINARY_, priority: 0 }],
@@ -162,7 +162,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	['!=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_BINARY_, priority: 2}],
 	['!==', 		{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_BINARY_, priority: 2}],
 	
-	['!', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_BINARY_, priority: 1 }],
+	['!', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_UNARY_FRONT_, priority: 1, notFollowedBySpace: true }],
 	['&', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 3}],
 	['|', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 3}],
 	
@@ -181,11 +181,11 @@ const STANDARD_TOKEN_MAP = new Map([
 	
 	["instanceof",  {type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_BINARY_, priority: 6 }], 
 	['typeof', 		{type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_UNARY_FRONT_, priority: 6 }],
-	['++', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],
-	['--', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
+	['++', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],
+	['--', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
 	
-	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA, followedByType: TOKEN_TYPE_ANY }],
-	['.', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
+	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA }],
+	['.', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
 	
 	['//', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_LINE }],
 	['/*', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_BLOCK_OPEN }],
@@ -460,6 +460,13 @@ class Token {
 		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.RETURN_KEY;
 	}
 	
+	static opFollowedBySpace(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type 
+				&& (tokenInfo.type === TOKEN_TYPE_OPERATOR_)
+				&& (tokenInfo.notFollowedBySpace === undefined || tokenInfo.notFollowedBySpace !== true);
+	}
+	
 	static bracketTypeToName(type) {
 		switch(type) {
 			case BRACKET_TYPE_CURLY:
@@ -537,6 +544,7 @@ class Token {
 	get isColon() { return Token.isColon(this.#name) }
 	get isSemicolon() { return Token.isSemicolon(this.#name) }
 	get isCommentBlock() { return this.type === Token.TOKEN_TYPE_COMMENT_BLOCK }
+	get isCommentLine() { return this.type === Token.TOKEN_TYPE_COMMENT_BLOCK }
 	get isLineCommentMark() {return Token.isLineCommentMark(this.#name)}
 	get isBlockCommentOpenMark()  {return Token.isBlockCommentOpenMark(this.#name)}
 	get isBlockCommentCloseMark() {return Token.isBlockCommentCloseMark(this.#name)}
@@ -567,7 +575,7 @@ class Token {
 	get isReturn() {return Token.isReturn(this.#name)}
 	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
-	
+	get opFollowedBySpace() { return Token.opFollowedBySpace(this.#name)}
 	get blockTag() { return this.#blockTag }
 	// #within can be set
 	set blockTag(tag) { this.#blockTag = tag}

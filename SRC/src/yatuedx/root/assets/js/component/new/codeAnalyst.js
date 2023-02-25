@@ -1,4 +1,5 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
+import {sysConstStrings}					from '../../core/sysConst.js'
 import {Token, TokenConst, TokenError}		from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
 import {CodeBlockState}						from '../parser/codeBlockState.js'
@@ -27,6 +28,7 @@ class CodeAnalyst {
 	/* geters and setters */
 	get tokens() { return this.#tokens; }
 	get meaningfulTokens() { return this.#meaningfulTokens; }
+	set meaningfulTokens(meaningfulTokens) { this.#meaningfulTokens = meaningfulTokens; }
 	get variables() { return this.#variables; }
 	get calledFunctions() { return this.#calledFunctions; }
 	get numbers() { return this.#numbers; }
@@ -41,7 +43,8 @@ class CodeAnalyst {
 		such as no closing { or ( or [
 	*/
 	shallowInspect() {
-		this.bracketMatchInspection();
+		this.#removeFormatterAddedComments();
+		this.#bracketMatchInspection();
 		if (this.errors.length === 0) {		
 			this.#syntaxParseOne();
 		}
@@ -49,54 +52,14 @@ class CodeAnalyst {
 		return this.errors;
 	}
 	
-	bracketMatchInspection() {
-		const bracketStack = [];
-		const quoteStack = [];
-		for (let i = 0; i < this.tokens.length; i++) {
-			const tokenInfo = Token.getTokenInfo(this.tokens[i].name);
-			const followedByInfo = this.#canBeFollowed(i);
-			if (followedByInfo.result === false) {
-				const invalidGrammer = new TokenError("Invalid symbol found", followedByInfo.token);
-				this.errors.push(invalidGrammer);
-			}
-			
-			// INSPECT BRACKET matches
-			if (tokenInfo) {
-				if (tokenInfo.bracketType) {
-					const unmatchError = this.#checkBracketMatches(this.tokens[i], bracketStack);
-					if (unmatchError) {
-						const bracketMismatchError = new TokenError(unmatchError, this.tokens[i]);
-						this.errors.push(bracketMismatchError);
-					}
-				} else if (tokenInfo.quoteType) {
-					this.#checkQuoteMatches(this.tokens[i], quoteStack);
-				}
-			}
-		}
-		
-		// see if we still have unmatched open brackets:
-		bracketStack.forEach(bt => {
-			const bracketMismatchError = new TokenError("Bracket is not closed", bt, TokenError.ERR_OPEN_CLOSE);
-			this.errors.push(bracketMismatchError);
-		});
-		
-		// see if we still have unmatched open quotes:
-		quoteStack.forEach(qt => {
-			const quoteMismatchError = new TokenError("Quote is not closed", qt, TokenError.ERR_OPEN_CLOSE);
-			this.errors.push(quoteMismatchError);
-		});
-	}
-	
 	/**
 		Formattting code according to JS coding style.
 	 **/
 	formatCode() {
-		// remove parser added comments if found
-		
 		this.shallowInspect();
 		// if error, advice to fix error first
 		if (this.errors.length > 0) {
-			return {err: true, newSrc: this.errors[0].errorDisplay};
+			return {err: true, newSrc: `${this.errors[0].errorDisplay} ${sysConstStrings.TAG_PARSER_ADDED_COMMENT} `};
 		}
 		
 		let newSrc = '';
@@ -115,7 +78,7 @@ class CodeAnalyst {
 				// start a new line if not 
 				newSrc += ' ' + current.name;
 				if (after && !after.isCR) {
-					newSrc += this.addRcAndTabs(nestLevel);
+					newSrc += this.#addRcAndTabs(nestLevel);
 				}			
 				
 				continue;
@@ -128,13 +91,13 @@ class CodeAnalyst {
 				
 				// start a new line if not 
 				if (!before.isCR) {
-					newSrc += this.addRcAndTabs(nestLevel);
+					newSrc += this.#addRcAndTabs(nestLevel);
 				}
 				newSrc += current.name;
 				
 				// "}" must be FLOOWED BY NEW CR and tabs
 				if (after && !after.isCR) {
-					newSrc += this.addRcAndTabs(nestLevel);
+					newSrc += this.#addRcAndTabs(nestLevel);
 				}
 				continue;
 			}
@@ -146,7 +109,7 @@ class CodeAnalyst {
 			if (current.blockTag === TokenConst.BLOCK_TAG_OBJECT_COMMA) {
 				newSrc += current.name;
 				if (after && !after.isCR) {
-					newSrc += this.addRcAndTabs(nestLevel);
+					newSrc += this.#addRcAndTabs(nestLevel);
 				}
 				continue;
 			}
@@ -156,18 +119,18 @@ class CodeAnalyst {
 				newSrc += Token.TOKEN_CR 
 				// add tabs after CR
 				if (after && !after.isCloseCurlyBracket) {
-					newSrc += this.addTabs(nestLevel);
+					newSrc += this.#addTabs(nestLevel);
 				} else if (after && after.isCloseCurlyBracket) {
-					newSrc += this.addTabs(nestLevel-1)
+					newSrc += this.#addTabs(nestLevel-1)
 				}
 				continue;
 			}	
 			
 			// Most operator needs to be spaced. Some operatord (such alike ".") need not to be spaced
 			if (current.type === Token.TOKEN_TYPE_OPERATOR) {
-				let space = " ";
-				if (current.isObjectAccessor) {
-					space = "";
+				let space = "";
+				if (current.opFollowedBySpace) {
+					space = " ";
 				}
 				newSrc += space + current.name + space;
 				continue;
@@ -184,19 +147,19 @@ class CodeAnalyst {
 			
 			// quote a string (todo: need to know the quote type, for now use single quote:
 			if (current.type === Token.TOKEN_TYPE_STRING) {
-				newSrc += "'" + current.name + "'";
+				newSrc += current.name;
 				continue;
 			}
 			
 			// add REGULAR text
 			newSrc += current.name;
-			newSrc += this.addSpaceOrNewLine(i, nestLevel);
+			newSrc += this.#addSpaceOrNewLine(i, nestLevel);
 		}
 		return {err: false, newSrc: newSrc};
 	}
 	
 	/* semicolon not inside 'for' statement shall start from a new line */
-	addSpaceOrNewLine(pos, nestLevel) {
+	#addSpaceOrNewLine(pos, nestLevel) {
 		let forEnd = false;
 		let startNewLine = false;
 		let addSpace = "";
@@ -206,7 +169,7 @@ class CodeAnalyst {
 			addSpace = " ";
 			startNewLine = after && !after.isCR;
 			// see if this semicolon is within a for loop
-			for (let i = pos-1; i >= 0; i--) {
+			for (let i = pos-1; startNewLine && i >= 0; i--) {
 				const token = this.meaningfulTokens[i];
 				if (token.blockTag === TokenConst.BLOCK_TAG_FOR_LOOP_END) {
 					break;
@@ -218,26 +181,98 @@ class CodeAnalyst {
 					break;
 				}
 			}
+			
+			// see if there is a line coment trwiling the ";"
+			for (let i = pos; startNewLine && i < this.meaningfulTokens.length; i++) {
+				const token = this.meaningfulTokens[i];
+				if (token.isCommentBlock) {
+					startNewLine = false;
+					break;
+				}
+				
+				// encountered "for" but not "end of for", break;
+				if (token.isCR) {
+					break;
+				}
+			}
 		}
 		
-		return startNewLine ? this.addRcAndTabs(nestLevel) : addSpace;
+		return startNewLine ? this.#addRcAndTabs(nestLevel) : addSpace;
 	}
 	
 	/* private methods */
 		
 	/* add CR and preceded by tabs */
-	addRcAndTabs(n) {
-		return Token.TOKEN_CR + this.addTabs(n);
+	#addRcAndTabs(n) {
+		return Token.TOKEN_CR + this.#addTabs(n);
 	}
 	
 	/* add (n) tabs before a token */
-	addTabs(n) {
+	#addTabs(n) {
 		let tabs = '';
 		for (let i = 0; i < n; i++) {
 			tabs += Token.TOKEN_TAB;
 		}
 		return tabs;
 	}
+	
+	#removeFormatterAddedComments() {
+		const tokensWithoutAddedComments = [];
+		let justRemoved = false;
+		for (let i = 0; i < this.meaningfulTokens.length; i++) {
+			const token = this.meaningfulTokens[i];
+			if (token.isCommentBlock && token.name.includes(sysConstStrings.TAG_PARSER_ADDED_COMMENT)) {
+				justRemoved = true;
+				continue;
+			}
+			if (justRemoved && token.isCR) {
+				justRemoved = false;
+				continue;
+			}
+			tokensWithoutAddedComments.push(token);
+		}
+		
+		this.#meaningfulTokens = tokensWithoutAddedComments;
+	}
+	
+	#bracketMatchInspection() {
+		const bracketStack = [];
+		const quoteStack = [];
+		for (let i = 0; i < this.meaningfulTokens.length; i++) {
+			const tokenInfo = Token.getTokenInfo(this.meaningfulTokens[i].name);
+			const followedByInfo = this.#canBeFollowed(i);
+			if (followedByInfo.result === false) {
+				const invalidGrammer = new TokenError("Invalid symbol found", followedByInfo.token);
+				this.errors.push(invalidGrammer);
+			}
+			
+			// INSPECT BRACKET matches
+			if (tokenInfo) {
+				if (tokenInfo.bracketType) {
+					const unmatchError = this.#checkBracketMatches(this.meaningfulTokens[i], bracketStack);
+					if (unmatchError) {
+						const bracketMismatchError = new TokenError(unmatchError, this.meaningfulTokens[i]);
+						this.errors.push(bracketMismatchError);
+					}
+				} else if (tokenInfo.quoteType) {
+					this.#checkQuoteMatches(this.meaningfulTokens[i], quoteStack);
+				}
+			}
+		}
+		
+		// see if we still have unmatched open brackets:
+		bracketStack.forEach(bt => {
+			const bracketMismatchError = new TokenError("Bracket is not closed", bt, TokenError.ERR_OPEN_CLOSE);
+			this.errors.push(bracketMismatchError);
+		});
+		
+		// see if we still have unmatched open quotes:
+		quoteStack.forEach(qt => {
+			const quoteMismatchError = new TokenError("Quote is not closed", qt, TokenError.ERR_OPEN_CLOSE);
+			this.errors.push(quoteMismatchError);
+		});
+	}
+	
 	
 	/* display tokens for debugging purpose */
 	#displayAll(tokens) {
@@ -444,7 +479,8 @@ class CodeAnalyst {
 			// got quote?
 			if (openQuote) {
 				if (t.name === openQuote.name) {
-					// quote closed, gathered a string
+					// quote closed, gathered a string with quote
+					currentString = `${t.name}${currentString}${t.name}`;
 					const strToken =  new Token(currentString, Token.TOKEN_TYPE_STRING, openQuote.lineNo, openQuote.beginPos, t.name);
 					meaningfulTokens.push(strToken);
 					openQuote = null;
@@ -524,7 +560,7 @@ class CodeAnalyst {
 			if (openBlockComment) {
 				if (t.isBlockCommentCloseMark) {
 					// quote closed, gathered a string
-					const commentToken =  new Token(`${openBlockComment.name}${currentString}${t.name}`, // code comment 
+					const commentToken =  new Token(`${openBlockComment.name}${currentString} ${t.name}`, // code comment 
 												Token.TOKEN_TYPE_COMMENT_BLOCK, 
 												openBlockComment.lineNo, 
 												openBlockComment.beginPos);
@@ -542,8 +578,39 @@ class CodeAnalyst {
 				continue;
 			} 
 			
+			// got line comment closing?
+			if (openLineComment) {
+				if (t.isCR) {
+					// quote closed, gathered a string
+					const commentToken =  new Token(`${openLineComment.name}${currentString}`, // code comment 
+												Token.TOKEN_TYPE_COMMENT_BLOCK, 
+												openLineComment.lineNo, 
+												openLineComment.beginPos);
+					tokensWithConsolidatedComments.push(commentToken);
+					tokensWithConsolidatedComments.push(t);
+					openLineComment = null;
+					currentString = "";
+				} else {
+					// note that here we don't use Token.name but Token.value due to 
+					// the symbolic nature of space chars
+					currentString += " " + t.value;
+				}
+				continue;
+			} else if (t.isLineCommentMark) {
+				openLineComment = t;
+				continue;
+			} 
+			
 			// not comments
 			tokensWithConsolidatedComments.push(t);
+		}
+		
+		// add trailing line comment if any
+		if (currentString && openLineComment) {
+			tokensWithConsolidatedComments.push(new Token(`${openLineComment.name}${currentString}`,  
+												Token.TOKEN_TYPE_COMMENT_BLOCK, 
+												openLineComment.lineNo, 
+												openLineComment.beginPos));
 		}
 		
 		this.#meaningfulTokens = tokensWithConsolidatedComments;
