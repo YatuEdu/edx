@@ -25,7 +25,7 @@ class ForLoopState extends ParsingState {
 			if (this.stage === ForLoopState.BEGIN_STATE) {
 				// check function name
 				if (!nextToken.isOpenRoundBracket) {
-					this.error = new TokenError("Invalid token found, expecting '(' ", nextToken);
+					this.error = new TokenError(TokenError.ERROR_EXPECTING_TOKEN_PREFIX + '(', nextToken);
 					break;
 				}
 				

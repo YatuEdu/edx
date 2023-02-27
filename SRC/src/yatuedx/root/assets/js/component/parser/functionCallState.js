@@ -32,10 +32,15 @@ class FunctionCallState extends ParsingState {
 			if (this.stage === 1) {
 				if (token.isCloseRoundBracket) {
 					stateEnded = true;
+					// also set parent state to finished if any
+					if (this.parentState) {
+						this.parentState.isTheLastToken(token);
+					}
 				} else {
 					// enter expression stage (again or first time)
 					nextState = new ExpressionState(pos, token, this.scope, this.codeAnalyst);
-					nextState.parentState = this;			
+					nextState.parentState = this;
+					
 					// Important!! 
 					// Since we always starts the expression with the current token, 
 					// we set startFromNextToken to false.  
@@ -55,6 +60,7 @@ class FunctionCallState extends ParsingState {
 	isTheLastToken(token) {
 		if (this.stage === 1 && token.isCloseRoundBracket) {
 			this.stateEnded = true;
+			
 		} 
 		return this.stateEnded;	
 	}

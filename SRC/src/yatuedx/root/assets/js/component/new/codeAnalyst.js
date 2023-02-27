@@ -106,7 +106,7 @@ class CodeAnalyst {
 			/*
 				todo: gather all such tokens and refactor into a methos
 			*/
-			if (current.blockTag === TokenConst.BLOCK_TAG_OBJECT_COMMA) {
+			if (current.hasBlockTag(TokenConst.BLOCK_TAG_OBJECT_COMMA)) {
 				newSrc += current.name;
 				if (after && !after.isCR) {
 					newSrc += this.#addRcAndTabs(nestLevel);
@@ -171,12 +171,12 @@ class CodeAnalyst {
 			// see if this semicolon is within a for loop
 			for (let i = pos-1; startNewLine && i >= 0; i--) {
 				const token = this.meaningfulTokens[i];
-				if (token.blockTag === TokenConst.BLOCK_TAG_FOR_LOOP_END) {
+				if (token.hasBlockTag(TokenConst.BLOCK_TAG_FOR_LOOP_END)) {
 					break;
 				}
 				
 				// encountered "for" but not "end of for", break;
-				if (token.blockTag === TokenConst.BLOCK_TAG_FOR_LOOP_START) {
+				if (token.hasBlockTag(TokenConst.BLOCK_TAG_FOR_LOOP_START)) {
 					startNewLine = false;
 					break;
 				}

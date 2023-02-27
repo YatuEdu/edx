@@ -132,6 +132,26 @@ class ParsingState {
 		return true;
 	}
 	
+	isObjectMethodCall(pos) {
+		// signature a.b() 
+		if (this.codeAnalyst.meaningfulTokens.length < pos + 5) {
+			return false;
+		}
+		const currentToken = this.codeAnalyst.meaningfulTokens[pos];
+		if ((currentToken.isName || currentToken.isKnownObjectName)
+		    && this.codeAnalyst.meaningfulTokens[pos + 1].isObjectAccessor 
+			&& this.codeAnalyst.meaningfulTokens[pos + 2].isName
+			&& this.codeAnalyst.meaningfulTokens[pos + 3].isOpenRoundBracket) {
+			// method call name
+			return currentToken.name + '_' + this.codeAnalyst.meaningfulTokens[pos + 2].name;
+		}
+		
+		return "";
+	}
+	
+	isObjectProperty(pos) {
+	}
+	
 	isForLoop(pos) {
 		const token = this.codeAnalyst.meaningfulTokens[pos];
 		return token.isForLoop;

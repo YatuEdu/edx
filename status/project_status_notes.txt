@@ -13,7 +13,9 @@ A: when op2 .priority > op1
 B: whe ")" is met, resolve back till "(" 
 C: if unary_back is met, resolve backward immeditately
 D: IF UNARY FRONT IS MET, push var, and wait to see the next 
-E: Skip comments
+E: Skip comments  (done)
+
+10: prsing forEach => 
 
 Code formatter issues:
 --------------------------
@@ -54,6 +56,24 @@ got weir error message: expecting "("
 4) (Fixed) ! operator does not work for parser: x = a ! b => should be invalid
 
 5) save exception
+
+6) student -> teacher code sync does not work
+
+7) object syntax, by pass: performance.now()
+
+8) (Fixed)  (x != 0) and (x !== 0) does not work
+
+9) (Fixed) ++2 should not be working
+
+10) // conment should have a space in front: x = 100;// 100 should be => x = 100; // 100
+
+12) support multiple accessror syntax: a.b.c or a.b.foo()
+
+13)  performance .now(); should be  performance.now(); 
+
+14) (Completed) support true false as a known value
+
+15) "," should have a spacw after it: a,b,c -> a, b, c
 
 Needed features:
 ---------------------------

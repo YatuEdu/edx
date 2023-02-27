@@ -6,8 +6,7 @@ import {FunctionCallState}					from './functionCallState.js'
 import {ArraySubscriptionState}				from './arraySubscriptionState.js'
 import {ArrayDefState}						from './arrayDefState.js'
 import {ObjectDefState}						from './objectDefState.js'
-
-const ERROR_UNDEFINED_VARIABLE_FOUND = "Undefined valrable found";
+import {ObjectMethodCallState}			from './objectMethodCallState.js'
 
 class ExpressionState extends ParsingState {
 	#operandStack;	
@@ -41,6 +40,17 @@ class ExpressionState extends ParsingState {
 				
 				// go to function calling state
 				nextState = new FunctionCallState(pos, nextToken, this.scope, this.codeAnalyst, false);
+				break;
+			}
+			
+			// is object method call syntax:
+			const methodCall = this.isObjectMethodCall(pos);
+			if (methodCall) {
+				// treat function call as a value
+				newElement = this.#addTempOprand(methodCall);
+				
+				// go to method call state
+				nextState = new ObjectMethodCallState(pos, nextToken, this.scope, this.codeAnalyst, false);
 				break;
 			}
 			
@@ -220,24 +230,32 @@ class ExpressionState extends ParsingState {
 	}
 	
 	#addOperand(token) {
+		const lastOperand = this.#peek();
+		const newOperand = new CodeOperand(token); 
+
+
 		// eat unary operator if applicable:
 		if (this.#currentOperator) {
 			if (this.#currentOperator.isUnaryFront) {
+				// unary op cannot be appiled by const
+				if (newOperand.isConst) {
+					this.error = new TokenError(TokenError.ERROR_CANNOT_APPLY_TO_CONST, this.#currentOperator.token);
+					return;
+				}
+				
 				// the unary front operator can be eaten by this operand
 				this.#currentOperator = null;
 			} else {
-				this.error = new TokenError("Invalid operator found", this.#currentOperator.token);
+				this.error = new TokenError(TokenError.ERROR_INVALID_OP, this.#currentOperator.token);
 				return;
 			}
 		}
-		const lastOperand = this.#peek();
-		const newOperand = new CodeOperand(token); 
 	
 		// operand must be defined prior
 		if (newOperand.isVariable) {
 			const v = this.scope.findVariable(newOperand.name, false);
 			if (!v) {
-				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, newOperand.token);
+				this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, newOperand.token);
 				return null;
 			}
 		}
@@ -272,6 +290,7 @@ class ExpressionState extends ParsingState {
 			if (!this.error) {
 				// leave front operator un-associated until next token
 				this.#currentOperator = newOp;
+				token.blockTag = TokenConst.BLOCK_TAG_UNARY_FRONT_OP;
 			} 
 			
 			return newOp;
@@ -282,10 +301,11 @@ class ExpressionState extends ParsingState {
 			if (!this.error) {
 				if (lastOperand.isConst) {
 					// todo: is there a rear operator that work on constant?
-					this.error = new TokenError("Invalid operator found", token);
+					this.error = new TokenError(TokenError.ERROR_CANNOT_APPLY_TO_CONST, token);
 				}
 			}
 			//eat unary rear operator	
+			token.blockTag = TokenConst.BLOCK_TAG_UNARY_FRONT_OP;
 			return newOp;
 		}
 		
@@ -333,7 +353,7 @@ class ExpressionState extends ParsingState {
 	// resolve two operand as a result of a binary operation
 	#resolveBinary(newOp) {
 		if (newOp && this.#operandStack.length < 2) {
-			this.error = new TokenError("Invalid operator found", newOp.token);
+			this.error = new TokenError(TokenError.ERROR_INVALID_OP, newOp.token);
 			return;
 		}
 		
@@ -348,7 +368,7 @@ class ExpressionState extends ParsingState {
 		if (oprandL.isVariable) {
 			const v = this.scope.findVariable(oprandL.name, false);
 			if (!v) {
-				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprandL.token);
+				this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, oprandL.token);
 				return null;
 			}
 		}
@@ -356,7 +376,7 @@ class ExpressionState extends ParsingState {
 		if (oprandR.isVariable && !(oprandR.binaryOperatorLeft instanceof DotOperator)) {
 			const v = this.scope.findVariable(oprandR.name, false);
 			if (!v) {
-				this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprandR.token);
+				this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, oprandR.token);
 				return null;
 			}
 		}
@@ -484,7 +504,7 @@ class ExpressionState extends ParsingState {
 			} else {
 				// The right most operand should not have a right operator in it
 				if (oprand && oprand.binaryOperatorRight ) {
-					this.error = new TokenError("Invalid operator found", oprand.binaryOperatorRight.token);
+					this.error = new TokenError(TokenError.ERROR_INVALID_OP, oprand.binaryOperatorRight.token);
 					break;
 				}
 			}
@@ -493,7 +513,7 @@ class ExpressionState extends ParsingState {
 			if (oprand && oprand.isVariable && !(oprand.binaryOperatorLeft instanceof DotOperator)) {
 				const v = this.scope.findVariable(oprand.name, false);
 				if (!v) {
-					this.error = new TokenError(ERROR_UNDEFINED_VARIABLE_FOUND, oprand.token);
+					this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, oprand.token);
 					break;
 				}
 			}
@@ -523,5 +543,4 @@ class ExpressionState extends ParsingState {
 	}
 }
 
-export {ExpressionState} 
-//, IfState, VarDeclarationState, AssignmentState, ExpressionState, FunctionDefState, FunctionCallState}
+export {ExpressionState}

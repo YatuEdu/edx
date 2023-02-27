@@ -75,6 +75,8 @@ class TokenConst {
 	static get RETURN_KEY() {return 10}
 	static get FOR_KEY() {return 11}
 	static get KNOWN_FUNCTION_NAME() {return 20}	
+	static get KNOWN_OBJECT_NAME() {return 21}
+	static get KNOWN_OBJECT_VALUE() {return 22}
 
 	static get VAR_TYPE_UNKNOWN() { return 0}
 	static get VAR_TYPE_CONST() { return 1}
@@ -100,13 +102,17 @@ class TokenConst {
 	static get BLOCK_TAG_OBJECT_END() { return 4; }
 	static get BLOCK_TAG_OBJECT_COMMA() { return 5; }
 	static get BLOCK_TAG_IF_START() { return 6; }
+	static get BLOCK_TAG_UNARY_FRONT_OP() { return 7; }
+	static get BLOCK_TAG_UNARY_REAR_OP() { return 7; }
 }
 
 const STANDARD_TOKEN_MAP = new Map([
-	['if', 			{type: TOKEN_TYPE_KEY_, keyType: TokenConst.IF_KEY } ],
-	['else', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.ELSE_KEY } ],
+	['if', 			{type: TOKEN_TYPE_KEY_, keyType: TokenConst.IF_KEY }],
+	['else', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.ELSE_KEY }],
+	['true', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_VALUE }],
+	['false', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_VALUE }],
 	['new', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.NEW_KEY }],
-	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY } ],
+	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY }],
 	['switch', 		{type: TOKEN_TYPE_KEY_ }],
 	['while', 		{type: TOKEN_TYPE_KEY_ }],
 	['do', 			{type: TOKEN_TYPE_KEY_ }],
@@ -114,6 +120,9 @@ const STANDARD_TOKEN_MAP = new Map([
 	['function', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FUNC_KEY }],
 	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY}],
 	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME}],
+	['performance', {type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['Math', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['this', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
 	['constructor', {type: TOKEN_TYPE_KEY_ }],
 	['get', 		{type: TOKEN_TYPE_KEY_}],
 	['set', 		{type: TOKEN_TYPE_KEY_}],
@@ -124,7 +133,6 @@ const STANDARD_TOKEN_MAP = new Map([
 	['break', 		{type: TOKEN_TYPE_KEY_ }],
 	['continue', 	{type: TOKEN_TYPE_KEY_ }],
 	['forEach', 	{type: TOKEN_TYPE_KEY_ }],
-	['this', 		{type: TOKEN_TYPE_KEY_ }],
 	['$', 			{type: TOKEN_TYPE_KEY_ }],
 
 	['"', 			{type: TOKEN_TYPE_SEPARATOR, quoteType: QUOTE_TYPE_DOUBLE }],
@@ -196,6 +204,8 @@ const STANDARD_TOKEN_MAP = new Map([
 
 const COMBINATION_TOKEN_MAP = new Map([
 	['=', 			{canBeFollowedBy: ["=", ">"]} ],
+	['!', 			{canBeFollowedBy: ["="]} ],
+	['!=', 			{canBeFollowedBy: ["="]} ],
 	['==', 			{canBeFollowedBy: ["=", ">"]} ],	
 	['>', 			{canBeFollowedBy: ["="] }],
 	['<', 			{canBeFollowedBy: ["="] }],
@@ -213,7 +223,7 @@ class Token {
 	#beginPos;
 	#type
 	#canBeExpression
-	#blockTag;
+	#blockTags;
 	#extraData;
 	
 	constructor(name, type, lineNo, beginPos, extraData) {
@@ -225,6 +235,7 @@ class Token {
 		
 		// fuether decide the type of the name 
 		this.typeDivide();
+		this.#blockTags = [];
 	}
 	
 	static createExpressionEndToken(pos) {
@@ -276,10 +287,21 @@ class Token {
 		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType == TokenConst.KNOWN_FUNCTION_NAME;
 	}
 	
+	static isKnownObjectName(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType == TokenConst.KNOWN_OBJECT_NAME;
+	}
+	
+	static isKnownObjectValue(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType == TokenConst.KNOWN_OBJECT_VALUE;
+	}
+	
 	static isKnownProperty(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.type && tokenInfo.type == Token.TOKEN_TYPE_KNOWN_PROP;
 	}
+	
 	
 	static isStar(c) {
 		return c === TOKEN_STAR_;
@@ -574,11 +596,42 @@ class Token {
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 	get isReturn() {return Token.isReturn(this.#name)}
 	get isKnownFunctionName() { return Token.isKnownFunctionName(this.#name)}
+	get isKnownObjectName() { return Token.isKnownObjectName(this.#name)}
+	get isKnownObjectValue() { return Token.isKnownObjectValue(this.#name)}
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
-	get opFollowedBySpace() { return Token.opFollowedBySpace(this.#name)}
-	get blockTag() { return this.#blockTag }
-	// #within can be set
-	set blockTag(tag) { this.#blockTag = tag}
+	get isUnaryOp() { return this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP) }
+	
+	/*
+		Used by code formatter to determine if this operator token followed by space? For example, ++x, should not be ++ x, but
+		x+y should be x + y.
+	 */
+	get opFollowedBySpace() { 
+		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP)) {
+			return false;
+		}
+		return Token.opFollowedBySpace(this.#name)
+	}
+	
+	/*
+		Test if the token has "any" of the given tags.
+	*/
+	hasBlockTag(...tags) { 
+		for(let tag of tags){
+			if (this.#blockTags.indexOf(tag) >= 0) {
+				return true; 
+			}
+		}
+		return false;
+	}
+	
+	/*
+		Add a block tag to a token.
+	*/
+	set blockTag(tag) { 
+		if (this.#blockTags.indexOf(tag) === -1) {
+			this.#blockTags.push(tag);
+		}
+	}
 }
 
 class TokenError {
@@ -600,6 +653,12 @@ class TokenError {
 	// error code
 	static get ERR_UNKNOWN () { return -1; }
 	static get ERR_OPEN_CLOSE () { return -2; }
+	
+	// well known error messasges
+	static get ERROR_UNDEFINED_VARIABLE_FOUND() { return "Undefined valrable found"; }
+	static get ERROR_CANNOT_APPLY_TO_CONST() { return "Invalid operator for a constant value"; }
+	static get ERROR_INVALID_OP() { return "Invalid operator found"; }
+	static get ERROR_EXPECTING_TOKEN_PREFIX() { return "Invalid token found, expecting "; }
 	
 	// properties
 	get msg() { return this.#msg; }

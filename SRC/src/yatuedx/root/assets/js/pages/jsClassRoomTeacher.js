@@ -20,7 +20,7 @@ const BTN_SYNC_BOARD 					= "yt_btn_sync_board";
 const BTN_MODE_CHANGE 					= 'yt_btn_switch_mode';
 const BTN_ERASE_BOARD  					= 'yt_btn_erase_board';
 const BTN_ERASE_RESULT 					= "yt_btn_erase_result";
-const BTN_BEAUTIFY_CODE 				= "yt_btn_btfy_code"
+const BTN_BEAUTIFY_CODE 				= "yt_btn_check_clean_code"
 const BTN_RUN_CODE  					= "yt_btn_run_code_on_student_board";
 const SEL_MSG_RECEIVER					= "select_option_msg_rcvr";
 const STUDENT_MESAGE_BUTTON_PREFIX 		= "yt_btn_std_msg_";
@@ -123,6 +123,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
 		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
+		$(this.beautifyCodeButton).click(this.handleCodeBeautify.bind(this));
 
 		// close the viedo (if any) when closing the window
 		window.unload = this.handleLeaving.bind(this);
@@ -564,6 +565,17 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	handleEraseResult(e) {
 		e.preventDefault();
 		$(this.resultConsoleControl).val('');
+	}
+	
+	/*
+		Beautify cdoe by calling the codeAnalyst formatting
+	 */
+	handleCodeBeautify(e) {
+		//obtain code from local "exercise board" and execute it locally
+		const newCodeSrc = super.formatCode();
+		if (newCodeSrc) {
+			$(this.codeInputTextArea).val(newCodeSrc);
+		}
 	}
 	
 	/*

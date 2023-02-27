@@ -17,7 +17,8 @@ class Operand extends ExpressionElement {
 		return  Token.TOKEN_TYPE_NAME === token.type ||
 				Token.TOKEN_TYPE_NUMBER === token.type ||
 				Token.TOKEN_TYPE_STRING == token.type ||
-				token.isKnownProperty;
+				token.isKnownProperty ||
+				token.isKnownObjectValue;
 	}
 	
 	// overrides

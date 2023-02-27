@@ -4,6 +4,7 @@ import {FunctionDefState}				from './functionDefState.js'
 import {ExpressionState}				from './expressionState.js'
 import {FunctionCallState}				from './functionCallState.js'
 import {AssignmentState}				from './assignmentState.js'
+import {ObjectMethodCallState}			from './objectMethodCallState.js'
 import {IfState}						from './ifState.js'
 import {VarDeclarationState}			from './varDeclarationState.js'
 import {Scope}							from './scope.js'
@@ -49,6 +50,13 @@ class CodeBlockState extends ParsingState {
 		// if it is a function definition statement
 		if (this.isFunctionDefinition(pos)) {
 			const nextState = new FunctionDefState(pos, nextToken, this.scope, 
+												   this.codeAnalyst, false);
+			return new StateAction(nextState, null, false);
+		}
+		
+		// if it is an object method call
+		if (this.isObjectMethodCall(pos)) {
+			const nextState = new ObjectMethodCallState(pos, nextToken, this.scope, 
 												   this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
 		}
