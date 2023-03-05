@@ -10,6 +10,10 @@ const sysConstants = Object.freeze({
 	// default board rows
 	YATU_DEFAULT_BOARD_ROWS: 10,
 	
+	// default max loop count
+	YATU_DEFAULT_MAX_LOOPS_WITH_IO: 1000,
+	YATU_DEFAULT_MAX_LOOPS_WITHOUT_IO: 100000,
+	
 	// code buffer refresh time (ms)
 	YATU_CODE_BUFFER_REFRESH_FREQUENCY: 5000,
 	

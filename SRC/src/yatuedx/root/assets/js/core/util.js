@@ -223,6 +223,33 @@ class StringUtil {
 		}
 		return false;
 	}	
+	
+	/*
+		Generate random strings for variable usage.
+	*/
+	static makeVarString(length) {
+		let result = '';
+		const characters = 'abcdefghijklmnopqrstuvwxyz';
+		const digits = '0123456789';
+		const charactersLength = (length / 3) * 2;
+		const digitLength = (length / 3);
+		
+		// char part
+		let counter = 0;
+		while (counter < charactersLength) {
+		  result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		  counter += 1;
+		}
+		
+		// trailing digit part
+		counter = 0
+		while (counter < digitLength) {
+		  result += digits.charAt(Math.floor(Math.random() * digitLength));
+		  counter += 1;
+		}
+		
+		return result;
+	}
 }
 
 class RegexUtil {

@@ -61,11 +61,11 @@ class CredentialManager {
 	async signOut() {
 		// remote call to sign out if we are signed-in
 		if (this.#userCredInfo.token) {
-			const ret = await Net.signOut(this.#userCredInfo.token);
-			if (!ret.err) {
+			// todo: const ret = await Net.signOut(this.#userCredInfo.token);
+			// todo: if (!ret.err) {
 				// clear previous auth info before new login request
 				this.private_clear();
-			}
+			//}
 		}
 	}
 	

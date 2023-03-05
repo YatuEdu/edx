@@ -65,21 +65,31 @@ class JSCodeExecutioner {
 		this.#undefineVars();
 		src = src.trim();
 		let analyticalInfo = [];
+		let newSrc = src;
 		if (src) {
 			// anaylize code
 			const codeAnalyst = new CodeAnalyst(src);
 			analyticalInfo  = codeAnalyst.shallowInspect();
+			
+			// add code as AOP interceptor
+			const instrumentedCode = codeAnalyst.instrumentSourceCode();
+			if (instrumentedCode) {
+				newSrc = instrumentedCode;
+				console.log("instrumented code:");
+				console.log(instrumentedCode);
+			}
+			
 		}
 		// we detected error, no need to executeCode
 		//if (analyticalInfo.length) {
 		//	return new CodeError(null, analyticalInfo);
 		//}
 		
-		if (src) {
+		if (newSrc) {
 			// run code
-			try {		
+			try {
 				// exec code
-				const func = new Function('print', 'printx', src);
+				const func = new Function('print', 'printx', newSrc);
 				const res = func(this.#printLine.bind(this), this.#appendMessage.bind(this));
 				if (res) {
 					this.#appendMessage(res);

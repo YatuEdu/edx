@@ -16,6 +16,10 @@ D: IF UNARY FRONT IS MET, push var, and wait to see the next
 E: Skip comments  (done)
 
 10: prsing forEach => 
+11: while () {} => endless loop detection
+12: switch () { case: default}
+13: do {} while()
+14: lambd () => expre, a => { block }, (a, b, c) => {}
 
 Code formatter issues:
 --------------------------
@@ -74,6 +78,16 @@ got weir error message: expecting "("
 14) (Completed) support true false as a known value
 
 15) "," should have a spacw after it: a,b,c -> a, b, c
+
+16) x = 3; 
+while (x-- > 0) {
+	for (let i = 0; i < x; i++) {
+		let y = i * 10; 
+		print (y); 
+	}
+	print (x); 
+	print (i);   => i should be undefined
+}
 
 Needed features:
 ---------------------------

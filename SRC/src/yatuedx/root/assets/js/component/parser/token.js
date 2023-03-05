@@ -74,6 +74,8 @@ class TokenConst {
 	static get FUNC_KEY() {return 9}
 	static get RETURN_KEY() {return 10}
 	static get FOR_KEY() {return 11}
+	static get WHILE_KEY() {return 12}
+	static get SWITCH_KEY() {return 13}
 	static get KNOWN_FUNCTION_NAME() {return 20}	
 	static get KNOWN_OBJECT_NAME() {return 21}
 	static get KNOWN_OBJECT_VALUE() {return 22}
@@ -103,7 +105,10 @@ class TokenConst {
 	static get BLOCK_TAG_OBJECT_COMMA() { return 5; }
 	static get BLOCK_TAG_IF_START() { return 6; }
 	static get BLOCK_TAG_UNARY_FRONT_OP() { return 7; }
-	static get BLOCK_TAG_UNARY_REAR_OP() { return 7; }
+	static get BLOCK_TAG_UNARY_REAR_OP() { return 8; }
+	static get BLOCK_TAG_WHILE_LOOP_EXPS_START() { return 9; }
+	static get BLOCK_TAG_LOOP_BODY_START() { return 10; }
+	static get BLOCK_TAG_LOOP_BODY_END() { return 11; }
 }
 
 const STANDARD_TOKEN_MAP = new Map([
@@ -114,13 +119,15 @@ const STANDARD_TOKEN_MAP = new Map([
 	['new', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.NEW_KEY }],
 	['case', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CASE_KEY }],
 	['switch', 		{type: TOKEN_TYPE_KEY_ }],
-	['while', 		{type: TOKEN_TYPE_KEY_ }],
+	['while', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.WHILE_KEY  }],
 	['do', 			{type: TOKEN_TYPE_KEY_ }],
 	['for', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FOR_KEY } ],
 	['function', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.FUNC_KEY }],
 	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY}],
-	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME}],
+	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
+	['printx', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
 	['performance', {type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['console', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME, isIoFunc:true}],
 	['Math', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
 	['this', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
 	['constructor', {type: TOKEN_TYPE_KEY_ }],
@@ -477,11 +484,21 @@ class Token {
 		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.FOR_KEY;
 	}
 	
+	static isWhileLoop(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.WHILE_KEY;
+	}
+	
 	static isReturn(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.RETURN_KEY;
 	}
 	
+	static isIoFunc(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.isIoFunc;
+	}
+
 	static opFollowedBySpace(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return tokenInfo && tokenInfo.type 
@@ -592,6 +609,7 @@ class Token {
 	}
 	get isFunction() { return Token.isFunction(this.#name); }
 	get isForLoop() { return Token.isForLoop(this.#name); }
+	get isWhileLoop() { return Token.isWhileLoop(this.#name); }
 	get isAssignment() { return Token.isAssignment(this.#name); }
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 	get isReturn() {return Token.isReturn(this.#name)}
@@ -600,7 +618,8 @@ class Token {
 	get isKnownObjectValue() { return Token.isKnownObjectValue(this.#name)}
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
 	get isUnaryOp() { return this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP) }
-	
+	get isIoFunc() { return Token.isIoFunc(this.#name) }
+		
 	/*
 		Used by code formatter to determine if this operator token followed by space? For example, ++x, should not be ++ x, but
 		x+y should be x + y.

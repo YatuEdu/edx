@@ -1,5 +1,5 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
-import {sysConstStrings}					from '../../core/sysConst.js'
+import {sysConstants, sysConstStrings}					from '../../core/sysConst.js'
 import {Token, TokenConst, TokenError}		from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
 import {CodeBlockState}						from '../parser/codeBlockState.js'
@@ -156,6 +156,121 @@ class CodeAnalyst {
 			newSrc += this.#addSpaceOrNewLine(i, nestLevel);
 		}
 		return {err: false, newSrc: newSrc};
+	}
+	
+	/**
+		Instrument the Source Code for purpose such as:
+			- loop guarding to prevent endless loop
+			- print program states
+			- obtain performance counters
+			- etc.
+	 **/
+	instrumentSourceCode() {
+		const loopPoints = [];
+		let lastLoopPoint = null;
+		let withIo = false;
+		for (let i = 0; i < this.meaningfulTokens.length; i++) {
+			const token = this.meaningfulTokens[i];
+			
+			// find loop key points
+			if (lastLoopPoint) {
+
+				// loop body begin-point
+				if (token.hasBlockTag(TokenConst.BLOCK_TAG_LOOP_BODY_START)) {
+					lastLoopPoint.begin = i;
+					continue;
+				}
+				
+				if (token.isIoFunc) {
+					withIo = true;
+					continue;
+				}
+				
+				// loop body end-point
+				if (token.hasBlockTag(TokenConst.BLOCK_TAG_LOOP_BODY_END)) {
+					lastLoopPoint.end = i;
+					lastLoopPoint.endStatement = this.addLoopGuardStatement(lastLoopPoint, 2);
+					lastLoopPoint.beginStatement = this.addLoopGuardStatement(lastLoopPoint, 1, withIo);
+					// found all the loop key point:
+					loopPoints.push(lastLoopPoint);
+					lastLoopPoint = null;
+					withIo = false;
+					continue;
+				}
+				
+				continue;
+			}
+			
+			// find new loop
+			if (token.isWhileLoop) {
+				lastLoopPoint = {
+					before: i
+				};
+				
+				lastLoopPoint.varName = StringUtil.makeVarString(10);
+				lastLoopPoint.beforeStatement = this.addLoopGuardStatement(lastLoopPoint, 0);
+			}
+		}
+		
+		// new code from code instrumentation:
+		let newSrc = "";
+			
+		/* Add loop guard to prevent endless loop. **/
+		
+		// find loop keyword
+		if (loopPoints.length > 0) {
+			for (let i = 0; i < this.meaningfulTokens.length; i++) {
+				const token = this.meaningfulTokens[i];
+				
+				// is this loop point 'befoe loop'?
+				let found = loopPoints.find(lp => lp.before === i);
+				if (found) {
+					// insert a statement before the loop begins
+					newSrc += found.beforeStatement;
+					newSrc += " " + token.name + " ";
+					continue;
+				}
+				
+				// is this loop point 'begin loop body'?
+				found = loopPoints.find(lp => lp.begin === i);
+				if (found) {
+					// append a statement after the loop begins
+					newSrc += " " + token.name + " ";
+					newSrc += found.beginStatement;
+					continue;
+				}
+				
+				// non-loop statement not affected
+				newSrc += " " + token.value + " ";
+			}
+		}
+			
+		return newSrc;
+	}
+	
+	/**
+		Add statements before, inside loop code , to make sure a loop always end
+	 **/
+	addLoopGuardStatement(loopPoint, i, withIo) {
+		// before loob
+		switch (i) {
+			case 0:
+				// initialize our own loop counter:
+				return `let ${loopPoint.varName} = 0;
+				`;
+			case 1: {
+				const maxLoops = withIo ? sysConstants.YATU_DEFAULT_MAX_LOOPS_WITH_IO : sysConstants.YATU_DEFAULT_MAX_LOOPS_WITHOUT_IO
+				// make sure that the loop counter is less than a predetermined value
+				return `if (${loopPoint.varName}++ > ${maxLoops}) { 
+								alert('Your loop is likely endless, please fix it to make sure it ends correctly!');
+								break;
+						}
+						`;
+			}
+			case 2:
+				// at the end of loop, increase counter
+				return '';
+		}
 	}
 	
 	/* semicolon not inside 'for' statement shall start from a new line */

@@ -1,5 +1,6 @@
 import {StateAction, ParsingState}		from './parsingState.js'
 import {ForLoopState}					from './forLoopState.js'
+import {WhileLoopState}					from './whileLoopState.js'
 import {FunctionDefState}				from './functionDefState.js'
 import {ExpressionState}				from './expressionState.js'
 import {FunctionCallState}				from './functionCallState.js'
@@ -43,6 +44,13 @@ class CodeBlockState extends ParsingState {
 		// if it is a "for" loop statement
 		if (this.isForLoop(pos)) {
 			const nextState = new ForLoopState(pos, nextToken, this.scope, 
+											   this.codeAnalyst, false);
+			return new StateAction(nextState, null, false);
+		}
+		
+		// if it is a "for" loop statement
+		if (nextToken.isWhileLoop) {
+			const nextState = new WhileLoopState(pos, nextToken, this.scope, 
 											   this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
 		}
