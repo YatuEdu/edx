@@ -10,6 +10,8 @@ class CodeAnalyst {
 	#tokens;
 	#meaningfulTokens;
 	#codeStr;
+	#rootScope;
+	#hasIO;
 	
 	// syntax parsing one outcome
 	#variables;
@@ -23,6 +25,7 @@ class CodeAnalyst {
 		this.#tokenize(codeStr);
 		this.#errors = [];
 		this.#variables = new Map();
+		this.#rootScope = new Scope(null);
 	}
 	
 	/* geters and setters */
@@ -34,6 +37,9 @@ class CodeAnalyst {
 	get numbers() { return this.#numbers; }
 	get expressions() { return this.#expressions; }
 	get errors () { return this.#errors; }
+	get rootVariableMap() { return this.#rootScope.variableMap; }
+	get hasIO() { return this.#hasIO; }
+	set hasIO(io) { this.#hasIO = io; }
 	
 	/* public methods */
 	
@@ -166,6 +172,26 @@ class CodeAnalyst {
 			- etc.
 	 **/
 	instrumentSourceCode() {
+		let newSrc = this.#safeGuardLoops();
+		return newSrc;
+	}
+	
+	/*
+		Obtain the value of all globally scoped variables and return their results in a map.
+	 */
+	printAllVaraibles() {
+		let varEvalLines = `;print("");print("------ variable values -------");\n`;
+		for (let [key, value] of this.rootVariableMap) {
+			try {
+				varEvalLines += `print('${key}:', ${key});`;
+			}
+			catch(e) {
+			} 
+		}
+		return varEvalLines;
+	}
+	
+	#safeGuardLoops() {
 		const loopPoints = [];
 		let lastLoopPoint = null;
 		let withIo = false;
@@ -189,8 +215,8 @@ class CodeAnalyst {
 				// loop body end-point
 				if (token.hasBlockTag(TokenConst.BLOCK_TAG_LOOP_BODY_END)) {
 					lastLoopPoint.end = i;
-					lastLoopPoint.endStatement = this.addLoopGuardStatement(lastLoopPoint, 2);
-					lastLoopPoint.beginStatement = this.addLoopGuardStatement(lastLoopPoint, 1, withIo);
+					lastLoopPoint.endStatement = this.#addLoopGuardStatement(lastLoopPoint, 2);
+					lastLoopPoint.beginStatement = this.#addLoopGuardStatement(lastLoopPoint, 1, withIo);
 					// found all the loop key point:
 					loopPoints.push(lastLoopPoint);
 					lastLoopPoint = null;
@@ -202,13 +228,13 @@ class CodeAnalyst {
 			}
 			
 			// find new loop
-			if (token.isWhileLoop) {
+			if (token.isLoop) {
 				lastLoopPoint = {
 					before: i
 				};
 				
 				lastLoopPoint.varName = StringUtil.makeVarString(10);
-				lastLoopPoint.beforeStatement = this.addLoopGuardStatement(lastLoopPoint, 0);
+				lastLoopPoint.beforeStatement = this.#addLoopGuardStatement(lastLoopPoint, 0);
 			}
 		}
 		
@@ -251,7 +277,7 @@ class CodeAnalyst {
 	/**
 		Add statements before, inside loop code , to make sure a loop always end
 	 **/
-	addLoopGuardStatement(loopPoint, i, withIo) {
+	#addLoopGuardStatement(loopPoint, i, withIo) {
 		// before loob
 		switch (i) {
 			case 0:
@@ -404,7 +430,7 @@ class CodeAnalyst {
 		this.#expressions = [];
 		const stateStack = [];
 		let i = 0;
-		let currentState = new CodeBlockState(i, null, new Scope(null), this);
+		let currentState = new CodeBlockState(i, null, this.#rootScope, this);
 		while (i < this.meaningfulTokens.length) {
 			const token = this.meaningfulTokens[i];
 			
@@ -418,6 +444,11 @@ class CodeAnalyst {
 			if (token.isCommentBlock) {
 				++i;
 				continue;
+			}
+			
+			// record IO function presence:
+			if (token.isIoFunc) {
+				this.hasIO = true;
 			}
 			
 			// get next state
@@ -450,10 +481,17 @@ class CodeAnalyst {
 			}				
 		}
 		
-		// if current state has not ended, end it:
-		if (currentState) {
-			currentState.complete();
-		}
+		// Ending all the states in the stack
+		const lastToken = this.meaningfulTokens[this.meaningfulTokens.length-1]
+		do {
+			if (!currentState) {
+				break;
+			}
+			
+			// clean up states for the last chance:
+			currentState.isTheLastToken(lastToken);
+			currentState = stateStack.pop();
+		} while(currentState);
 	}
 	
 	/* tokenize code string, this is the preparation ofr further code analysis. */
@@ -854,8 +892,6 @@ class CodeAnalyst {
 			quoteStack.push(token);
 		}
 	}
-	
-	variableToken(name) { this.variables.get(token.name); }
 	
 }
 

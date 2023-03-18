@@ -59,7 +59,7 @@ class ParsingState {
 	}
 	
 	isTheLastToken(token) {
-		throw new Error('isTheLastToken: sub-class-should-overload-this method'); 
+		// default doing nothing
 	}
 	
 	/*

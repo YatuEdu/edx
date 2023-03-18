@@ -32,3 +32,11 @@ for(let i = 10; (2 + i) > 0; i--) {
 for (; i < 10; i+=2) {
 	print(i);
 }			// error: i not defined
+
+//--------------------------------endless loop erro case -------------
+let i = 0; 
+for (; i < 10; i--) {
+	print (i)
+}
+print (i); => alert: your loop is endless likely
+	

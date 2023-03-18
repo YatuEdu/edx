@@ -6,17 +6,14 @@ import {VarDeclarationState}			from './varDeclarationState.js'
 import {TokenError, TokenConst}			from './token.js'
 import {Scope}							from './scope.js'
 
-class ForLoopState extends ParsingState {
+class BaseForLoopState extends ParsingState {
 	constructor(beginPos, beginToken, scope, codeAnalyst) {
 		super(beginPos, beginToken, scope, codeAnalyst);
-		this.stage = ForLoopState.BEGIN_STATE;
+		this.stage = BaseForLoopState.BEGIN_STATE;
 	}
 	
 	static get BEGIN_STATE() {return 0; }
-	static get INIT_EXPR_STATE() {return 1; }
-	static get INIT_EXPR_BODY_STATE() {return 2; }
-	static get EXIT_CONDTION_EXPR_STATE() {return 3; }
-	static get ITERATION_EXPR_STATE() {return 4; }
+	static get FOR_EXPR_STATE() {return 1; }
 	static get LOOP_BODY_STARTS_STATE() {return 5; }
 	static get LOOP_BODY_STATE() {return 6; }
 	
@@ -27,59 +24,23 @@ class ForLoopState extends ParsingState {
 		let skipNextToken = true;
 		do {
 			if (this.stage === ForLoopState.BEGIN_STATE) {
-				// check function name
-				if (!nextToken.isOpenRoundBracket) {
-					this.error = new TokenError(TokenError.ERROR_EXPECTING_TOKEN_PREFIX + '(', nextToken);
+				// check "for" loop expression type
+				const forExpressionState = getForExpressionStateType(nextToken, pos);
+				
+				if (!forExpressionState) {
+					this.error = new TokenError(TokenError.ERROR_INVALID_FOR_XPRESSION, nextToken);
 					break;
 				}
 				
-				this.stage = ForLoopState.INIT_EXPR_STATE;
+				this.stage = ForLoopState.FOR_EXPR_STATE;
+				nextState = forExpressionState;
+				
 				// mark this token as THE BEGINING OF A FOR LOOP
 				nextToken.blockTag = TokenConst.BLOCK_TAG_FOR_LOOP_START;
 				break;
 			}	
 			
-			if (this.stage === ForLoopState.INIT_EXPR_STATE) {
-				// definition of loop variable
-				
-				// empty initialization?
-				if (nextToken.isSemicolon) {
-					this.stage = ForLoopState.EXIT_CONDTION_EXPR_STATE;
-					nextState = new ExpressionState(pos, nextToken, this.scope, this.codeAnalyst, false);
-					break;
-				}
-				
-				// assignment encounteed
-				if (this.matchTokenName(pos+1, '=') ) {
-					nextState = new AssignmentState(pos, nextToken, this.scope, this.codeAnalyst, false);
-					this.stage = ForLoopState.INIT_EXPR_BODY_STATE;
-					break;
-				}
-				
-				// variable declaration encounteed
-				if (nextToken.isVarDeclaration ) {
-					nextState = new VarDeclarationState(pos, nextToken, this.scope, this.codeAnalyst);
-					this.stage = ForLoopState.INIT_EXPR_BODY_STATE;
-					break;						
-				}
-			
-				break;
-			}
-
-			if (this.stage === ForLoopState.INIT_EXPR_BODY_STATE) {
-				this.stage = ForLoopState.EXIT_CONDTION_EXPR_STATE;
-				nextState = new ExpressionState(pos, nextToken, this.scope, this.codeAnalyst, false);
-				skipNextToken = false;	
-				break;
-			}
-			
-			if (this.stage === ForLoopState.EXIT_CONDTION_EXPR_STATE ) {
-				this.stage = ForLoopState.ITERATION_EXPR_STATE;
-				nextState = new ExpressionState(pos, nextToken, this.scope, this.codeAnalyst, false);
-				skipNextToken = false;	
-				break;
-			}
-			
+			// for loop body starts
 			if (this.stage === ForLoopState.LOOP_BODY_STARTS_STATE) {
 				// check open round bracket 
 				if (!nextToken.isOpenCurlyBracket) {
@@ -91,7 +52,7 @@ class ForLoopState extends ParsingState {
 				
 				// mark this token as THE BEGINING OF a LOOP body
 				nextToken.blockTag = TokenConst.BLOCK_TAG_LOOP_BODY_START;
-				nextState = new CodeBlockState(pos, nextToken, this.scope, this.codeAnalyst, false);
+				nextState = new CodeBlockState(pos, nextToken, new Scope(this.scope), this.codeAnalyst, false);
 				break;
 			}
 			
@@ -109,12 +70,7 @@ class ForLoopState extends ParsingState {
 	
 	isTheLastToken(token) {
 		let hasError = false;
-		if (this.stage === ForLoopState.EXIT_CONDTION_EXPR_STATE) {
-			if (!token.isSemicolon) {
-				hasError = true;
-			}
-		} 
-		else if (this.stage === ForLoopState.ITERATION_EXPR_STATE) {
+		if (this.stage === ForLoopState.FOR_EXPR_STATE) {
 			if (token.isCloseRoundBracket) {
 				this.stage = ForLoopState.LOOP_BODY_STARTS_STATE;
 				

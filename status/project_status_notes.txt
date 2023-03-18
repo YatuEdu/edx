@@ -6,6 +6,13 @@ if (x >= (y / 4)) { <<= detect y not defined
 3) const x = 12;
 x = 100
 	
+General Issues
+---------------------
+1. Add print(...a) support
+2. better variable output (for all defined variables)
+3. add for of support
+
+
 Parsing Issues
 ---------------
 principal: a. resolve asap: a
@@ -77,7 +84,7 @@ got weir error message: expecting "("
 
 14) (Completed) support true false as a known value
 
-15) "," should have a spacw after it: a,b,c -> a, b, c
+15) "," should have a space after it: a,b,c -> a, b, c
 
 16) x = 3; 
 while (x-- > 0) {
@@ -89,11 +96,41 @@ while (x-- > 0) {
 	print (i);   => i should be undefined
 }
 
+17) (Done) add endless loop detection for "for" loop
+		- for loop analys til it's loop body ends "}". reference "while" loop
+17.1) no-body loop endless detection (delayed)
+   x = 1; 
+while (x++ < 10) ;
+for(let i = 0; i < 100; i--);
+
+17.2) nested endless detection (Delayed)
+while (x > 0) {
+	while (y > 0) {
+	}
+}
+
+		
+18) (Delayed) do {} while() loop analysis
+
+19) switch (case) analysis
+
+20) print all the const / let / globals in the top scope
+
+21) add nested loop analysis and endless loop prevention
+
+22) (FIXED) expression does not end if no ";" or the last expression is an assignment, such as x = 100; y = 12; => y is not parsed
+
+23) array subscription assignment does not work:
+	arr[pos1] = arr[pos2];
+	arr[pos2] = x;
+
+
 Needed features:
 ---------------------------
 1) teacher notes per class
 2) teacher set invisible coe (for testing purpose)
-
+3) load my code into running context
+4) view running context and manage it (by add and / removing code by functions)
 Teaching content:
 ------------------------
 Varaible, value, and data type

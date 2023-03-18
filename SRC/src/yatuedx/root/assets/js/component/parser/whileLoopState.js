@@ -46,7 +46,7 @@ class WhileLoopState extends ParsingState {
 			}	
 			
 			if (this.stage === WhileLoopState.WHILE_BODY_STARTS_STATE) {
-				// check close round bracket 
+				// check open round bracket 
 				if (!nextToken.isOpenCurlyBracket) {
 					this.error = new TokenError(TokenError.ERROR_EXPECTING_TOKEN_PREFIX + "'{'", nextToken);
 					break;
@@ -56,7 +56,7 @@ class WhileLoopState extends ParsingState {
 				
 				// mark this token as THE BEGINING OF a LOOP body
 				nextToken.blockTag = TokenConst.BLOCK_TAG_LOOP_BODY_START;
-				nextState = new CodeBlockState(pos, nextToken, new Scope(this.scope), this.codeAnalyst, false);
+				nextState = new CodeBlockState(pos, nextToken, this.scope, this.codeAnalyst, false);
 				break;
 			}	
 			
@@ -88,7 +88,6 @@ class WhileLoopState extends ParsingState {
 				this.error = new TokenError(TokenError.ERROR_EXPECTING_TOKEN_PREFIX + "'}'", token);	
 			}
 		}
-
 		if (this.error) {	
 			this.codeAnalyst.errors.push(this.error);
 		}

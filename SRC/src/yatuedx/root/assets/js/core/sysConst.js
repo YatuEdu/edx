@@ -49,7 +49,10 @@ const sysConstStrings = Object.freeze({
 	ATTR_MODE: 'mode',
 	TAB_STRING: '\t',
 	
-	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment'
+	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment',
+	
+	// output text during code running:
+	
 });
 
 const languageConstants = Object.freeze({

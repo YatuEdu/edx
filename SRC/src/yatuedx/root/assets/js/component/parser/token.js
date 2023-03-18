@@ -99,7 +99,7 @@ class TokenConst {
 	static get VAR_DATA_NUMBER_OR_STRING() { return 7}
 	
 	static get BLOCK_TAG_FOR_LOOP_START() { return 1; }
-	static get BLOCK_TAG_FOR_LOOP_END() { return 2; }
+	static get BLOCK_TAG_FOR_LOOP_EXPRS_END() { return 2; }
 	static get BLOCK_TAG_OBJECT_START() { return 3; }
 	static get BLOCK_TAG_OBJECT_END() { return 4; }
 	static get BLOCK_TAG_OBJECT_COMMA() { return 5; }
@@ -489,6 +489,12 @@ class Token {
 		return tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.WHILE_KEY;
 	}
 	
+	static isLoop(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.keyType && (   tokenInfo.keyType === TokenConst.WHILE_KEY 
+												  || tokenInfo.keyType === TokenConst.FOR_KEY);
+	}
+	
 	static isReturn(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.RETURN_KEY;
@@ -610,6 +616,7 @@ class Token {
 	get isFunction() { return Token.isFunction(this.#name); }
 	get isForLoop() { return Token.isForLoop(this.#name); }
 	get isWhileLoop() { return Token.isWhileLoop(this.#name); }
+	get isLoop() { return Token.isLoop(this.#name); }
 	get isAssignment() { return Token.isAssignment(this.#name); }
 	get isObjectAccessor() {return Token.isObjectAccessor(this.#name);}
 	get isReturn() {return Token.isReturn(this.#name)}
@@ -678,6 +685,8 @@ class TokenError {
 	static get ERROR_CANNOT_APPLY_TO_CONST() { return "Invalid operator for a constant value"; }
 	static get ERROR_INVALID_OP() { return "Invalid operator found"; }
 	static get ERROR_EXPECTING_TOKEN_PREFIX() { return "Invalid token found, expecting "; }
+	static get ERROR_INVALID_FOR_XPRESSION() { return "Invalid 'for' expression found"; }
+	static get ERROR_INVALID_ASSIGNMENT_XPRESSION() { return "Invalid assignment statement found"; }
 	
 	// properties
 	get msg() { return this.#msg; }

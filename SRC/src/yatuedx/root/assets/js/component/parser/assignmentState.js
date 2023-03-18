@@ -22,44 +22,30 @@ class AssignmentState extends ParsingState {
 		if (this.error) {
 			codeAnalyst.errors.push(this.error);
 		}
-		this.stage = 0;
+		this.stage = AssignmentState.BEGIN_STATE;
 	}
+	
+	static get BEGIN_STATE() {return 0; }
+	static get EXPR_STATE() {return 1; }
 	
 	advance(nextToken, pos) {
 		if (this.error) {
 			return new StateAction(null, this.error, true)
 		}
 		
-		
 		let nextState = null;
 		let advanceToNext = false;
 		do {
-			if (0 === this.stage) {
+			if (AssignmentState.BEGIN_STATE === this.stage) {
 				if (!nextToken.isAssignment) {
-					this.error = new TokenError("Invalid assignment state", nextToken);
+					this.error = new TokenError(TokenError.ERROR_INVALID_ASSIGNMENT_XPRESSION, nextToken);
 					codeAnalyst.errors.push(this.error);
 				}
-				this.stage = 1;
+				this.stage = AssignmentState.EXPR_STATE;
 				// start the expression
 				nextState = new ExpressionState(pos, nextToken, this.scope, this.codeAnalyst);
+				nextState.parentState = this;
 				advanceToNext = true;
-				break;
-			}
-			
-			if (1 === this.stage) {
-				// expression state ended, we can add the new variable now if not already added
-				const v = this.scope.findVariable(this.beginToken.name, false);
-				if (!v) {
-					// Implicit variable declaration as global (windows) variable
-					const newVar = new Variable(this.beginToken, TokenConst.VAR_TYPE_WINDOW);
-					this.scope.addWindowsVariable(this.beginToken.name, newVar); 
-				}
-				this.stage = 2;
-				break;
-			}
-			
-			if (2 === this.stage) {
-				this.stateEnded = true;
 				break;
 			}
 		
@@ -69,6 +55,27 @@ class AssignmentState extends ParsingState {
 		// go to expression state		 
 		return new StateAction(nextState, this.error, this.stateEnded, advanceToNext);			
 	}
+	
+	/**
+		assignment is done, can add a new variable.
+	 **/
+	isTheLastToken(token) {
+		this.stateEnded = true;
+		if (AssignmentState.EXPR_STATE !== this.stage) {
+			this.error = new TokenError(TokenError.ERROR_INVALID_ASSIGNMENT_XPRESSION, token);
+			this.codeAnalyst.errors.push(this.error);
+			return this.stateEnded;
+		} 
+		
+		// expression state ended, we can add the new variable now if not already added
+		const v = this.scope.findVariable(this.beginToken.name, false);
+		if (!v) {
+			// Implicit variable declaration as global (windows) variable
+			const newVar = new Variable(this.beginToken, TokenConst.VAR_TYPE_WINDOW);
+			this.scope.addWindowsVariable(this.beginToken.name, newVar); 
+		}
+		return this.stateEnded;	
+	}	
 }
 
 export {AssignmentState}

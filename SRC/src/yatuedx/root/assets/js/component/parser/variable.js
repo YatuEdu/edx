@@ -4,6 +4,7 @@ class Variable {
 	#token
 	#type
 	#dataType
+	#value;
 	
 	constructor(token, type) {
 		this.#token = token;
@@ -20,6 +21,8 @@ class Variable {
 	get isTemp() { return this.#type === TokenConst.VAR_TYPE_TEMP; }
 	get dataType() { return this.#dataType; }
 	set dataType(dt) { this.#dataType = dt; }
+	get value() { return this.#value; }
+	set value(v) { this.#value = v; }
 }
 
 export {Variable}

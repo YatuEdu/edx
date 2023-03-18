@@ -23,18 +23,9 @@ class CodeError {
 **/
 class JSCodeExecutioner {
 	#consoleId;
-	#vars;
 	
     constructor(consoleId) {
 		this.#consoleId = consoleId; 
-		// A ~ Z
-		const alpha = Array.from(Array(26)).map((e, i) => i + 65);
-		const alphabet = alpha.map((x) => String.fromCharCode(x));
-		// a ~ z
-		const alpha2 = Array.from(Array(26)).map((e, i) => i + 97);
-		const alphabet2= alpha2.map((x) => String.fromCharCode(x));
-		// merge
-		this.#vars = alphabet.concat(alphabet2);
 	}
 	
 	/*
@@ -61,14 +52,13 @@ class JSCodeExecutioner {
 		Run js code 
 	 */
 	#runJSCode(src) {
-		// first cleasr left over globals
-		this.#undefineVars();
 		src = src.trim();
 		let analyticalInfo = [];
 		let newSrc = src;
+		let codeAnalyst = null;
 		if (src) {
 			// anaylize code
-			const codeAnalyst = new CodeAnalyst(src);
+			codeAnalyst = new CodeAnalyst(src);
 			analyticalInfo  = codeAnalyst.shallowInspect();
 			
 			// add code as AOP interceptor
@@ -80,23 +70,29 @@ class JSCodeExecutioner {
 			}
 			
 		}
-		// we detected error, no need to executeCode
-		//if (analyticalInfo.length) {
-		//	return new CodeError(null, analyticalInfo);
-		//}
+		
+		// todo: in near future refine code analyst so that when we detected error, no need to executeCode.
+		//	if (analyticalInfo.length) {
+		//		return new CodeError(null, analyticalInfo);
+		//	}
 		
 		if (newSrc) {
+
+			const returnSrc = codeAnalyst.printAllVaraibles();
+			if (returnSrc) {
+				newSrc += "\n" + returnSrc;
+			}
 			// run code
 			try {
-				// exec code
-				const func = new Function('print', 'printx', newSrc);
-				const res = func(this.#printLine.bind(this), this.#appendMessage.bind(this));
-				if (res) {
-					this.#appendMessage(res);
+				// expecting program output:
+				if (codeAnalyst.hasIO) {
+					this.#printLine("------ output -------");
 				}
 				
-				// print well-know variqables (from a ~ z)
-				this.#printvars();
+				// exec code
+				const func = new Function('print', 'printx', newSrc);
+				func(this.#printLine.bind(this), this.#printx.bind(this));
+				
 			}
 			catch (e) {
 				// return error info to caller 
@@ -131,63 +127,65 @@ class JSCodeExecutioner {
 	/*
 		append message text to console in a new line
 	 */
-	#printLine(msg) {
-		const id = `#${this.#consoleId}`;
-		const oldTxt = $(id).val();
-		if (oldTxt) {
-			msg = '\n' + msg;
-		}
-		//printResult(msg);
-		this.#appendMessage(msg);
+	#printLine(...msgs) {
+		this.#appendMessage(true, msgs);
+	}
+	
+	/*
+		append message text to console on the same line
+	 */
+	#printx(...msgs) {
+		this.#appendMessage(false, msgs);
 	}
 	
 	/*
 		append message text to console.
 	 */
-	#appendMessage(msg) {
+	#appendMessage(newLine, args) {
+		let msgTxt = "";
+		for (const a of args) {
+			let argText = a;
+			if (a && typeof a === 'object' && a.constructor === Object) {
+				argText = this.#getObjectProperties(a);
+			}
+			msgTxt += msgTxt ? ' ' + argText : argText;
+		}
+		
 		//  append message to console
 		const id = `#${this.#consoleId}`;
 		const oldTxt = $(id).val();
 		let printTex = '';
 		if (oldTxt) {
-			printTex = `${oldTxt}  ${msg}`;
+			printTex = `${oldTxt}${msgTxt}`;
 		}
 		else {
-			printTex = `${msg}`;
+			printTex = `${msgTxt}`;
 		}
+		
+		if (newLine) {
+			printTex += '\n';
+		} else {
+			printTex += ' ';
+		}
+		
 		$(id).val(printTex);
     }
 	
-	/*
-		undefine well know variables (a ~ z, A, Z) to avoid polluting the
-		global space.
-	 */
-	#undefineVars() {
-		// if any of the vars defined, print them:
-		this.#vars.forEach(maybe => {
-			try {
-				eval(maybe + "=undefined");
+	#getObjectProperties(obj) {
+		let objText = "{";
+		let i = 0;
+		for (const key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				const objValStr = (typeof obj[key] === 'string' || obj[key] instanceof String) ? 
+									`"${obj[key]}"` : `${obj[key]}`;
+				const kvPair = `${key}: ${objValStr}`;;
+				objText += i++ == 0 ? `${kvPair}` : `,${kvPair}`;
 			}
-			catch(e) {
-			} 
-		});
-	}
-	
-	/*
-		print well know variables (a ~ z, A, Z) to console.
-	 */
-	#printvars() {
-		// if any of the vars defined, print them:
-		this.#vars.forEach(maybe => {
-			try {
-				if (eval(maybe + "!==undefined")) {
-					this.#printLine(maybe + "=" + eval(maybe));
-				}
-			}
-			catch(e) {
-			} 
-		});
-	}
+		}
+		objText += "}";
+        return objText;
+    }
+
 }
 
 export {JSCodeExecutioner}

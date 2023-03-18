@@ -43,14 +43,14 @@ class CodeBlockState extends ParsingState {
 		
 		// if it is a "for" loop statement
 		if (this.isForLoop(pos)) {
-			const nextState = new ForLoopState(pos, nextToken, this.scope, 
+			const nextState = new ForLoopState(pos, nextToken, new Scope(this.scope), 
 											   this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
 		}
 		
 		// if it is a "for" loop statement
 		if (nextToken.isWhileLoop) {
-			const nextState = new WhileLoopState(pos, nextToken, this.scope, 
+			const nextState = new WhileLoopState(pos, nextToken, new Scope(this.scope), 
 											   this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
 		}
