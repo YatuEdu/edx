@@ -45,15 +45,15 @@ class CodeSyncManager {
 		
 		// DEEP COMPARISON of the two strings and know the
 		// detailed change states
-		const chaneObj = StringUtil.findChangeBetweenText(this.#lastCodeSaved,newCode);
-		if (chaneObj.flag != UtilConst.STR_CHANGE_NON ) {
+		const changeObj = StringUtil.findChangeBetweenText(this.#lastCodeSaved,newCode);
+		if (changeObj.flag != UtilConst.STR_CHANGE_NON ) {
 			// update the code storage
 			this.#lastCodeSaved = newCode;
 			if (this.#lastCodeSaved) {
-				chaneObj.digest = StringUtil.getMessageDigest(this.#lastCodeSaved);
+				changeObj.digest = StringUtil.getMessageDigest(this.#lastCodeSaved);
 			}
 		}
-		return chaneObj;
+		return changeObj;
 	}
 }				
 

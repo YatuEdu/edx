@@ -59,7 +59,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 	}
 	
 	/**
-		Child class object calls this function to update the code cache.  Upon after dating the code in the cache,
+		Child class object calls this function to update the code cache.  Upon updating code in the cache,
 		#codeSyncManager also advices what kind of changes the code has: appending, deletion, or what not so that
 		the child classd objects know what to do.
 	 **/
@@ -81,6 +81,9 @@ class ProgrammingClassCommandUI extends AuthPage {
 		let newContent = "";
 		let digest = "";
 		const flag = how[0];
+		if (oldStr === undefined) {
+			oldStr = "";
+		}
 		switch(flag) {
 			// REFRESH EVERYTHING
 			case UtilConst.STR_CHANGE_ALL:

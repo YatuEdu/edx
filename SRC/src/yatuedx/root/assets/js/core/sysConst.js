@@ -17,6 +17,11 @@ const sysConstants = Object.freeze({
 	// code buffer refresh time (ms)
 	YATU_CODE_BUFFER_REFRESH_FREQUENCY: 5000,
 	
+	// classroom mode
+	LIVE_MODE: 0, 		// OR UNDEFINED
+	EXERCISE_MODE: 1,
+
+	
 	// role names
 	YATU_ROLE_TEACHER: 'teacher',
 	YATU_ROLE_ADMIN: 'admin',

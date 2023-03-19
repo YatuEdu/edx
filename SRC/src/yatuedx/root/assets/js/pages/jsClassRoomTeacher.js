@@ -270,7 +270,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			$(this.StudentBoardHideButtoncClassSelector).click(this.hideStudentContainer.bind(this));	
 
 			// handle sending message to student
-			$(this.getStudentMessageSendBtnIdSelector).click(this.sendMessageToStudent.bind(this));
+			$(this.getStudentMessageSendBtnIdSelector(student)).click(this.sendMessageToStudent.bind(this));
 		}
 		// set class mode for the new student 
 		const currentModeStr = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
@@ -379,7 +379,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// obtain the new code sample using an algorithm defined in parent class as a static method
 		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, studentCurrentCode);
-		
+		let shouldUpdate = false;
 		while (true) {		
 			// update the code on UI
 			if (!newContent) {
@@ -388,12 +388,13 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			}
 			
 			// verify the digest if it is present
-			let shouldUpdate = true;
+			
 			if (digest) {
 				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
-					shouldUpdate = false;
 					console.log('content not verified, asking for re-sync');
 					this.#displayBoardTeacher.askReSync(student);
+				} else {
+					shouldUpdate = true;
 				}
 			}
 			else {
@@ -410,8 +411,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		}
 		
 		// change student button to indicate that student has new code
-		const hasCode = $(this.getStudentConsoleIdSelector(student)).val().trim().length > 0;
-		this.toggleStudentButton(student, hasCode);
+		this.toggleStudentButton(student, shouldUpdate);
 
 	}
 	

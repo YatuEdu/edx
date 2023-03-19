@@ -1,15 +1,15 @@
 import {sysConstants, sysConstStrings, uiConstants} from '../core/sysConst.js'
-import {credMan} 							from '../core/credMan.js'
-import {uiMan} 								from '../core/uiManager.js';
-import {DisplayBoardForCoding}				from '../component/displayBoardForCoding.js'
-import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
-import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
-import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
-import {IncomingCommand}					from '../command/incomingCommand.js'
-import {PageUtil, StringUtil,RegexUtil}		from '../core/util.js';
-import {Net}			    				from "../core/net.js"
-import {CodeManContainer}					from '../component/new/codeManager.js'
-import {CodeInputConsole}					from '../component/new/CodeInputConsole.js';
+import {credMan} 									from '../core/credMan.js'
+import {uiMan} 										from '../core/uiManager.js';
+import {DisplayBoardForCoding}						from '../component/displayBoardForCoding.js'
+import {JSCodeExecutioner}							from '../component/jsCodeExecutioner.js'
+import {PTCC_COMMANDS}								from '../command/programmingClassCommand.js'
+import {ProgrammingClassCommandUI}					from './programmingClassCommandUI.js'
+import {IncomingCommand}							from '../command/incomingCommand.js'
+import {PageUtil, StringUtil, RegexUtil, UtilConst}	from '../core/util.js';
+import {Net}			    						from "../core/net.js"
+import {CodeManContainer}							from '../component/new/codeManager.js'
+import {CodeInputConsole}							from '../component/new/CodeInputConsole.js';
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
@@ -97,7 +97,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		this.#groupId = groupId;
 		
 		
-		if (mode !== 0) {
+		if (mode && mode === 1) {
 			// Do not show video if we are only doing excersize
 			$(this.columnVideoAreaSelector).hide();
 			$(this.columnCodingAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
@@ -366,7 +366,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	updateCodeBufferAndSync() {
 		console.log('JSClassRoom.updateCodeBufferAndSync called');
 		const codeUpdateObj = this.updateCode(this.code); 
-		if (codeUpdateObj) {
+		if (codeUpdateObj && codeUpdateObj.flag !== UtilConst.STR_CHANGE_NON) {
 			this.#displayBoardForCoding.updateCodeBufferAndSync(codeUpdateObj);
 		}
 	}
@@ -548,7 +548,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		else if (newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
 			// restart code transmit timer (only in classroom mode (not in offline-exercise mode))
-			if (classMode === 0) { 
+			if (classMode === undefined || classMode === sysConstants.LIVE_MODE) { 
 				this.startOrStopCodeRefreshTimer(true);
 			}
 			
