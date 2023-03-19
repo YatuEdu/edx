@@ -74,6 +74,63 @@ class ParsingState {
 	}
 	
 	/**
+		Tell if object Subscript syntax is seen: x[a]
+	 **/
+	isSubscript(pos) {
+		// At leasr 4 tokens, for example: a[i]
+		if (this.codeAnalyst.meaningfulTokens.length < pos + 4) {
+			return false;
+		}
+		
+		const objName = this.codeAnalyst.meaningfulTokens[pos];
+		if (!objName.isName){
+			return false;
+		}
+		const openSqure = this.codeAnalyst.meaningfulTokens[pos+1];
+		if (!openSqure.isOpenSquareBracket){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+		Tell if object Subscript syntax is seen: x[a] = 0;
+	 **/
+	isSubscriptAssignment(pos) {
+		// At leasr 6 tokens, for example: a[i] = 0
+		let len = this.codeAnalyst.meaningfulTokens.length;
+		if (len < pos + 6) {
+			return false;
+		}
+		
+		const objName = this.codeAnalyst.meaningfulTokens[pos];
+		if (!objName.isName){
+			return false;
+		}
+		
+
+		const openSqure = this.codeAnalyst.meaningfulTokens[pos+1];
+		if (!openSqure.isOpenSquareBracket){
+			return false;
+		}
+		
+		// find ] = 
+		let i = pos + 2;
+		let found = false;
+		while(i < len-1) {
+			let token = this.codeAnalyst.meaningfulTokens[i];
+			let token2 = this.codeAnalyst.meaningfulTokens[i+1];
+			if (token.isCloseSquareBracket && token2.isAssignment) {
+				found = true;
+				break;
+			}
+			++i;
+		}
+		return found;
+	}
+	
+	
+	/**
 		Tell if a function call statement is at position 'pos"
 	 **/
 	isFunctionCall(pos) {

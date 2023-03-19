@@ -5,6 +5,7 @@ import {FunctionDefState}				from './functionDefState.js'
 import {ExpressionState}				from './expressionState.js'
 import {FunctionCallState}				from './functionCallState.js'
 import {AssignmentState}				from './assignmentState.js'
+import {SubscriptAssignmentState}		from './subscriptAssignmentState.js'
 import {ObjectMethodCallState}			from './objectMethodCallState.js'
 import {IfState}						from './ifState.js'
 import {VarDeclarationState}			from './varDeclarationState.js'
@@ -53,6 +54,15 @@ class CodeBlockState extends ParsingState {
 			const nextState = new WhileLoopState(pos, nextToken, new Scope(this.scope), 
 											   this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
+		}
+		
+		// is it a subscript assignment, such as a[i] = 10;
+		if (this.isSubscriptAssignment(pos)) {
+			const nextState = new SubscriptAssignmentState(pos, nextToken, new Scope(this.scope), 
+											   this.codeAnalyst, false);
+			// we keep this token for SubscriptAssignmentState state
+			const advanceToNextToken = false;
+			return new StateAction(nextState, null, false, advanceToNextToken); 
 		}
 		
 		// if it is a function definition statement

@@ -55,7 +55,7 @@ class ExpressionState extends ParsingState {
 			}
 			
 			// array subscription syntax?
-			if (Operand.isOperand(nextToken) && this.matchTokenName(pos+1, "[")){
+			if (this.isSubscript(pos)){
 				// treat function call as a value
 				newElement = this.#addTempOprand("arraryElement");
 				
