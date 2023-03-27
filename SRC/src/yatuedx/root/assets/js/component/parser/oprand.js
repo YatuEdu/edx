@@ -26,7 +26,8 @@ class Operand extends ExpressionElement {
 	// accessor
 	
 	get isVariable() { return false }
-	get isConst() { return false }	get isOpenRoundBracket() { return false; }
+	get isConst() { return false }	
+	get isOpenRoundBracket() { return false; }
 	get isCloseRoundBracket() { return false; }
 	get binaryOperatorRight() { return this.#binaryOperatorRight;}
 	set binaryOperatorRight(op) { this.#binaryOperatorRight = op;}

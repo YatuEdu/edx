@@ -134,7 +134,7 @@ class ExpressionState extends ParsingState {
 			// no expression element found
 			if (!changeState && !nextState) {
 				if (!this.stateEnded && !newElement) {
-					this.error = new TokenError("Invalid expression element found", nextToken);
+					//this.error = new TokenError("Invalid expression element found", nextToken);
 					break;
 				}
 			}
@@ -168,11 +168,15 @@ class ExpressionState extends ParsingState {
 
 	complete() {
 		if (!this.error) {
+			// left over operator?
+			if (this.#currentOperator) {
+				this.error = new TokenError("Invalid operator found", this.#currentOperator.token);
+			}
 			this.#handleSubExpressionClose(null);
-			if (this.error) {
+		}
+		if (this.error) {
 				this.codeAnalyst.errors.push(this.error);
 			}
-		}
 	}
 
 	/*
@@ -185,11 +189,30 @@ class ExpressionState extends ParsingState {
 	// if we started a new line, we might start a new expression or continue the current one.
 	// it is complicated. For now we look for "=" only.
 	// todo: make it perfect
-	#expressionEnded(nextToken, pos) {
+	#expressionEnded(token, pos) {
 		let newExprStarted = false;
-		if (nextToken.isCR) {
+		if (token.isCR) {
 			// reached the end?
 			if (pos + 1 === this.codeAnalyst.meaningfulTokens.length) {
+				return true;
+			}
+			
+			// last token is block-ending, then this expression ends as well 
+			const lastToken = this.codeAnalyst.meaningfulTokens[pos-1];
+			if (lastToken.isExpressionEnd) {
+				return true;
+			}
+			
+			// last token is not operator and next token is a name, the expression ends 
+			const nextToken = this.codeAnalyst.meaningfulTokens[pos+1];
+			if (lastToken.isOperator) {
+				if (lastToken.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_REAR_OP) && !nextToken.isOperator) {
+					return true;
+				}
+				return false;
+			}
+			
+			if (!nextToken.isOperator) {
 				return true;
 			}
 		
@@ -233,12 +256,11 @@ class ExpressionState extends ParsingState {
 		const lastOperand = this.#peek();
 		const newOperand = new CodeOperand(token); 
 
-
 		// eat unary operator if applicable:
 		if (this.#currentOperator) {
 			if (this.#currentOperator.isUnaryFront) {
 				// unary op cannot be appiled by const
-				if (newOperand.isConst) {
+				if (newOperand.isConst && !this.#currentOperator.token.opCanApplyToConst || this.#isConstVar(newOperand)) {
 					this.error = new TokenError(TokenError.ERROR_CANNOT_APPLY_TO_CONST, this.#currentOperator.token);
 					return;
 				}
@@ -270,6 +292,14 @@ class ExpressionState extends ParsingState {
 		return newOperand;
 	}
 	
+	#isConstVar(operand) {
+		const v = this.scope.findVariable(operand.name, false);
+		if (v && v.isConst) {
+			return true;
+		}
+		return false;
+	}
+	
 	#addOperator(token, pos) {
 		if (this.#currentOperator) {
 			this.error = new TokenError("Ophaned operator found", token);
@@ -299,13 +329,13 @@ class ExpressionState extends ParsingState {
 		// / for unary rear operator
 		if (this.#shouldBeUnaryRearOperator(lastOperand, newOp, pos)) {
 			if (!this.error) {
-				if (lastOperand.isConst) {
+				if (lastOperand.isConst || this.#isConstVar(lastOperand)) {
 					// todo: is there a rear operator that work on constant?
 					this.error = new TokenError(TokenError.ERROR_CANNOT_APPLY_TO_CONST, token);
 				}
 			}
 			//eat unary rear operator	
-			token.blockTag = TokenConst.BLOCK_TAG_UNARY_FRONT_OP;
+			token.blockTag = TokenConst.BLOCK_TAG_UNARY_REAR_OP;
 			return newOp;
 		}
 		
@@ -476,6 +506,7 @@ class ExpressionState extends ParsingState {
 		let lastLeftOperator = null;
 		let oprand = null;
 		do {
+			// getting the last operand
 			oprand = this.#operandStack.pop();
 			
 			// we have an error because we would have seen "(" first
@@ -497,12 +528,12 @@ class ExpressionState extends ParsingState {
 				// combine this operand (left) with the last operand (right)
 				if (oprand) {
 					if (oprandRight.binaryOperatorLeft !== oprand.binaryOperatorRight) {
-						this.error = new TokenError("Unmatched operator found", oprand.token);
+						this.error = new TokenError(TokenError.ERROR_UNMATCH_OPERATOR, oprand.token);
 						break;
 					}
 				}	
 			} else {
-				// The right most operand should not have a right operator in it
+				// The right most (the last one) operand should not have a right operator in it
 				if (oprand && oprand.binaryOperatorRight ) {
 					this.error = new TokenError(TokenError.ERROR_INVALID_OP, oprand.binaryOperatorRight.token);
 					break;

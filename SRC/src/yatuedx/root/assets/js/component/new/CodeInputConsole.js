@@ -154,11 +154,18 @@ class CodeInputConsole extends ComponentBase {
 	showDiagnoticMessage(error) {
 		// format diagnostical dialog box:
 		let errorMsgHtml = "";
-		error.analyticalInfo.forEach(e => errorMsgHtml += DIAGNOSTIC_MESSAGE_TEMPLATE
-								.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE, e.token.lineNo)
-								.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE_DATA_ATTR, DATA_ATTR_LINE)
-								.replace(REPLACMENT_DIAGNOSTIC_ERROR_ENTRY_CLASS, this.errorEntryClass)
-								.replace(REPLACMENT_DIAGNOSTIC_MESSAGE, e.errorDisplay));
+		const errMsgSet = new Set();
+		error.analyticalInfo.forEach(e => {
+			// only add error that has not been seen before
+			if (!errMsgSet.has(e.errorDisplay)) {
+				errMsgSet.add(e.errorDisplay);
+				errorMsgHtml += DIAGNOSTIC_MESSAGE_TEMPLATE
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE, e.token.lineNo)
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE_DATA_ATTR, DATA_ATTR_LINE)
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_ENTRY_CLASS, this.errorEntryClass)
+									.replace(REPLACMENT_DIAGNOSTIC_MESSAGE, e.errorDisplay);
+			}
+		});
 		$(this.diagnoticMsgDivIdSelector).html(errorMsgHtml);
 		if (error.exception) {
 			$(this.diagnoticExceptionDivIdSelector).html(`<p>${error.exception.name}: ${error.exception.message}</p>`);

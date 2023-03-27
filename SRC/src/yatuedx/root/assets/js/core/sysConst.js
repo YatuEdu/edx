@@ -56,6 +56,8 @@ const sysConstStrings = Object.freeze({
 	
 	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment',
 	
+	EXE_PROGRAM_OUTPUT:   '------ PROGRAMMING OUTPUT -------\n',
+	EXE_PROGRAM_FIN:    '\n------  END OF EXECUTION  -------\n\n'
 	// output text during code running:
 	
 });

@@ -1,5 +1,5 @@
 import {StringUtil, RegexUtil}				from '../../core/util.js'
-import {sysConstants, sysConstStrings}					from '../../core/sysConst.js'
+import {sysConstants, sysConstStrings}		from '../../core/sysConst.js'
 import {Token, TokenConst, TokenError}		from '../parser/token.js'
 import {Scope}								from '../parser/scope.js'
 import {CodeBlockState}						from '../parser/codeBlockState.js'
@@ -65,7 +65,7 @@ class CodeAnalyst {
 		this.shallowInspect();
 		// if error, advice to fix error first
 		if (this.errors.length > 0) {
-			return {err: true, newSrc: `${this.errors[0].errorDisplay} ${sysConstStrings.TAG_PARSER_ADDED_COMMENT} `};
+			return {hasError: true, errors: this.errors};
 		}
 		
 		let newSrc = '';
@@ -102,7 +102,7 @@ class CodeAnalyst {
 				newSrc += current.name;
 				
 				// "}" must be FLOOWED BY NEW CR and tabs
-				if (after && !after.isCR) {
+				if (after && !after.isCR && !after.isSemicolon) {
 					newSrc += this.#addRcAndTabs(nestLevel);
 				}
 				continue;
@@ -133,12 +133,10 @@ class CodeAnalyst {
 			}	
 			
 			// Most operator needs to be spaced. Some operatord (such alike ".") need not to be spaced
-			if (current.type === Token.TOKEN_TYPE_OPERATOR) {
-				let space = "";
-				if (current.opFollowedBySpace) {
-					space = " ";
-				}
-				newSrc += space + current.name + space;
+			if (current.shouldProceededBySpace || current.shouldFollowedBySpace) {
+				let spaceBefore = current.shouldProceededBySpace ? " " : "";
+				let spaceAfter = current.shouldFollowedBySpace ? " " : "";
+				newSrc += spaceBefore + current.name + spaceAfter;
 				continue;
 			}
 			
@@ -161,7 +159,7 @@ class CodeAnalyst {
 			newSrc += current.name;
 			newSrc += this.#addSpaceOrNewLine(i, nestLevel);
 		}
-		return {err: false, newSrc: newSrc};
+		return {err: false, newSourc: newSrc};
 	}
 	
 	/**
@@ -180,7 +178,7 @@ class CodeAnalyst {
 		Obtain the value of all globally scoped variables and return their results in a map.
 	 */
 	printAllVaraibles() {
-		let varEvalLines = `;print("");print("------ variable values -------");\n`;
+		let varEvalLines = `;print("");print("------ VARIABLE VALUES -------");\n`;
 		for (let [key, value] of this.rootVariableMap) {
 			try {
 				varEvalLines += `print('${key}:', ${key});`;
@@ -323,7 +321,7 @@ class CodeAnalyst {
 				}
 			}
 			
-			// see if there is a line coment trwiling the ";"
+			// see if there is a line coment following the ";"
 			for (let i = pos; startNewLine && i < this.meaningfulTokens.length; i++) {
 				const token = this.meaningfulTokens[i];
 				if (token.isCommentBlock) {
@@ -435,7 +433,7 @@ class CodeAnalyst {
 			const token = this.meaningfulTokens[i];
 			
 			// throw CR if the state-machine does not care about it
-			if (token.isCR && currentState.ignoreCR) {
+			if (token.isCR && currentState.ignoreCR()) {
 				++i;
 				continue;
 			}
@@ -490,6 +488,7 @@ class CodeAnalyst {
 			
 			// clean up states for the last chance:
 			currentState.isTheLastToken(lastToken);
+			currentState.complete();
 			currentState = stateStack.pop();
 		} while(currentState);
 	}

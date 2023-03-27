@@ -109,6 +109,13 @@ class TokenConst {
 	static get BLOCK_TAG_WHILE_LOOP_EXPS_START() { return 9; }
 	static get BLOCK_TAG_LOOP_BODY_START() { return 10; }
 	static get BLOCK_TAG_LOOP_BODY_END() { return 11; }
+	
+	static get SPACE_TYPE_UNKNOWN() { return -1; }
+	static get SPACE_TYPE_NONE() { return 0; }
+	static get SPACE_TYPE_LEFT() { return 1; }
+	static get SPACE_TYPE_RIGHT() { return 2; }
+	static get SPACE_TYPE_BOTH() { return 3; }
+	
 }
 
 const STANDARD_TOKEN_MAP = new Map([
@@ -153,9 +160,9 @@ const STANDARD_TOKEN_MAP = new Map([
 	['[', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_OPEN  }],
 	[']', 			{type: TOKEN_TYPE_SEPARATOR, bracketType: BRACKET_TYPE_SQUARE, bracketAction: ACTION_CLOSE }],
 	
-	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA }],
+	[',', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COMMA, spaceType: TokenConst.SPACE_TYPE_RIGHT }],
 	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON }],
-	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON }],
+	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, spaceType: TokenConst.SPACE_TYPE_RIGHT}],
 	
 	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR}],	
 	
@@ -177,15 +184,16 @@ const STANDARD_TOKEN_MAP = new Map([
 	['!=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_BINARY_, priority: 2}],
 	['!==', 		{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_BINARY_, priority: 2}],
 	
-	['!', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_UNARY_FRONT_, priority: 1, notFollowedBySpace: true }],
+	['!', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LOGIC_OPERATOR, opMode: OP_MODE_UNARY_FRONT_, priority: 1, 
+						spaceType: TokenConst.SPACE_TYPE_NONE, opCanApplyToConst: true }],
 	['&', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 3}],
 	['|', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 3}],
 	
 	['+', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, 
-					 opMode: OP_MODE_UNARY_FRONT_AND_BINARY_, priority: 3, 
+					 opMode: OP_MODE_UNARY_FRONT_AND_BINARY_, priority: 3, opCanApplyToConst: true,
 					 frontOperandType: TokenConst.VAR_DATA_NUMBER, binaryOperandType: TokenConst.VAR_DATA_NUMBER_OR_STRING  }],
 	['-', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, 
-					opMode: OP_MODE_UNARY_FRONT_AND_BINARY_, priority: 3, 
+					opMode: OP_MODE_UNARY_FRONT_AND_BINARY_, priority: 3, opCanApplyToConst: true,
 					frontOperandType: TokenConst.VAR_DATA_NUMBER, binaryOperandType: TokenConst.VAR_DATA_NUMBER}],
 	
 	['*', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_BINARY_, priority: 4 }],
@@ -196,11 +204,11 @@ const STANDARD_TOKEN_MAP = new Map([
 	
 	["instanceof",  {type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_BINARY_, priority: 6 }], 
 	['typeof', 		{type: TOKEN_TYPE_OPERATOR_, opMode: OP_MODE_UNARY_FRONT_, priority: 6 }],
-	['++', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],
-	['--', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
+	['++', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_UNKNOWN, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],
+	['--', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_UNKNOWN, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
 	
 	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA }],
-	['.', 			{type: TOKEN_TYPE_OPERATOR_, notFollowedBySpace: true, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
+	['.', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_NONE, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
 	
 	['//', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_LINE }],
 	['/*', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_BLOCK_OPEN }],
@@ -277,6 +285,11 @@ class Token {
 	
 	static getTokenInfo(name) { return STANDARD_TOKEN_MAP.get(name) }
 	
+	static isOperator(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type === TOKEN_TYPE_OPERATOR_;
+	}
+	
 	static isSpace(c) {
 		return c === TOKEN_CR_ || c === TOKEN_TAB_ || c === TOKEN_SPACE_;
 	}
@@ -309,6 +322,40 @@ class Token {
 		return tokenInfo && tokenInfo.type && tokenInfo.type == Token.TOKEN_TYPE_KNOWN_PROP;
 	}
 	
+	static shouldProceededBySpace(c) {
+		return Token.shouldFollowedOrProceededBySpace(c, TokenConst.SPACE_TYPE_LEFT);
+	}
+	
+	static shouldFollowedBySpace(c) {
+		return Token.shouldFollowedOrProceededBySpace(c, TokenConst.SPACE_TYPE_RIGHT);
+	}
+	
+	static shouldFollowedOrProceededBySpace(c, spaceType) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		if (tokenInfo && tokenInfo.type) {
+			if (tokenInfo.spaceType && tokenInfo.spaceType === TokenConst.SPACE_TYPE_NONE) {
+				return false;
+			}
+			
+			if (tokenInfo.type === TOKEN_TYPE_OPERATOR_) {
+				// operator defualt to true unless specififed
+				if (tokenInfo.spaceType) {
+					return tokenInfo.spaceType === spaceType || tokenInfo.spaceType === TokenConst.SPACE_TYPE_BOTH;
+				}
+				return true;
+			} else if (tokenInfo.spaceType) {
+				return tokenInfo.spaceType === spaceType || tokenInfo.spaceType === TokenConst.SPACE_TYPE_BOTH;
+			}
+		} 
+		return false;
+	}
+	
+	static opFollowedBySpace(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return tokenInfo && tokenInfo.type 
+				&& (tokenInfo.type === TOKEN_TYPE_OPERATOR_)
+				&& (tokenInfo.notFollowedBySpace === undefined || tokenInfo.notFollowedBySpace !== true);
+	}
 	
 	static isStar(c) {
 		return c === TOKEN_STAR_;
@@ -452,6 +499,11 @@ class Token {
 				tokenInfo.keyType === TokenConst.CONST_KEY;
 	}
 	
+	static opCanApplyToConst(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo.opCanApplyToConst;
+	}
+	
 	static isLetVarDeclaration(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.subType && tokenInfo.subType === KEY_SUB_TYPE_VAR_DECL &&
@@ -503,13 +555,6 @@ class Token {
 	static isIoFunc(c) {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.isIoFunc;
-	}
-
-	static opFollowedBySpace(c) {
-		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
-		return tokenInfo && tokenInfo.type 
-				&& (tokenInfo.type === TOKEN_TYPE_OPERATOR_)
-				&& (tokenInfo.notFollowedBySpace === undefined || tokenInfo.notFollowedBySpace !== true);
 	}
 	
 	static bracketTypeToName(type) {
@@ -565,7 +610,29 @@ class Token {
 			   this.type == TOKEN_TYPE_STRING_ ||
 			   this.type == TOKEN_TYPE_NUMBER_;
 	}
+	get isOperator() {  return Token.isOperator(this.#name) } 
 	get isSpace () { return TOKEN_TYPE_SPACE_ === this.type}
+	
+	get shouldProceededBySpace() { 
+		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP)) {
+			return true;
+		}
+		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_REAR_OP)) {
+			return false;
+		}
+		return Token.shouldProceededBySpace(this.#name) 
+	}
+	
+	get shouldFollowedBySpace() { 
+		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP)) {
+			return false;
+		}
+		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_REAR_OP)) {
+			return true;
+		}
+		return Token.shouldFollowedBySpace(this.#name); 
+	}
+	
 	get isStar() { return Token.isStar(this.#name)}
 	get isCR() { return TOKEN_TYPE_SPACE_ === this.type && this.value === TOKEN_CR_}
 	get isConst() { return  this.type === TOKEN_TYPE_NUMBER_ || this.type === TOKEN_TYPE_STRING_ }
@@ -613,6 +680,7 @@ class Token {
 		
 		return TokenConst.VAR_TYPE_UNKNOWN;
 	}
+	get opCanApplyToConst() {return Token.opCanApplyToConst(this.#name);}
 	get isFunction() { return Token.isFunction(this.#name); }
 	get isForLoop() { return Token.isForLoop(this.#name); }
 	get isWhileLoop() { return Token.isWhileLoop(this.#name); }
@@ -626,17 +694,6 @@ class Token {
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
 	get isUnaryOp() { return this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP) }
 	get isIoFunc() { return Token.isIoFunc(this.#name) }
-		
-	/*
-		Used by code formatter to determine if this operator token followed by space? For example, ++x, should not be ++ x, but
-		x+y should be x + y.
-	 */
-	get opFollowedBySpace() { 
-		if (this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP)) {
-			return false;
-		}
-		return Token.opFollowedBySpace(this.#name)
-	}
 	
 	/*
 		Test if the token has "any" of the given tags.
@@ -687,6 +744,8 @@ class TokenError {
 	static get ERROR_EXPECTING_TOKEN_PREFIX() { return "Invalid token found, expecting "; }
 	static get ERROR_INVALID_FOR_XPRESSION() { return "Invalid 'for' expression found"; }
 	static get ERROR_INVALID_ASSIGNMENT_XPRESSION() { return "Invalid assignment statement found"; }
+	static get ERROR_UNMATCH_OPERATOR() { return "Unmatched operator found"; }
+	
 	
 	// properties
 	get msg() { return this.#msg; }

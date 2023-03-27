@@ -206,6 +206,16 @@ class ParsingState {
 		return "";
 	}
 	
+	isEpressionStatement(pos) {
+		while (pos < this.codeAnalyst.meaningfulTokens.length) {
+			const token = this.codeAnalyst.meaningfulTokens[pos++];
+			if (token.isName || token.isOp || token.isConst) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	isObjectProperty(pos) {
 	}
 	

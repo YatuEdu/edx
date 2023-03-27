@@ -6,6 +6,18 @@ print(x)  // -1
 const x = +1;
 print(x) // 1
 
+const x =  +1
+const y =  -x
+const z =  -y
+const w =  -1
+const t =  +y
+// => 
+x: 1
+y: -1
+z: 1
+w: -1
+t: -1
+
 const x = *1;
 print(x) // invalid token "*"
 
@@ -16,18 +28,18 @@ x = 10;
 print(x+y)  
 print (x + t) // error: t is not defined
 
-let x = 1;
-let y = 2;
-x = 10;
+let x = 1
+let y = 2
+x = 10
 z = x+ (y * (x + y) * 2) // z = 58
 
-let x = 1;
-let y = 2;
-x = 10;
-z = x+ (y * (x + y) * 2) + w;  // w not defined error
+let x = 1
+let y = 2
+x = 10
+z = x+ (y * (x + y) * 2) + w  // w not defined error
 
-let x = 1;
-let y = 2;
+let x = 1
+let y = 2
 print(x+ (y * (x + y) * 2))   // 13
 
 let x = 1;
@@ -36,8 +48,8 @@ x = 10;
 print(x+ (y * * (x + y) * 2))   // Invalid expression element found: *
 
 // known property 'length'
-const a = [1, 2, 3];
-const b = a.length + 10;
+const a = [1, 2, 3]
+const b = a . length + 10
 print (b) // 13
 
 
@@ -94,6 +106,12 @@ x = 10;
 y = 2;
 print(foo(x * (y + 1), x + (y +x * y))) // 960
 
+function foo(x, y) {
+	let z = x * y; 
+	return z; 
+}
+x = foo(1, 3) + 4 * (foo(2, 3) + 12)
+// 75
 
 ///////////// error case
 function foo(x, y) {
@@ -112,7 +130,7 @@ function foo(x, y) {
 	let z = x * y ;
 	return z;
 }
-x = foo(1, 3) + 4 * // * invalid operator
+x = foo(1, 3) + 4 * // * invalid operator xxxxxxxxxxxxxxxxxxxxxxxxx
 
 let x = 1;
 let y = 2;

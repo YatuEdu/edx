@@ -118,6 +118,15 @@ class CodeBlockState extends ParsingState {
 									
 		}
 		
+		// Note: this must be the last to call for independednt exptession statement (such as X++)
+		if (this.isEpressionStatement(pos)) {
+			// go to expression state		
+			const nextState = new ExpressionState(pos, nextToken, 
+												  this.scope, this.codeAnalyst);
+			const advanceToNextToken = false;
+			return new StateAction(nextState, null, false, advanceToNextToken);			
+		}
+		
 		// if we come here, we are still in the same code block, keep probing ahead
 		return new StateAction(null, null, false);
 	}

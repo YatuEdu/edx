@@ -9,7 +9,7 @@ import {IncomingCommand}							from '../command/incomingCommand.js'
 import {PageUtil, StringUtil, RegexUtil, UtilConst}	from '../core/util.js';
 import {Net}			    						from "../core/net.js"
 import {CodeManContainer}							from '../component/new/codeManager.js'
-import {CodeInputConsole}							from '../component/new/CodeInputConsole.js';
+import {CodeInputConsole}							from '../component/new/codeInputConsole.js';
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
@@ -516,17 +516,22 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		// display error only in self-study mode
-		if (errorInfo) {
-			if ($(this.resultConsoleControl).prop('readonly')) {
-				// do not show diagnostical dbox since we are not interactive
-				// just print error since teach is gonna fix it, not me
-				$(this.resultConsoleControl).val("error");
-			} else {
-				this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
-			}
+		this.#showErroDialog(errorInfo, true);
+	}
+	
+	/**
+		Hnandle code formatting text from code baord
+	**/
+	handleCodeFormatting(e) {
+		e.preventDefault(); 
+		
+		//obtain code from local "exercise board" and execute it locally
+		const result = super.formatCode();
+		if (result.hasError) {
+			// display error only in self-study mode
+			this.#showErroDialog(result.errors, false);
 		} else {
-			// show output cosole
-			this.#codeInputConsoleComponent.showOutput();
+			$(this.codeBoardTextArea).val(result.newSourc);
 		}
 	}
 	
@@ -574,19 +579,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		//obtain code from local "exercise board" and execute it locally
 		this.runCodeFrom();
-	}
-	
-	/**
-		Hnandle code formatting text from code baord
-	**/
-	handleCodeFormatting(e) {
-		e.preventDefault(); 
-		
-		//obtain code from local "exercise board" and execute it locally
-		const newCodeSrc = super.formatCode();
-		if (newCodeSrc) {
-			$(this.codeBoardTextArea).val(newCodeSrc);
-		}
 	}
 	
 	/**
@@ -663,6 +655,21 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.messageInputTa).val("");
 		}
 		
+	}
+	
+	#showErroDialog(errorInfo, showConsole) {
+		if (errorInfo) {
+			if ($(this.resultConsoleControl).prop('readonly')) {
+				// do not show diagnostical dbox since we are not interactive
+				// just print error since teach is gonna fix it, not me
+				$(this.resultConsoleControl).val("error");
+			} else {
+				this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+			}
+		} else if (showConsole) {
+			// show output cosole
+			this.#codeInputConsoleComponent.showOutput();
+		}
 	}
 	
 	/**

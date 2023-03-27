@@ -8,7 +8,7 @@ import {STUDENT_BOARD_TEMPLATE}				from '../component/studentCommCard.js';
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
 import {IncomingCommand}					from '../command/incomingCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
-import {CodeInputConsole}					from '../component/new/CodeInputConsole.js';
+import {CodeInputConsole}					from '../component/new/codeInputConsole.js';
 
 const DIV_VIEDO_AREA 					= "yt_div_video_area";
 const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
@@ -388,7 +388,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			}
 			
 			// verify the digest if it is present
-			
 			if (digest) {
 				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
 					console.log('content not verified, asking for re-sync');
@@ -572,9 +571,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 */
 	handleCodeBeautify(e) {
 		//obtain code from local "exercise board" and execute it locally
-		const newCodeSrc = super.formatCode();
-		if (newCodeSrc) {
-			$(this.codeInputTextArea).val(newCodeSrc);
+		const result = super.formatCode();
+		if (result.hasError) {
+			this.#codeInputConsoleComponent.showDiagnoticMessage(result.errors);
+		} else {
+			$(this.codeInputTextArea).val(result.newSourc);
 		}
 	}
 	

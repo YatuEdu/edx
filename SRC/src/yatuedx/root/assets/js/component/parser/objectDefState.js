@@ -13,6 +13,7 @@ class ObjectDefState extends ParsingState {
 	static get PROP_NAME_STATE() {return 1; }
 	static get PROP_POST_NAME_STATE() {return 2; }
 	static get PROP_VALUE_STATE() {return 3; }
+	static get PROP_LAST_STATE() {return 4; }
 	
 	advance(nextToken, pos) {
 		let bodyStarted = false;
@@ -39,7 +40,18 @@ class ObjectDefState extends ParsingState {
 				
 				this.error = new TokenError(errorMsg, nextToken);
 				break;
-			}	
+			}
+
+			if (this.stage === ObjectDefState.PROP_LAST_STATE) {
+				if (nextToken.isCloseCurlyBracket) {
+					stateEnded = true;
+					break;
+				}
+				
+				this.error = new TokenError(errorMsg, nextToken);
+				break;
+			}
+	
 		} while (false);
 		
 		if (nextState) {
@@ -56,14 +68,15 @@ class ObjectDefState extends ParsingState {
 	isTheLastToken(token) {
 		if (token.isCloseCurlyBracket) {
 			this.stateEnded = true;
-		} else if (!token.isComma) {
-			this.error = new TokenError(errorMsg, token);	
-			this.codeAnalyst.errors.push(this.error);
-		} else {
-			this.stage = ObjectDefState.PROP_NAME_STATE;
-			
+		} else if (token.isComma) {
+			this.stage = ObjectDefState.PROP_NAME_STATE;	
 			// Tag the comma
 			token.blockTag = TokenConst.BLOCK_TAG_OBJECT_COMMA;
+		} else if (token.isCR) {
+			this.stage = ObjectDefState.PROP_LAST_STATE;
+		} else {
+			this.error = new TokenError(errorMsg, token);	
+			this.codeAnalyst.errors.push(this.error);
 		}
 
 		return this.stateEnded;	

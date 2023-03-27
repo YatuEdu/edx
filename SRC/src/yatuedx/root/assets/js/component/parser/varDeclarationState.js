@@ -66,7 +66,7 @@ class VarDeclarationState extends ParsingState {
 			this.scope.variableMap.set(this.#varToken.name, newVar); 
 			this.stateEnded = true;
 		} else {
-			this.error = new TokenError("Variable declaration invalid state encountered");
+			this.error = new TokenError("Variable declaration invalid state encountered", token);
 			this.codeAnalyst.errors.push(this.error);
 		}
 		return this.stateEnded;	

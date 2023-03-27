@@ -1,6 +1,6 @@
-import {sysConstants, languageConstants} 	from '../core/sysConst.js'
-import {uiMan} 								from '../core/uiManager.js';
-import {CodeAnalyst}						from './new/codeAnalyst.js'
+import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
+import {uiMan} 												from '../core/uiManager.js';
+import {CodeAnalyst}										from './new/codeAnalyst.js'
 
 /**
 	This class handles JS Code runner board
@@ -40,12 +40,16 @@ class JSCodeExecutioner {
 	 */
 	formatCode(src) {
 		const codeAnalyst = new CodeAnalyst(src);
-		const retObj = codeAnalyst.formatCode();
-		if (retObj.err) {
-			return `/* ${retObj.newSrc} */` + '\n' + src;
+		const result = codeAnalyst.formatCode();
+		if (result.hasError) {
+			return {hasError: true, errors: this.#handleErrors(result.errors, null)}
+		} else {
+			return result;
 		}
-		
-		return retObj.newSrc;
+	}
+	
+	#getConsoleId() {
+		return `#${this.#consoleId}`;
 	}
 	
 	/*
@@ -77,21 +81,30 @@ class JSCodeExecutioner {
 		//	}
 		
 		if (newSrc) {
-
 			const returnSrc = codeAnalyst.printAllVaraibles();
 			if (returnSrc) {
 				newSrc += "\n" + returnSrc;
 			}
 			// run code
 			try {
+				// keep existinv console out put
+				const consoleId = this.#getConsoleId();
+				let oldTxt = $(consoleId).val();
+				let codeOutputHeaderTxt = "";
+				$(consoleId).val('');
+				
 				// expecting program output:
 				if (codeAnalyst.hasIO) {
-					this.#printLine("------ output -------");
+					codeOutputHeaderTxt = sysConstStrings.EXE_PROGRAM_OUTPUT;
 				}
 				
 				// exec code
 				const func = new Function('print', 'printx', newSrc);
 				func(this.#printLine.bind(this), this.#printx.bind(this));
+				
+				// append the old output with the new output
+				const newTxt = $(consoleId).val();
+				$(consoleId).val(`${codeOutputHeaderTxt}${newTxt}${sysConstStrings.EXE_PROGRAM_FIN}${oldTxt}`);
 				
 			}
 			catch (e) {
@@ -112,16 +125,6 @@ class JSCodeExecutioner {
 	#handleErrors(analyticalInfo, e) {
 		// analyse the code
 		return new CodeError(e, analyticalInfo);
-		
-		/*
-		if (this.#codeErrorCallback && errors.length > 0) {
-			this.#codeErrorCallback(errors);
-		} else {
-			// simply print the error on the console
-			this.#printLine(e);		
-			errors.forEach(e  => this.#printLine(e.errorDisplay));
-		}
-		*/
 	}
 	
 	/*
@@ -147,13 +150,18 @@ class JSCodeExecutioner {
 			let argText = a;
 			if (a && typeof a === 'object' && a.constructor === Object) {
 				argText = this.#getObjectProperties(a);
+			} else if (Array.isArray(a)) {
+				argText = this.#displayArray(a);
+			} else if (a instanceof Function) {
+				argText = "Function";
 			}
+			
 			msgTxt += msgTxt ? ' ' + argText : argText;
 		}
 		
-		//  append message to console
-		const id = `#${this.#consoleId}`;
-		const oldTxt = $(id).val();
+		//  insert message to console
+		const consoleId = this.#getConsoleId();
+		const oldTxt = $(consoleId).val();
 		let printTex = '';
 		if (oldTxt) {
 			printTex = `${oldTxt}${msgTxt}`;
@@ -168,7 +176,7 @@ class JSCodeExecutioner {
 			printTex += ' ';
 		}
 		
-		$(id).val(printTex);
+		$(consoleId).val(printTex);
     }
 	
 	#getObjectProperties(obj) {
@@ -185,6 +193,16 @@ class JSCodeExecutioner {
 		objText += "}";
         return objText;
     }
+	
+	#displayArray(arr) {
+		let objText = "[";
+		let bodyText = "";
+		arr.forEach(e => {
+			bodyText += bodyText ? `, ${e}` : e;
+		});
+		objText += bodyText + "]";
+        return objText;
+	}
 
 }
 
