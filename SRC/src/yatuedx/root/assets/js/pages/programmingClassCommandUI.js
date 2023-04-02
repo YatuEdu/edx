@@ -33,10 +33,16 @@ class ProgrammingClassCommandUI extends AuthPage {
 	**/
 	startOrStopCodeRefreshTimer(start) {
 		if (start) {
-			this.#timer = setInterval(this.handleTimter.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+			if (!this.#timer) {
+				// do not set interval when one is already working
+				this.#timer = setInterval(this.handleTimter.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+			}
 		}
 		else {
+			console.log(this.#timer + ' clearled');
 			clearInterval(this.#timer);
+			this.#timer = undefined;
+			
 		}
 	}
 	
@@ -54,8 +60,12 @@ class ProgrammingClassCommandUI extends AuthPage {
 		Stub function for handling timer. Calls the actual handler "v_handleTimer", which would be provided
 		by the child class, who knows what to do.
 	 **/
-	handleTimter() {
-		this.v_handleTimer();
+	handleTimter(e) {
+		if (this.#timer) {
+			this.v_handleTimer();
+		} else {
+			console.log('warning: undefined timer called');
+		}
 	}
 	
 	/**

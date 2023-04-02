@@ -94,7 +94,6 @@ class CodeInputConsole extends ComponentBase {
 		// hook up event handleer
 		$(this.showOrHideBtnIdSelector).click(this.handleHideOutput.bind(this));
 		$(this.enlargeOrShrinkBtnIdSelector).click(this.enlargeOrShrinkCodeConsole);
-		//$(this.outputContainerIdSelector).click(this.handleHideOutput.bind(this));
 		$(this.inputIdSelector).bind('input propertychange', this.handleCodeInput.bind(this)); // handle all text input event
 		$(this.inputIdSelector).change(this.handleCodeInput.bind(this)); // handle text change programmingly
 		$(this.inputIdSelector).scroll(this.handleScroll.bind(this));
@@ -147,8 +146,12 @@ class CodeInputConsole extends ComponentBase {
 	
 	/* public methods */
 	
-	showOutput() {
+	showOutput(hide) {
 		$(this.outputContainerIdSelector).show();
+	}
+	
+	hideOutput() {
+		$(this.outputContainerIdSelector).hide();
 	}
 	
 	showDiagnoticMessage(error) {

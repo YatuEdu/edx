@@ -123,7 +123,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		);
 		
 		// upon initialization, student board is in "exercise" mode
-		this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE, mode);
+		//this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE, mode);
 		
 		/**
 			maxize or minimize input consoles.
@@ -375,6 +375,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Execute a command encapsulated by command string (cmd)
 	**/
 	v_execute(cmd) {
+		console.log("received command:" + cmd.id);
 		switch(cmd.id) {
 			// set board mode to readonly or not
 			case PTCC_COMMANDS.PTC_CLASSROOM_SWITCH_MODE:
@@ -484,6 +485,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// update the code on UI
 		this.code = newContent;
+		
+		// close output in teaching mode (when new code comes)
+		if (this.#isInTeachingMode) {
+			this.#codeInputConsoleComponent.hideOutput();
+		}
 		if (!newContent) {
 			return;  // no need to validate
 		}
@@ -506,6 +512,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Run JS Code Smaple and print results on the Console
 	**/
 	runCodeFrom(codeText) {
+		if (this.#isInTeachingMode) {
+			// when in teaching mode, only show out put for this run
+			$(this.resultConsoleControl).val("");
+		}
 		let errorInfo = null;
 		if (!codeText) {
 			// run code locally text console
@@ -515,8 +525,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			errorInfo = super.executeCode(codeText);
 		}
 		
-		// display error only in self-study mode
-		this.#showErroDialog(errorInfo, true);
+		this.#showOutputOrErro(errorInfo, true);
 	}
 	
 	/**
@@ -529,7 +538,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const result = super.formatCode();
 		if (result.hasError) {
 			// display error only in self-study mode
-			this.#showErroDialog(result.errors, false);
+			this.#showOutputOrErro(result.errors, false);
 		} else {
 			$(this.codeBoardTextArea).val(result.newSourc);
 		}
@@ -657,16 +666,25 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 	}
 	
-	#showErroDialog(errorInfo, showConsole) {
+	get #isInTeachingMode() {
+		return $(this.resultConsoleControl).prop('readonly');
+	}
+	
+	#showOutputOrErro(errorInfo, showConsole) {
+		let teachingMode = false;
+		if (this.#isInTeachingMode) {
+			teachingMode = true;
+		}
 		if (errorInfo) {
-			if ($(this.resultConsoleControl).prop('readonly')) {
-				// do not show diagnostical dbox since we are not interactive
-				// just print error since teach is gonna fix it, not me
+			if (teachingMode) {
+				// do not show diagnostical dbox when we are in teaching mode
 				$(this.resultConsoleControl).val("error");
 			} else {
 				this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
 			}
-		} else if (showConsole) {
+		} 
+
+		if (showConsole) {
 			// show output cosole
 			this.#codeInputConsoleComponent.showOutput();
 		}

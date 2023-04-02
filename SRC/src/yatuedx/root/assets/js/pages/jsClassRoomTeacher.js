@@ -12,7 +12,8 @@ import {CodeInputConsole}					from '../component/new/codeInputConsole.js';
 
 const DIV_VIEDO_AREA 					= "yt_div_video_area";
 const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
-const DIV_STUDENT_MSG_BOARD 			= "yt_div_student_textarea";
+const DIV_STUDENT_AREA_ID 				= "yt_div_student_area_";
+const DIV_STUDENT_MSG_BOARD 			= "yt_div_students_area";
 const DIV_MSG_RECEIVER_SEL  			= "yt_div_msg_receiver_select";
 const TA_NOTES							= "yt_txt_notes_console";
 const BTN_SAVE_NOTES					= "yt_btn_save_notes";
@@ -33,6 +34,7 @@ const YT_TA_CODE_BOARD_ID 				= "yt_ta_code_board";
 const YT_TA_OUTPUT_CONSOLE_ID 			= "yt_ta_output_console";
 
 
+const REPLACEMENT_STUDENT_AREA_ID = '{std_area_id}';
 const REPLACEMENT_TA_ID = '{taid}';
 const REPLACEMENT_TA_CONTAINER_ID = '{console_ctnr_id}'
 const REPLACEMENT_LB = '{lb}';
@@ -241,21 +243,22 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	 **/
 	addStudentConsole(student) {
 		// add an area to contain student's video and blackboard
-		if (!$(this.stdentTextAreaDiv).find(this.getStudentConsoleIdSelector(student)).length) {	
+		if (0 === $(this.stdentsTextAreaDivSelecotr).find(this.getStudentAreaId(student)).length) {	
 			// add student console
 			const sconsoleHtml = STUDENT_BOARD_TEMPLATE
-									.replace(REPLACEMENT_LB, student)
-									.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
-									.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
-									.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
-									.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
-									.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
-									.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
-									.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
-									.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student))
-									.replace(REPLACEMENT_TA_TCHR_MSG_ID, this.getTeacherMessageTaId(student));
+				.replace(REPLACEMENT_STUDENT_AREA_ID, this.getStudentAreaId(student))
+				.replace(REPLACEMENT_LB, student)
+				.replace(REPLACEMENT_TA_CONTAINER_ID, this.getStudentConsoleContainerId(student))
+				.replace(REPLACEMENT_TA_ID, this.getStudentConsoleId(student))
+				.replace(REPLACEMENT_STUDENT_ID, this.getstudentConsoleToggleButton(student))
+				.replace(REPLACEMENT_STUDENT_ID2, this.getstudentRunCodeButton(student))
+				.replace(REPLACEMENT_STUDENT_MSG_BTN_ID, this.getStudentMessageButtonId(student))
+				.replace(REPLACEMENT_TA_MSG_CONTAINER_ID, this.getStudentMessageContainerId(student))
+				.replace(REPLACEMENT_BTN_MSG_SEND_ID, this.getStudentMessageSendBtnId(student))
+				.replace(REPLACEMENT_TA_MSG_ID, this.getStudentMessageTaId(student))
+				.replace(REPLACEMENT_TA_TCHR_MSG_ID, this.getTeacherMessageTaId(student));
 
-			$(this.stdentTextAreaDiv).append(sconsoleHtml);
+			$(this.stdentsTextAreaDivSelecotr).append(sconsoleHtml);
 			
 			// handle toggle code console event
 			$(this.getstudentConsoleToggleButtonSelector(student)).click(this.showStudentConsole.bind(this));	
@@ -288,7 +291,8 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Delete student Console when he leaves.  This is not totally reliable for now.
 	 **/
 	 deleteStudentConsole(student) {
-		//$(this.getStudentConsoleIdSelector(student)).remove();
+		const id = this.getStudentAreaIdSelector(student);
+		$(id).remove();
 	}
 	
 	/**
@@ -617,7 +621,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	}
 	
 	// student text Area div
-	get stdentTextAreaDiv() {
+	get stdentsTextAreaDivSelecotr() {
 		return `#${DIV_STUDENT_MSG_BOARD}`;
 	}
 	
@@ -659,6 +663,15 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// button for BEAUTIFY code mode
 	get beautifyCodeButton() {
 		return `#${BTN_BEAUTIFY_CODE}`;
+	}
+	
+	// student area id
+	getStudentAreaId(student) {
+		return `${DIV_STUDENT_AREA_ID}${student}`; 
+	}
+	
+	getStudentAreaIdSelector(student) {
+		return `#${this.getStudentAreaId(student)}`; 
 	}
 	
 	// student console container id getter

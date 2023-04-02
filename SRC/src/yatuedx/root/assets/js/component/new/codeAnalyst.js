@@ -415,7 +415,7 @@ class CodeAnalyst {
 	
 	/* display tokens for debugging purpose */
 	#displayAll(tokens) {
-		tokens.forEach(t => console.log(t.displayStr));
+		//tokens.forEach(t => console.log(t.displayStr));
 	}
 	
 	/* 
@@ -544,12 +544,12 @@ class CodeAnalyst {
 					// new space token
 					const token = new Token(spaceName, Token.TOKEN_TYPE_SPACE, currentLine, currentPos);
 					tokens.push(token);
-					console.log(`found new SPACE token: ${spaceName}`);
+					//console.log(`found new SPACE token: ${spaceName}`);
 				} 
 				else {
 					const token = new Token(currentChar, seperater, currentLine, currentPos);
 					tokens.push(token);
-					console.log(`found new separater token: ${currentChar}`);
+					//console.log(`found new separater token: ${currentChar}`);
 				}
 				
 				// make sure normal token ends here
@@ -595,7 +595,7 @@ class CodeAnalyst {
 		
 		this.#tokens = tokens;
 		
-		console.log(`number of Line: ${currentLine}, number of tokens: ${tokens.length}`);
+		//console.log(`number of Line: ${currentLine}, number of tokens: ${tokens.length}`);
 		// display all tokens
 		this.#displayAll(this.#tokens);
 		
@@ -605,7 +605,7 @@ class CodeAnalyst {
 		// consolidate comments inside code into one tokens if any
 		this.#consolidateComments();
 		
-		console.log(`number of meaningful tokens: ${this.#meaningfulTokens.length}`);
+		//console.log(`number of meaningful tokens: ${this.#meaningfulTokens.length}`);
 		// display all tokens
 		this.#displayAll(this.#meaningfulTokens);
 		
@@ -796,7 +796,7 @@ class CodeAnalyst {
 	#newToken(codeStr, begin, end, line) {
 		// new token name
 		const name = codeStr.substring(begin, end);
-		console.log(`found new token: ${name}`);
+		//console.log(`found new token: ${name}`);
 		let type = Token.getTokenInfo(name);
 		let tt = null;
 		if (type) {

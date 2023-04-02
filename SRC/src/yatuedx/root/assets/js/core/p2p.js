@@ -124,8 +124,8 @@ class PeerTalk {
 		 /* our socket.io connection to our webserver */
 		this.#signaling_socket = io(SIGNALING_SERVER, {query:`token=${token}`});
 		
-            var local_media_stream = null; /* our own microphone / webcam */
-            var local_current_stream = null; // 本地当前展示的视频流 摄像头或共享屏幕
+		var local_media_stream = null; /* our own microphone / webcam */
+		var local_current_stream = null; // 本地当前展示的视频流 摄像头或共享屏幕
         this.#peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
         this.#peer_media_elements = {};  /* keep track of our <video>/<audio> tags, indexed by peer_id */
             var local_media_tag = null;
