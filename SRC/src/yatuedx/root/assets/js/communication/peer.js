@@ -1,24 +1,21 @@
-
-const ICE_SERVERS = [
-    {urls:"turn:35.93.56.93:3478",
-        "username": "webrtc_user",
-        "credential": "zRk6i2fhrllloZXq",
-        "credentialType": "password"
-    }
-];
+import {Net} from "../core/net.js";
+import {sysConstants} from '../core/sysConst.js'
+import {credMan} from "../core/credMan.js";
 
 export class Peer {
 
-    #peerConnection; 
+    #token;
+    #peerConnection;
     #user;
     #commClient;
     #shouldCreateOffer;
     #localAudioTrack;
     #localVideoTrack;
-	
+
     // #mediaStream;
 
     constructor(commClient, user, shouldCreateOffer, localAudioTrack, localVideoTrack) {
+        this.#token = credMan.credential.token;
         this.#commClient = commClient;
         this.#user = user;
         this.#localAudioTrack = localAudioTrack;
@@ -27,8 +24,20 @@ export class Peer {
     }
 
     async init() {
+        let res = await Net.getTurnAuth(this.#token);
+        if (res.code!=0) {
+            alert("Get video server auth info failed.");
+            return;
+        }
+        let userPass = res.data;
+        let iceServers = [{
+            urls: sysConstants.YATU_TURN_URL,
+            "username": userPass.user,
+            "credential": userPass.pass,
+            "credentialType": "password"
+        }];
         this.#peerConnection = new RTCPeerConnection(
-            { "iceServers": ICE_SERVERS },
+            { "iceServers": iceServers },
             { "optional": [{ "DtlsSrtpKeyAgreement": true }] } /* this will no longer be needed by chrome
 																* eventually (supposedly), but is necessary
 																* for now to get firefox to talk to chrome */

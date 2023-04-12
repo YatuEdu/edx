@@ -5,6 +5,7 @@ const API_FOR_TOKEN_CHECKING = 200000;
 const API_FOR_SIGN_IN_WITH_NAME = 202102;
 const API_FOR_REGISTER = 202101; 
 const API_FOR_GET_ALL_MY_GROUPS = 202107;
+const API_FOR_GET_TURN_AUTH = 202130;
 
 const API_FOR_JOINING_GROUP_SESSION = 202111;
 const API_FOR_MY_GROUPS = 202115;
@@ -639,6 +640,34 @@ class Net {
 	
 	static async applyForAGroup(token, groupId) {
 		const req = Net.compoesRequestFoGroupApplication(token, groupId);
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+	 Yatu API for logged in user to get her turn server auth(userName&&password)
+	 **/
+	static composeRequestDataForGetTurnAuth(token) {
+		// query for my groups
+		const queryData = {
+			header: {
+				token: token,
+				api_id: API_FOR_GET_TURN_AUTH
+			},
+
+			data: {
+			}
+		};
+
+		return {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(queryData),
+		};
+	}
+
+	static async getTurnAuth(token) {
+		const req = Net.composeRequestDataForGetTurnAuth(token);
+		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
 }
