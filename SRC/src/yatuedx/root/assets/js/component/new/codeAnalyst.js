@@ -181,7 +181,11 @@ class CodeAnalyst {
 		let varEvalLines = `;print("");print("------ VARIABLE VALUES -------");\n`;
 		for (let [key, value] of this.rootVariableMap) {
 			try {
-				varEvalLines += `print('${key}:', ${key});`;
+				let displayValue = key;
+				if (value.isFunction) {
+					displayValue = "'function'";
+				}
+				varEvalLines += `print('${key}:', ${displayValue});`;
 			}
 			catch(e) {
 			} 

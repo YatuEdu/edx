@@ -122,9 +122,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 					YT_TA_OUTPUT_CONSOLE_ID
 		);
 		
-		// upon initialization, student board is in "exercise" mode
-		//this.setClassMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE, mode);
-		
 		/**
 			maxize or minimize input consoles.
 			Note that we handle this event at the body level so that all "+" button events are
@@ -157,7 +154,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.saveCodeToDbButtonSelector).click(this.saveCodeToDb.bind(this));
 		// handle erasing code from board
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
-		
+		// accept tab and insert \t when tab key is hit by user
+		// note that we do not want to bind this handler the "this" class
+		this.setTabHandler();
 	}
 	
 	/**
@@ -573,10 +572,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			// show run code and clear consol buttons
 			$(this.runCodeButton).show(); 
 			$(this.clearResultButton).show();
-			
-			// accept tab and insert \t when tab key is hit by user
-			// note that we do not want to bind this handler the "this" class
-			this.setTabHandler();
 		}
 	}
 	

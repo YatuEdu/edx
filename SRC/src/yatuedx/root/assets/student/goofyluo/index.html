@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>remove demo</title>
+  <style>
+  p {
+    background: purple;
+    margin: 6px 0;
+  }
+   textarea {
+    background: black;
+	color: white;
+    margin: 6px 0;
+  }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+</head>
+<body>
+ 
+<p>Hello</p>
+<textarea id="ta" class="student-input-board-extend" spellcheck="true"></textarea>
+how are
+<p>you?</p>
+<button>Is it even?</button>
+ 
+<script>
+$( "button" ).click(function() {
+   const txt = document.getElementById("ta").value;
+	const n = parseInt(txt)
+	if (n % 2 === 0) {
+		document.getElementById("ta").value = "even"
+	} else {
+		document.getElementById("ta").value = "odd"
+	}
+});
+</script>
+ 
+</body>
+</html>

@@ -14,6 +14,7 @@ const TOKEN_TYPE_EXPRESSION = 7;
 const TOKEN_TYPE_COMMENT_MARK_ = 8;
 const TOKEN_TYPE_COMMENT_BLOCK_ = 9;
 const TOKEN_TYPE_KNOWN_PROP_ = 10;
+const TOKEN_TYPE_KNOWN_NAME_ = 11;
 
 const TOKEN_SPACE_ = " ";
 const TOKEN_CR_ = "\n";
@@ -110,8 +111,8 @@ class TokenConst {
 	static get BLOCK_TAG_LOOP_BODY_START() { return 10; }
 	static get BLOCK_TAG_LOOP_BODY_END() { return 11; }
 	
-	static get SPACE_TYPE_UNKNOWN() { return -1; }
-	static get SPACE_TYPE_NONE() { return 0; }
+	static get SPACE_TYPE_UNKNOWN() { return -2; }
+	static get SPACE_TYPE_NONE() { return -1; }
 	static get SPACE_TYPE_LEFT() { return 1; }
 	static get SPACE_TYPE_RIGHT() { return 2; }
 	static get SPACE_TYPE_BOTH() { return 3; }
@@ -133,10 +134,10 @@ const STANDARD_TOKEN_MAP = new Map([
 	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY}],
 	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
 	['printx', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
-	['performance', {type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
-	['console', 	{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME, isIoFunc:true}],
-	['Math', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
-	['this', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['performance', {type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['console', 	{type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME, isIoFunc:true}],
+	['Math', 		{type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
+	['this', 		{type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
 	['constructor', {type: TOKEN_TYPE_KEY_ }],
 	['get', 		{type: TOKEN_TYPE_KEY_}],
 	['set', 		{type: TOKEN_TYPE_KEY_}],
@@ -208,7 +209,8 @@ const STANDARD_TOKEN_MAP = new Map([
 	['--', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_UNKNOWN, opType: OP_TYPE_MATH_OPERATOR, opMode: OP_MODE_UNARY_BOTH_, priority: 6 }],	
 	
 	['=>', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_LAMBDA }],
-	['.', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_NONE, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, opMode: OP_MODE_BINARY_, priority: 7}],
+	['.', 			{type: TOKEN_TYPE_OPERATOR_, spaceType: TokenConst.SPACE_TYPE_NONE, opType: OP_TYPE_OBJECT_PROPERTY_ACCESSOR, 
+					 opMode: OP_MODE_BINARY_, priority: 7}],
 	
 	['//', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_LINE }],
 	['/*', 			{type: TOKEN_TYPE_COMMENT_MARK_, cmType: CM_BLOCK_OPEN }],

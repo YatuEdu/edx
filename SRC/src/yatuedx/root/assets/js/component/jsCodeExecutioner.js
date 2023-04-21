@@ -187,7 +187,7 @@ class JSCodeExecutioner {
 				const objValStr = (typeof obj[key] === 'string' || obj[key] instanceof String) ? 
 									`"${obj[key]}"` : `${obj[key]}`;
 				const kvPair = `${key}: ${objValStr}`;;
-				objText += i++ == 0 ? `${kvPair}` : `,${kvPair}`;
+				objText += i++ == 0 ? `${kvPair}, ` : `${kvPair}`;
 			}
 		}
 		objText += "}";

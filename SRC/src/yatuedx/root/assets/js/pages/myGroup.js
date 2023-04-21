@@ -6,7 +6,7 @@ import {getGroupCardHtml}				 from '../component/groupCard.js';
 import {TimeUtil,StringUtil,PageUtil}	 from '../core/util.js';
 
 /**
-	This class manages both login and sigup workflow
+	This class manages all classesd the user belongs to
 **/
 class MyGroupPageHandler {
 	#credMan;
