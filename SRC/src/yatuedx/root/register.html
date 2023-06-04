@@ -29,10 +29,16 @@
 						<h5 class="text-reset">Enter your email address for us to validate it.</h5>
 						<div class="row mb-4">
 							<div class="col-3 text-right auth-bg-section text-white">
-								<label for="userEmail">Your email address</label>
+								<label for="userEmail">Your email address</label><span style="color:yellow">&nbsp;(required)</span>
 							</div>
-							<div class="col-8 text-center auth-bg-section text-white text-white">
-								<input type="text" name="registration" id="yt_inpt_email" class="form-control" autocomplete="new-password" placeholder="Email">
+							<div class="col-5 text-center float-start auth-bg-section text-white text-white">
+								<input type="text" id="yt_inpt_email" class="form-control" name="code"
+									   autocomplete="off" placeholder="Enter your email address">
+							</div>
+							<div class="col-3 text-center auth-bg-section text-white">
+								<button id="yt_btn_send_email_code" type="button" style="width:180px;height:90%" 
+								        title="A six digit email code will be sent to your mail box upon request" 
+										class="btn btn-success btn-block float-right">Obtain verification code</button>
 							</div>
 						</div>
 						<div class="row mb-1" id="yt_rw_pre_email_vefication2">
@@ -40,15 +46,13 @@
 								<label for="emailCode">Email verification code</label>
 							</div>
 							<div class="col-5 text-center d-flex flex-column text-white">
-								<input type="text" data-text-id="yt_inpt_email_code" name="code" id="yt_inpt_email_code" class="form-control" placeholder="Enter email code">
+								<input type="text" data-text-id="yt_inpt_email_code" name="code" id="yt_inpt_email_code" 
+								       class="form-control" placeholder="Enter verification code" autocomplete="off">
 							</div>
 							<div class="col-3 text-center auth-bg-section text-white">
-								<button id="yt_btn_send_email_code" type="button" style="width:180px;height:90%" title="A six digit email code will be sent to your mail box upon request" class="btn btn-success btn-block float-right">Obtain email code</button>
-							</div>
-						</div>
-						<div class="row mb-1" id="yt_rw_pre_email_vefication3">
-							<div class="col-11 text-center auth-bg-section text-white">
-								<button id="yt_btn_verify_code" type="button" style="width:180px;height:90%"  title="Enter the six digit email code and press the button to verify your email." class="btn btn-success btn-block float-right">Verify email</button>
+								<button id="yt_btn_verify_code" type="button" style="width:180px;height:90%"  
+								        title="Enter the six digit email code and press the button to verify your email." 
+								        class="btn btn-success btn-block float-right">Enter and verify code</button>
 							</div>
 						</div>
 					</div>
@@ -56,26 +60,46 @@
 						<h5 class="text-reset">Name and password</h5>
 						<div class="row mb-1 form-group" >
 							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
-								<label for="username" >User name</label>
+								<label for="userfullname" >First name</label>
 							</div>
 							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
-								<input type="text" data-text-id="p_login_fld_nm" data-validation-id="p_login_fld_nm_char" name="username" id="user_name" class="form-control" placeholder="Username">
+								<input type="text" data-text-id="p_login_fld_first_nm" data-validation-id="p_login_fld_first_nm_char" 
+								name="firstname" id="user_first_name" class="form-control" autocomplete="off" placeholder="First name">
+							</div>
+						</div>	
+						<div class="row mb-1 form-group" >
+							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
+								<label for="userfullname" >Last name</label>
+							</div>
+							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
+								<input type="text" data-text-id="p_login_fld_last_nm" data-validation-id="p_login_fld_last_nm_char" 
+								name="lastname" id="user_last_name" class="form-control" autocomplete="off" placeholder="Last name">
+							</div>
+						</div>							
+						<div class="row mb-1 form-group" >
+							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
+								<label for="username" >User login name</label><span style="color:yellow">&nbsp;(required)</span>
+							</div>
+							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
+								<input type="text" data-text-id="p_login_fld_login_nm" data-validation-id="p_login_fld_nm_char" name="username" id="user_name" class="form-control" placeholder="Login name">
 							</div>
 						</div>
 						<div class="row mb-1 form-group"  >
 							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
-								<label for="userPassword">Password</label>
+								<label for="userPassword">Password</label><span style="color:yellow">&nbsp;(required)</span>
 							</div>
 							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
-								<input type="password" data-text-id="p_login_fld_pw" name="userPassword" id="user_password" class="form-control" placeholder="Password">
+								<input type="password" data-text-id="p_login_fld_pw" name="userPassword" id="user_password" 
+								       class="form-control" placeholder="Password" autocomplete="off">
 							</div>
 						</div>
 						<div class="row mb-1 form-group"  >
 							<div class="col-md-3 text-right d-flex flex-column justify-content-right">
-								<label for="userPassword">Re-enter password</label>
+								<label for="userPassword">Re-enter password</label><span style="color:yellow">&nbsp;(required)</span>
 							</div>
 							<div class="col-md-8 text-center d-flex flex-column justify-content-center">
-								<input type="password" data-text-id="p_login_fld_pw2" name="userPassword2" id="user_password2" class="form-control" placeholder="Password">
+								<input type="password" data-text-id="p_login_fld_pw2" name="userPassword2" id="user_password2" 
+								       class="form-control" placeholder="Password" autocomplete="off">
 							</div>
 						</div>
 						<div class="row mb-1"  >
@@ -89,14 +113,6 @@
 							</div>
 							<div class="col-md-4 text-center text-white">
 								<button id="auth_button" type="button" style="width:180px;height:75%" class="btn btn-success btn-block mb-3 float-right">Register</button>
-							</div>
-						</div>
-						<div class="row mb-1 post-email" id="yt_dv_post_email_vefication" >
-							<div class="col-md-7 text-right text-white">
-								<label class="form-check-label float-right">Already registered?</label>
-							</div>
-							<div class="col-md-4 text-center text-white">
-								<button id="yt_btn_login" type="button" style="width:180px;height:75%" class="btn btn-success btn-block mb-3 float-right">Login</button>
 							</div>
 						</div>
 					</div>

@@ -48,12 +48,12 @@ class CredentialManager {
 	}
 	
 	// call remote auth server to sign in a user
-	async signUp(userFirstName, userMiddleName, userLastName, email, userPassword) {
+	async signUp(userFirstName, userLastName, userLoginName, email, userPassword) {
 		// clear previous auth info before new login request
 		this.private_clear();
 
 		// remote call to sign up
-		const ret = await Net.signUp(userFirstName, userMiddleName, userLastName, email, userPassword);
+		const ret = await Net.signUp(userFirstName, userLastName, userLoginName, email, userPassword);
 		this.#authError = ret.err;
 	}
 	

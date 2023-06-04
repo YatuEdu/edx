@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <title data-langid="myspace" >My Classes</title>
+    <title data-langid="myspace" >My Subjects (as teacher)</title>
     <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
     <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
@@ -40,10 +40,24 @@
         <div class="row">
             <div class="col-md-9 pt-5 pt-md-0">
                 <main class="product-list">
-					<h4 class="text-left font-weight-bold">My Scheduled Classes</h2>
-					<div class="row myGroupRow">
+					<h4 class="text-left font-weight-bold">My classes</h2>
+					<div class="container mySubjectSequenceRow">
+						<div class="row mb-1">
+						 <div class="col-3 text-center auth-bg-section text-white">
+						  <label for="classname">Class</label>
+						 </div>
+						 <div class="col-3 text-center auth-bg-section text-white">
+						  <label for="subject">Subject</label>
+						 </div>
+						 <div class="col-3 text-center auth-bg-section text-white">
+						  <label for="subject">Sequence</label>
+						 </div>
+						  <div class="col-3 text-center auth-bg-section text-white">
+						  <label for="subject">Action</label>
+						 </div>
+						</div>
 					</div>
-					<h4 class="text-left font-weight-bold">Other Groups</h2>
+					<h4 class="text-left font-weight-bold">My students</h2>
                     <div class="row publicGroupRow">                    
                     </div>
                 </main>
@@ -74,7 +88,7 @@
     <script src="../src/vendors/jquery/dist/jquery.min.js"></script>
     <script src="../src/vendors/popper.js/dist/umd/popper.min.js"></script>
     <script src="../src/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script type="module" src="./assets/js/pages/myGroup.js"></script> </body>
+	<script type="module" src="./assets/js/pages/myGroupSubject.js"></script> </body>
 </body>
 
 </html>

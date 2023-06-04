@@ -69,12 +69,12 @@ class LoginPageHandler {
 	clearField() {
 		const self = this;
         setTimeout( (() => {
-			$( EMAIL_INPUT_CTRL ).val(self.#parmEmail);
-			$( "#user_name" ).val(self.#parmName);
+			$( EMAIL_INPUT_CTRL ).val(" ");
+			$( "#user_name" ).val("");
 			$( "#yt_inpt_email_code").val('');
 			$( PW_INPUT_CTRL ).val('');
 			$( "#user_password2").val('');
-		}), 10);
+		}), 500);
 	}
 	
 	/**
@@ -229,15 +229,15 @@ class LoginPageHandler {
 		$(e.target).next('p').remove();
 		
 		// retrieve data from UI
-		const name = $("#user_name").val().trim();
+		const loginName = $("#user_name").val().trim();
 		const pw = $( PW_INPUT_CTRL ).val().trim();
-		if (!name || !pw) {
+		if (!loginName || !pw) {
 			return;
 		}
 
 		// for log in
 		if (!this.#forSignup) {
-			await this.#credMan.authenticate(name, pw);
+			await this.#credMan.authenticate(loginName, pw);
 			if (!this.#credMan.lastError) {
 				// go to my page
 				window.location.href = "./index.html";
@@ -251,7 +251,15 @@ class LoginPageHandler {
 		else
 		{
 			const email = $(EMAIL_INPUT_CTRL).val().trim();
-			await this.#credMan.signUp(name, email, pw);
+			let firstName = $("#user_first_name").val().trim();
+			let lastName = $("#user_first_name").val().trim();
+			if (!firstName) {
+				firstName = loginName;
+			}
+			if (!lastName) {
+				lastName = loginName;
+			}
+			await this.#credMan.signUp(firstName, lastName, loginName, email, pw);
 			if (!this.#credMan.lastError) {
 				// go to login page to log in
 				window.location.href = "./login.html";

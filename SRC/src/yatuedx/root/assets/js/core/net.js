@@ -22,6 +22,7 @@ const API_ADD_CODE = 202126;
 const API_LIST_CODE_HEADERS = 202128;
 const API_GET_CODE_TEXT = 202129;
 const API_DELETE_CODE = 202127;
+const API_OWNER_LIST_CLASSES = 202146;
 
 class Net {
 	/**
@@ -36,8 +37,8 @@ class Net {
 	/**
 		Yatu API for user-sign-up
 	**/
-	static async signUp(userName, email, userPassword) {
-		const req = Net.composeRequestDataForSignUp(userName, email, userPassword);
+	static async signUp(userFirstName, userLastName, userLoginName, email, userPassword) {
+		const req = Net.composeRequestDataForSignUp(userFirstName, userLastName, userLoginName, email, userPassword);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -67,6 +68,15 @@ class Net {
 	**/
 	static async emailCodeCheck(email, code) {
 		const req = Net.composeRequestDataForEmailCodeCheck(email, code);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for A GROUP OWNER listing all his classes (with sequences)
+	**/
+	static async groupOwnerListClasses(token) {
+		const req = Net.composeRequestDataForGroupOwnerListClasses(token);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -248,7 +258,7 @@ class Net {
 	/**
 		Forming Yatu API request data for user-sign up and register for Yatu service
 	**/
-	static composeRequestDataForSignUp(userName, email, userPassword) {
+	static composeRequestDataForSignUp(userFirstName, userLastName, userLoginName, email, userPassword) {
 		const signupData = {
 			header: {
 				token: "",
@@ -256,10 +266,10 @@ class Net {
 			},
 			
 			data: {					
-				name: userName,
+				name: userLoginName,
 				email: email,
-				fistName: userName,
-				lastName: userName,
+				fistName: userFirstName,
+				lastName: userLastName,
 				pwh: sha256(sha256(userPassword))
 			}
 		};
@@ -316,6 +326,24 @@ class Net {
 			data: {
 				userEmail: email,
 				veriCode: code
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailCodeCheckReq);
+	}
+	
+	/**
+		Forming Yatu API request data for GROUP OWNER listing all his classes
+	**/	
+	static composeRequestDataForGroupOwnerListClasses(t) {
+			// query for the yatu token's validness
+		const emailCodeCheckReq = {
+			header: {
+				token: t,
+				api_id: API_OWNER_LIST_CLASSES
+			},
+		
+			data: {
 			}					
 		};
 			

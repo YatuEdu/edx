@@ -40,13 +40,22 @@ class IndexPageHandler {
 		}
 		else {
 			
-			btnTxt = uiMan.getText(languageConstants.ACCOUNT);
+			btnTxt = credMan.credential.name + ":" + uiMan.getText(languageConstants.ACCOUNT);
 			//btnTxt = "我的账户";
 			$( "#yt_btn_login_signup" ).click(this.handleAccount);
 			
 			// fix nav bar authenticated user onky items
 			$( ".for-authenticated-only" ).show();
 			$( ".for-unauthenticated-only" ).hide();
+			
+			// fix nav bar for teachers
+			if (credMan.credential.role === sysConstants.YATU_ROLE_TEACHER ||
+			    credMan.credential.role === sysConstants.YATU_ROLE_ADMIN) {
+				$(".for-teachers-only").show();
+			}
+			else {
+				$(".for-teachers-only").hide();
+			}
 		}
 		$( "#yt_btn_login_signup" ).text(btnTxt);
 	}
