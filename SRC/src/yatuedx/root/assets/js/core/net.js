@@ -22,7 +22,11 @@ const API_ADD_CODE = 202126;
 const API_LIST_CODE_HEADERS = 202128;
 const API_GET_CODE_TEXT = 202129;
 const API_DELETE_CODE = 202127;
+
+const API_MEMBER_LIST_LIVE_SESSIONS = 202145;
 const API_OWNER_LIST_CLASSES = 202146;
+const API_OWNER_START_CLASS = 202148;
+const API_OWNER_STOP_CLASS = 202148;
 
 class Net {
 	/**
@@ -68,6 +72,24 @@ class Net {
 	**/
 	static async emailCodeCheck(email, code) {
 		const req = Net.composeRequestDataForEmailCodeCheck(email, code);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for A GROUP MEMBER listing all LIVE SEssions for him at this time
+	**/
+	static async groupMemberListLiveSessions(token) {
+		const req = Net.composeRequestDataForGroupMemberListLiveSessions(token);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
+	/**
+		Yatu API for GROUP OWNER to start a live class
+	**/	
+	static async groupOwnerStartClass(t, clssId, seqId) {
+		const req = Net.composeRequestDataForGroupOwnerStartClass(t, clssId, seqId);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -326,6 +348,45 @@ class Net {
 			data: {
 				userEmail: email,
 				veriCode: code
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailCodeCheckReq);
+	}
+	
+	/**
+		Forming Yatu API request data for GROUP MEMBER listing all LIVE SESSION at this time
+	**/	
+	static composeRequestDataForGroupMemberListLiveSessions(t) {
+			// query for the yatu token's validness
+		const emailCodeCheckReq = {
+			header: {
+				token: t,
+				api_id: API_MEMBER_LIST_LIVE_SESSIONS
+			},
+		
+			data: {
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailCodeCheckReq);
+	}
+	
+	
+	/**
+		Forming Yatu API request data for GROUP OWNER start a live class
+	**/	
+	static composeRequestDataForGroupOwnerStartClass(t, clssId, seqId) {
+			// query for the yatu token's validness
+		const emailCodeCheckReq = {
+			header: {
+				token: t,
+				api_id: API_OWNER_START_CLASS
+			},
+		
+			data: {
+				classId: clssId,
+				sequenceId: seqId
 			}					
 		};
 			
