@@ -1,8 +1,6 @@
-import {sysConstants, languageConstants, groupTypeConstants} from '../core/sysConst.js'
-import {credMan}                         from '../core/credMan.js'
-import {LocalStoreAccess} 				 from '../core/localStorage.js';
 import {uiMan}                           from '../core/uiManager.js';
 import {Net}                             from '../core/net.js';
+import {AuthPage} 						 from '../core/authPage.js'
 import {getGroupCardHtml}				 from '../component/groupCard.js';
 import {TimeUtil,StringUtil,PageUtil}	 from '../core/util.js';
 
@@ -43,35 +41,29 @@ const BTN_TEXT_STOP_SESSION = "Stop class";
 /**
 	This class manages all classesd the user belongs to
 **/
-class MyGroupSubjectPageHandler {
-	#credMan;
-	#activeSessionInfo;
-	#store
+class MyGroupSubjectPageHandler extends AuthPage {
 	
-    constructor(credMan) {
-		this.#credMan = credMan;
-		this.#store =  new LocalStoreAccess(sysConstants.YATU_OWNER_STORE_KEY);
-		if (this.#store.getItem()) {
-			/* live session info struct is
-			{ session_id: '1234567',
-			  sequence_id: 23456,    // not from DB by managed by client
-			    group_id: 123456,
-				owner_id: 'ly8838',
-			  group_type: 10
-			}
-			*/
-			this.#activeSessionInfo = JSON.parse(this.#store.getItem());
-		} else {
-			this.#activeSessionInfo = {};
-		}
-		this.init();
+	/* 
+	 static facotry method for MyGroupSubjectPageHandler to assure that it calls its
+	 async init method.
+	 */
+	static async createMyGroupSubjectPageHandler() {
+		const myInstance = new MyGroupSubjectPageHandler();
+		await myInstance.init();
+		return myInstance;
+	}
+	
+    constructor() {
+		super();
 	}
 	
 	// hook up events
 	async init() {
+		// important: must call AuthPage init asynchronously
+		await super.init();
 		// get top 10 groups that I can join
 		// remote call to sign up
-		const t = this.#credMan.credential.token;
+		const t = this.credential.token;
 		await this.retrieveMyClasses(t);
 		
 		// schedule a live class
@@ -117,41 +109,14 @@ class MyGroupSubjectPageHandler {
 				$(".mySubjectSequenceRow").append(htmlForClasses);
 			}
 			
-			if (this.#activeSessionInfo.group_id) {
-				this.selectLiveClass({}, {classId: this.#activeSessionInfo.group_id, sequenceId: this.#activeSessionInfo.sequence_id} );
+			if (this.liveSession.group_id) {
+				this.selectLiveClass({}, {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id} );
 			}	
 		} else {
 			alert("Failed to retieve your classes!");
 		}
 	}
 	
-	/**
-		retrieve the live session I started.
-	 **/
-	async retrieveMyLiveSession(t) {
-		const ret = await Net.groupMemberListLiveSessions(t);
-		if (ret.code === 0) {
-			const mySessions = ret.data;
-			
-			// I am not allowed to be in different live sessons at the same time
-			if (myClasses.length > 1) {
-				alert("You cannot be in multiple sessions at the same time.  Stop all sessions but one!");
-				return;
-			}
-			
-			// no active sessions for this teacher, clear previous active session info
-			if (myClasses.length === 0) {
-				this.#store.setItem("");
-				return;
-			}
-			
-			const liveSession = myClasses[i];
-			const authStr = JSON.stringify(liveSession);
-			this.#store.setItem(authStr);
-		} else {
-			alert("Failed to retieve active sessions!");
-		}
-	}
 	
 	handleRefill(e) {
 		e.preventDefault();
@@ -171,58 +136,11 @@ class MyGroupSubjectPageHandler {
 		window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}&mode=1`;
 	}
 	
-	/**
-		Enter the video chat group if applicable
-	**/
-	handleEntering(e) {
-		e.preventDefault();
-		
-		// retrieve group meta data
-		const groupId = $(this).attr('data-grp-id');
-		const groupName = $(this).attr('data-grp-name');
-		const groupType = $(this).attr('data-grp-type');
-		const groupOwner = $(this).attr('data-grp-owner');
-		const startTimeStr =  $(this).attr('data-grp-dt');
-		if (startTimeStr) {
-			const startTime =Number(startTimeStr);
-			// only allowed to going 10 minutes before a class starts
-			const diffInMinutes = TimeUtil.diffMinutes(Date.now(), startTime);
-			if (diffInMinutes > 10) {
-				alert("The group will be open 10 minutes before it starts");
-				return;
-			}
-			if ( diffInMinutes < -20) {
-				alert("You are too late to join this class! Try to be punctual next time.");
-				return;
-			}
-		}
-		// check 
-		if (groupType == groupTypeConstants.GPT_EDU_JSP) {
-			if ( (credMan.credential.role === sysConstants.YATU_ROLE_TEACHER || 
-				  credMan.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
-				  credMan.credential.name === groupOwner ) {
-				// go to class room as teacher
-				window.location.href =  `./class-room-teacher.html?group=${groupId}`;
-			}
-			else {
-				// go to class room as student
-				window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}`;				
-			}
-		}
-		else {
-			// go to chat page
-			window.location.href =  `./legacy/videoChat.html?group=${groupId}`; 
-		}
-								   //`./videoChat.html`;
-
-		// `./legacy/chat.html??group=${groupId}`;
-	}
-	
 	async handleJoining(e) {
 		e.preventDefault();
 		
 		// call remote API to apply for the membership
-		const t = this.#credMan.credential.token;
+		const t = this.credential.token;
 		const btnId = $(e.target).attr('id');
 		const ret = await Net.applyForAGroup(t, StringUtil.getIdFromBtnId(btnId));
 	
@@ -243,12 +161,12 @@ class MyGroupSubjectPageHandler {
 			if (!answer) {
 				return;
 			}
-			oldSelection = {classId: this.#activeSessionInfo.group_id, sequenceId: this.#activeSessionInfo.sequence_id}
-			await this.stopClass(this.#activeSessionInfo.group_id, this.#activeSessionInfo.sequence_id);	
+			oldSelection = {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id}
+			await this.stopClass(this.liveSession.group_id, this.liveSession.sequence_id);	
 		}
 		
 		// Start a new class
-		const t = this.#credMan.credential.token;
+		const t = this.credential.token;
 		const ret = await Net.groupOwnerStartClass(t, clssId, seqId);
 		if (ret.code === 0) {
 			const mySessionInfo = ret.data[0];
@@ -260,7 +178,7 @@ class MyGroupSubjectPageHandler {
 	}
 	
 	async stopClass(clssId, seqId) {
-		const t = this.#credMan.credential.token;
+		const t = this.credential.token;
 		const ret = {code: 0}; // await Net.groupOwnerStopClass(t, clssId, seqId);
 		if (ret.code === 0) {
 			this.setActiveSessionInfo(null, 0, 0, 0)
@@ -268,20 +186,20 @@ class MyGroupSubjectPageHandler {
 	}
 	
 	setActiveSessionInfo(sessionId, clssId, seqId, type) {
-		this.#activeSessionInfo.session_id = sessionId;
-		this.#activeSessionInfo.group_id = clssId;
-		this.#activeSessionInfo.sequence_id = seqId;
-		this.#activeSessionInfo.group_type = type;
+		this.liveSession.session_id = sessionId;
+		this.liveSession.group_id = clssId;
+		this.liveSession.sequence_id = seqId;
+		this.liveSession.group_type = type;
 		
 		// save the live class info
-		const sessionInfoStr = JSON.stringify(this.#activeSessionInfo);
+		const sessionInfoStr = JSON.stringify(this.liveSession);
 		this.#store.setItem(sessionInfoStr);
 	}
 	
 	isActiveSession(clssId, seqId) {
-		return 	this.#activeSessionInfo.session_id &&
-				this.#activeSessionInfo.group_id === clssId &&
-				this.#activeSessionInfo.sequence_id === seqId;
+		return 	this.liveSession.session_id &&
+				this.liveSession.group_id === clssId &&
+				this.liveSession.sequence_id === seqId;
 	}
 	
 	formRowId(groupId, sequenceId) {
@@ -325,5 +243,5 @@ let myGroupSubjectPageHandler = null;
 
 $( document ).ready(function() {
     console.log( "myGroup page ready!" );
-	myGroupSubjectPageHandler = new MyGroupSubjectPageHandler(credMan);
+	myGroupSubjectPageHandler = MyGroupSubjectPageHandler.createMyGroupSubjectPageHandler()
 });

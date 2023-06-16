@@ -1,8 +1,9 @@
-import {sysConstants, languageConstants, regexConstants} 	from '../core/sysConst.js'
-import {credMan} 						from '../core/credMan.js'
-import {uiMan} 							from '../core/uiManager.js';
+import {sysConstants, languageConstants, regexConstants} 	
+										 from '../core/sysConst.js'
+import {credMan} 						 from '../core/credMan.js'
+import {uiMan} 							 from '../core/uiManager.js';
 import {PageUtil, StringUtil, RegexUtil} from '../core/util.js';
-import {Net} 							from '../core/net.js';
+import {Net} 							 from '../core/net.js';
 
 const EMAIL_INPUT_CTRL = "#yt_inpt_email";
 const PW_INPUT_CTRL = "#user_password";
@@ -10,7 +11,6 @@ const PW_INPUT_CTRL = "#user_password";
 	This class manages both login and sigup workflow
 **/
 class LoginPageHandler {
-	#credMan;
 	#uiName;
 	#uiPw;
 	#forSignup;  // for signing up html if true
@@ -18,8 +18,7 @@ class LoginPageHandler {
 	#parmEmail;
 	#validators;
 	
-    constructor(credMan, forSignup) {
-		this.#credMan = credMan;
+    constructor(forSignup) {
 		this.#forSignup = forSignup;
 		this.#parmEmail = '';
 		this.#parmName = '';
@@ -237,14 +236,14 @@ class LoginPageHandler {
 
 		// for log in
 		if (!this.#forSignup) {
-			await this.#credMan.authenticate(loginName, pw);
-			if (!this.#credMan.lastError) {
+			await credMan.authenticate(loginName, pw);
+			if (!credMan.lastError) {
 				// go to my page
 				window.location.href = "./index.html";
 			}
 			else {
 				// dispaly error message
-				$(e.target).after( `<p style="color:red;">${this.#credMan.lastError}</p>` ); 
+				$(e.target).after( `<p style="color:red;">${credMan.lastError}</p>` ); 
 			}
 		}
 		// for sign up
@@ -259,14 +258,14 @@ class LoginPageHandler {
 			if (!lastName) {
 				lastName = loginName;
 			}
-			await this.#credMan.signUp(firstName, lastName, loginName, email, pw);
-			if (!this.#credMan.lastError) {
+			await credMan.signUp(firstName, lastName, loginName, email, pw);
+			if (!credMan.lastError) {
 				// go to login page to log in
 				window.location.href = "./login.html";
 			}	
 			else {
 				// dispaly error message
-				$(e.target).after( `<p style="color:red;">${this.#credMan.lastError}</p>` ); 
+				$(e.target).after( `<p style="color:red;">${credMan.lastError}</p>` ); 
 			}			
 		}
 	}

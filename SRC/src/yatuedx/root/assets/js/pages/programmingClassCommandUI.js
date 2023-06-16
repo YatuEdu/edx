@@ -1,4 +1,3 @@
-import {credMan} 							from '../core/credMan.js'
 import {AuthPage} 							from '../core/authPage.js'
 import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
@@ -8,20 +7,26 @@ import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
 class ProgrammingClassCommandUI extends AuthPage {
 	#jsCodeExecutioner;
 	#codeInputId;
+	#resultConsolId;
 	#videoAreaId;
 	#screenShareBtnId;
 	#timer;
 	#codeSyncManager;
 	#groupId;
 	
-	constructor(credMan, codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
-		super(credMan);
+	constructor(codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
+		super();
 		this.#codeInputId = codeInputId;
+		this.#resultConsolId = resultConsolId;
 		this.#videoAreaId = videoAreaId;
 		this.#screenShareBtnId = screenShareBtnId;
+	}
+	
+	async init() {
+		await super.init();
 		
 		// create js code executioner
-		this.#jsCodeExecutioner =  new JSCodeExecutioner(resultConsolId);
+		this.#jsCodeExecutioner =  new JSCodeExecutioner(this.#resultConsolId);
 		
 		// create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
@@ -154,6 +159,14 @@ class ProgrammingClassCommandUI extends AuthPage {
 			}
 		}
 		return {newContent: newContent, digest: digest};
+	}
+	
+	/*
+		This page is A BASE PAGE for live chat page, 
+		we don't need to call initGroups logic of that in parent class (AuthPage)
+	 */
+	v_isLiveChatPage() {
+		return true;
 	}
 	
 	/**

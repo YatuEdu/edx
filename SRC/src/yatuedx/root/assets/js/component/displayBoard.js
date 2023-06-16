@@ -8,8 +8,8 @@ class DisplayBoard extends CommunicationSpace {
 	_originalText;
 	_formatedText;
 	
-	constructor(roomName, videoAreaId, screenShareBtnId) {
-		super(roomName, videoAreaId, screenShareBtnId); 
+	constructor(videoAreaId, screenShareBtnId) {
+		super(videoAreaId, screenShareBtnId); 
 		this._originalText = '';
 		this._textLines = [];
 	}

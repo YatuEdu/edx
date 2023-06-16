@@ -34,9 +34,8 @@ class CommunicationSpace {
 	#screenShareBtnId
 	#me;
 	
-	constructor(roomName, videoDivId, screenShareBtnId) {
+	constructor(videoDivId, screenShareBtnId) {
 		this.#userVideoItTemplate = uiConstants.VIDEO_ID_TEMPLATE;
-		this.init(roomName);
 		this.#videoDivId = videoDivId;
 		this.#screenShareBtnId = screenShareBtnId;
 		this.#userMap = new Map();
@@ -45,16 +44,20 @@ class CommunicationSpace {
 	/**
 		Initializing the socket client and get ready for communication between classmates and teacher
 	 **/
-	async init(roomName) {
+	async init(liveSession) {
 		const token = credMan.credential.token;
 		this.#me  = credMan.credential.name;
 			
 		// call API to get room
+		/* todo: revisit the logic for "scheduled class".  For now, we only deal with teacher started class,
+		          whose room is known.
+				  
 		const groupSession = await Net.groupMemberJoiningSession(token, roomName);
 		if (groupSession.err) {
 			alert('Failed to enter room');
 			return;
 		}
+		*/
 		
 		// initialize video
 		let tracks = null;
@@ -68,8 +71,7 @@ class CommunicationSpace {
 		}
 		
 		// create the communication client to handle p2p commuinication
-		const room = groupSession.data[0].session_id;
-		this.#commClient = new CommClient(sysConstants.YATU_SOCKET_URL, token, this.#me, room); 
+		this.#commClient = new CommClient(sysConstants.YATU_SOCKET_URL, token, this.#me, liveSession.session_id); 
 		
 		this.#commClient.onReady = this.handleCommunicationReady.bind(this);
 

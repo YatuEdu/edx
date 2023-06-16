@@ -9,14 +9,24 @@ const VIDEO_TEMPLATE = `
 
 
 class DisplayBoardTeacher extends CommunicationSpace {  
-	_textLines;
 	#view;
 	
-	constructor(roomName, view) {
-		super(roomName, view.videoAreaId, view.screenShareBtnId); 
-		this._textLines = [];
+	/*private*/
+	constructor(view) {
+		super(view.videoAreaId, view.screenShareBtnId); 
 		this.#view = view;
 	}
+	
+	/* 
+	 static facotry method for DisplayBoardTeacher to assure that it calls its
+	 async init method.
+	 */
+	static async createDisplayBoardTeacher(liveSession, view) {
+		const myInstance = new DisplayBoardTeacher(view);
+		await myInstance.init(liveSession);
+		return myInstance;
+	}
+	
 	
 	/**
 		Update code buffer sample and sync with students
@@ -87,7 +97,6 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	
 	// {cmd: hi, p1: hello} -> stringfy jason
 	refresh(coomandObj ) {
-		this._textLines = textLines; 
 		return this.v_composeHtml();
 	}
 	

@@ -67,18 +67,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#displayBoardForCoding;
 	#notes;
 	#tabIndex;
-	#teacher;
 	#codeManContainer;
 	#codeInputConsoleComponent;
-	#groupId;
 	
-    constructor(credMan) {
-		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
-		this.init();
+    constructor() {
+		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
 	}
 	
 	// hook up events
 	async init() {
+		await super.init();
 		// initialize dialog boxes for this page
 		$(this.codeSaveDialogSelector).dialog({
 				autoOpen : false, 
@@ -91,11 +89,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// other initialization
 		this.#tabIndex = 0;
 		const paramMap = PageUtil.getUrlParameterMap();
-		const groupId = paramMap.get(sysConstants.UPN_GROUP);
 		const modeStr = paramMap.get(sysConstants.UPN_MODE);
 		const mode = modeStr ? parseInt(modeStr, 10) : 0;
-		this.#groupId = groupId;
-		
 		
 		if (mode && mode === 1) {
 			// Do not show video if we are only doing excersize
@@ -106,8 +101,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			
 		} else {
 			// show video if we are in class mode	
-			this.#teacher = paramMap.get(sysConstants.UPN_TEACHER);
-			this.#displayBoardForCoding = new DisplayBoardForCoding(groupId, this.#teacher, this);
+			this.#displayBoardForCoding = 
+				await DisplayBoardForCoding.createDisplayBoardForCoding(
+													this.liveSession, 
+													this);
+		
 		}
 		
 		// itialize code manager
@@ -170,7 +168,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Load notes from data base
 	 **/
 	async initCodeDepot() {
-		const resp = await Net.memberListCode(credMan.credential.token, this.#groupId);
+		const resp = await Net.memberListCode(credMan.credential.token, this.liveSession.groupId);
 		if (resp.data.length > 0) {
 			let first = true;
 			const codeDataList = [];
@@ -200,8 +198,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	async getCodeFor(codeName) {
 		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
-															  this.#groupId, 
-															  codeName);
+														 this.liveSession.groupId, 
+														 codeName);
 		return respCodeText.data[0].text;
 	}
 	
@@ -253,7 +251,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async updateCodeToDb(codeName, codeText) {
 		const codeHash = StringUtil.getMessageDigest(codeText);
 		const resp = await Net.memberAddCode(credMan.credential.token, 
-											 this.#groupId, codeName, 
+											 this.liveSession.groupId, 
+											 codeName, 
 											 codeText, codeHash);
 		return resp;
 	}
@@ -617,7 +616,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async prv_saveNotesToDb() {
 		const noteTxt = $(this.notesTextArea).val();
 		if (!StringUtil.testEqual(this.#notes, noteTxt)) {
-			await Net.userUpdateClassNotes(credMan.credential.token, this.#groupId, noteTxt);
+			await Net.userUpdateClassNotes(credMan.credential.token, this.liveSession.groupId, noteTxt);
 			this.#notes=noteTxt;
 			console.log("saved: " + this.#notes);
 		}
@@ -780,7 +779,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	get teacherVideoSelector() {
-		return `#${USER_VIDEO_ID_TEMPLATE}${this.#teacher}`;	
+		return `#${USER_VIDEO_ID_TEMPLATE}${this.licveSession.owner_name}`;	
 	}
 	
 	get videoAreaSelector() {
@@ -799,7 +798,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 let jsClassRoom = null;
 
 // A $( document ).ready() block.
-$( document ).ready(function() {
+$( document ).ready(async function() {
     console.log( "index page ready!" );
-	jsClassRoom = new JSClassRoom(credMan);
+	jsClassRoom = new JSClassRoom();
+	await jsClassRoom.init()
 });

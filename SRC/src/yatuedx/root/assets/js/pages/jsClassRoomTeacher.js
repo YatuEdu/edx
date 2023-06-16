@@ -80,18 +80,19 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#timer;
 	#codeInputConsoleComponent;
 	
-    constructor(credMan) {
-		super(credMan, YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
-		this.init();
+    constructor() {
+		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
 	}
 	
 	// hook up events
 	async init() {
+		await super.init();
 		const paramMap = PageUtil.getUrlParameterMap();
-		this.groupId = paramMap.get(sysConstants.UPN_GROUP);
-		//const clssName = 'JS 101 Test';
-		this.#displayBoardTeacher = new DisplayBoardTeacher(this.groupId, this);
 		
+		this.#displayBoardTeacher = 
+						await DisplayBoardTeacher.createDisplayBoardTeacher(
+										this.liveSession, this);
+											
 		// create component for code input / editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(
 					"", 
@@ -178,7 +179,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		Load teacher's notes for the class from backend
 	 **/
 	async loadNotes() {
-		const resp = await Net.classGetNotes(credMan.credential.token,this.groupId);
+		const resp = await Net.classGetNotes(credMan.credential.token,this.liveSession.class_id);
 		let notes = '';
 		if (resp.data.length > 0) {
 			resp.data.forEach(n => {
@@ -453,7 +454,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	async handleSaveNotes(e) {
 		e.preventDefault(); 
 		const notes = $(this.resultConsoleControl).val();
-		await Net.classUpdateNotes(credMan.credential.token,this.groupId, notes);
+		await Net.classUpdateNotes(credMan.credential.token,this.liveSession.class_id, notes);
 	}
 	
 	/**
@@ -779,7 +780,8 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 let jsClassRoomTeacher = null;
 
 // A $( document ).ready() block.
-$( document ).ready(function() {
+$( document ).ready(async function() {
     console.log( "index page ready!" );
-	jsClassRoomTeacher = new JSClassRoomTeacher(credMan);
+	jsClassRoomTeacher = new JSClassRoomTeacher();
+	await jsClassRoomTeacher.init();
 });

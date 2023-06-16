@@ -1,6 +1,3 @@
-import {credMan} 		from '../core/credMan.js'
-import {AuthPage} 		from '../core/authPage.js'
-
 // PTC = prgramming-teaching command 
 // PTCP = prgramming-teaching command parameter
 // GM = general message

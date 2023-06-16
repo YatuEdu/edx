@@ -1,7 +1,7 @@
-import {sysConstants} from './sysConst.js'
-import {LocalStoreAccess} from './localStorage.js';
-import {Net} from './net.js';
-import {TimeUtil} from './util.js'
+import {sysConstants} 		from './sysConst.js'
+import {LocalStoreAccess} 	from './localStorage.js';
+import {Net} 				from './net.js';
+import {TimeUtil} 			from './util.js'
 
 const ROLE_AGENT = 'agent';
 const ROLE_ADMIN = 'admin';
@@ -36,9 +36,9 @@ class CredentialManager {
 		const ret = await Net.login(userName, userPassword);
 		
 		// error?
-		if (ret.err) {
+		if (ret.code) {
 			// TO DO: GO TO ERROR PAGE
-			this.#authError = ret.err;
+			this.#authError = ret.code;
 		}
 		else {
 			// got result in data:
@@ -76,7 +76,7 @@ class CredentialManager {
 		if (t) {
 			// yatu token still valid?
 			const diff = TimeUtil.diffMinutes(tt, Date.now());
-			if (diff < sysConstants.FINMIND_TOKEN_VALID_IN_MIN) {
+			if (diff < sysConstants.YATU_TOKEN_VALID_IN_MIN) {
 				return true;
 			}
 			

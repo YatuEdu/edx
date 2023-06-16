@@ -1,3 +1,4 @@
+import {CommunicationSpace} from './communicationSpace.js';
 import {DisplayBoard} 		from './displayBoard.js';
 import {PTCC_COMMANDS}  	from '../command/programmingClassCommand.js'
 import {OutgoingCommand}	from '../command/outgoingCommand.js'
@@ -41,179 +42,26 @@ const WORD_TEMPLATE =
 <span class="{clss}">{wd}</span>
 `;
 
-const KEY_CLASS = 'js-k';
-const KEY_CLASS_YATU = 'js-yt';
-const DELIMITER_CLASS = 'js-d';
-const NON_KEY_CLASS = 'js-nk';
-const TAB_CLASS = 'tab';
-const STR_QUOTE_CLASS = 'JS_SQ';
-
-const MAP_JS_KEYWORD = new Map([
-    [ 'if', KEY_CLASS ],
-	[ 'else', KEY_CLASS ],
-	[ 'function', KEY_CLASS ],
-	[ 'const', KEY_CLASS ],
-	[ 'let', KEY_CLASS ],
-	[ 'for', KEY_CLASS ],
-	[ 'while', KEY_CLASS ],
-	[ 'do', KEY_CLASS ],
-	[ 'switch', KEY_CLASS ],
-	[ 'case', KEY_CLASS ],
-	[ 'break', KEY_CLASS ],
-	[ 'continue', KEY_CLASS ],
-	[ 'return', KEY_CLASS ],
-	[ 'print', KEY_CLASS_YATU ],
-	[ 'printx', KEY_CLASS_YATU ],
-	[ 'default', KEY_CLASS ],
-	[ '{', DELIMITER_CLASS ],
-	[ '}', DELIMITER_CLASS ],
-	[ '(', DELIMITER_CLASS ],
-	[ ')', DELIMITER_CLASS ],
-	[ ';', DELIMITER_CLASS ],
-	[ ':', DELIMITER_CLASS ],
-	[ "'", STR_QUOTE_CLASS ],
-	[ '"', STR_QUOTE_CLASS ],
-	[TAB_STRING, TAB_CLASS],
-	[TAB_HTML_STRING, TAB_CLASS],// special clase for TAB
-]);
-
-class ParserState {
-	_stateFactory;
-	_tokenBuffer;
-	_tokens;
-	
-	constructor(stateFactory, tokens) {
-		this._stateFactory = stateFactory;
-		this._tokens =  tokens;
-		this._tokenBuffer = [];
-	}
-	
-	/**
-		Accept an input and change or remain the current state,
-	**/
-	accept(ch) {
-		// ended
-		if (!ch) {
-			this.v_exit();
-			return null;
-		}
-		
-		return this.v_changeState(ch);
-	}
-	
-	/**
-		Exit an input and change or remain the current state,
-	**/
-	exit() {
-		this.v_exit();
-	}
-	
-	v_changeState(ch) {
-		throw new Error('v_changeState: sub-class-should-overload-this');
-	}
-	
-	v_exit() {
-		// by default, we create a new token upon exiting
-		this._tokens.push(this.newToken);
-	}
-	
-	get newToken() {
-		return this._tokenBuffer.join('');
-	}
-	
-	addChar(ch) {
-		this._tokenBuffer.push(ch);
-		return this;
-	}
-}
-
-class ParserUnknown extends ParserState {
-	constructor(stateFactory, tokens) {
-		super(stateFactory, tokens); 
-	}
-	
-	/**
-		Change to a known state
-	**/
-	v_changeState(ch) {
-		let newState = this;
-		if (MAP_JS_KEYWORD.get(ch) === DELIMITER_CLASS) {
-			this._tokens.push(ch);
-		} else if (MAP_JS_KEYWORD.get(ch) === TAB_CLASS) {
-			this._tokens.push(TAB_HTML_STRING);
-		} else if (ch === SPACE) {
-			this._tokens.push(SPACE_HTML_STRING);
-		}
-		else {
-			newState  = this._stateFactory.create(TEXT_STATE).addChar(ch);
-		}
-		return newState;
-	}
-}
-
-class ParserText extends ParserState {
-	
-	constructor(stateFactory, tokens) {
-		super(stateFactory, tokens); 
-	}
-	
-	v_changeState(ch) {
-		let newState = this;
-		if (MAP_JS_KEYWORD.get(ch) === DELIMITER_CLASS) {
-			this._tokens.push(this.newToken);
-			this._tokens.push(ch);
-			newState = this._stateFactory.create(UNKNOWN_STATE);
-		} 
-		else if (MAP_JS_KEYWORD.get(ch) === TAB_CLASS) {
-			this._tokens.push(TAB_HTML_STRING);
-			newState = this._stateFactory.create(UNKNOWN_STATE);
-		} 
-		else if (ch === SPACE) {
-			this._tokens.push(this.newToken);
-			this._tokens.push(ch);
-			newState = this._stateFactory.create(UNKNOWN_STATE);
-		}
-		else {
-			this._tokenBuffer.push(ch);
-		}
-		return newState;		
-	}
-}
-
-class StateFactory {
-	#tokens;
-	
-	constructor(tokens) {
-		this.#tokens = tokens;
-	}
-	
-	/**
-		Create a new state by name
-	**/
-	create(stateName) {
-		let newState = null;
-		switch(stateName) {
-			case UNKNOWN_STATE:
-				newState = new ParserUnknown(this, this.#tokens);
-				break;
-			case TEXT_STATE:
-				newState = new ParserText(this, this.#tokens);
-				break;
-		}
-		
-		return newState;
-	}
-}
-
-class DisplayBoardForCoding extends DisplayBoard { 
+class DisplayBoardForCoding extends CommunicationSpace { 
 	#view;
-	#teacher;
+	#liveSession;
 	
-	constructor(roomName, teacherName, view) {
-		super(roomName, view.videoAreaId); 
+	/*private*/
+	constructor(liveSession, view) {
+		super(view.videoAreaId); 
 		this.#view = view;
-		this.#teacher = teacherName;
+		this.#liveSession = liveSession;
 		this.initUI();
+	}
+	
+	/* 
+	 static facotry method for DisplayBoardForCoding to assure that it calls its
+	 async init method.
+	 */
+	static async createDisplayBoardForCoding(liveSession, view) {
+		const myInstance = new DisplayBoardForCoding(liveSession, view);
+		await myInstance.init(liveSession);
+		return myInstance;
 	}
 	
 	/**
@@ -229,7 +77,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 	}
 	
 	get classTeacher() {
-		return this.#teacher;
+		return this.#liveSession.owner_name;
 	}
 	
 	/*
@@ -285,7 +133,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 	updateCodeBufferAndSync(codeUpdateObj) {
 		let cmd = this.composeContentUpateMsg(codeUpdateObj);
 		if (cmd) {
-			this.sendMessageToUser(this.#teacher, cmd.str);
+			this.sendMessageToUser(this.classTeacher, cmd.str);
 		}
 	}
 	
@@ -296,7 +144,7 @@ class DisplayBoardForCoding extends DisplayBoard {
 		if (msg) {
 			const cmd = new OutgoingCommand(PTCC_COMMANDS.GM_HELLO_FROM_PEER, 	// command id
 											msg);								// msg body
-			this.sendMessageToUser(this.#teacher, cmd.str);
+			this.sendMessageToUser(this.classTeacher, cmd.str);
 		}
 	}
 	
