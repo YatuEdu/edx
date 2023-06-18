@@ -13,7 +13,8 @@ This class (CommunicationSpace) serves as utility class for web socket communica
 class GroupWebSocket {  
 	#groupSessionInfo /* groupSession.group_id, 
 					     groupSession.subject_name, 
-					     groupSession.session_id */
+					     groupSession.session_id
+						 groupSession.sequence_id */
 	#messageHander
 	#commClient;
 	#me;
@@ -52,15 +53,19 @@ class GroupWebSocket {
 
         this.#commClient.onUserList = this.handleUserList.bind(this);
 	}
+
+	sendGroupTextMessage(message) {
+		this.#commClient.sendPublicMsg(message);
+	}
 	
 	/**	
 		Handle p2p messages by interpretting it as command and do things accordingly
 	**/
 	handleMessage(sender, msg) {
-		const cmdObject = new IncomingCommand(msg, sender);
+		//const cmdObject = new IncomingCommand(msg, sender);
 		
 		// the derived class execute this command on UI
-		this.messageHander(this.#groupSessionInfo, cmdObject);
+		this.#messageHander(msg);
 	}
 	
 	/**

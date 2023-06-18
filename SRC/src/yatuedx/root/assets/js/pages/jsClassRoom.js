@@ -69,6 +69,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#tabIndex;
 	#codeManContainer;
 	#codeInputConsoleComponent;
+
+	/* 
+	 static facotry method for JSClassRoom to assure that it calls its
+	 async init method.
+	 */
+	 static async createJSClassRoom() {
+		const myInstance = new JSClassRoom();
+		await myInstance.init();
+		return myInstance;
+	}
 	
     constructor() {
 		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
@@ -77,6 +87,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	// hook up events
 	async init() {
 		await super.init();
+
 		// initialize dialog boxes for this page
 		$(this.codeSaveDialogSelector).dialog({
 				autoOpen : false, 
@@ -799,7 +810,6 @@ let jsClassRoom = null;
 
 // A $( document ).ready() block.
 $( document ).ready(async function() {
-    console.log( "index page ready!" );
-	jsClassRoom = new JSClassRoom();
-	await jsClassRoom.init()
+    console.log( "JSClassRoom page ready!" );
+	jsClassRoom = await JSClassRoom.createJSClassRoom();
 });

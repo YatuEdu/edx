@@ -16,8 +16,9 @@ class AuthPage {
 	#store
 	#liveSession
 	
-	constructor(publicOk) {
-		this.#store =  new LocalStoreAccess(sysConstants.YATU_OWNER_STORE_KEY);
+	constructor() {
+		this.#store =  new LocalStoreAccess(sysConstants.YATU_CHAT_GROUP_STORE_KEY);
+		this.validateLiveSession();
 	}
 	
 	/**
@@ -41,15 +42,14 @@ class AuthPage {
 	async initGroups() {
 		// need to go to the video chat window now?
 		let willGotoLiveClass = true;
-		let liveClass = this.liveSession;
 			
 		// live chat page can skip the following logic
-		if (liveClass && this.v_isLiveChatPage() ) {
+		if (this.v_isLiveChatPage() ) {
 			return;
 		}
 		
-		if (liveClass) {
-			if (this.gotoLiveClass(liveClass)) {
+		if (this.liveSession) {
+			if (this.gotoLiveClass(this.liveSession)) {
 				return;
 			}
 			willGotoLiveClass = false;
@@ -75,13 +75,12 @@ class AuthPage {
 			const myGroupSessions = ret.data;
 		
 			// find the live chat class
-			liveClass = myGroupSessions.find(s => s.sequence_id != null);
+			const liveClass = myGroupSessions.find(s => s.sequence_id != null);
 			// save live class if there
 			if (liveClass) {
 				// also serialize the live session info for across page visibility
-				liveClass.creationTime = Date.now();
-				const liveClassStr = JSON.stringify(liveClass);
-				this.#store.setItem(liveClassStr);
+				this.setLiveSession(liveClass);
+
 				// open another tab for live class
 				if (willGotoLiveClass) {
 					willGotoLiveClass = this.gotoLiveClass(liveClass);
@@ -91,10 +90,12 @@ class AuthPage {
 			if (!willGotoLiveClass) {
 				// obtain non-live groups for group communication
 				myGroupSessions.forEach(groupSession => {
-					// Join WebSocket group one by one
-					const groupWebSocket = new GroupWebSocket(groupSession,
-															  this.groupMessageHandler.bind(this));
-					this.#groupWebSocketMap.set(groupSession.group_id, groupWebSocket);
+					if (groupSession.sequence_id === null) {
+						// Join WebSocket group one by one
+						const groupWebSocket = new GroupWebSocket(groupSession,
+																this.groupMessageHandler.bind(this));
+						this.#groupWebSocketMap.set(groupSession.group_id, groupWebSocket);
+					}
 				});
 			}
 		}
@@ -114,11 +115,10 @@ class AuthPage {
 	/*
 		handleMessage from groupSessionInfo
 	 */
-	groupMessageHandler(groupSessionInfo, cmdObject) {
-		alert ('get message from ' + groupSessionInfo.group_id);
-	}
-	
-	deserializeLiveClassFromStore() {
+	groupMessageHandler(message) {
+		//alert ('get message from ' + groupSessionInfo.group_id);
+		console.log('Received message:' + message);
+		alert (message);
 	}
 	
 	gotoLiveClass(liveClass) {
@@ -155,16 +155,17 @@ class AuthPage {
 		return credMan.credential;
 	}
 	
-	get liveSession() {
+	
+	validateLiveSession() {
 		const itemStr = this.#store.getItem();
 		if (itemStr && itemStr != "null") {
 			this.#liveSession = JSON.parse(this.#store.getItem());
 			
-			// check if the live class is stale (after 10 minutes)
+			// check if the live class is stale (after 3 minutes)
 			const diff = this.#liveSession.creationTime ? TimeUtil.diffMinutes(this.#liveSession.creationTime, Date.now())
 						 :
-						 sysConstants.YATU_TOKEN_VALID_IN_MIN + 1;
-			if ( diff > sysConstants.YATU_TOKEN_VALID_IN_MIN) {
+						 sysConstants.YATU_LIVE_SESSION_VALID_IN_MIN + 1;
+			if ( diff > sysConstants.YATU_LIVE_SESSION_VALID_IN_MIN) {
 				this.#liveSession = null;
 				this.#store.setItem(null)
 			}
@@ -172,8 +173,36 @@ class AuthPage {
 		} else {
 			this.#liveSession = null;
 		}
-		
+
 		return this.#liveSession;
+	}
+
+	get liveSession() {
+		return this.#liveSession;
+	}
+
+	setLiveSession(newSession) {
+		if (newSession.session_id) {
+			newSession.creationTime = Date.now();
+			const liveClassStr = JSON.stringify(newSession);
+			this.#store.setItem(liveClassStr);
+			this.#liveSession = newSession;
+		} else {
+			this.#store.setItem(null);
+		}
+	}
+
+	/**
+	 * Group owner sends messages to the group memebers who are online.
+	 * 
+	 * @param {} groupId 
+	 * @param {*} message 
+	 */
+	sendGroupTextMessage(groupId, message) {
+		const groupWS = this.#groupWebSocketMap.get(groupId);
+		if (groupWS) {
+			groupWS.sendGroupTextMessage(message);
+		}
 	}
 }
 

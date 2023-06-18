@@ -8,14 +8,24 @@ import {AuthPage} 							from '../core/authPage.js'
 class IndexPageHandler extends AuthPage {
 	#userName;
 	
+	/* 
+	 static facotry method for MyGroupSubjectPageHandler to assure that it calls its
+	 async init method.
+	 */
+	 static async createIndexPageHandler() {
+		const myInstance = new IndexPageHandler();
+		await myInstance.init();
+		return myInstance;
+	}
+
     constructor() {
-		super(true); // true means index page is facing to public
-		this.init();
+		super(); 
 	}
 	
 	// hook up events
 	async init() {
-		await super.init();
+		await super.init(true); // true means index page can be viewed by public
+
 		// sign up Link
 		$( "#yt_btn_redirect_to_signup" ).click(this.redirectToSignup);
 		
@@ -94,9 +104,8 @@ class IndexPageHandler extends AuthPage {
 let indexPageHandler = null;
 
 // A $( document ).ready() block.
-$( document ).ready(function() {
-    console.log( "index page ready!" );
-	indexPageHandler = new IndexPageHandler();
+$( document ).ready(async function() {
+	indexPageHandler = await IndexPageHandler.createIndexPageHandler();
 });
 
 export {IndexPageHandler}

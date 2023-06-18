@@ -80,6 +80,16 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#timer;
 	#codeInputConsoleComponent;
 	
+	/* 
+	 static facotry method for JSClassRoomTeacher to assure that it calls its
+	 async init method.
+	 */
+	 static async createJSClassRoomTeacher() {
+		const myInstance = new JSClassRoomTeacher();
+		await myInstance.init();
+		return myInstance;
+	}
+
     constructor() {
 		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, DIV_VIEDO_AREA, BTN_SHARE_SCREEN);
 	}
@@ -781,7 +791,6 @@ let jsClassRoomTeacher = null;
 
 // A $( document ).ready() block.
 $( document ).ready(async function() {
-    console.log( "index page ready!" );
-	jsClassRoomTeacher = new JSClassRoomTeacher();
-	await jsClassRoomTeacher.init();
+    console.log( "jsClassRoomTeacher page ready!" );
+	jsClassRoomTeacher = await JSClassRoomTeacher.createJSClassRoomTeacher();
 });
