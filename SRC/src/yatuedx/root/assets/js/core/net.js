@@ -26,7 +26,7 @@ const API_DELETE_CODE = 202127;
 const API_MEMBER_LIST_LIVE_SESSIONS = 202145; 
 const API_OWNER_LIST_CLASSES = 202146;
 const API_OWNER_START_CLASS = 202148;
-const API_OWNER_STOP_CLASS = 202148;
+const API_OWNER_STOP_CLASS = 202149;
 
 class Net {
 	/**
@@ -90,6 +90,15 @@ class Net {
 	**/	
 	static async groupOwnerStartClass(t, clssId, seqId) {
 		const req = Net.composeRequestDataForGroupOwnerStartClass(t, clssId, seqId);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for GROUP OWNER to start a live class
+	**/	
+	static async groupOwnerStopClass(t, sessionId) {
+		const req = Net.composeRequestDataForGroupOwnerStopClass(t, sessionId);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -392,6 +401,26 @@ class Net {
 			
 		return Net.composePostRequestFromData_private(emailCodeCheckReq);
 	}
+
+	/**
+		Forming Yatu API request data for GROUP OWNER to stop a live class
+	**/	
+	static composeRequestDataForGroupOwnerStopClass(t, sId) {
+		// query for the yatu token's validness
+		const emailCodeCheckReq = {
+			header: {
+				token: t,
+				api_id: API_OWNER_STOP_CLASS
+			},
+		
+			data: {
+				sessionId: sId,
+			}					
+		};
+			
+		return Net.composePostRequestFromData_private(emailCodeCheckReq);
+	}
+	
 	
 	/**
 		Forming Yatu API request data for GROUP OWNER listing all his classes

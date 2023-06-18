@@ -1,8 +1,5 @@
-import {uiMan}                           from '../core/uiManager.js';
 import {Net}                             from '../core/net.js';
 import {AuthPage} 						 from '../core/authPage.js'
-import {getGroupCardHtml}				 from '../component/groupCard.js';
-import {TimeUtil,StringUtil,PageUtil}	 from '../core/util.js';
 
 const MY_CLASS_TEMPLATE_ROW = `
 <div class="row mb-1" id="{rowid}" >
@@ -42,7 +39,7 @@ const BTN_TEXT_STOP_SESSION = "Stop class";
 	This class manages all classesd the user belongs to
 **/
 class MyGroupSubjectPageHandler extends AuthPage {
-	
+
 	/* 
 	 static facotry method for MyGroupSubjectPageHandler to assure that it calls its
 	 async init method.
@@ -109,7 +106,7 @@ class MyGroupSubjectPageHandler extends AuthPage {
 				$(".mySubjectSequenceRow").append(htmlForClasses);
 			}
 			
-			if (this.liveSession.group_id) {
+			if (this.liveSession && this.liveSession.group_id) {
 				this.selectLiveClass({}, {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id} );
 			}	
 		} else {
@@ -136,68 +133,65 @@ class MyGroupSubjectPageHandler extends AuthPage {
 		window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}&mode=1`;
 	}
 	
-	async handleJoining(e) {
-		e.preventDefault();
-		
-		// call remote API to apply for the membership
-		const t = this.credential.token;
-		const btnId = $(e.target).attr('id');
-		const ret = await Net.applyForAGroup(t, StringUtil.getIdFromBtnId(btnId));
-	
-		if (ret.code == 0) {
-			alert('Pending approval...');
-		}
-		else{
-			alert('Error code： ' + ret.code);
-		}
-	}
-	
+	/**
+	 * handle starting a new class event.
+	 * 
+	 * @param {*} clssId  	- new class id
+	 * @param {*} seqId 	- new sequence id
+	 * @returns 			- none
+	 */
 	async startClass(clssId, seqId) {
 		const newSelection = {classId: clssId, sequenceId: seqId};
 		let oldSelection = {};
-		// need to stop the active live session?
-		if (!this.isActiveSession(clssId, seqId)) {
-			const answer = confirm('You need to stop an active class session first. Do you want to do that?');
-			if (!answer) {
-				return;
+
+		// Stop the existing class and then start a new class?	
+		let startNewSession = false;
+		if (this.liveSession) {
+			if (!this.isActiveSession(clssId, seqId)) {
+				// Stop the currently active live session?
+				const answer = confirm('You need to stop an active class session first. Do you want to do that?');
+				if (!answer) {
+					return;
+				}
+
+				// stop live session
+				oldSelection = {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id}
+				await this.stopClass(this.liveSession.session_id);	
+
+				// need to start a new session
+				startNewSession = true;
 			}
-			oldSelection = {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id}
-			await this.stopClass(this.liveSession.group_id, this.liveSession.sequence_id);	
+		} else {
+			startNewSession = true;
 		}
 		
-		// Start a new class
-		const t = this.credential.token;
-		const ret = await Net.groupOwnerStartClass(t, clssId, seqId);
-		if (ret.code === 0) {
-			const mySessionInfo = ret.data[0];
-			this.setActiveSessionInfo(mySessionInfo.session_id, clssId, seqId, mySessionInfo.group_type);
-			
-			// Switch UI Highlight
-			this.selectLiveClass(oldSelection, newSelection);
+		// Start a new class 
+		if (startNewSession) {
+			const t = this.credential.token;
+			const ret = await Net.groupOwnerStartClass(t, clssId, seqId);
+			if (ret.code === 0) {
+				const newSessionInfo = ret.data[0];
+				// save the live class info
+				this.setLiveSession(newSessionInfo);
+				// Switch UI Highlight
+				this.selectLiveClass(oldSelection, newSelection);
+				// send messages to students
+				this.sendGroupTextMessage(clssId, `Teacher ${this.credential.name} has started a class.  Please go to the class`);
+			}
 		}
 	}
 	
-	async stopClass(clssId, seqId) {
+	async stopClass(sessionId) {
 		const t = this.credential.token;
-		const ret = {code: 0}; // await Net.groupOwnerStopClass(t, clssId, seqId);
+		const ret = await Net.groupOwnerStopClass(t, sessionId);
 		if (ret.code === 0) {
-			this.setActiveSessionInfo(null, 0, 0, 0)
+			this.setLiveSession( {session_id: null});
 		}
 	}
 	
-	setActiveSessionInfo(sessionId, clssId, seqId, type) {
-		this.liveSession.session_id = sessionId;
-		this.liveSession.group_id = clssId;
-		this.liveSession.sequence_id = seqId;
-		this.liveSession.group_type = type;
-		
-		// save the live class info
-		const sessionInfoStr = JSON.stringify(this.liveSession);
-		this.#store.setItem(sessionInfoStr);
-	}
-	
+
 	isActiveSession(clssId, seqId) {
-		return 	this.liveSession.session_id &&
+		return 	this.liveSession &&
 				this.liveSession.group_id === clssId &&
 				this.liveSession.sequence_id === seqId;
 	}
@@ -241,7 +235,7 @@ class MyGroupSubjectPageHandler extends AuthPage {
 
 let myGroupSubjectPageHandler = null;
 
-$( document ).ready(function() {
+$( document ).ready(async function() {
     console.log( "myGroup page ready!" );
-	myGroupSubjectPageHandler = MyGroupSubjectPageHandler.createMyGroupSubjectPageHandler()
+	myGroupSubjectPageHandler = await MyGroupSubjectPageHandler.createMyGroupSubjectPageHandler()
 });
