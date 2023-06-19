@@ -1,5 +1,6 @@
 import {Net}                             from '../core/net.js';
 import {AuthPage} 						 from '../core/authPage.js'
+import {sysConstStrings } 				 from '../core/sysConst.js';
 
 const MY_CLASS_TEMPLATE_ROW = `
 <div class="row mb-1" id="{rowid}" >
@@ -58,8 +59,7 @@ class MyGroupSubjectPageHandler extends AuthPage {
 	async init() {
 		// important: must call AuthPage init asynchronously
 		await super.init();
-		// get top 10 groups that I can join
-		// remote call to sign up
+		// get all the classes I created 
 		const t = this.credential.token;
 		await this.retrieveMyClasses(t);
 		
@@ -154,11 +154,10 @@ class MyGroupSubjectPageHandler extends AuthPage {
 					return;
 				}
 
-				// stop live session
-				oldSelection = {classId: this.liveSession.group_id, sequenceId: this.liveSession.sequence_id}
-				await this.stopClass(this.liveSession.session_id);	
+				// stop current live session
+				await this.stopClass(this.liveSession.group_id,  this.liveSession.sequence_id);	
 
-				// need to start a new session
+				// then to start a new session
 				startNewSession = true;
 			}
 		} else {
@@ -172,20 +171,26 @@ class MyGroupSubjectPageHandler extends AuthPage {
 			if (ret.code === 0) {
 				const newSessionInfo = ret.data[0];
 				// save the live class info
+				newSessionInfo.group_id = clssId;
 				this.setLiveSession(newSessionInfo);
 				// Switch UI Highlight
 				this.selectLiveClass(oldSelection, newSelection);
 				// send messages to students
-				this.sendGroupTextMessage(clssId, `Teacher ${this.credential.name} has started a class.  Please go to the class`);
+				this.sendGroupTextMessage(clssId, `Teacher "${this.credential.name} "${sysConstStrings.TEACHER_CLASS_STARTED}`);
 			}
 		}
 	}
 	
-	async stopClass(sessionId) {
-		const t = this.credential.token;
-		const ret = await Net.groupOwnerStopClass(t, sessionId);
-		if (ret.code === 0) {
-			this.setLiveSession( {session_id: null});
+	async stopClass(clssId, seqId) {
+		if (this.liveSession.session_id && 
+			this.liveSession.group_id === clssId &&
+			this.liveSession.sequence_id === seqId ) {
+			const t = this.credential.token;
+			const ret = await Net.groupOwnerStopClass(t, this.liveSession.session_id);
+			if (ret.code === 0) {
+				this.selectLiveClass({classId: clssId, sequenceId: seqId}, {});
+				this.setLiveSession( {session_id: null});
+			}
 		}
 	}
 	
@@ -216,10 +221,12 @@ class MyGroupSubjectPageHandler extends AuthPage {
 		if (oldSelection.classId !== newSelection.classId ||
 			oldSelection.sequenceId !== newSelection.sequenceId) {
 
-			const newRowId = '#' + this.formRowId(newSelection.classId, newSelection.sequenceId);
-			$(newRowId).addClass(YT_CLASS_IS_LIVE);
-			const newBtnId = "#" + this.formButtonId(newSelection.classId, newSelection.sequenceId);
-			$(newBtnId).html(BTN_TEXT_STOP_SESSION);
+			if (newSelection.classId) {
+				const newRowId = '#' + this.formRowId(newSelection.classId, newSelection.sequenceId);
+				$(newRowId).addClass(YT_CLASS_IS_LIVE);
+				const newBtnId = "#" + this.formButtonId(newSelection.classId, newSelection.sequenceId);
+				$(newBtnId).html(BTN_TEXT_STOP_SESSION);
+			}
 			
 			if (oldSelection.classId) {
 				const oldRowId = '#' + this.formRowId(oldSelection.classId, oldSelection.sequenceId);
@@ -236,6 +243,6 @@ class MyGroupSubjectPageHandler extends AuthPage {
 let myGroupSubjectPageHandler = null;
 
 $( document ).ready(async function() {
-    console.log( "myGroup page ready!" );
+    console.log( "MyGroupSubject page ready!" );
 	myGroupSubjectPageHandler = await MyGroupSubjectPageHandler.createMyGroupSubjectPageHandler()
 });

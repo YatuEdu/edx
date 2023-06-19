@@ -1,9 +1,9 @@
-import {credMan} 							from './credMan.js'
-import {Net}                    			from './net.js';
-import {TimeUtil} 							from './util.js'
-import {GroupWebSocket}						from '../component/groupTextCommunication.js';
-import {LocalStoreAccess} 					from '../core/localStorage.js';
-import {sysConstants, groupTypeConstants} 	from '../core/sysConst.js'
+import {credMan} 											from './credMan.js'
+import {Net}                    							from './net.js';
+import {TimeUtil} 											from './util.js'
+import {GroupWebSocket}										from '../component/groupTextCommunication.js';
+import {LocalStoreAccess} 									from '../core/localStorage.js';
+import {sysConstants, sysConstStrings, groupTypeConstants} 	from '../core/sysConst.js'
 
 /**
 	
@@ -40,9 +40,10 @@ class AuthPage {
 		Get all my live communication sessions
 	**/
 	async initGroups() {
-		// need to go to the video chat window now?
-		let willGotoLiveClass = true;
 			
+		// need to go to the live session if any?
+		let willGotoLiveClass = true;
+
 		// live chat page can skip the following logic
 		if (this.v_isLiveChatPage() ) {
 			return;
@@ -55,6 +56,7 @@ class AuthPage {
 			willGotoLiveClass = false;
 		}
 			
+		
 		
 		this.#groupWebSocketMap = new Map();
 		const t = credMan.credential.token;
@@ -85,6 +87,10 @@ class AuthPage {
 				if (willGotoLiveClass) {
 					willGotoLiveClass = this.gotoLiveClass(liveClass);
 				}
+			} else {
+				willGotoLiveClass = false;
+				// clear up local storage for old session info
+				this.setLiveSession( {session_id: null});
 			} 
 			
 			if (!willGotoLiveClass) {
@@ -93,7 +99,7 @@ class AuthPage {
 					if (groupSession.sequence_id === null) {
 						// Join WebSocket group one by one
 						const groupWebSocket = new GroupWebSocket(groupSession,
-																this.groupMessageHandler.bind(this));
+																  this.groupMessageHandler.bind(this));
 						this.#groupWebSocketMap.set(groupSession.group_id, groupWebSocket);
 					}
 				});
@@ -115,10 +121,15 @@ class AuthPage {
 	/*
 		handleMessage from groupSessionInfo
 	 */
-	groupMessageHandler(message) {
-		//alert ('get message from ' + groupSessionInfo.group_id);
+	async groupMessageHandler(message) {
 		console.log('Received message:' + message);
-		alert (message);
+		if (message.includes(sysConstStrings.TEACHER_CLASS_STARTED)) {
+			this.#liveSession = null;
+			this.#store.setItem(null);
+			await this.initGroups();
+		} else {
+			alert (message);
+		}
 	}
 	
 	gotoLiveClass(liveClass) {
@@ -127,7 +138,7 @@ class AuthPage {
 		const gotoClass = confirm('You have a live class going on. Do you want to go to the classroom?');
 		if (gotoClass) {
 			if (liveClass.group_type == groupTypeConstants.GPT_EDU_JSP) {
-				if (this.credential.name.trim() === liveClass.owner_name.trim()) {
+				if (this.credential.name === liveClass.owner_name) {
 					// go to class room as teacher
 					window.location.href =  `./class-room-teacher.html`;
 				}
@@ -159,7 +170,7 @@ class AuthPage {
 	validateLiveSession() {
 		const itemStr = this.#store.getItem();
 		if (itemStr && itemStr != "null") {
-			this.#liveSession = JSON.parse(this.#store.getItem());
+			this.#liveSession = JSON.parse(itemStr);
 			
 			// check if the live class is stale (after 3 minutes)
 			const diff = this.#liveSession.creationTime ? TimeUtil.diffMinutes(this.#liveSession.creationTime, Date.now())
@@ -189,6 +200,7 @@ class AuthPage {
 			this.#liveSession = newSession;
 		} else {
 			this.#store.setItem(null);
+			this.#liveSession = null;
 		}
 	}
 
