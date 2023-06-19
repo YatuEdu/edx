@@ -53,6 +53,7 @@ const sysConstants = Object.freeze({
 });
 
 const sysConstStrings = Object.freeze({
+
 	EMPTY: '',
 	UNKNOWN: 'UNKNOWN',
 	SWITCH_TO_LEARNING: 'Current mode: exercise',
@@ -64,8 +65,10 @@ const sysConstStrings = Object.freeze({
 	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment',
 	
 	EXE_PROGRAM_OUTPUT:   '------ PROGRAMMING OUTPUT -------\n',
-	EXE_PROGRAM_FIN:    '\n------  END OF EXECUTION  -------\n\n'
-	// output text during code running:
+	EXE_PROGRAM_FIN:    '\n------  END OF EXECUTION  -------\n\n',
+	
+	// Message const
+	TEACHER_CLASS_STARTED: 'has started a class.  Please go to the class!'
 	
 });
 

@@ -1,72 +1,96 @@
-import {TimeUtil}	 from '../core/util.js';
+const CLASS_SCHEDULE_TEMPLATE_SECTION = `
+	<div class="container">
+			{subjects}
+	</div>`;
 
-// template parameter:
-//  0 - group id
-//  1 - image file name
-//	2 - 
-const alertColorStyle='title="This event starts in ##10 hour(s) ##11 minutes" style="font-size:22px; color:#FF0001; font-weight:bold; font-style:italic;"';
-const GROUP_CARD_TEMPLATE = `
- <div id="card_div##1"  class="col-sm-10 col-lg-10 py-3 group-card">
-	<div class="card h-100">
-		<div class="card-body text-center">
-			<img src="assets/images/dynamic/default.png" class="img-fluid py-1 my-4" alt="Product 2" height="180">
-			<h6 ##9 class="mb-0 font-weight-bold translatable" id="card_name_##1" data-text-id="c_group_fld_nm_##1">##2</h6>
-			<p class="mb-0"></p>
-			<p class="h5 font-weight-bold mb-3 translatable" data-text-id="c_group_fld_num_online_##1">##4 ##7</p>
-			<button class="btn btn-rounded btn-outline-primary translatable" id="join_btn_##1" 
-					data-grp-type="##3"
-					data-grp-name="##2"
-					data-grp-id="##5"
-					data-grp-owner="##6"
-					data-grp-dt="##8"
-			        data-text-id="c_group_fld_btn_enter">Join Class</button>
-			<button class="btn btn-rounded btn-outline-primary translatable" id="exe_btn_##1" 
-					data-grp-type="##3"
-					data-grp-name="##2"
-					data-grp-id="##5"
-					data-grp-owner="##6"
-					data-grp-dt="##8"
-			        data-text-id="c_group_fld_btn_enter">Do Exercise</button>
+const SUBJECT_TEMPLATE_ROW = `
+	<div class="row mb-1" id="{subrowid}" >
+		<div class="col-12 text-left text-black">
+			<h3>{sub}</h3>
 		</div>
 	</div>
-  </div>
+	{classes}`;
+
+const CLASS_TEMPLATE_ROW = `
+	<div class="row mb-1" id="{subrowid}">
+		<div class="col-8 text-left text-black">
+			<h3>{clss}</h3>
+		</div>
+		<div class="col-4 text-right text-black">
+			<button class="btn btn-outline-primary translatable schedule-action" 
+				data-clss-id="{grpid}" 
+				data-seq-id="{seqid}" id="{exebtnid}">Do exercise</button>
+		</div>
+	</div>
+	{seqrows}
+	`;
+
+const CLASS_SEQUENCE_TEMPLATE_ROW = `
+	<div class="row mb-1" id="{seqrowid}" >
+		<div class="col-4 text-left text-black">
+			<span>{seqname}</span>
+		</div>
+		<div class="col-1 text-right text-black">
+			<button class="btn btn-rounded btn-outline-primary translatable schedule-action" 
+				data-clss-id="{grpid}" 
+				data-seq-id="{seqid}" id="{btnid}">+</button>
+		</div>
+		<div class="col-4 text-left text-black">
+			<span>{seqstrt}</span>
+		</div>
+		<div class="col-1 text-left text-black">
+			<span>{seqlen}hr</span>
+		</div>
+		<div class="col-2 text-right text-black">
+			<button class="btn btn-rounded btn-outline-primary translatable schedule-action" 
+				data-clss-id="{grpid}" 
+				data-seq-id="{seqid}" id="{btnid}">Go to classroom</button>
+		</div>
+	</div>
 `;
 
-function cutShort(length, str) {
-	return str.substring(0, length);
+const REPLACEMENTSUBJECT_NAME = '{sub}';
+const REPLACEMENT_CLASS_NAME = '{clss}';
+
+const REPLACEMENT_GROUP_ID = '{grpid}';
+const REPLACEMENT_SEQUENCE_ID = '{seqid}';
+const REPLACEMENT_SEQUENCE_NAME = '{seqname}'
+const REPLACEMENT_SEQUENCESTART = '{seqstrt}';
+const REPLACEMENT_SEQUENCELEN = '{seqlen}';
+
+const REPLACEMENT_SUBJECT_ROW_HTML = '{subjects}';
+const REPLACEMENT_CLASS_ROW_HTML = '{classes}'
+const REPLACEMENT_SEQUENCE_ROW_HTML = '{seqrows}';
+
+
+const REPLACEMENT_SUBJECT_NAME = '{sub}';
+const REPLACEMENT_SEQUENCE_ROW_ID = '{rowid}';
+const REPLACEMENT_ROW_ID = '{rowid}';
+const REPLACEMENT_BUTTON_ID = '{btnid}';
+
+const YT_CLASS_SCHEDULE_LIVE = '.schedule-action';
+const YT_CLASS_IS_LIVE = 'live-class';
+
+const BTN_TEXT_START_SESSION = "Start class";
+const BTN_TEXT_STOP_SESSION = "Stop class";
+
+class MyClassTemplates {
+	static get SECTION() { return CLASS_SCHEDULE_TEMPLATE_SECTION}
+	static get SUBJECT() { return SUBJECT_TEMPLATE_ROW}
+	static get CLASS () { return CLASS_TEMPLATE_ROW}
+	static get SEQUENCE () { return CLASS_SEQUENCE_TEMPLATE_ROW}
+
+	static get REPLACE_SUBJECT_ROWS() {return REPLACEMENT_SUBJECT_ROW_HTML}
+	static get REPLACE_CLASS_ROWS() {return REPLACEMENT_CLASS_ROW_HTML}
+	static get REPLACE_SEQUENCE_ROWS() {return REPLACEMENT_SEQUENCE_ROW_HTML}
+
+	static get REPLACE_SEQUENCE_NAME() { return REPLACEMENT_SEQUENCE_NAME}
+	static get REPLACE_SEQUENCESTART() {return REPLACEMENT_SEQUENCESTART}
+	static get REPLACE_SEQUENCELEN() { return REPLACEMENT_SEQUENCELEN}
+
+	static get REPLACE_SUBJECT_NAME() { return REPLACEMENTSUBJECT_NAME}
+	static get REPLAC_CLASS_NAME() { return REPLACEMENT_CLASS_NAME; }
 }
 
-function getGroupCardHtml(groupInfo) {
-	let htmlCard = GROUP_CARD_TEMPLATE;
-	const joinBtnAttrId = `#join_btn_${groupInfo.id}`;
-	const exeBtnAttrId = `#exe_btn_${groupInfo.id}`;
-	
-	// alert for the class is it starts within 8 hours 
-	let colorStyle = "";
-	let inMinutes = 0;
-	let inHours = 0;
-	if (groupInfo.dt) {
-		const startTime = new Date(Number(groupInfo.dt));
-		const diffInMin = TimeUtil.diffMinutes(Date.now(), startTime);
-		if (diffInMin > 0 && diffInMin  < 8 * 60) {
-			colorStyle = alertColorStyle;
-			inHours = Math.floor(diffInMin / 60);
-			inMinutes = diffInMin % 60;
-		}
-	}
-	htmlCard = 	htmlCard.replace(new RegExp(`##1`, 'g'), groupInfo.id)
-						.replace(new RegExp(`##2`, 'g'), groupInfo.name)
-						.replace(new RegExp(`##3`, 'g'), groupInfo.type)
-						.replace('##4', groupInfo.displayDate ?? 'Any day')
-						.replace('##7', groupInfo.displayTime ?? 'Any time')
-						.replace(new RegExp(`##5`, 'g'), groupInfo.id)
-						.replace(new RegExp(`##6`, 'g'), groupInfo.owner)
-						.replace('##8', groupInfo.dt ?? "")
-						.replace('##9', colorStyle)
-						.replace('##10', inHours )
-						.replace('##11', inMinutes);
-	return  {joinBtnId: joinBtnAttrId, exeBtnId: exeBtnAttrId, html: htmlCard};
-}
-
-export {getGroupCardHtml};
+export {MyClassTemplates};
 						

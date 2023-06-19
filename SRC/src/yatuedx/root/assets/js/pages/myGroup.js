@@ -1,72 +1,107 @@
 import {sysConstants, languageConstants, groupTypeConstants} from '../core/sysConst.js'
-import {credMan}                         from '../core/credMan.js'
-import {uiMan}                           from '../core/uiManager.js';
+import {AuthPage} 						 from '../core/authPage.js'
 import {Net}                             from '../core/net.js';
-import {getGroupCardHtml}				 from '../component/groupCard.js';
+import {MyClassTemplates}				 from '../component/groupCard.js';
 import {TimeUtil,StringUtil,PageUtil}	 from '../core/util.js';
 
 /**
 	This class manages all classesd the user belongs to
 **/
-class MyGroupPageHandler {
-	#credMan;
+class MyGroupPageHandler extends AuthPage {
 	
-    constructor(credMan) {
-		this.#credMan = credMan;
-		this.init();
+	/* 
+	 static facotry method for MyGroupPageHandler to assure that it calls its
+	 async init method.
+	 */
+	 static async createMyGroupPageHandler() {
+		const myInstance = new MyGroupPageHandler();
+		await myInstance.init();
+		return myInstance;
+	}
+	
+    constructor() {
+		super();
 	}
 	
 	// hook up events
 	async init() {
-		// get top 10 groups that I can join
-		// remote call to sign up
-		const t = this.#credMan.credential.token;
-		await this.retrieveMyGroups(t);
-		//await this.retrieveNewGroups(t, 10);
+		// important: must call AuthPage init asynchronously
+		await super.init();
+
+		// GET my signed up classes
+		await this.retrieveMyClasses();
 	}	
 	
 	/**
 		retrieve the groups that I am registered with.
 	 **/
-	async retrieveMyGroups(t) {
-		const ret = await Net.groupMemberGetMyGroups(t);
+	async retrieveMyClasses() {
+		const ret = await Net.myClassSchedules(this.credential.token);
 		if (ret.code === 0) {
-			const myGroup = ret.data;
-			this.sortGroupByTime(myGroup);
-			for(let i = 0; i < myGroup.length; i++) {
-				const g = myGroup[i];
-				const  {joinBtnId, exeBtnId, html} = getGroupCardHtml(
-							{id: g.id, 
-							 name: g.name, 
-							 type: g.type, 
-							 owner: g.owner.trim(),
-							 hasLiveSession: g.session_is_live,
-							 dt: g.dt,
-							 displayDate: g.displayDate,
-							 displayTime: g.displayTime,
-							});
-				$(".myGroupRow").append(html);
-				
-				$( exeBtnId ).click(this.handleExercize);
-				// still a valid member?
-				if (g.s_credit || g.g_credit) {
-					$( joinBtnId ).click(this.handleEntering);
+			const mySchedules = ret.data;
+
+			// group by SUBJECT name
+			const groupBySubjectSchedules = this.#groupByReduce(mySchedules, "subject_name");
+			// process each class
+			let subjectRows = "";
+			for(const subject in groupBySubjectSchedules) {
+				// html row for this class
+				let subjectRowHtml = MyClassTemplates.SUBJECT
+										.replace(MyClassTemplates.REPLACE_SUBJECT_NAME, subject);
+				// group by classes
+				const classList = groupBySubjectSchedules[subject];
+
+				// group by class names
+				const groupByClass = this.#groupByReduce(classList, "class_name");
+				let classRowHtml = "";
+				for(const clss in groupByClass) {
+					const classHtml  = MyClassTemplates.CLASS
+										.replace(MyClassTemplates.REPLAC_CLASS_NAME, clss);
+
+					const groupBySequences = this.#groupByReduce(groupByClass[clss], "sequence_id");
+					let sequnceRows = "";
+					for(const seq in groupBySequences) {
+						const sequenceList = groupBySequences[seq];
+						sequenceList.forEach(q => {
+							const jsDate = new Date(q.start_time * 1000);
+							const sequenceHtml  = MyClassTemplates.SEQUENCE
+													.replace(MyClassTemplates.REPLACE_SEQUENCE_NAME, q.sequence_name)
+													.replace(MyClassTemplates.REPLACE_SEQUENCESTART, jsDate.toString())
+													.replace(MyClassTemplates.REPLACE_SEQUENCELEN, q.length_in_min / 60); 
+							sequnceRows += sequenceHtml;
+						});
+					}
+					classRowHtml += classHtml.replace(MyClassTemplates.REPLACE_SEQUENCE_ROWS, sequnceRows);		
 				}
-				else {
-					$( buttonId ).text("Sign up for the group");
-					$( buttonId ).click(this.handleRefill);
-				}
+				subjectRowHtml = subjectRowHtml.replace(MyClassTemplates.REPLACE_CLASS_ROWS, classRowHtml);
+				subjectRows += subjectRowHtml;
 			}
+			const html = MyClassTemplates.SECTION
+			 				.replace(MyClassTemplates.REPLACE_SUBJECT_ROWS, subjectRows);
+
+			 $(".myGroupRow").append(html);
 		}
 	}
+
+	#groupByReduce(myClassSchedules, key) {
+		return myClassSchedules.reduce((acc, currentValue) => {
+			let groupKey = currentValue[key];
+			if (!acc[groupKey]) {
+			acc[groupKey] = [];
+			}
+			acc[groupKey].push(currentValue);
+			return acc;
+		}, {});
+	}
 	
-	sortGroupByTime(group) {
-		if (group.length < 1) {
+	/*
+	sortScheduleByTime(schedule) {
+		if (schedule.length < 1) {
 			return;
 		}
 		
 		// sort by time in descending order
-		group.sort( (g1, g2) => {
+		schedule.sort( (g1, g2) => {
 			if (!g1.begin_date && !g2.begin_date) {
 				return 0;
 			}
@@ -78,8 +113,8 @@ class MyGroupPageHandler {
 			}
 			
 			// comparing date_time
-			const t1 = Date.parse(g1.begin_date + ' ' + g1.begin_time);
-			const t2 = Date.parse(g2.begin_date + ' ' + g2.begin_time);
+			const t1 = Date.parse(g1.start_time);
+			const t2 = Date.parse(g2.start_time + ' ' + g2.begin_time);
 			const tnorm1 = new Date(t1);
 			const tmorm2 = new Date(t2);
 			// side effect by setting displayable time format for the group member
@@ -96,7 +131,8 @@ class MyGroupPageHandler {
 			}
 			return 1;
 		});
-	}
+	} */
+
 	
 	/*
 	async retrieveMyGroups(t, top) {
@@ -159,9 +195,9 @@ class MyGroupPageHandler {
 		}
 		// check 
 		if (groupType == groupTypeConstants.GPT_EDU_JSP) {
-			if ( (credMan.credential.role === sysConstants.YATU_ROLE_TEACHER || 
-				  credMan.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
-				  credMan.credential.name === groupOwner ) {
+			if ( (this.credential.role === sysConstants.YATU_ROLE_TEACHER || 
+				 this.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
+				  this.credential.name === groupOwner ) {
 				// go to class room as teacher
 				window.location.href =  `./class-room-teacher.html?group=${groupId}`;
 			}
@@ -179,28 +215,11 @@ class MyGroupPageHandler {
 		// `./legacy/chat.html??group=${groupId}`;
 	}
 	
-	async handleJoining(e) {
-		e.preventDefault();
-		
-		// call remote API to apply for the membership
-		const t = this.#credMan.credential.token;
-		const btnId = $(e.target).attr('id');
-		const ret = await Net.applyForAGroup(t, StringUtil.getIdFromBtnId(btnId));
-	
-		if (ret.code == 0) {
-			alert('Pending approval...');
-		}
-		else{
-			alert('Error code： ' + ret.code);
-		}
-	}
-	
-	
 }
 
 let myGroupPageHandler = null;
 
-$( document ).ready(function() {
+$( document ).ready(async function() {
     console.log( "myGroup page ready!" );
-	myGroupPageHandler = new MyGroupPageHandler(credMan);
+	myGroupPageHandler = await MyGroupPageHandler.createMyGroupPageHandler()
 });

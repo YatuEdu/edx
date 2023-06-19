@@ -6,9 +6,7 @@ const API_FOR_SIGN_IN_WITH_NAME = 202102;
 const API_FOR_REGISTER = 202101; 
 const API_FOR_GET_ALL_MY_GROUPS = 202107;
 const API_FOR_GET_TURN_AUTH = 202130;
-
 const API_FOR_JOINING_GROUP_SESSION = 202111;
-const API_FOR_MY_GROUPS = 202115;
 const API_FOR_SUBJECT_SERIES = 202116;
 const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
 const API_GET_NOTES_FOR_SERIES = 202119;
@@ -22,7 +20,7 @@ const API_ADD_CODE = 202126;
 const API_LIST_CODE_HEADERS = 202128;
 const API_GET_CODE_TEXT = 202129;
 const API_DELETE_CODE = 202127;
-
+const API_FOR_MY_CLASS_SCHEDULES = 202144;
 const API_MEMBER_LIST_LIVE_SESSIONS = 202145; 
 const API_OWNER_LIST_CLASSES = 202146;
 const API_OWNER_START_CLASS = 202148;
@@ -124,8 +122,8 @@ class Net {
 	/**
 		Yatu API for A user to get a list of all her group info
 	**/
-	static async groupMemberGetMyGroups(token) {
-		const req = Net.composeRequestDataForMyGroups(token);
+	static async myClassSchedules(token) {
+		const req = Net.composeRequestDataForMyClassSchedules(token);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -347,7 +345,6 @@ class Net {
 		Forming Yatu API request data for EMAIL code validity test
 	**/	
 	static composeRequestDataForEmailCodeCheck(email, code) {
-		// query for the yatu token's validness
 		const emailCodeCheckReq = {
 			header: {
 				token: "",
@@ -367,7 +364,6 @@ class Net {
 		Forming Yatu API request data for GROUP MEMBER listing all LIVE SESSION at this time
 	**/	
 	static composeRequestDataForGroupMemberListLiveSessions(t) {
-			// query for the yatu token's validness
 		const emailCodeCheckReq = {
 			header: {
 				token: t,
@@ -386,7 +382,6 @@ class Net {
 		Forming Yatu API request data for GROUP OWNER start a live class
 	**/	
 	static composeRequestDataForGroupOwnerStartClass(t, clssId, seqId) {
-			// query for the yatu token's validness
 		const emailCodeCheckReq = {
 			header: {
 				token: t,
@@ -406,7 +401,6 @@ class Net {
 		Forming Yatu API request data for GROUP OWNER to stop a live class
 	**/	
 	static composeRequestDataForGroupOwnerStopClass(t, sId) {
-		// query for the yatu token's validness
 		const emailCodeCheckReq = {
 			header: {
 				token: t,
@@ -426,7 +420,6 @@ class Net {
 		Forming Yatu API request data for GROUP OWNER listing all his classes
 	**/	
 	static composeRequestDataForGroupOwnerListClasses(t) {
-			// query for the yatu token's validness
 		const emailCodeCheckReq = {
 			header: {
 				token: t,
@@ -462,11 +455,11 @@ class Net {
 	/**
 		Forming Yatu API request data for getting all my group info
 	**/	
-	static composeRequestDataForMyGroups(t) {
+	static composeRequestDataForMyClassSchedules(t) {
 		const myGroupsReq = {
 			header: {
 				token: t,
-				api_id: API_FOR_MY_GROUPS
+				api_id: API_FOR_MY_CLASS_SCHEDULES
 			},
 			data: {
 			}
