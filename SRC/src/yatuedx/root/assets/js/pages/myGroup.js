@@ -30,6 +30,14 @@ class MyGroupPageHandler extends AuthPage {
 
 		// GET my signed up classes
 		await this.retrieveMyClasses();
+
+		// Enable one "go to class" button if a live class is going on right now:
+		$(this.gotoLiveButtonClassSelector).each(this.enableGotoLiveClassButton.bind(this));
+
+		// event handler hookup
+		$(this.gotoLiveButtonClassSelector).click(this.handleEntering.bind(this));
+		$(this.sequenceDescriptionExpandClassSelector).click(this.handleSequenceDescriptionExpand.bind(this));
+		$(this.gotoExersizeBtnClassSelector).click(this.handleGotoExcersizeRm.bind(this));
 	}	
 	
 	/**
@@ -56,7 +64,9 @@ class MyGroupPageHandler extends AuthPage {
 				let classRowHtml = "";
 				for(const clss in groupByClass) {
 					const classHtml  = MyClassTemplates.CLASS
-										.replace(MyClassTemplates.REPLAC_CLASS_NAME, clss);
+										.replace(MyClassTemplates.REPLAC_CLASS_NAME, clss)
+										.replace(MyClassTemplates.REPLACE_GOTO_EXCERSICE_RM_BTN_CLASS, this.gotoExersizeBtnClass)
+										.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, 0);
 
 					const groupBySequences = this.#groupByReduce(groupByClass[clss], "sequence_id");
 					let sequnceRows = "";
@@ -67,6 +77,13 @@ class MyGroupPageHandler extends AuthPage {
 							const sequenceHtml  = MyClassTemplates.SEQUENCE
 													.replace(MyClassTemplates.REPLACE_SEQUENCE_NAME, q.sequence_name)
 													.replace(MyClassTemplates.REPLACE_SEQUENCESTART, jsDate.toString())
+													.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, q.class_id)
+													.replaceAll(MyClassTemplates.REPLACE_SEQUENCE_ID, q.sequence_id)
+													.replace(MyClassTemplates.REPLACE_SEQUENCE_DESCRPT_DIV, this.sequenceDescriptionDivId(q.sequence_id))
+													.replace(MyClassTemplates.REPLACE_SEQUENCE_DESCRPT, q.sequence_description)
+													.replace(MyClassTemplates.REPLACEMENT_SEQUENCE_DESCRPT_EXPAND_BTN_TEXT, this.getExpButtonText(true))
+													.replace(MyClassTemplates.REPLACE_SEQUENCE_DESCRPT_EXPAND_CLASS, this.sequenceDescriptionExpandClass)
+													.replace(MyClassTemplates.REPLACE_GOTO_LIVE_CLASS, this.gotoLiveButtonClass)
 													.replace(MyClassTemplates.REPLACE_SEQUENCELEN, q.length_in_min / 60); 
 							sequnceRows += sequenceHtml;
 						});
@@ -94,125 +111,113 @@ class MyGroupPageHandler extends AuthPage {
 		}, {});
 	}
 	
-	/*
-	sortScheduleByTime(schedule) {
-		if (schedule.length < 1) {
-			return;
-		}
-		
-		// sort by time in descending order
-		schedule.sort( (g1, g2) => {
-			if (!g1.begin_date && !g2.begin_date) {
-				return 0;
-			}
-			if (g1.begin_date && !g2.begin_date) {
-				return -1;
-			}
-			if (g2.begin_date && !g2.begin_date) {
-				return 1;
-			}
-			
-			// comparing date_time
-			const t1 = Date.parse(g1.start_time);
-			const t2 = Date.parse(g2.start_time + ' ' + g2.begin_time);
-			const tnorm1 = new Date(t1);
-			const tmorm2 = new Date(t2);
-			// side effect by setting displayable time format for the group member
-			g1.dt = t1.toString();
-			g2.dt = t2.toString();
-			g1.displayDate = tnorm1.toDateString();
-			g2.displayDate = tmorm2.toDateString();
-			g1.displayTime = tnorm1.toLocaleTimeString();
-			g2.displayTime = tmorm2.toLocaleTimeString();
-
-			// comparing (early first)
-			if (t1 < t2) {
-				return -1;
-			}
-			return 1;
-		});
-	} */
-
-	
-	/*
-	async retrieveMyGroups(t, top) {
-		const ret = await Net.getAllMyGroups(t, top);
-		// append new groups
-		if (ret.code === 0) {
-			for(let i = 0; i < ret.data.length; i++) {
-				const g = ret.data[i];
-				const bntId = `#card_btn_${g.secId}`;
-				$(".publicGroupRow").append(getGroupCardHtml({id: g.secId, name: g.name, type: g.type}));
-				$( bntId ).text("申请加入");
-				$( bntId ).click(this.handleJoining.bind(this));
-			}
-		}
-	}
-	*/
-	
-	handleRefill(e) {
-		e.preventDefault();
-		alert('entering:' + $(this).attr('data-grp-name') + ":" + $(this).attr('data-grp-type'));
-	}
-	
-	
 	/**
 		Enter the exercize room if applicable
 	**/
-	handleExercize(e) {
+	handleGotoExcersizeRm(e) {
 		e.preventDefault();
 		
 		// go to exercize room as student
-		const groupId = $(this).attr('data-grp-id');
-		const groupOwner = $(this).attr('data-grp-owner');
-		window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}&mode=1`;
+		const jqObject = e.target;
+		const groupId = $(jqObject).attr('data-clss-id');
+
+		// set class room mode
+		window.location.href =  `./class-room.html?group=${groupId}&teacher=any&mode=1`;
 	}
 	
 	/**
-		Enter the video chat group if applicable
+	 * Expand or shrink the sequence description.
+	 * 
+	 * @param {*} e 
+	 */
+	handleSequenceDescriptionExpand(e) {
+		e.preventDefault();
+
+		const jqObject = e.target;
+		const seqId  = parseInt($(jqObject).attr('data-seq-id'));
+		const btnTxt = $(jqObject).html();
+		if (this.getExpButtonText(true) === btnTxt) {
+			$(this.sequenceDescriptionDivSelector(seqId)).show();
+			$(jqObject).html(this.getExpButtonText(false));
+		} else {
+			$(this.sequenceDescriptionDivSelector(seqId)).hide();
+			$(jqObject).html(this.getExpButtonText(true));
+		}
+	}
+
+	/**
+		Enter live class when a live class is happening
 	**/
 	handleEntering(e) {
 		e.preventDefault();
-		
+		const target = e.target;
+
 		// retrieve group meta data
-		const groupId = $(this).attr('data-grp-id');
-		const groupName = $(this).attr('data-grp-name');
-		const groupType = $(this).attr('data-grp-type');
-		const groupOwner = $(this).attr('data-grp-owner');
-		const startTimeStr =  $(this).attr('data-grp-dt');
-		if (startTimeStr) {
-			const startTime =Number(startTimeStr);
-			// only allowed to going 10 minutes before a class starts
-			const diffInMinutes = TimeUtil.diffMinutes(Date.now(), startTime);
-			if (diffInMinutes > 10) {
-				alert("The group will be open 10 minutes before it starts");
+		const {groupId, sequenceId} = this.retrieveGroupAndSequenceId(target);
+
+		// live class is going on...
+		if (!this.liveSession ||
+			this.liveSession.group_id !== groupId ||
+			this.liveSession.sequence_id !==  sequenceId) {
+				alert("Live class is not available!");
 				return;
-			}
-			if ( diffInMinutes < -20) {
-				alert("You are too late to join this class! Try to be punctual next time.");
-				return;
-			}
 		}
-		// check 
-		if (groupType == groupTypeConstants.GPT_EDU_JSP) {
-			if ( (this.credential.role === sysConstants.YATU_ROLE_TEACHER || 
-				 this.credential.role === sysConstants.YATU_ROLE_ADMIN ) && 
-				  this.credential.name === groupOwner ) {
-				// go to class room as teacher
-				window.location.href =  `./class-room-teacher.html?group=${groupId}`;
-			}
-			else {
-				// go to class room as student
-				window.location.href =  `./class-room.html?group=${groupId}&teacher=${groupOwner}`;				
-			}
-		}
-		else {
+
+		// where to go
+		if (this.liveSession.group_type === groupTypeConstants.GPT_EDU_JSP) {
+			// go to class room as student
+			window.location.href =  `./class-room.html`;				
+		} else {
 			// go to chat page
 			window.location.href =  `./legacy/videoChat.html?group=${groupId}`; 
 		}
-								   //`./videoChat.html`;
+	}
 
-		// `./legacy/chat.html??group=${groupId}`;
+	enableGotoLiveClassButton(indx, target) {
+		const {groupId, sequenceId} = this.retrieveGroupAndSequenceId(target);
+		if (this.liveSession &&
+			this.liveSession.group_id === groupId &&
+			this.liveSession.sequence_id ===  sequenceId) {
+				$(target).prop('disabled', false);
+		} else {
+				$(target).prop('disabled', true);
+		}
+	}
+
+	/* retrieve group id and sequence id from button */
+	retrieveGroupAndSequenceId(target) {
+		const groupId = parseInt($(target).attr('data-clss-id'));
+		const sequenceId = parseInt($(target).attr('data-seq-id'));
+		return {groupId: groupId, sequenceId:sequenceId}
+
+	}
+	
+
+	/* sequence description expansion button */
+	get sequenceDescriptionExpandClass() { return "sequence-descrpt-exp"}
+	get sequenceDescriptionExpandClassSelector() { return `.${this.sequenceDescriptionExpandClass}`}
+
+	/* sequence description expansion div */
+	sequenceDescriptionDivId(seqId) { return `sequence-descrpt-div-${seqId}`}
+	sequenceDescriptionDivSelector(seqId) { 
+		return `#${this.sequenceDescriptionDivId(seqId)}`
+	}
+
+	/* go to excersize rm button */
+	get gotoExersizeBtnClass() { return 'go-to-excersize-rm'}
+	get gotoExersizeBtnClassSelector() { return `.${this.gotoExersizeBtnClass}` }
+
+	/* go to live clas room button class */
+	get gotoLiveButtonClass() { return 'go-to-live-session'}
+	get gotoLiveButtonClassSelector() { return `.${this.gotoLiveButtonClass}`}
+
+	/* dynamic button text for detail expandin button */
+	getExpButtonText(expand) {
+		if (expand) {
+			return "+";
+		}
+
+		return "-";
 	}
 	
 }

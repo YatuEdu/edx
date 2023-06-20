@@ -3359,6 +3359,13 @@ input.btn-tumblr-block[type="button"] {
   white-space: nowrap; }
   .navbar-brand:hover, .navbar-brand:focus {
     text-decoration: none; }
+  
+  button:disabled,
+  button[disabled]{
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
 
 .navbar-nav {
   display: -webkit-box;
