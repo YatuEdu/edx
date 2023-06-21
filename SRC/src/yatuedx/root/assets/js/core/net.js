@@ -15,11 +15,11 @@ const API_REGISTER_FOR_CLASS = 202121;
 const API_USER_UPDATE_NOTES=202124;
 const API_USER_GET_NOTES=202125;
 const API_SEND_CODE_TO_EMAIL=202122;
-const API_VALIDATE_EMAIL=202123; 
-const API_ADD_CODE = 202126;
-const API_LIST_CODE_HEADERS = 202128;
-const API_GET_CODE_TEXT = 202129;
+const API_VALIDATE_EMAIL = 202123; 
+const API_ADD_CODE = 202131;
 const API_DELETE_CODE = 202127;
+const API_LIST_CODE_HEADERS = 202142;
+const API_GET_CODE_TEXT = 202143;
 const API_FOR_MY_CLASS_SCHEDULES = 202144;
 const API_MEMBER_LIST_LIVE_SESSIONS = 202145; 
 const API_OWNER_LIST_CLASSES = 202146;
@@ -149,8 +149,8 @@ class Net {
 	/**
 		Yatu API for member to add code to code-depot
 	**/
-	static async memberAddCode(token, groupId, codeName, codeText, codeHash) {
-		const req = Net.composeRequestDataForMemberAddCode(token, groupId, codeName, codeText, codeHash);
+	static async memberAddCode(token, groupId, seqId, codeName, codeText, codeHash) {
+		const req = Net.composeRequestDataForMemberAddCode(token, groupId, seqId, codeName, codeText, codeHash);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -158,8 +158,8 @@ class Net {
 	/**
 		Yatu API for member to list his code from code-depot
 	**/
-	static async memberListCode(token, groupId) {
-		const req = Net.composeRequestDataForMemberListCode(token, groupId);
+	static async memberListAllCode(token) {
+		const req = Net.composeRequestDataForMemberListCode(token);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -167,8 +167,8 @@ class Net {
 	/**
 		Yatu API for member to get code text from code-depot by name
 	**/
-	static async memberGetCodeText(token, groupId, codeName) {
-		const req = Net.composeRequestDataForMemberGetCodeText(token, groupId, codeName);
+	static async memberGetCodeText(token, seqId, codeName) {
+		const req = Net.composeRequestDataForMemberGetCodeText(token, seqId, codeName);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -504,7 +504,7 @@ class Net {
 	/**
 		Forming Yatu API request data for adding code to code depot
 	**/
-	static composeRequestDataForMemberAddCode(t, groupId, codeName, codeText, codeHash) {
+	static composeRequestDataForMemberAddCode(t, groupId, seqId, codeName, codeText, codeHash) {
 		const intGroupId =  parseInt(groupId, 10);
 		const apiRequest = {
 			header: {
@@ -512,7 +512,8 @@ class Net {
 				api_id: API_ADD_CODE
 			},
 			data: {
-				groupId: intGroupId,
+				classId: intGroupId,
+				sequenceId: seqId,
 				name: codeName,
 				code: codeText,
 				hash: codeHash
@@ -524,15 +525,14 @@ class Net {
 	/**
 		Forming Yatu API request data for listing code heasers (name, hash)
 	**/
-	static composeRequestDataForMemberListCode(t, groupId) {
-		const intGroupId =  parseInt(groupId, 10);
+	static composeRequestDataForMemberListCode(t) {
 		const apiRequest = {
 			header: {
 				token: t,
 				api_id: API_LIST_CODE_HEADERS
 			},
 			data: {
-				groupId: intGroupId
+				sequenceId: null
 			}
 		};
 		return Net.composePostRequestFromData_private(apiRequest);
@@ -541,15 +541,14 @@ class Net {
 	/**
 		Forming Yatu API request data for get code text
 	**/
-	static composeRequestDataForMemberGetCodeText(t, groupId, codeName) {
-		const intGroupId =  parseInt(groupId, 10);
+	static composeRequestDataForMemberGetCodeText(t, seqId, codeName) {
 		const apiRequest = {
 			header: {
 				token: t,
 				api_id: API_GET_CODE_TEXT
 			},
 			data: {
-				groupId: intGroupId,
+				sequenceId: seqId,
 				name: codeName
 			}
 		};

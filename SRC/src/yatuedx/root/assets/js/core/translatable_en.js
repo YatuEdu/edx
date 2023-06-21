@@ -9,7 +9,7 @@ const translationMapEn =
 			 [languageConstants.SIGNIN_NAME_NEEDED, 'Name cannot be empty'],
 			 [languageConstants.SIGNIN_PW_NOT_IDENTICAL, 'Passwords must be the same'],
 			 [languageConstants.SIGNUP_TNA_NEEDED, 'Terms and agreement need to be checked!'],
-			 [languageConstants.SIGNIN_NAME_INVALID_CHAR, 'Login name can only contan lower case alphanumeric, underscore, and space.'], 			 
+			 [languageConstants.SIGNIN_NAME_INVALID_CHAR, 'Login name can only contain alphabetic characters with minimum length of 4 and maximum length of 10, without any whitespace or special characters in it.'], 			 
 			 [languageConstants.SIGNUP_EMAIL_NEEDED, 'Email cannot be empty'],
 			 [languageConstants.SIGNIN_PW_NEEDED, 'Password cannot be empty'], 
 			 [languageConstants.SERVER_UNEXPECTED_ERR, 'Yatu service encounted an error. We are sorry for your inconvinience.  Please try later!'],

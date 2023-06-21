@@ -1,8 +1,8 @@
-import {sysConstants, languageConstants, groupTypeConstants} from '../core/sysConst.js'
-import {AuthPage} 						 from '../core/authPage.js'
-import {Net}                             from '../core/net.js';
-import {MyClassTemplates}				 from '../component/groupCard.js';
-import {TimeUtil,StringUtil,PageUtil}	 from '../core/util.js';
+import {groupTypeConstants, sysConstants} 	from '../core/sysConst.js'
+import {AuthPage} 				from '../core/authPage.js'
+import {Net}                    from '../core/net.js';
+import {MyClassTemplates}		from '../component/groupCard.js';
+
 
 /**
 	This class manages all classesd the user belongs to
@@ -60,15 +60,18 @@ class MyGroupPageHandler extends AuthPage {
 				const classList = groupBySubjectSchedules[subject];
 
 				// group by class names
-				const groupByClass = this.#groupByReduce(classList, "class_name");
+				const groupByClass = this.#groupByReduce(classList, "class_id");
 				let classRowHtml = "";
-				for(const clss in groupByClass) {
+				for(const clssId in groupByClass) {
+					const currentClassList = groupByClass[clssId];
+					const defaultSequenceIdForExercise = currentClassList[0].sequence_id;
 					const classHtml  = MyClassTemplates.CLASS
-										.replace(MyClassTemplates.REPLAC_CLASS_NAME, clss)
+										.replace(MyClassTemplates.REPLAC_CLASS_NAME, currentClassList[0].class_name)
 										.replace(MyClassTemplates.REPLACE_GOTO_EXCERSICE_RM_BTN_CLASS, this.gotoExersizeBtnClass)
-										.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, 0);
+										.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, clssId)
+										.replaceAll(MyClassTemplates.REPLACE_SEQUENCE_ID, defaultSequenceIdForExercise)
 
-					const groupBySequences = this.#groupByReduce(groupByClass[clss], "sequence_id");
+					const groupBySequences = this.#groupByReduce(currentClassList, "sequence_id");
 					let sequnceRows = "";
 					for(const seq in groupBySequences) {
 						const sequenceList = groupBySequences[seq];
@@ -120,9 +123,11 @@ class MyGroupPageHandler extends AuthPage {
 		// go to exercize room as student
 		const jqObject = e.target;
 		const groupId = $(jqObject).attr('data-clss-id');
+		const seqId = $(jqObject).attr('data-seq-id');
 
 		// set class room mode
-		window.location.href =  `./class-room.html?group=${groupId}&teacher=any&mode=1`;
+		window.location.href 
+		=  `./class-room.html?${sysConstants.UPN_GROUP}=${groupId}&${sysConstants.UPN_SEQUENCE}=${seqId}&${sysConstants.UPN_TEACHER}=any&mode=1`;
 	}
 	
 	/**

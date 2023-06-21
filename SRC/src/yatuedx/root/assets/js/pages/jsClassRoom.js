@@ -69,6 +69,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#tabIndex;
 	#codeManContainer;
 	#codeInputConsoleComponent;
+	#groupId;
+	#sequenceId;
+
 
 	/* 
 	 static facotry method for JSClassRoom to assure that it calls its
@@ -102,25 +105,31 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const paramMap = PageUtil.getUrlParameterMap();
 		const modeStr = paramMap.get(sysConstants.UPN_MODE);
 		const mode = modeStr ? parseInt(modeStr, 10) : 0;
-		
+		const groupStr = paramMap.get(sysConstants.UPN_GROUP);
+		const sequenceStr = paramMap.get(sysConstants.UPN_SEQUENCE);
 		if (mode && mode === 1) {
+			if (!groupStr) {
+				alert('Invalid URL.  You probably have no privilge to access this page!');
+				return;
+			}
 			// Do not show video if we are only doing excersize
 			$(this.columnVideoAreaSelector).hide();
 			$(this.columnCodingAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
 			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
-
-			
+			this.#groupId = parseInt(groupStr);	
+			this.#sequenceId = parseInt(sequenceStr);
 		} else {
 			// show video if we are in class mode	
 			this.#displayBoardForCoding = 
 				await DisplayBoardForCoding.createDisplayBoardForCoding(
 													this.liveSession, 
 													this);
-		
+				this.#groupId = this.liveSession.group_id;
+				this.#sequenceId = this.liveSession.sequence_id;
 		}
 		
 		// itialize code manager
-		this.initCodeDepot();
+		await this.initCodeDepot();
 		
 		// initialize code editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(
@@ -179,39 +188,41 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Load notes from data base
 	 **/
 	async initCodeDepot() {
-		const resp = await Net.memberListCode(credMan.credential.token, this.liveSession.groupId);
+		const codeDataList = [];
+		const resp = await Net.memberListAllCode(credMan.credential.token);
 		if (resp.data.length > 0) {
 			let first = true;
-			const codeDataList = [];
+			
 			resp.data.forEach(codeHeader => {
-				const codeEntry = {name: codeHeader.name, hash: codeHeader.hash};
+				const codeEntry = {sequence_id: codeHeader.sequence_id, name: codeHeader.name, hash: codeHeader.hash};
 				codeDataList.push(codeEntry);
 				
 				// the first entry is selected by default
 				if (first) {
 					// insert code to the code text area
-					codeEntry.text = this.getCodeFor(codeHeader.name);
+					codeEntry.text = this.getCodeFor(codeHeader.sequence_id, codeHeader.name);
 					first = false;
 				}
 			});
-			
-			this.#codeManContainer = new CodeManContainer(
-					'', 
-					'CODEManger', 
-					'yt_div_code_manager',
-					YT_TA_CODE_BOARD_ID,
-					codeDataList,
-					this.getCodeFor.bind(this),
-					this.updateCodeToDb.bind(this),
-					"tbd", 0);
 		}
+		this.#codeManContainer = new CodeManContainer(
+			'', 
+			'CODEManger', 
+			'yt_div_code_manager',
+			YT_TA_CODE_BOARD_ID,
+			codeDataList,
+			this.getCodeFor.bind(this),
+			this.updateCodeToDb.bind(this),
+			"tbd", 0);
 	}
 	
-	async getCodeFor(codeName) {
+	async getCodeFor(seqId, codeName) {
 		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
-														 this.liveSession.groupId, 
+														 seqId, 
 														 codeName);
-		return respCodeText.data[0].text;
+		if (respCodeText.code === 0) {
+			return respCodeText.data[0].text;
+		}
 	}
 	
 	/*
@@ -262,7 +273,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async updateCodeToDb(codeName, codeText) {
 		const codeHash = StringUtil.getMessageDigest(codeText);
 		const resp = await Net.memberAddCode(credMan.credential.token, 
-											 this.liveSession.groupId, 
+											 this.#groupId,
+											 this.#sequenceId,
 											 codeName, 
 											 codeText, codeHash);
 		return resp;
@@ -605,12 +617,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		}
 		
-		// todo: add code to code list
-		
-		//const noteTxt = $(this.notesTextArea).val();
-		//const newNotes = codeTxt + '\n' + noteTxt;
-		//$(this.notesTextArea).val(newNotes);
-		//this.prv_saveNotesToDb();
 		// switch tab to notes:
 		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_NOTES_CONSOLE);
 		this.prv_toggleTab(ti);
@@ -627,7 +633,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async prv_saveNotesToDb() {
 		const noteTxt = $(this.notesTextArea).val();
 		if (!StringUtil.testEqual(this.#notes, noteTxt)) {
-			await Net.userUpdateClassNotes(credMan.credential.token, this.liveSession.groupId, noteTxt);
+			await Net.userUpdateClassNotes(credMan.credential.token, this.#groupId, noteTxt);
 			this.#notes=noteTxt;
 			console.log("saved: " + this.#notes);
 		}

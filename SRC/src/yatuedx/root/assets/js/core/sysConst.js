@@ -35,6 +35,7 @@ const sysConstants = Object.freeze({
 	
 	// URL param name:
 	UPN_GROUP: 		'group',
+	UPN_SEQUENCE: 	'sequence',
 	UPN_TEACHER: 	'teacher',
 	UPN_EMAIL:		'email',
 	UPN_NAME: 		'name',

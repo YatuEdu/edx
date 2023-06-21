@@ -19,7 +19,7 @@ const CLASS_TEMPLATE_ROW = `
 		<div class="col-4 text-right text-black">
 			<button class="btn btn-outline-primary translatable {gotoexerm}" 
 				data-clss-id="{grpid}" 
-				data-seq-id="{seqid}" id="{exebtnid}">Do exercise</button>
+				data-seq-id="{seqid}" title="Show or hide class description details">Do exercise</button>
 		</div>
 	</div>
 	{seqrows}
