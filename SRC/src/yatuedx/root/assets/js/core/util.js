@@ -253,7 +253,7 @@ class StringUtil {
 }
 
 class RegexUtil {
-	static YATU_NAME_REGEX = /^[A-Za-z][A-Za-z0-9_]+$/;
+	static YATU_NAME_REGEX = /^[a-zA-Z]{4,10}$/;
 	static NUMBER_REGEX =  /^[\+\-]?\d*\.?\d+(?:[Ee][\+\-]?\d+)?$/;
 	static ALPGANUMERIC_REXP = /^[a-z0-9]+$/;
 	
