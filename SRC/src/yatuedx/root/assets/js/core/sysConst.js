@@ -3,6 +3,7 @@ const sysConstants = Object.freeze({
 	YATU_CRED_STORE_KEY: "yatu_cred_store_8838",
 	YATU_OWNER_STORE_KEY: "yatu_owner_store_8838",
 	YATU_CHAT_GROUP_STORE_KEY: "yatu_chat_group_store_8838",
+	YATU_MY_CODE_STORE_KEY: "yatu_my_code_store_8838",
 
 	YATU_AUTH_URL: "https://rtc.4thspace.cn/bfwk-privilege-management",
 	YATU_SOCKET_URL: "wss://rtc.4thspace.cn/websocket",

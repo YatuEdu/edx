@@ -1,11 +1,9 @@
 import {sysConstants, sysConstStrings, uiConstants} from '../core/sysConst.js'
 import {credMan} 									from '../core/credMan.js'
-import {uiMan} 										from '../core/uiManager.js';
 import {DisplayBoardForCoding}						from '../component/displayBoardForCoding.js'
-import {JSCodeExecutioner}							from '../component/jsCodeExecutioner.js'
+import {LocalStoreAccess}							from '../core/localStorage.js'
 import {PTCC_COMMANDS}								from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}					from './programmingClassCommandUI.js'
-import {IncomingCommand}							from '../command/incomingCommand.js'
 import {PageUtil, StringUtil, RegexUtil, UtilConst}	from '../core/util.js';
 import {Net}			    						from "../core/net.js"
 import {CodeManContainer}							from '../component/new/codeManager.js'
@@ -19,6 +17,8 @@ const YT_DIV_CODE_EDITOR					= "yt_div_code_editor";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
+const YT_BTN_PUBLISH_WEB 					= 'yt_btn_publish_web_from_board';
+const YT_BTN_PREVIEW_WEB 					= 'yt_btn_run_web_from_board';
 const YT_BTN_FORMAT_CODE_ID 				= 'yt_btn_format_code';
 const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
@@ -71,7 +71,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	#codeInputConsoleComponent;
 	#groupId;
 	#sequenceId;
-
+	#codeStore;
 
 	/* 
 	 static facotry method for JSClassRoom to assure that it calls its
@@ -85,6 +85,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
     constructor() {
 		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
+		this.#codeStore =  new LocalStoreAccess(sysConstants.YATU_MY_CODE_STORE_KEY);
 	}
 	
 	// hook up events
@@ -152,6 +153,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
+		// handling code preview and publishing function
+		$(this.publishWebButtonSelector).click(this.handleWebPublishing.bind(this));
+		$(this.previewhWebButtonSelector).click(this.handleWebPreviewing.bind(this));
 		// handle format Code
 		$(this.formatCodeButton).click(this.handleCodeFormatting.bind(this));
 		// handle copy code to notes
@@ -200,7 +204,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 				// the first entry is selected by default
 				if (first) {
 					// insert code to the code text area
-					codeEntry.text = this.getCodeFor(codeHeader.sequence_id, codeHeader.name);
+					codeEntry.text = this.getCodeFor(codeHeader.name);
 					first = false;
 				}
 			});
@@ -213,17 +217,30 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			codeDataList,
 			this.getCodeFor.bind(this),
 			this.updateCodeToDb.bind(this),
+			this.deleteCodeFor.bind(this),
 			"tbd", 0);
 	}
 	
-	async getCodeFor(seqId, codeName) {
+	async getCodeFor(codeName) {
 		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
-														 seqId, 
+														 0, 
 														 codeName);
 		if (respCodeText.code === 0) {
-			return respCodeText.data[0].text;
+			return StringUtil.decodeText(respCodeText.data[0].text);
 		}
 	}
+
+	async deleteCodeFor(codeName) {
+		const resp = await Net.memberDeleteCode(credMan.credential.token,
+												0, codeName);
+		if (resp.code === 0) {
+			alert(`Code block with name '${codeName}'' has been deleted!`)
+		} else {
+			alert(`Deleting code block '${codeName}'' has failed!`)
+		}
+		return resp.code;
+	}
+	
 	
 	/*
 		Save user's code to his code depot in DB.  
@@ -239,7 +256,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		}
 		
-		if (!RegexUtil.isValidYatuName(codeName)) {
+		if (!RegexUtil.isValidCodeName(codeName)) {
 			alert("Code name must start with an alphabet and contains only alphanumeric chars without space or special chars!");
 			return;
 		}
@@ -258,10 +275,13 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		} 
 		
-		const resp = await this.updateCodeToDb(codeName, codeText);
-		if (resp.err) {
-			alert("Error encountered: error code:" +  resp.err);
+		// encode text for safety and viewbility
+		const encodedCodeText = StringUtil.encodeText(codeText);
+		const resp = await this.updateCodeToDb(codeHash, codeName, encodedCodeText);
+		if (resp.code) {
+			alert("Error encountered: error code:" +  resp.code);
 		} else {
+			alert("Code added to your depot:");
 			// add code to our code manager
 			this.#codeManContainer.addCodeEntry(codeName, codeHash, codeText);
 		}
@@ -270,8 +290,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.codeSaveDialogSelector).dialog("close");
 	}
 	
-	async updateCodeToDb(codeName, codeText) {
-		const codeHash = StringUtil.getMessageDigest(codeText);
+	async updateCodeToDb(codeHash, codeName, codeText) {
 		const resp = await Net.memberAddCode(credMan.credential.token, 
 											 this.#groupId,
 											 this.#sequenceId,
@@ -608,6 +627,29 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
+		Hnandle publishing html code to db and load the content from student page
+	**/
+	handleWebPublishing(e) {
+		e.preventDefault();
+
+	}
+
+	handleWebPreviewing(e) {
+		// convert code to base64 string
+		const codeTxt = $(this.codeBoardTextArea).val();
+		if (!codeTxt) {
+			return;
+		}
+
+		// stash the code to storage for later use
+		this.#codeStore.setItem(StringUtil.encodeText(codeTxt));
+	
+		// go to the test page
+		const studentUrl = './assets/student/index.html';
+		window.open(studentUrl, '_blank');
+	}
+
+	/**
 		Hnandle copy code to from code console to memory and eventually save to DB
 	**/
 	handleCopyAndSaveCodeToDb(e) {
@@ -736,6 +778,14 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	get runCodeButton() {
 		return `#${YT_BTN_RUN_CODE_ID}`;
+	}
+	
+	get publishWebButtonSelector() {
+		return `#${YT_BTN_PUBLISH_WEB}`;
+	}
+
+	get previewhWebButtonSelector() {
+		return `#${YT_BTN_PREVIEW_WEB}`;
 	}
 	
 	get formatCodeButton() {
