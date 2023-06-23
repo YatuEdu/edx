@@ -141,6 +141,14 @@ class StringUtil {
 		return {flag: UtilConst.STR_CHANGE_MIDDLE, delta: deltaStr, begin: begin, end: oldLen-rearLen };
 	}
 
+	static encodeText(txt) {
+		return btoa(txt);
+	}
+
+	static decodeText(txt) {
+		return atob(txt);
+	}
+
 	static testEqual(str1, str2)  {
 		const len1 = str1.length;
 		const len2 = str2.length;
@@ -254,6 +262,7 @@ class StringUtil {
 
 class RegexUtil {
 	static YATU_NAME_REGEX = /^[a-zA-Z]{4,10}$/;
+	static YATU_CODE_NAME_REGEX =/^[a-zA-Z]+[a-zA-Z0-9]*$/;
 	static NUMBER_REGEX =  /^[\+\-]?\d*\.?\d+(?:[Ee][\+\-]?\d+)?$/;
 	static ALPGANUMERIC_REXP = /^[a-z0-9]+$/;
 	
@@ -262,6 +271,13 @@ class RegexUtil {
 	*/
 	static isValidYatuName(name) {
 		return RegexUtil.YATU_NAME_REGEX.test(name);
+	}
+
+	/*
+		yatu name must be alphabet and digit only
+	*/
+	static isValidCodeName(name) {
+		return RegexUtil.YATU_CODE_NAME_REGEX.test(name);
 	}
 	
 	/*

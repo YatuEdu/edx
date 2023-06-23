@@ -63,11 +63,13 @@ const CODE_LIST_LINK_PREFIX = 'yt_code_list_link_';
 **/
 class CodeEntry {
 	#name;
+	#sequenceId;
 	#text;
 	#hash;
 	
-	constructor(name, hash, text) {
+	constructor(name, seqId, hash, text) {
 		this.#name = name;
+		this.#sequenceId = seqId;
 		this.#hash = hash;
 		this.#text =  text;
 	}
@@ -76,6 +78,10 @@ class CodeEntry {
 		return this.#name;
 	}
 	
+	get sequenceId() {
+		return this.#sequenceId;
+	}
+
 	get text() {
 		return this.#text;
 	}
@@ -110,6 +116,7 @@ class CodeMan {
 			this.#codeMapByName.set(e.name, ce);
 		});
 	}
+
 	
 	// add new code or updating existing code hash or text
 	addCodeEntry(codeEntry) {
@@ -139,6 +146,14 @@ class CodeMan {
 			entry.hash = hsh;
 		}
 	}
+
+	// delete code entry
+	deleteCodeEntry(name) {
+		const entry = this.#codeMapByName.get(name);
+		if (entry) {
+			this.#codeMapByName.delete(name);
+		}
+	}
 }
 
 /**
@@ -148,6 +163,8 @@ class CodeManContainer extends ComponentBase {
 	#codeMan;
 	#getCodeFromDbMethod;
 	#updateCodeToDbMethod;
+	#deleteCodeFromDbMethod;		
+	;
 	#selectedCodeName;
 	#codeInoputBoardId;
 	
@@ -157,7 +174,8 @@ class CodeManContainer extends ComponentBase {
 				codeInoputBoardId,
 				codeDataList, 
 				getCodeFromDbMethod,
-				updateCodeToDbMethod,				
+				updateCodeToDbMethod,	
+				deleteCodeFromDbMethod,			
 				userName, group) {
 		super(id, name, parentId, "", MY_CSS);
 		this.#codeInoputBoardId = codeInoputBoardId;
@@ -178,6 +196,9 @@ class CodeManContainer extends ComponentBase {
 		
 		// call this function to update code by name
 		this.#updateCodeToDbMethod = updateCodeToDbMethod;
+
+		// call this function to delete code by name
+		this.#deleteCodeFromDbMethod = deleteCodeFromDbMethod;
 	}
 	
 	
@@ -242,8 +263,21 @@ class CodeManContainer extends ComponentBase {
 		}
 	}
 	
-	handleDeleteCode(e) {
-		alert('Are you sure you want to delete the code permanantly from code depot?');
+	async handleDeleteCode(e) {
+		const deleteCode = confirm('Are you sure you want to delete the code permanantly from code depot?');
+		if (!deleteCode) {
+			return
+		}
+
+		const codeName = this.prv_getCodeNameFromEvent(e);
+		// only react to selected code entry
+		if (this.#selectedCodeName == codeName) {
+			// delete code from depot and DB
+			await this.#deleteCodeFromDbMethod(codeName);
+
+			// delete code entry from UI
+			$(this.getCodeListLinkSelector(codeName)).remove();
+		}
 	}
 	
 	async handleUpdateCode(e) {

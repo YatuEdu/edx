@@ -17,7 +17,7 @@ const API_USER_GET_NOTES=202125;
 const API_SEND_CODE_TO_EMAIL=202122;
 const API_VALIDATE_EMAIL = 202123; 
 const API_ADD_CODE = 202131;
-const API_DELETE_CODE = 202127;
+const API_DELETE_CODE = 202141;
 const API_LIST_CODE_HEADERS = 202142;
 const API_GET_CODE_TEXT = 202143;
 const API_FOR_MY_CLASS_SCHEDULES = 202144;
@@ -176,8 +176,8 @@ class Net {
 	/**
 		Yatu API for member to delete code from code-depot by name
 	**/
-	static async memberDeleteCode(token, groupId, codeName) {
-		const req = Net.composeRequestDataForMemberDeleteCode(token, groupId, codeName);
+	static async memberDeleteCode(token, seqId, codeName) {
+		const req = Net.composeRequestDataForMemberDeleteCode(token, seqId, codeName);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -558,15 +558,14 @@ class Net {
 	/**
 		Forming Yatu API request data for deleting code by name
 	**/
-	static composeRequestDataForMemberDeleteCode(t, groupId, codeName) {
-		const intGroupId =  parseInt(groupId, 10);
+	static composeRequestDataForMemberDeleteCode(t, seqId, codeName) {
 		const apiRequest = {
 			header: {
 				token: t,
 				api_id: API_DELETE_CODE
 			},
 			data: {
-				groupId: intGroupId,
+				sequenceId: seqId,
 				name: codeName
 			}
 		};
