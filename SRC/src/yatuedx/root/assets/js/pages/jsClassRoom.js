@@ -24,7 +24,6 @@ const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
 const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
-const YT_BTN_MSG_SEND						= 'yt_btn_msg_send';
 const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
 const VD_VIEDO_AREA 						= "yt_video_area";	
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
@@ -48,11 +47,11 @@ const CSS_CODING_COL_WITHOUT_VIDEO = 'col-12';
 
 const TAB_LIST = [
 	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER] },
-	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID, YT_BTN_MSG_SEND] },
+	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID] },
 ];
 
 const MIN_CODE_LENGTH = 16;
-const MSG_TAB_INDX = 2;
+const MSG_TAB_INDX = 1;
 const USER_VIDEO_AREA = uiConstants.VIDEO_AREA_ID;
 const USER_VIDEO_ID_TEMPLATE = uiConstants.VIDEO_ID_TEMPLATE;
 	
@@ -168,8 +167,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to msg
 		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
-		// handle sending message to teacher
-		$(this.sendMsgButon).click(this.handleSendMessage.bind(this));
+		// handle sending message to teacher by 'return key'
+		$(this.messageBoardInputSlector).keydown(this.handleSendMessage.bind(this));
 		// handle message indicator clicking
 		$(this.messageIndicatorBtnSelector).click(this.toggleToMegTab.bind(this));
 		// handle save code to DB
@@ -386,7 +385,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			this.#tabIndex = ti;
 		}
 		// scroll to bottom so we can see the bottom panel better
-		$(window).scrollTop(300);
+		$("html, body").animate({
+			scrollTop: $(
+			  'html, body').get(0).scrollHeight
+		}, 2000);
 	}
 	
 	/**
@@ -496,20 +498,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		selector.removeClass(CSS_MSG_BOX_NO_MSG);
 		selector.addClass(CSS_MSG_BOX_WITH_MSG);
 		selector.prop('title', 'your have new messages');
-	}
-	
-	/**
-		Display messages from peers on message board
-	**/
-	displayMessage(msgTxt, sender) {
-		if (msgTxt) {
-			// prepend to the old messages
-			const displayMsg = `from ${sender}: ${msgTxt}\n`;
-			$(this.msgTextArea).val(displayMsg);
-			return true;
-		}
-		
-		return false;
 	}
 	
 	/**
@@ -697,22 +685,45 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.resultConsoleControl).val(sysConstStrings.EMPTY);
 	}
 	
-	/*
-		Send message button clicked and send message to techer.
-	 */
-	handleSendMessage(e) {
-		e.preventDefault();
-		
-		// 1. get the message
-		const outgoingMsg = $(this.messageInputTa).val();
-		
-		if (outgoingMsg) {
-			// 2. send to teacher
-			this.#displayBoardForCoding.sendMsgToTeacher(outgoingMsg);
-			// 3. erase the message (so that it does not linger)
-			$(this.messageInputTa).val("");
+	/**
+		Display messages from peers on message board
+	**/
+	displayMessage(msgTxt, sender) {
+		if (msgTxt) {
+			// prepend to the old messages
+			const oldMsg = $(this.msgTextArea).val();
+			const newMsg = `${sender}: ${msgTxt}\n`;
+			$(this.msgTextArea).val(newMsg + oldMsg);
+			return true;
 		}
 		
+		return false;
+	}
+
+	/*
+		Send message button clicked and send message to techer. This only works during live class
+	 */
+	handleSendMessage(e) {
+		if (!this.#displayBoardForCoding) {
+			alert('Teacher is not on-line now');
+			return;
+		}
+
+		if(this.#displayBoardForCoding && e.which===13){ 
+			const outgoingMsg = $(e.target).val();
+
+			// send message to teacher (so far we only allow messages between student and teacher)
+			this.#displayBoardForCoding.sendMsgToTeacher(outgoingMsg);
+
+			// display my message as well
+			this.displayMessage(outgoingMsg, "\t" + "me");
+			// clear sent messages:
+			$(e.target).val("");
+
+			// prevent "enter"" to be populated and handled further
+			e.stopPropagation();
+			e.preventDefault(); 			
+		}
 	}
 	
 	get #isInTeachingMode() {
@@ -829,11 +840,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return `#${YT_TA_MSG_ID}`;
 	}
 	
-	get sendMsgButon() {
-		return `#${YT_BTN_MSG_SEND}`;
-	}
-	
-	get messageInputTa() {
+	get messageBoardInputSlector() {
 		return `#${YT_TA_MSG_INPUT_ID}`;
 	}
 	
