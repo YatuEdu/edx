@@ -233,11 +233,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	async deleteCodeFor(codeName) {
 		const resp = await Net.memberDeleteCode(credMan.credential.token,
 												0, codeName);
-		if (resp.code === 0) {
-			alert(`Code block with name '${codeName}'' has been deleted!`)
-		} else {
-			alert(`Deleting code block '${codeName}'' has failed!`)
-		}
 		return resp.code;
 	}
 	
@@ -267,7 +262,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		}
 		
-		const codeHash = StringUtil.getMessageDigest(codeText);
 		const existingCodeEntry = this.#codeManContainer.getCodeEntry(codeName);
 		if (existingCodeEntry) {
 			// do you want to update existing code in db?
@@ -275,27 +269,29 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			return;
 		} 
 		
-		// encode text for safety and viewbility
-		const encodedCodeText = StringUtil.encodeText(codeText);
-		const resp = await this.updateCodeToDb(codeHash, codeName, encodedCodeText);
+		const resp = await this.updateCodeToDb(codeName, codeText);
 		if (resp.code) {
 			alert("Error encountered: error code:" +  resp.code);
 		} else {
 			alert("Code added to your depot:");
 			// add code to our code manager
-			this.#codeManContainer.addCodeEntry(codeName, codeHash, codeText);
+			this.#codeManContainer.addCodeEntry(codeName, codeText);
 		}
 		
 		//close dialog box:
 		$(this.codeSaveDialogSelector).dialog("close");
 	}
 	
-	async updateCodeToDb(codeHash, codeName, codeText) {
+	async updateCodeToDb(codeName, codeText) {
+		// encode text for safety and viewbility
+		const codeHash = StringUtil.getMessageDigest(codeText);
+		const encodedCodeText = StringUtil.encodeText(codeText);
 		const resp = await Net.memberAddCode(credMan.credential.token, 
 											 this.#groupId,
 											 this.#sequenceId,
 											 codeName, 
-											 codeText, codeHash);
+											 encodedCodeText, 
+											 codeHash);
 		return resp;
 	}
 	

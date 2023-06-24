@@ -206,7 +206,8 @@ class CodeManContainer extends ComponentBase {
 		public methods
 	*/
 	
-	addCodeEntry(codeName, codeHash, codeText) {
+	addCodeEntry(codeName, codeText) {
+		const codeHash = StringUtil.getMessageDigest(codeText);
 		const codeEntry = new CodeEntry(codeName, codeHash, codeText);
 		if (this.#codeMan.addCodeEntry(codeEntry)) {
 			// added a new code entry to the list
@@ -264,18 +265,24 @@ class CodeManContainer extends ComponentBase {
 	}
 	
 	async handleDeleteCode(e) {
-		const deleteCode = confirm('Are you sure you want to delete the code permanantly from code depot?');
+		const codeName = this.prv_getCodeNameFromEvent(e);
+		const deleteCode = confirm(`Are you sure you want to delete "${codeName}" code block permanantly from your code depot?`);
 		if (!deleteCode) {
 			return
 		}
 
-		const codeName = this.prv_getCodeNameFromEvent(e);
 		// only react to selected code entry
 		if (this.#selectedCodeName == codeName) {
 			// delete code from depot and DB
-			await this.#deleteCodeFromDbMethod(codeName);
+			const result = await this.#deleteCodeFromDbMethod(codeName);
+			if (result === 0) {
+				alert(`Code block with name "${codeName}" has been deleted!`)
+			} else {
+				alert(`Deleting code block "${codeName}" has failed!`)
+			}
 
 			// delete code entry from UI
+			$(this.getCodeListLinkSelector(codeName)).empty();
 			$(this.getCodeListLinkSelector(codeName)).remove();
 		}
 	}
@@ -289,13 +296,15 @@ class CodeManContainer extends ComponentBase {
 			if (uiText != depotText) {
 				// update depot DB
 				const resp = await this.#updateCodeToDbMethod(codeName, uiText);
-				if (resp.err) {
-					alert("Error encountered during updating code to DB. Error code:" +  resp.err);
+				if (resp.code) {
+					alert("Error encountered during updating code to DB. Error code:" +  resp.code);
 				} else {
 					// updater manager
 					this.#codeMan.updateCodeEntry(codeName, uiText, StringUtil.getMessageDigest(uiText));
 					alert(`Code "${codeName}" successfully updated!`);
 				}
+			} else {
+				alert(`Code "${codeName}" has not been changed.`);
 			}
 		}
 	}
