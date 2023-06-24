@@ -16,6 +16,7 @@ const DIV_STUDENT_AREA_ID 				= "yt_div_student_area_";
 const DIV_STUDENT_MSG_BOARD 			= "yt_div_students_area";
 const DIV_MSG_RECEIVER_SEL  			= "yt_div_msg_receiver_select";
 const TA_NOTES							= "yt_txt_notes_console";
+const YT_BTN_MSG_SEND					= 'yt_btn_msg_send';
 const BTN_SAVE_NOTES					= "yt_btn_save_notes";
 const BTN_SYNC_BOARD 					= "yt_btn_sync_board"; 
 const BTN_MODE_CHANGE 					= 'yt_btn_switch_mode';
@@ -783,6 +784,11 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	// MESSAGE RECEIVER dropdown
 	get msgReceiverDropdown() {
 		return `#${SEL_MSG_RECEIVER} option:selected`; 
+	}
+
+	// selector for message sending button
+	get sendMsgButonSelector() {
+		return `#${YT_BTN_MSG_SEND}`;
 	}
 	
 }

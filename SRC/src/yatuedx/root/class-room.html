@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <title>Yatu Classroom</title>
+    <link rel="shortcut icon" href="assets/images/dynamic/ck.png" type="image/x-icon">
+    <title>My Classroom</title>
     <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
     <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
     <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
@@ -93,20 +93,24 @@
 						</div>
 						<div id="yt_div_code_manager" data-type="ytComponent" style="display:block">	
 						</div>
-						 <textarea readonly class="msg-board"
-						  style="display:none"
-						  id="yt_ta_msg" 
-						  spellcheck="trye" 
-						  placeholder="Received messages"
-						  rows="20"></textarea>
+						<div class="row mb-0">
+							<div class="col-12 tool-tbtn-dimention-left">
+								<textarea readonly class="msg-board"
+								style="display:none"
+								id="yt_ta_msg" 
+								spellcheck="trye" 
+								placeholder="Received messages"
+								rows="10"></textarea>
+							</div>
+						</div>
 						<div class="row mb-0">
 							<div class="col-12 tool-tbtn-dimention-left">
 								<textarea class="msg-board"
-								  style="display:none"
+								  style="display:none; height: 100%;"
 								  id="yt_ta_msg_input" 
 								  spellcheck="trye" 
 								  placeholder="Enter your messages"
-								  rows="3"></textarea>	
+								  rows="2"></textarea>	
 							</div>
 						</div>
 					</div>
@@ -114,6 +118,18 @@
 			</div>
         </article>
     </main>
+
+	<footer class="up-common-footer">
+        <div class="container">
+            <nav class="nav footer-social-nav justify-content-center">
+                <a href="#" class="nav-link social-link-facebook"> <i class="mdi mdi-facebook"></i> </a>
+                <a href="#" class="nav-link social-link-twitter"> <i class="mdi mdi-twitter"></i> </a>
+                <a href="#" class="nav-link social-link-behance"> <i class="mdi mdi-behance"></i> </a>
+                <a href="#" class="nav-link social-link-dribbble"> <i class="mdi mdi-dribbble"></i> </a>
+            </nav>
+			<p class="footer-text text-center">©2022 This page is protected by Yatu Corp. and is subject to the Google Privacy Policy and Terms of Service.</p>
+        </div>
+    </footer>
 	
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>

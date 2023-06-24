@@ -9110,9 +9110,9 @@ button:focus, .btn:focus {
       font-size: 18px; }
 
 .up-common-footer {
-  background-color: #001731;
-  padding-top: 110px;
-  padding-bottom: 75px; }
+  background-color: #00ffff;
+  padding-top: 20px;
+  padding-bottom: 30px; }
   .up-common-footer .nav-link {
     color: #575d78;
     -webkit-transition: color 0.2s ease;
