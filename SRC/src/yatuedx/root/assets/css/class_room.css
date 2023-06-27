@@ -12,6 +12,13 @@
 	line-height: 30px;
 }
 
+.front-page-text {
+	color: #737782 !important;
+	font-weight: 300 !important;
+	font-family: Inter, Helvetica, Arial, sans-serif !important;
+	font-size: 20px !important;
+}
+
 .blob-comment {
 	width: 10%;
 	min-width: 150px;
@@ -382,7 +389,7 @@
 .yt-video-area {
 	background-repeat:no-repeat;
 	background-size:contain;
-	height:200px;
+	height:100%;
 	width:500px;;
 	background-image: url('../images/dynamic/empty-avatar.png') !important;
 	border:outset 4px orange;
@@ -393,8 +400,9 @@
 }
 
 .yt-video-max {
-	position:relative;
-    border:none;
+	position:absolute;
+	top: 0;
+    border:outset 4px orange;
 	width: 100vw;								/* <-- children as wide as the browser window (viewport) */
 	height: 100%;
 	overflow-y: auto;    						/* Trigger vertical scroll    */

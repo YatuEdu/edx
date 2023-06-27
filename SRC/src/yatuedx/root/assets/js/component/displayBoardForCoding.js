@@ -119,7 +119,7 @@ class DisplayBoardForCoding extends CommunicationSpace {
 		see the class teacher and herself, not other students.
 	**/	
 	v_isUserVisible(user) {
-		if (this.classTeacher.localeCompare(user) == 0 || this.me.localeCompare(user))
+		if (this.classTeacher === user || this.me === user)
 		{
 			return true;
 		}

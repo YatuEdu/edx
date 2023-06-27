@@ -13,7 +13,6 @@ class ContentLoader {
     }
 
     async init() {
-        debugger;
         const isLoggedIn = await credMan.hasLoggedIn();
 		if (!isLoggedIn) {
 			// go to login page (todo: append target url): extract the file name
