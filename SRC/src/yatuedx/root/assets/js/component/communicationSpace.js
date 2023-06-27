@@ -13,7 +13,7 @@ const REPLACE_PID = '{pid}';
 const REPLACE_PID_TEMPLATE = '{pidtmplt}';
 
 const VIDEO_TEMPLATE = `
-<video class="yt-video" id="{pidtmplt}{pid}" autoplay playsinline>"`;
+<video class="yt-video" id="{pidtmplt}{pid}" autoplay playsinline>`;
 
 /**
 
@@ -28,14 +28,14 @@ class CommunicationSpace {
 	#videoClient;
 	#videoTrack;
 	#audioTrack;
-	#userVideoItTemplate
+	#userVideoIdTemplate
 	#userMap;
 	#videoDivId;
 	#screenShareBtnId
 	#me;
 	
 	constructor(videoDivId, screenShareBtnId) {
-		this.#userVideoItTemplate = uiConstants.VIDEO_ID_TEMPLATE;
+		this.#userVideoIdTemplate = uiConstants.VIDEO_ID_TEMPLATE;
 		this.#videoDivId = videoDivId;
 		this.#screenShareBtnId = screenShareBtnId;
 		this.#userMap = new Map();
@@ -195,17 +195,17 @@ class CommunicationSpace {
 		const mediaStream = new MediaStream();
 		mediaStream.addTrack(videoTrack);
 
-		const videTagStr = VIDEO_TEMPLATE
-							.replace(REPLACE_PID_TEMPLATE, this.#userVideoItTemplate)
+		const videoTagStr = VIDEO_TEMPLATE
+							.replace(REPLACE_PID_TEMPLATE, this.#userVideoIdTemplate)
 							.replace(REPLACE_PID, user);
-		const videoElement = $(videTagStr)[0];
+		const videoElement = $(videoTagStr)[0];
 		
 		//
 		// If user has a video area, use it, otherwise add a new one
 		// this is to prevent multiple video areaq in the situation of 
 		// user's reconnection after loss of connection
 		//
-		const userSelector = `#${this.#userVideoItTemplate}${user}`;
+		const userSelector = `#${this.#userVideoIdTemplate}${user}`;
 		if ($(this.videoAreaDiv).find(userSelector).length === 0) {	
 			$(this.videoAreaDiv).append(videoElement);
 		}

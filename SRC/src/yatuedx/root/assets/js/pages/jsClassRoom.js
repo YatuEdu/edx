@@ -23,7 +23,6 @@ const YT_BTN_FORMAT_CODE_ID 				= 'yt_btn_format_code';
 const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';					
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
-const YT_BTN_SEARCH_NOTES					= 'yt_btn_search_notes';
 const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
 const VD_VIEDO_AREA 						= "yt_video_area";	
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
@@ -35,15 +34,15 @@ const YT_COL_CODE_LIST						= 'yt_col_code_list';
 const YT_COL_VIDEO_AREA  					= 'yt_col_video_area';
 const YT_COL_CODING_AREA					= 'yt_col_coding_area';
 
-const CSS_MSG_BOX_NO_MSG = 'btn-mail-box-no-msg';
-const CSS_MSG_BOX_WITH_MSG = 'btn-mail-box-with-msg';
-const CSS_VIDEO_MIN = 'yt-video';
-const CSS_VIDEO_MAX = 'yt-video-max';
-const CSS_BTN_MAX_INPUT = 'ta-btn-minmax';
-const CSS_MAX_CONTAINER = 'ta-container-max';
-const CSS_MIN_CONTAINER = 'ta-container';
-const CSS_CODING_COL_WITH_VIDEO = 'col-10';
-const CSS_CODING_COL_WITHOUT_VIDEO = 'col-12';
+const CSS_MSG_BOX_NO_MSG 					= 'btn-mail-box-no-msg';
+const CSS_MSG_BOX_WITH_MSG 					= 'btn-mail-box-with-msg';
+const CSS_VIDEO_MIN 						= 'yt-video';
+const CSS_VIDEO_MAX 						= 'yt-video-max';
+const CSS_BTN_MAX_INPUT 					= 'ta-btn-minmax';
+const CSS_MAX_CONTAINER 					= 'ta-container-max';
+const CSS_MIN_CONTAINER						= 'ta-container';
+const CSS_CODING_COL_WITH_VIDEO				= 'col-10';
+const CSS_CODING_COL_WITHOUT_VIDEO 			= 'col-12';
 
 const TAB_LIST = [
 	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER] },
@@ -322,14 +321,13 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	 **/
 	toggleVideoSize(e) {
 		e.preventDefault(); 
-		const videoSelector = this.teacherVideoSelector;
-		if ($(videoSelector).hasClass( CSS_VIDEO_MIN)) {
-			$(videoSelector).removeClass(CSS_VIDEO_MIN);
-			$(videoSelector).addClass(CSS_VIDEO_MAX);
+		if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
+			$(e.target).removeClass(CSS_VIDEO_MIN);
+			$(e.target).addClass(CSS_VIDEO_MAX);
 		}
 		else {
-			$(videoSelector).removeClass(CSS_VIDEO_MAX);
-			$(videoSelector).addClass(CSS_VIDEO_MIN);
+			$(e.target).removeClass(CSS_VIDEO_MAX);
+			$(e.target).addClass(CSS_VIDEO_MIN);
 		}
 	}
 	
@@ -849,11 +847,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	get teacherVideoSelector() {
-		return `#${USER_VIDEO_ID_TEMPLATE}${this.licveSession.owner_name}`;	
+		return `#${USER_VIDEO_ID_TEMPLATE}${this.liveSession.owner_name}`;	
 	}
 	
-	get videoAreaSelector() {
-		return `#${USER_VIDEO_AREA}`;
+	videoAreaSelector(userId) {
+		return `#${USER_VIDEO_ID_TEMPLATE}${userId}`;	
 	}
 	
 	get codeListDivSelector() {
