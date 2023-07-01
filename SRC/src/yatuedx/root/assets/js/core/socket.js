@@ -54,6 +54,9 @@ export class Socket extends Heart {
             if (this.onClose!=null && typeof this.onClose === 'function') {
                 this.onClose(event);
             }
+            if (event.code==1008) {
+                this.destroy();
+            }
         };
 
         this.#ws.onerror = (event) => {

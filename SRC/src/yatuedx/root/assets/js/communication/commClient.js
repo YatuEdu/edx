@@ -90,9 +90,6 @@ export class CommClient extends Socket {
 
     onClose(event) {
         console.log('onClose ', event.code, event.reason);
-        if (event.code==1008) {
-            super.destroy();
-        }
     }
 
     onError(event) {
