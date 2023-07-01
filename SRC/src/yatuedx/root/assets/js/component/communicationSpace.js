@@ -13,7 +13,7 @@ const REPLACE_PID = '{pid}';
 const REPLACE_PID_TEMPLATE = '{pidtmplt}';
 
 const VIDEO_TEMPLATE = `
-<video class="yt-video" id="{pidtmplt}{pid}" autoplay playsinline>`;
+<video class="yt-video-any yt-video" id="{pidtmplt}{pid}" autoplay playsinline>`;
 
 /**
 
