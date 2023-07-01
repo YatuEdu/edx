@@ -17,7 +17,7 @@ const YT_DIV_CODE_EDITOR					= "yt_div_code_editor";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
-const YT_BTN_PUBLISH_WEB 					= 'yt_btn_publish_web_from_board';
+const YT_BTN_SHARE_SCREEN 					= 'yt_btn_share_screen';
 const YT_BTN_PREVIEW_WEB 					= 'yt_btn_run_web_from_board';
 const YT_BTN_FORMAT_CODE_ID 				= 'yt_btn_format_code';
 const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';					
@@ -36,9 +36,6 @@ const YT_COL_CODING_AREA					= 'yt_col_coding_area';
 
 const CSS_MSG_BOX_NO_MSG 					= 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG 					= 'btn-mail-box-with-msg';
-const CSS_VIDEO_MIN 						= 'yt-video';
-const CSS_VIDEO_MAX 						= 'yt-video-max';
-const CSS_VIDEO_ANY 						= 'yt-video-any';
 const CSS_BTN_MAX_INPUT 					= 'ta-btn-minmax';
 const CSS_MAX_CONTAINER 					= 'ta-container-max';
 const CSS_MIN_CONTAINER						= 'ta-container';
@@ -83,7 +80,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
     constructor() {
-		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA);
+		super(YT_TA_CODE_BOARD_ID, YT_TA_OUTPUT_CONSOLE_ID, VD_VIEDO_AREA, YT_BTN_SHARE_SCREEN);
 		this.#codeStore =  new LocalStoreAccess(sysConstants.YATU_MY_CODE_STORE_KEY);
 	}
 	
@@ -150,12 +147,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		 **/
 		$(document.body).on('click', this.inputMaxMinButtonClassSelector, this.handleInputMaxMin);
 			
-		// handle maximize or minimize video screen
-		$(this.videoAreaClassSelector).click(this.toggleVideoSize);
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
-		// handling code preview and publishing function
-		$(this.publishWebButtonSelector).click(this.handleWebPublishing.bind(this));
+		// web preview event handler
 		$(this.previewhWebButtonSelector).click(this.handleWebPreviewing.bind(this));
 		// handle format Code
 		$(this.formatCodeButton).click(this.handleCodeFormatting.bind(this));
@@ -315,29 +309,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			// change button text to "+"
 			$(event.target).html('+');
 		}
-	}
-	
-	/**
-		When the teacher video is clicked,  toggle bewtween a min / max sized screen.
-	 **/
-	toggleVideoSize(e) {
-		// the click is only on the video area
-		if ($(e.target).hasClass(CSS_VIDEO_ANY))  {
-			e.preventDefault(); 
-
-			if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
-				$(e.target).removeClass(CSS_VIDEO_MIN);
-				$(e.target).addClass(CSS_VIDEO_MAX);
-			}
-			else {
-				$(e.target).removeClass(CSS_VIDEO_MAX);
-				$(e.target).addClass(CSS_VIDEO_MIN);
-			}
-
-			e.stopPropagation();
-			e.preventDefault();
-		}
-		 
 	}
 	
 	/**
@@ -618,13 +589,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	/**
-		Hnandle publishing html code to db and load the content from student page
-	**/
-	handleWebPublishing(e) {
-		e.preventDefault();
-
-	}
-
+	 * Preview web page we made inside code text area by opening another tab to show it.
+	 * 
+	 * @param {*} e 
+	 * @returns 
+	 */
 	handleWebPreviewing(e) {
 		// convert code to base64 string
 		const codeTxt = $(this.codeBoardTextArea).val();
@@ -792,10 +761,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	get runCodeButton() {
 		return `#${YT_BTN_RUN_CODE_ID}`;
-	}
-	
-	get publishWebButtonSelector() {
-		return `#${YT_BTN_PUBLISH_WEB}`;
 	}
 
 	get previewhWebButtonSelector() {

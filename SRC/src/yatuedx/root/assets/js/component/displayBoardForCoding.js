@@ -48,7 +48,7 @@ class DisplayBoardForCoding extends CommunicationSpace {
 	
 	/*private*/
 	constructor(liveSession, view) {
-		super(view.videoAreaId); 
+		super(view.videoAreaId, view.screenShareBtnId); 
 		this.#view = view;
 		this.#liveSession = liveSession;
 		this.initUI();

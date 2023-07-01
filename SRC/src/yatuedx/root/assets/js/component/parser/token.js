@@ -134,6 +134,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	['class', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.CLASS_KEY}],
 	['print', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
 	['printx', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:true}],
+	['div', 		{type: TOKEN_TYPE_KEY_, keyType: TokenConst.KNOWN_FUNCTION_NAME, isIoFunc:false}],
 	['performance', {type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
 	['console', 	{type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME, isIoFunc:true}],
 	['Math', 		{type: TOKEN_TYPE_KNOWN_NAME_, keyType: TokenConst.KNOWN_OBJECT_NAME}],
