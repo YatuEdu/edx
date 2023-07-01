@@ -4,6 +4,10 @@ import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
 import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
 import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
 
+const CSS_VIDEO_MIN 						= 'yt-video';
+const CSS_VIDEO_MAX 						= 'yt-video-max';
+const CSS_VIDEO_ANY 						= 'yt-video-any';
+
 class ProgrammingClassCommandUI extends AuthPage {
 	#jsCodeExecutioner;
 	#codeInputId;
@@ -30,6 +34,9 @@ class ProgrammingClassCommandUI extends AuthPage {
 		
 		// create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
+
+		// handle maximize or minimize video screen
+		$(this.videoAreaId).click(this.toggleVideoSize);
 	}
 	
 	/**
@@ -87,6 +94,29 @@ class ProgrammingClassCommandUI extends AuthPage {
 	 **/
 	syncCode(codeSrc) {
 		return this.#codeSyncManager.syncCode(codeSrc);
+	}
+
+	/**
+		When a video is clicked,  toggle bewtween a min / max sized screen.
+	 **/
+	toggleVideoSize(e) {
+		// the click is only on the video area
+		if ($(e.target).hasClass(CSS_VIDEO_ANY))  {
+			e.preventDefault(); 
+
+			if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
+				$(e.target).removeClass(CSS_VIDEO_MIN);
+				$(e.target).addClass(CSS_VIDEO_MAX);
+			}
+			else {
+				$(e.target).removeClass(CSS_VIDEO_MAX);
+				$(e.target).addClass(CSS_VIDEO_MIN);
+			}
+
+			e.stopPropagation();
+			e.preventDefault();
+		}
+			
 	}
 	
 	/**

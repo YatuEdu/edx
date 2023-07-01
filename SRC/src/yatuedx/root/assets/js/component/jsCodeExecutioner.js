@@ -23,9 +23,12 @@ class CodeError {
 **/
 class JSCodeExecutioner {
 	#consoleId;
-	
+
     constructor(consoleId) {
 		this.#consoleId = consoleId; 
+
+		// set global functions for our usage
+		window.div = this.#integerDiv
 	}
 	
 	/*
@@ -203,6 +206,17 @@ class JSCodeExecutioner {
 		objText += bodyText + "]";
         return objText;
 	}
+
+	/*
+		Global variables and functions
+	 */
+		#integerDiv(a, b) {
+			if (b === 0) {
+				alert('Infinity');
+			}
+
+			return Math.trunc(a / b);
+		}
 
 }
 
