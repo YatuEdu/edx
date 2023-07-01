@@ -11,6 +11,7 @@ export class Peer {
     #shouldCreateOffer;
     #localAudioTrack;
     #localVideoTrack;
+    #iceCandidateList = []; // 用于暂存对方ice candidate
 
     // #mediaStream;
 
@@ -82,7 +83,7 @@ export class Peer {
         // this.#mediaStream.addTrack(event.track);
         // this.#displayElement[0].srcObject = this.#mediaStream;
     }
-	
+
     onIceCandidate(event) {
         if (event.candidate) {
                 this.#commClient.sendRtcMsg(this.#user,
@@ -114,6 +115,13 @@ export class Peer {
 
                 console.log("Answer setLocalDescription succeeded", this.#user);
             }
+
+            if (this.#iceCandidateList.length>0) {
+                for(let iceCandidate of this.#iceCandidateList) {
+                    this.#peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+                }
+                this.#iceCandidateList = [];
+            }
         } catch(err) {
             console.log(err);
             this.errHandle(err);
@@ -121,7 +129,11 @@ export class Peer {
     }
 
     feedIceCandidate(iceCandidate) {
-        this.#peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+        if (this.#peerConnection) {
+            this.#peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+        } else {
+            this.#iceCandidateList.push(iceCandidate);
+        }
     }
 
     switchVideoTrack(newVideoTrack) {

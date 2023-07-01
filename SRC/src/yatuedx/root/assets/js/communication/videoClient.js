@@ -1,20 +1,20 @@
 import {Peer} 	from "./peer.js";
 
 /**
-	VideoPeer class represents an RTC Video peer on an application page.	
+	VideoPeer class represents an RTC Video peer on an application page.
  **/
 export class VideoClient {
- 
+
     #commClient;
     #audioTrack;
     #videoTrack;
 
 	// Peer对象列表，key为user
-    #peers = {}; 
+    #peers = {};
 
 	/**
-		Constructs a VideoPeer object using text, audio, and video tracks.	
-	**/   
+		Constructs a VideoPeer object using text, audio, and video tracks.
+	**/
 	constructor(commClient, audioTrack, videoTrack) {
         this.#commClient = commClient;
         this.#audioTrack = audioTrack;
@@ -25,8 +25,8 @@ export class VideoClient {
     }
 
 	/**
-		Start screen sharing (???)	
-	**/ 
+		Start screen sharing (???)
+	**/
     async startShare(user, shouldCreateOffer = true) {
         let peer = this.#peers[user];
         if (peer == null) {
@@ -38,8 +38,8 @@ export class VideoClient {
                     this.onRemoteVideoTrack(user, track);
                 }
             };
-            await peer.init();
             this.#peers[user] = peer;
+            await peer.init();
         }
     }
  // 错误回调
