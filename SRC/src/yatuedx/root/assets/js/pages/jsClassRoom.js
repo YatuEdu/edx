@@ -38,6 +38,7 @@ const CSS_MSG_BOX_NO_MSG 					= 'btn-mail-box-no-msg';
 const CSS_MSG_BOX_WITH_MSG 					= 'btn-mail-box-with-msg';
 const CSS_VIDEO_MIN 						= 'yt-video';
 const CSS_VIDEO_MAX 						= 'yt-video-max';
+const CSS_VIDEO_ANY 						= 'yt-video-any';
 const CSS_BTN_MAX_INPUT 					= 'ta-btn-minmax';
 const CSS_MAX_CONTAINER 					= 'ta-container-max';
 const CSS_MIN_CONTAINER						= 'ta-container';
@@ -148,7 +149,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			
 		 **/
 		$(document.body).on('click', this.inputMaxMinButtonClassSelector, this.handleInputMaxMin);
-		
+			
+		// handle maximize or minimize video screen
+		$(this.videoAreaClassSelector).click(this.toggleVideoSize);
 		// hook up event handleRun  to run code locally in learning "exercise mode"
 		$(this.runCodeButton).click(this.handleRun.bind(this));
 		// handling code preview and publishing function
@@ -160,8 +163,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.copyAndSaveCodeButtonSelector).click(this.handleCopyAndSaveCodeToDb.bind(this));
 		// handle erase result board
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-		// handle maximize or minimize video screen
-		$(this.videoAreaSelector).click(this.toggleVideoSize.bind(this));
 		// switching tab to notes
 		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
 		// switching tab to msg
@@ -320,15 +321,23 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		When the teacher video is clicked,  toggle bewtween a min / max sized screen.
 	 **/
 	toggleVideoSize(e) {
-		e.preventDefault(); 
-		if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
-			$(e.target).removeClass(CSS_VIDEO_MIN);
-			$(e.target).addClass(CSS_VIDEO_MAX);
+		// the click is only on the video area
+		if ($(e.target).hasClass(CSS_VIDEO_ANY))  {
+			e.preventDefault(); 
+
+			if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
+				$(e.target).removeClass(CSS_VIDEO_MIN);
+				$(e.target).addClass(CSS_VIDEO_MAX);
+			}
+			else {
+				$(e.target).removeClass(CSS_VIDEO_MAX);
+				$(e.target).addClass(CSS_VIDEO_MIN);
+			}
+
+			e.stopPropagation();
+			e.preventDefault();
 		}
-		else {
-			$(e.target).removeClass(CSS_VIDEO_MAX);
-			$(e.target).addClass(CSS_VIDEO_MIN);
-		}
+		 
 	}
 	
 	/**
@@ -597,6 +606,23 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.clearResultButton).show();
 		}
 	}
+
+	/**
+	 * Override the parent method to use keydown event to trigger code renewal message to teacher.
+	 * 
+	 * @param {*} start 	true means start sending / false means stop sending
+	 */
+	startOrStopCodeRefreshTimer(start) {
+		if (start) {
+			// key dow event
+			$(this.codeBoardTextArea).keydown(function(e) {
+				this.v_handleTimer();
+			  });
+		} else {
+			// remove key dow event
+			$(this.codeBoardTextArea).off('keydown');
+		}
+	}
 	
 	/**
 		Hnandle running code using text from code baord
@@ -852,6 +878,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	videoAreaSelector(userId) {
 		return `#${USER_VIDEO_ID_TEMPLATE}${userId}`;	
+	}
+
+	videoAreaClassSelector() {
+		return `.yt-video-area`;	
 	}
 	
 	get codeListDivSelector() {
