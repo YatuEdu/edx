@@ -606,23 +606,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.clearResultButton).show();
 		}
 	}
-
-	/**
-	 * Override the parent method to use keydown event to trigger code renewal message to teacher.
-	 * 
-	 * @param {*} start 	true means start sending / false means stop sending
-	 */
-	startOrStopCodeRefreshTimer(start) {
-		if (start) {
-			// key dow event
-			$(this.codeBoardTextArea).keydown(function(e) {
-				this.v_handleTimer();
-			  });
-		} else {
-			// remove key dow event
-			$(this.codeBoardTextArea).off('keydown');
-		}
-	}
 	
 	/**
 		Hnandle running code using text from code baord
