@@ -27,7 +27,6 @@ const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
 const VD_VIEDO_AREA 						= "yt_video_area";	
 const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
 const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
-const YT_TB_MSG_INDICATOR					= 'yt_btn_msg_indicator';
 const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
 const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
 const YT_COL_CODE_LIST						= 'yt_col_code_list';
@@ -86,6 +85,16 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	// hook up events
 	async init() {
+		const paramMap = PageUtil.getUrlParameterMap();
+		const modeStr = paramMap.get(sysConstants.UPN_MODE);
+		const mode = modeStr ? parseInt(modeStr, 10) : 0;
+		const groupStr = paramMap.get(sysConstants.UPN_GROUP);
+		const sequenceStr = paramMap.get(sysConstants.UPN_SEQUENCE);
+
+		// set class mode needs to be called before super.init()
+		this.classMode = mode;
+
+		// call parent init (such as AuthPage init, !important)
 		await super.init();
 
 		// initialize dialog boxes for this page
@@ -99,11 +108,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 
 		// other initialization
 		this.#tabIndex = 0;
-		const paramMap = PageUtil.getUrlParameterMap();
-		const modeStr = paramMap.get(sysConstants.UPN_MODE);
-		const mode = modeStr ? parseInt(modeStr, 10) : 0;
-		const groupStr = paramMap.get(sysConstants.UPN_GROUP);
-		const sequenceStr = paramMap.get(sysConstants.UPN_SEQUENCE);
+
+		// initialize UI accordin to mode
 		if (mode && mode === 1) {
 			if (!groupStr) {
 				alert('Invalid URL.  You probably have no privilge to access this page!');
@@ -115,6 +121,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
 			this.#groupId = parseInt(groupStr);	
 			this.#sequenceId = parseInt(sequenceStr);
+
 		} else {
 			// show video if we are in class mode	
 			this.#displayBoardForCoding = 
@@ -163,12 +170,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
 		// handle sending message to teacher by 'return key'
 		$(this.messageBoardInputSlector).keydown(this.handleSendMessage.bind(this));
-		// handle message indicator clicking
-		$(this.messageIndicatorBtnSelector).click(this.toggleToMegTab.bind(this));
 		// handle save code to DB
 		$(this.saveCodeToDbButtonSelector).click(this.saveCodeToDb.bind(this));
 		// handle erasing code from board
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
+
 		// accept tab and insert \t when tab key is hit by user
 		// note that we do not want to bind this handler the "this" class
 		this.setTabHandler();
@@ -315,7 +321,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		toggle tag between output, notes, and etc.
 	 **/
 	toggleTab(e) {
-		const jqTarget = $(event.target);
+		const jqTarget = $(e.target);
 		let ti = jqTarget.attr('data-tabindex');
 		ti = parseInt(ti, 10);
 		this.prv_toggleTab(ti);
@@ -324,11 +330,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	/**
 		toggle tag between output, notes, and etc.
 	 **/
-	toggleToMegTab(e) {
-		this.prv_toggleTab(MSG_TAB_INDX);
-		
+	toggleToMegTab() {
 		// make the message box to be "no new message"
-		const selector = $(this.messageIndicatorBtnSelector);
+		const selector = $(this.msgConsoleTab);
 		this.messageIndicatorHasNoMessage(selector)
 	}
 	
@@ -358,15 +362,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 					e.sub_elements.forEach(se => {
 						$(`#${se}`).show();
 					});
+					// special case message tqab
+					if (e.tab === YT_TB_MSG_CONSOLE) {
+						this.toggleToMegTab();
+					}
 				}
 			});
 			this.#tabIndex = ti;
+
 		}
-		// scroll to bottom so we can see the bottom panel better
-		$("html, body").animate({
-			scrollTop: $(
-			  'html, body').get(0).scrollHeight
-		}, 2000);
 	}
 	
 	/**
@@ -457,7 +461,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		we make it normal.
 	 **/
 	toggleMessageIndicator() {
-		const selector = $(this.messageIndicatorBtnSelector);
+		const selector = $(this.msgConsoleTab);
 		if (selector.hasClass(CSS_MSG_BOX_NO_MSG)) {
 			this.messageIndicatorHasMessage(selector);
 		}
@@ -814,10 +818,6 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	get messageBoardInputSlector() {
 		return `#${YT_TA_MSG_INPUT_ID}`;
-	}
-	
-	get messageIndicatorBtnSelector() {
-		return `#${YT_TB_MSG_INDICATOR}`;
 	}
 	
 	get teacherVideoSelector() {

@@ -33,7 +33,7 @@ const TEMPLETE =
 		  id="yt_ta_selected_code" 
 		  spellcheck="false" 
 		  placeholder="Load code from DB"
-		  rows="40"></textarea>
+		  rows="44"></textarea>
   </div>
  </div>
  <div id="yt_col_code_list" class="col-6 tool-tbtn-dimention yt-list-panel-right">

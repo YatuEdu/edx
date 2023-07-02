@@ -35,6 +35,24 @@
       $(this).css("background-color", colors[i++]);
       $(textarea).css("background-color", colors[i++]);
     }
+
+    function isPrime() {
+      const txt = document.getElementById("ta").value;
+      const n = parseInt(txt);
+      if (n === 0 || n === 2 || n % 2 === 0) {
+        document.getElementById("ta").value = "Not a prime";
+        return;
+      }
+
+      for (i = 3; i < n; i += 2) {
+        if (n % i === 0) {
+          document.getElementById("ta").value = "Not a prime";
+          return;
+        }
+      }
+     
+      document.getElementById("ta").value = "Is a prime"
+    }
   </script>
 </body>
 </html>

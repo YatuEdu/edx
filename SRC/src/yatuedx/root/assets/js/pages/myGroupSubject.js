@@ -172,6 +172,7 @@ class MyGroupSubjectPageHandler extends AuthPage {
 				const newSessionInfo = ret.data[0];
 				// save the live class info
 				newSessionInfo.group_id = clssId;
+				newSessionInfo.owner_name = this.credential.name;
 				this.setLiveSession(newSessionInfo);
 				// Switch UI Highlight
 				this.selectLiveClass(oldSelection, newSelection);
