@@ -407,6 +407,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			if (digest) {
 				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
 					console.log('content not verified, asking for re-sync');
+					$(this.getStudentConsoleIdSelector(student)).val(newContent); // update anyway
 					this.#displayBoardTeacher.askReSync(student);
 				} else {
 					shouldUpdate = true;
@@ -414,6 +415,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 			}
 			else {
 				console.log('No digest available');
+				shouldUpdate = true;
 			}
 			
 			// update the code for this student on UI

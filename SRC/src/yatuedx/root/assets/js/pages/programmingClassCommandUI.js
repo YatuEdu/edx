@@ -17,6 +17,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 	#timer;
 	#codeSyncManager;
 	#groupId;
+	#classMode
 	
 	constructor(codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
 		super();
@@ -24,6 +25,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		this.#resultConsolId = resultConsolId;
 		this.#videoAreaId = videoAreaId;
 		this.#screenShareBtnId = screenShareBtnId;
+		this.#classMode = 0;
 	}
 	
 	async init() {
@@ -196,7 +198,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		we don't need to call initGroups logic of that in parent class (AuthPage)
 	 */
 	v_isLiveChatPage() {
-		return true;
+		return this.#classMode === 0;
 	}
 	
 	/**
@@ -281,6 +283,11 @@ class ProgrammingClassCommandUI extends AuthPage {
 	
 	executeCode(codeText) {
 		return this.#jsCodeExecutioner.executeCode(codeText);
+	}
+	
+	set classMode(cm) {
+		this.#classMode = cm;
+
 	}
 	
 	get groupId() {

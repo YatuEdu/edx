@@ -44,9 +44,6 @@
 						<li class="nav-item active yt-li-dimention">
                             <button id="yt_btn_clear_result" class="btn  btn-outline-primary btn-mail-box-dimention btn-mail-box-no-msg" title="Clear output console">Clear output</button>
                         </li>
-						<li class="nav-item active">
-                            <button id="yt_btn_msg_indicator" class="btn  btn-outline-primary btn-mail-box-dimention btn-mail-box-no-msg" title="no message">Message</button>
-                        </li>
 						<li class="nav-item active yt-li-dimention"> 
                             <button id="yt_btn_share_screen" class="btn btn-outline-primary btn-mail-box-dimention btn-mail-box-no-msg" title="Share my screen with teacher">Share Screen</button>
                         </li>
@@ -74,43 +71,44 @@
 					</div>
 					<div id="yt_col_coding_area" class="col-10">
 						<div class="row mb-0">
-							<div class="col-12 tool-tbtn-dimention-left">
+							<div class="col-6 tool-tbtn-dimention-left">
 								<div id="yt_div_code_editor" data-type="ytComponent">
 								</div>
 							</div>
-						</div>
-						<div class="row mb-0">
 							<div class="col-6 tool-tbtn-dimention-left">
-								<div id="yt_tb_notes_console"  class="selected-tab">
-									<a class="nav-link" data-tabindex="0" href="#">Code depot</a>
+								<div class="row mb-0">
+									<div id="yt_tb_notes_console"  class="selected-tab">
+										<a class="nav-link" data-tabindex="0" href="#">Code depot</a>
+									</div>
+									<div id="yt_tb_msg_console"  class="unselected-tab">
+										<a class="nav-link btn-mail-box-no-msg" data-tabindex="1" href="#">Messages</a>
+									</div>
 								</div>
-							</div>
-							<div class="col-6 tool-tbtn-dimention">
-								<div id="yt_tb_msg_console"  class="unselected-tab">
-									<a class="nav-link" data-tabindex="1" href="#">Messages</a>
+								<div class="row mb-0">
+									<div class="col-11 code-console-container-dimention">
+										<div id="yt_div_code_manager" data-type="ytComponent" style="height:780px !important; display:block">
+										</div>
+									</div>
 								</div>
-							</div>
-						</div>
-						<div id="yt_div_code_manager" data-type="ytComponent" style="display:block">	
-						</div>
-						<div class="row mb-0">
-							<div class="col-12 tool-tbtn-dimention-left">
-								<textarea readonly class="msg-board"
-								style="display:none"
-								id="yt_ta_msg" 
-								spellcheck="trye" 
-								placeholder="Received messages"
-								rows="10"></textarea>
-							</div>
-						</div>
-						<div class="row mb-0">
-							<div class="col-12 tool-tbtn-dimention-left">
-								<textarea class="msg-board"
-								  style="display:none; height: 100%;"
-								  id="yt_ta_msg_input" 
-								  spellcheck="trye" 
-								  placeholder="Enter your messages"
-								  rows="2"></textarea>	
+								<div class="row mb-0">
+									<div class="col-11 code-console-container-dimention">
+										<textarea readonly class="msg-board"
+										style="display:none"
+										id="yt_ta_msg" 
+										spellcheck="trye" 
+										placeholder="Received messages"
+										rows="10"></textarea>
+									</div>
+								</div>
+								<div class="row mb-0">
+									<div class="col-11">
+										<textarea class="msg-board"
+										style="display:none; height: 100%;"
+										id="yt_ta_msg_input" 
+										spellcheck="trye" 
+										placeholder="Enter your messages"
+										rows="2"></textarea>	
+								</div>
 							</div>
 						</div>
 					</div>
