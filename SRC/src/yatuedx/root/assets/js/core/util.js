@@ -150,6 +150,10 @@ class StringUtil {
 	}
 
 	static testEqual(str1, str2)  {
+		if (!str1 || !str2) {
+			return false;
+		}
+
 		const len1 = str1.length;
 		const len2 = str2.length;
 		if (len1 != len2) {
@@ -375,4 +379,20 @@ class Dbg {
 	}
 }
 
-export { TimeUtil, StringUtil, RegexUtil, PageUtil, Dbg, UtilConst};
+class CollectionUtil {
+	/*
+		Group a list by a key
+	*/
+	static groupByReduce(objList, key) {
+		return objList.reduce((acc, currentValue) => {
+			let groupKey = currentValue[key];
+			if (!acc[groupKey]) {
+			acc[groupKey] = [];
+			}
+			acc[groupKey].push(currentValue);
+			return acc;
+		}, {});
+	}
+}
+
+export { TimeUtil, StringUtil, RegexUtil, PageUtil, Dbg, UtilConst, CollectionUtil};
