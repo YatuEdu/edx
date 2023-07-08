@@ -12,7 +12,6 @@ const API_FOR_CLASS_SERIES_SCHEDULE = 202118;
 const API_GET_NOTES_FOR_SERIES = 202119;
 const API_ADD_NOTES = 202120;
 const API_REGISTER_FOR_CLASS = 202121;
-const API_USER_UPDATE_NOTES=202124;
 const API_USER_GET_NOTES=202125;
 const API_SEND_CODE_TO_EMAIL=202122;
 const API_VALIDATE_EMAIL = 202123; 
@@ -25,6 +24,9 @@ const API_MEMBER_LIST_LIVE_SESSIONS = 202145;
 const API_OWNER_LIST_CLASSES = 202146;
 const API_OWNER_START_CLASS = 202148;
 const API_OWNER_STOP_CLASS = 202149;
+const API_MEMBER_GET_NOTES = 202150;
+const API_MEMBER_ADD_NOTES = 202151;
+
 
 class Net {
 	/**
@@ -154,6 +156,27 @@ class Net {
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
+
+	
+
+	/**
+		Yatu API for member to get notes from backend
+	**/
+	static async memberGetNotes(token) {
+		const req = Net.composeRequestDataForMemberGetNotes(token);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+
+	/**
+		Yatu API for member to add code to code-depot
+	**/
+	static async memberAddNotes(token, groupId, notesB64) {
+		const req = Net.composeRequestDataForMemberAddNotes(token, groupId, notesB64);
+		// remote call
+		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
+	}
+	
 	
 	/**
 		Yatu API for member to list his code from code-depot
@@ -187,16 +210,6 @@ class Net {
 	**/
 	static async classUpdateNotes(token, groupId, text) {
 		const req = Net.composeRequestDataForClassAddNotes(token, groupId, text);
-		// remote call
-		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
-	}
-
-
-	/**
-		Yatu API for USER to update her class notes for class
-	**/
-	static async userUpdateClassNotes(token, groupId, text) {
-		const req = Net.composeRequestDataForUserUpdateNotes(token, groupId, text);
 		// remote call
 		return await Net.remoteCall(sysConstants.YATU_AUTH_URL, req);
 	}
@@ -519,8 +532,47 @@ class Net {
 				hash: codeHash
 			}
 		};
+		
 		return Net.composePostRequestFromData_private(apiRequest);
 	}	
+
+
+	/**
+		Forming Yatu API request data for GETTING NOTES from student's notes table
+	**/
+	static composeRequestDataForMemberGetNotes(t) {
+		
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_MEMBER_GET_NOTES
+			},
+			data: {
+			}
+		};
+		
+		return Net.composePostRequestFromData_private(apiRequest);
+	}	
+
+	/**
+		Forming Yatu API request data for adding NOTES to student's notes table
+	**/
+	static composeRequestDataForMemberAddNotes(t, groupId, notesB64) {
+		
+		const apiRequest = {
+			header: {
+				token: t,
+				api_id: API_MEMBER_ADD_NOTES
+			},
+			data: {
+				classId: groupId,
+				notes: notesB64
+			}
+		};
+		
+		return Net.composePostRequestFromData_private(apiRequest);
+	}	
+
 	
 	/**
 		Forming Yatu API request data for listing code heasers (name, hash)
@@ -585,25 +637,6 @@ class Net {
 			data: {
 				groupId: gIdi,
 				notes: txt
-			}
-		};
-		return Net.composePostRequestFromData_private(myGroupsReq);
-	}	
-	
-	/**
-		Forming Yatu API request data for adding class notes
-	**/
-	static composeRequestDataForUserUpdateNotes(t, gId, txt) {
-		const gIdi =  parseInt(gId, 10);
-		const myGroupsReq = {
-			header: {
-				token: t,
-				api_id: API_USER_UPDATE_NOTES
-			},
-			data: {
-				groupId: gIdi,
-				notes: txt,
-				updateNotes: 1
 			}
 		};
 		return Net.composePostRequestFromData_private(myGroupsReq);

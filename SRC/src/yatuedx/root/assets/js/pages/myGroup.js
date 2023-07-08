@@ -2,7 +2,7 @@ import {groupTypeConstants, sysConstants} 	from '../core/sysConst.js'
 import {AuthPage} 				from '../core/authPage.js'
 import {Net}                    from '../core/net.js';
 import {MyClassTemplates}		from '../component/groupCard.js';
-
+import {CollectionUtil}			from '../core/util.js';
 
 /**
 	This class manages all classesd the user belongs to
@@ -49,7 +49,7 @@ class MyGroupPageHandler extends AuthPage {
 			const mySchedules = ret.data;
 
 			// group by SUBJECT name
-			const groupBySubjectSchedules = this.#groupByReduce(mySchedules, "subject_name");
+			const groupBySubjectSchedules = CollectionUtil.groupByReduce(mySchedules, "subject_name");
 			// process each class
 			let subjectRows = "";
 			for(const subject in groupBySubjectSchedules) {
@@ -60,7 +60,7 @@ class MyGroupPageHandler extends AuthPage {
 				const classList = groupBySubjectSchedules[subject];
 
 				// group by class names
-				const groupByClass = this.#groupByReduce(classList, "class_id");
+				const groupByClass =  CollectionUtil.groupByReduce(classList, "class_id");
 				let classRowHtml = "";
 				for(const clssId in groupByClass) {
 					const currentClassList = groupByClass[clssId];
@@ -71,7 +71,7 @@ class MyGroupPageHandler extends AuthPage {
 										.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, clssId)
 										.replaceAll(MyClassTemplates.REPLACE_SEQUENCE_ID, defaultSequenceIdForExercise)
 
-					const groupBySequences = this.#groupByReduce(currentClassList, "sequence_id");
+					const groupBySequences =  CollectionUtil.groupByReduce(currentClassList, "sequence_id");
 					let sequnceRows = "";
 					for(const seq in groupBySequences) {
 						const sequenceList = groupBySequences[seq];
@@ -103,17 +103,6 @@ class MyGroupPageHandler extends AuthPage {
 		}
 	}
 
-	#groupByReduce(myClassSchedules, key) {
-		return myClassSchedules.reduce((acc, currentValue) => {
-			let groupKey = currentValue[key];
-			if (!acc[groupKey]) {
-			acc[groupKey] = [];
-			}
-			acc[groupKey].push(currentValue);
-			return acc;
-		}, {});
-	}
-	
 	/**
 		Enter the exercize room if applicable
 	**/

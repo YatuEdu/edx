@@ -187,10 +187,17 @@ class JSCodeExecutioner {
 		let i = 0;
 		for (const key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				const objValStr = (typeof obj[key] === 'string' || obj[key] instanceof String) ? 
+				let objValStr = "";
+
+				// recursion occurs if the field is another object
+				if (typeof obj[key] === 'object') {
+					objValStr = this.#getObjectProperties(obj[key]);
+				} else {
+					objValStr = (typeof obj[key] === 'string' || obj[key] instanceof String) ? 
 									`"${obj[key]}"` : `${obj[key]}`;
-				const kvPair = `${key}: ${objValStr}`;;
-				objText += i++ == 0 ? `${kvPair}, ` : `${kvPair}`;
+				}
+				const kvPair = `${key}: ${objValStr}`;
+				objText += i++ === 0 ? `${kvPair} ` : `, ${kvPair}`;
 			}
 		}
 		objText += "}";

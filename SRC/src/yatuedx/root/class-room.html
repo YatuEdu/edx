@@ -77,11 +77,14 @@
 							</div>
 							<div class="col-6 tool-tbtn-dimention-left">
 								<div class="row mb-0">
-									<div id="yt_tb_notes_console"  class="selected-tab">
+									<div id="yt_tb_code_depot"  class="selected-tab yt_tab">
 										<a class="nav-link" data-tabindex="0" href="#">Code depot</a>
 									</div>
-									<div id="yt_tb_msg_console"  class="unselected-tab">
+									<div id="yt_tb_msg_console"  class="unselected-tab yt_tab">
 										<a class="nav-link btn-mail-box-no-msg" data-tabindex="1" href="#">Messages</a>
+									</div>
+									<div id="yt_tb_notes_console"  class="unselected-tab yt_tab">
+										<a class="nav-link" data-tabindex="2" href="#">Notes</a>
 									</div>
 								</div>
 								<div class="row mb-0">
@@ -93,21 +96,52 @@
 								<div class="row mb-0">
 									<div class="col-11 code-console-container-dimention">
 										<textarea readonly class="msg-board"
-										style="display:none"
-										id="yt_ta_msg" 
-										spellcheck="trye" 
-										placeholder="Received messages"
-										rows="10"></textarea>
+											style="display:none"
+											id="yt_ta_msg" 
+											spellcheck="trye" 
+											placeholder="Received messages"
+											rows="10">
+										</textarea>
 									</div>
 								</div>
 								<div class="row mb-0">
 									<div class="col-11">
 										<textarea class="msg-board"
-										style="display:none; height: 100%;"
-										id="yt_ta_msg_input" 
-										spellcheck="trye" 
-										placeholder="Enter your messages"
-										rows="2"></textarea>	
+											style="display:none; height: 100%;"
+											id="yt_ta_msg_input" 
+											spellcheck="trye" 
+											placeholder="Enter your messages"
+											rows="2">
+										</textarea>	
+									</div>
+								</div>
+								<div class="row mb-0">
+									<div class="col-11 code-console-container-dimention">
+										<div id="yt_btn_html_editors">
+											<button name="h1" type="button" title="Make the selected text as Header 1" class="textButton smallTextButton yt-btn-notes-editor">H1</button>
+											<button name="h2" type="button" title="Make the selected text as Header 2" class="textButton smallTextButton yt-btn-notes-editor">H2</button>
+											<button name="b" type="button" title="Make the selected text as bold" class="textButton smallTextButton yt-btn-notes-editor">B</button>
+											<button name="i" type="button" title="Make the selected text as italic" class="textButton smallTextButton yt-btn-notes-editor">I</button>
+											<button name="u" type="button" title="Make the selected text as underlined" class="textButton smallTextButton yt-btn-notes-editor">U</button>
+											<picture id="yt_btn_save_notes" class="btn tiphost">
+												<span class="tooltip">
+													<div class="tooltiptext">Save Notes</div>
+												</span>
+												<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/save_notes.webp" />
+												<img src="/my-image.jpg" />
+											</picture>
+										</div>
+									</div>
+								</div>
+								<div class="row mb-0">
+									<div class="col-11 code-console-container-dimention">
+										<div class="msg-board" style="display:none; height: 660px;"
+											id="yt_div_notes" 
+											contenteditable="true"
+											placeholder="Enter study notes here"
+											spellcheck="true">
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>

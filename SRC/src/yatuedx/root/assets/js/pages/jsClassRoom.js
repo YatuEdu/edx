@@ -4,18 +4,20 @@ import {DisplayBoardForCoding}						from '../component/displayBoardForCoding.js'
 import {LocalStoreAccess}							from '../core/localStorage.js'
 import {PTCC_COMMANDS}								from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}					from './programmingClassCommandUI.js'
-import {PageUtil, StringUtil, RegexUtil, UtilConst}	from '../core/util.js';
+import {PageUtil, StringUtil, RegexUtil, UtilConst, CollectionUtil}	from '../core/util.js';
 import {Net}			    						from "../core/net.js"
 import {CodeManContainer}							from '../component/new/codeManager.js'
 import {CodeInputConsole}							from '../component/new/codeInputConsole.js';
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
+const YT_DIV_NOTES  						= 'yt_div_notes';
 const YT_TA_NOTES_ID 					    = "yt_ta_notes"; //todo: remove it
 const YT_DIV_CODE_MANAGER 					= "yt_div_code_manager";
 const YT_DIV_CODE_EDITOR					= "yt_div_code_editor";
 const YT_TA_OUTPUT_CONSOLE_ID 				= "yt_ta_output_console";
 const YT_TA_CODE_BOARD_ID 					= "yt_ta_code_board";
+const YT_BTN_HTML_EDITORS 					= "yt_btn_html_editors";
 const YT_BTN_RUN_CODE_ID 					= 'yt_btn_run_code_from_board';
 const YT_BTN_SHARE_SCREEN 					= 'yt_btn_share_screen';
 const YT_BTN_PREVIEW_WEB 					= 'yt_btn_run_web_from_board';
@@ -24,9 +26,11 @@ const YT_BTN_SAVE_CODE_POPUP				= 'yt_btn_save_code_to_db_popup';
 const YT_BTN_CLEAR_RESULT_CODE_ID 			= 'yt_btn_clear_result';
 const YT_BTN_CLEAR_CODE_BOARD				= 'yt_btn_erase_code';
 const YT_BTN_SAVE_CODE						= 'yt_btn_save_code_to_db';
+const YT_BTN_SAVE_NOTES						= 'yt_btn_save_notes';
 const VD_VIEDO_AREA 						= "yt_video_area";	
-const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
+const YT_TB_CODE_DEPOT						= 'yt_tb_code_depot';
 const YT_TB_MSG_CONSOLE					    = 'yt_tb_msg_console';
+const YT_TB_NOTES_CONSOLE					= 'yt_tb_notes_console';
 const YT_DL_ASK_FOR_SAVING_CODE				= 'yt_dl_ask_to_save';
 const YT_TXT_CODE_NAME						= 'yt_txt_code_name';
 const YT_COL_CODE_LIST						= 'yt_col_code_list';
@@ -40,19 +44,18 @@ const CSS_MAX_CONTAINER 					= 'ta-container-max';
 const CSS_MIN_CONTAINER						= 'ta-container';
 const CSS_CODING_COL_WITH_VIDEO				= 'col-10';
 const CSS_CODING_COL_WITHOUT_VIDEO 			= 'col-12';
+const CSS_YT_TAB							= "yt_tab";
+const CSS_YT_BTN_NOTES_EDITOR				= "yt-btn-notes-editor";
 
 const TAB_LIST = [
-	{tab:YT_TB_NOTES_CONSOLE,  sub_elements: [YT_DIV_CODE_MANAGER] },
-	{tab:YT_TB_MSG_CONSOLE,    sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID] },
+	{tab:YT_TB_CODE_DEPOT,  	sub_elements: [YT_DIV_CODE_MANAGER] },
+	{tab:YT_TB_MSG_CONSOLE,    	sub_elements: [YT_TA_MSG_ID, YT_TA_MSG_INPUT_ID] },
+	{tab:YT_TB_NOTES_CONSOLE,   sub_elements: [YT_DIV_NOTES, YT_BTN_HTML_EDITORS] },
 ];
 
 const MIN_CODE_LENGTH = 16;
-const MSG_TAB_INDX = 1;
-const USER_VIDEO_AREA = uiConstants.VIDEO_AREA_ID;
 const USER_VIDEO_ID_TEMPLATE = uiConstants.VIDEO_ID_TEMPLATE;
-	
-const REPLACE_CODELIST_ID = "{codelstid}";
-const REPLACE_CODELIST_LABEL = "{lb}";
+
 
 /**
 	This class handles JS Code runner board
@@ -135,6 +138,9 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// itialize code manager
 		await this.initCodeDepot();
 		
+		// initialize notes
+		await this.initNotes();
+
 		// initialize code editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(
 					"", 
@@ -164,16 +170,21 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		$(this.copyAndSaveCodeButtonSelector).click(this.handleCopyAndSaveCodeToDb.bind(this));
 		// handle erase result board
 		$(this.clearResultButton).click(this.handleClearConsole.bind(this));
-		// switching tab to notes
-		$(this.notesConsoleTab).click(this.toggleTab.bind(this));
-		// switching tab to msg
-		$(this.msgConsoleTab).click(this.toggleTab.bind(this));
+		// switching tab to notes, code-depot, or message
+		$(this.classYtTabSelector).click(this.toggleTab.bind(this)); 
 		// handle sending message to teacher by 'return key'
 		$(this.messageBoardInputSlector).keydown(this.handleSendMessage.bind(this));
 		// handle save code to DB
 		$(this.saveCodeToDbButtonSelector).click(this.saveCodeToDb.bind(this));
 		// handle erasing code from board
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
+		// hamdle notes editor button click
+		$(this.notesEditorButtonClassSelector).click(this.addHtmlToNotes);
+		// hook up event 'save notes;
+		$(this.saveNotesButton).click(this.saveNotes.bind(this));
+
+		// hadling windows unload by saving notes to DB if notes are dirty
+		$(window).on('beforeunload',this.preExitHandler.bind(this));
 
 		// accept tab and insert \t when tab key is hit by user
 		// note that we do not want to bind this handler the "this" class
@@ -235,7 +246,25 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		return resp.code;
 	}
 	
+	async initNotes() {
+		const resp = await Net.memberGetNotes(credMan.credential.token);
+		if (resp.code === 0 && resp.data.length > 0) {
+			// group by classes:
+			const classNotes = CollectionUtil.groupByReduce(resp.data, "group_id");
+			const myClassNotes = classNotes[this.#groupId];
+			if (myClassNotes && myClassNotes.length) {
+				this.#notes = myClassNotes[0].notes;
+				this.#insertNotes();
+			}
+		}
+	}
 	
+	#insertNotes() {
+		// decode notes and then intert it as html
+		const notesHtml = StringUtil.decodeText(this.#notes);
+		$(this.notesTextAreaSelector).html(notesHtml);
+	}
+
 	/*
 		Save user's code to his code depot in DB.  
 		The code name needs to be normalized to prevent SQL injections and makes it easier to
@@ -342,7 +371,70 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	eraseCodeFromBoard(e) {
 		$(this.codeBoardTextArea).val('');
 	}
+
+	/**
+	 * When html editor button is clicked, we insert html tags for the selected text.
+	 * 
+	 * @param {*} e 
+	 */
+	addHtmlToNotes(e) {
+		e.preventDefault();
+
+		const text = window.getSelection().toString();
+		if (!text) {return}
+
+		const name = $(e.target).attr('name');
+		const tag = document.createElement(name);
+		tag.innerHTML = text;
+		document.execCommand('insertHTML', false, tag.outerHTML);
+	}
 	
+	async saveNotes() {
+		const notes = $(this.notesTextAreaSelector).html();
+		if (this.isNotesDirty(notes)) {
+			const notesB64 = StringUtil.encodeText(notes);
+			const status = await Net.memberAddNotes(credMan.credential.token, this.#groupId, notesB64);
+			if (status.code !== 0) {
+				alert("Failed to save notes, error code is" + status.code);
+				return;
+			} 
+			
+			alert("Notes updated!");
+			this.#notes = notesB64;
+		}
+	}
+
+	isNotesDirty(notes) {
+		if (!notes && !this.#notes) {
+			return false;
+		}
+
+		if (notes && !this.#notes || !notes && this.#notes) {
+			return true;
+		}
+
+		const notesB64 = StringUtil.encodeText(notes);
+		if (!StringUtil.testEqual(this.#notes, notesB64)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	preExitHandler(e) {
+		const notes = $(this.notesTextAreaSelector).html();
+		if (!this.isNotesDirty(notes) ) {
+            return undefined;
+        }
+
+        const confirmationMessage = 'It looks like you have been updating your study notes. '
+                                + 'If you leave before saving, your changes will be lost.';
+        
+        (e).returnValue = confirmationMessage; 	//Gecko + IE
+        return confirmationMessage; 			//Gecko + Webkit, Safari, Chrome etc.
+	}
+
+
 	/**
 		toggle tag between output, notes, and etc.
 	 **/
@@ -624,25 +716,13 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		}
 		
 		// switch tab to notes:
-		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_NOTES_CONSOLE);
+		const ti = TAB_LIST.findIndex(t => t.tab == YT_TB_CODE_DEPOT);
 		this.prv_toggleTab(ti);
 		
 		// ask if user want to save code to code depot?
 		const selectedCodeName = this.#codeManContainer.currentSelection;
 		$(this.codeNameTextSelector).val(selectedCodeName);
 		 $(this.codeSaveDialogSelector).dialog("open");
-	}
-	
-	/**
-		Hnandle saving notes
-	**/
-	async prv_saveNotesToDb() {
-		const noteTxt = $(this.notesTextArea).val();
-		if (!StringUtil.testEqual(this.#notes, noteTxt)) {
-			await Net.userUpdateClassNotes(credMan.credential.token, this.#groupId, noteTxt);
-			this.#notes=noteTxt;
-			console.log("saved: " + this.#notes);
-		}
 	}
 	
 	/*
@@ -804,26 +884,42 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	}
 	
 	get notesConsoleTab() {
-		return `#${YT_TB_NOTES_CONSOLE}`;
+		return `#${YT_TB_CODE_DEPOT}`;
 	}
 	
 	get msgConsoleTab() {
 		return `#${YT_TB_MSG_CONSOLE}`;
 	}
 	
+	get classYtTabSelector() {
+		return `.${CSS_YT_TAB}`;
+	} 
 	
 	get msgTextArea() {
 		return `#${YT_TA_MSG_ID}`;
 	}
+
+	get notesTextAreaSelector() {
+		return `#${YT_DIV_NOTES}`;
+	}
 	
 	get messageBoardInputSlector() {
 		return `#${YT_TA_MSG_INPUT_ID}`;
+	}
+
+	// button for saving notes
+	get saveNotesButton() {
+		return `#${YT_BTN_SAVE_NOTES}`;
 	}
 	
 	get teacherVideoSelector() {
 		return `#${USER_VIDEO_ID_TEMPLATE}${this.liveSession.owner_name}`;	
 	}
 	
+	get notesEditorButtonClassSelector() {
+		return `.${CSS_YT_BTN_NOTES_EDITOR}`;
+	}
+
 	videoAreaSelector(userId) {
 		return `#${USER_VIDEO_ID_TEMPLATE}${userId}`;	
 	}

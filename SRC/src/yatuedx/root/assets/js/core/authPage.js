@@ -56,8 +56,6 @@ class AuthPage {
 			willGotoLiveClass = false;
 		}
 			
-		
-		
 		this.#groupWebSocketMap = new Map();
 		const t = credMan.credential.token;
 		
@@ -137,7 +135,11 @@ class AuthPage {
 		console.log('go to live class ' + liveClass.group_id);
 		const gotoClass = confirm('You have a live class going on. Do you want to go to the classroom?');
 		if (gotoClass) {
-			if (liveClass.group_type == groupTypeConstants.GPT_EDU_JSP) {
+			// js coding and web coding share same class room
+			// todo: better way to direct to different classrooms
+			if (liveClass.group_type == groupTypeConstants.GPT_EDU_JSP ||
+				liveClass.group_type == groupTypeConstants.GPT_EDU_JSP_NODE) {  
+				
 				if (this.credential.name === liveClass.owner_name) {
 					// go to class room as teacher
 					window.location.href =  `./class-room-teacher.html`;
@@ -147,9 +149,10 @@ class AuthPage {
 					window.location.href =  `./class-room.html`;				
 				}
 			}
+			// other codeing such as SQL, Java, and Python are not currently supported
 			else {
 				// go to chat page
-				window.location.href =  `./legacy/videoChat.html?group=${groupId}`; 
+				window.location.href =  `./legacy/videoChat.html`; 
 			};
 		}
 		
