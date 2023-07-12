@@ -8,6 +8,7 @@ import {PageUtil, StringUtil, RegexUtil, UtilConst, CollectionUtil}	from '../cor
 import {Net}			    						from "../core/net.js"
 import {CodeManContainer}							from '../component/new/codeManager.js'
 import {CodeInputConsole}							from '../component/new/codeInputConsole.js';
+import {DomUtil}									from '../core/domUtil.js';
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
@@ -46,6 +47,7 @@ const CSS_CODING_COL_WITH_VIDEO				= 'col-10';
 const CSS_CODING_COL_WITHOUT_VIDEO 			= 'col-12';
 const CSS_YT_TAB							= "yt_tab";
 const CSS_YT_BTN_NOTES_EDITOR				= "yt-btn-notes-editor";
+const CSS_YT_NOTES_SPAN 					= "yt-notes-span";
 
 const TAB_LIST = [
 	{tab:YT_TB_CODE_DEPOT,  	sub_elements: [YT_DIV_CODE_MANAGER] },
@@ -179,9 +181,11 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		// handle erasing code from board
 		$(this.eraseCodeFromBoardButtonSelector).click(this.eraseCodeFromBoard.bind(this));
 		// hamdle notes editor button click
-		$(this.notesEditorButtonClassSelector).click(this.addHtmlToNotes);
+		$(this.notesEditorButtonClassSelector).click(this.addHtmlToNotes.bind(this));
 		// hook up event 'save notes;
 		$(this.saveNotesButton).click(this.saveNotes.bind(this));
+		// toggle font style for notes
+		$(this.notesTextSpanSelector).dblclick(this.toggleNotesStyle);
 
 		// hadling windows unload by saving notes to DB if notes are dirty
 		$(window).on('beforeunload',this.preExitHandler.bind(this));
@@ -383,10 +387,17 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		const text = window.getSelection().toString();
 		if (!text) {return}
 
+		// Get style selection name (i.e.: b for bold, i for italiz, and etc)
 		const name = $(e.target).attr('name');
-		const tag = document.createElement(name);
-		tag.innerHTML = text;
-		document.execCommand('insertHTML', false, tag.outerHTML);
+		// change style of selected text (double click to undo changes)
+		DomUtil.toggleSelectionStyle(CSS_YT_NOTES_SPAN, name, this.toggleNotesStyle);
+	}
+
+	toggleNotesStyle(e) {
+		e.target.style.fontWeight = 'normal';
+		e.target.style.fontStyle = 'inherit';
+		e.target.style.textDecoration  = "none";
+		e.target.style.fontSize = "inherit";
 	}
 	
 	async saveNotes() {
@@ -918,6 +929,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	
 	get notesEditorButtonClassSelector() {
 		return `.${CSS_YT_BTN_NOTES_EDITOR}`;
+	}
+
+	get notesTextSpanSelector() {
+		return `.${CSS_YT_NOTES_SPAN}`;
 	}
 
 	videoAreaSelector(userId) {

@@ -18,7 +18,7 @@ const TOKEN_TYPE_KNOWN_NAME_ = 11;
 
 const TOKEN_SPACE_ = " ";
 const TOKEN_CR_ = "\n";
-const TOKEN_TAB_ = "\t";
+const TOKEN_TAB_ = "    ";
 const TOKEN_STAR_ = "*";
 const SPACE_TOKEN_NAME_ = 'SPC';
 const TAB_TOKEN_NAME_ = 'TAB';
@@ -559,6 +559,11 @@ class Token {
 		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
 		return 	tokenInfo && tokenInfo.isIoFunc;
 	}
+
+	static isElse(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		return 	tokenInfo && tokenInfo.keyType && tokenInfo.keyType === TokenConst.ELSE_KEY; 
+	}
 	
 	static bracketTypeToName(type) {
 		switch(type) {
@@ -668,6 +673,7 @@ class Token {
 	get isConstVarDeclaration() { return Token.isConstVarDeclaration(this.#name); }
 	get isLetVarDeclaration() { return Token.isLetVarDeclaration(this.#name); }
 	get isVarVarDeclaration() { return Token.isVarVarDeclaration(this.#name); }
+	get isElse()	          { return Token.isElse(this.#name); }			
 	get varType() {
 		if (this.isConstVarDeclaration) {
 			return TokenConst.VAR_TYPE_CONST;

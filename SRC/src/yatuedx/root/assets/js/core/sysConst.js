@@ -62,7 +62,7 @@ const sysConstStrings = Object.freeze({
 	SWITCH_TO_EXERCISE: 'Current mode: learning',
 	
 	ATTR_MODE: 'mode',
-	TAB_STRING: '\t',
+	TAB_STRING: '    ',
 	
 	TAG_PARSER_ADDED_COMMENT: 'sys_inserted_comment',
 	

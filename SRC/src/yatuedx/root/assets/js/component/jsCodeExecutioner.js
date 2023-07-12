@@ -28,7 +28,7 @@ class JSCodeExecutioner {
 		this.#consoleId = consoleId; 
 
 		// set global functions for our usage
-		window.div = this.#integerDiv
+		window.div = this.#integerDiv;
 	}
 	
 	/*
@@ -144,21 +144,25 @@ class JSCodeExecutioner {
 		this.#appendMessage(false, msgs);
 	}
 	
+	#formatVarriable(v) {
+		let varText = v;
+		if (v && typeof v === 'object' && v.constructor === Object) {
+			varText = this.#getObjectProperties(v);
+		} else if (Array.isArray(v)) {
+			varText = this.#displayArray(v);
+		} else if (v instanceof Function) {
+			varText = "Function";
+		}
+		return varText;
+	}
+
 	/*
 		append message text to console.
 	 */
 	#appendMessage(newLine, args) {
 		let msgTxt = "";
 		for (const a of args) {
-			let argText = a;
-			if (a && typeof a === 'object' && a.constructor === Object) {
-				argText = this.#getObjectProperties(a);
-			} else if (Array.isArray(a)) {
-				argText = this.#displayArray(a);
-			} else if (a instanceof Function) {
-				argText = "Function";
-			}
-			
+			let argText = this.#formatVarriable(a);
 			msgTxt += msgTxt ? ' ' + argText : argText;
 		}
 		
@@ -197,7 +201,7 @@ class JSCodeExecutioner {
 									`"${obj[key]}"` : `${obj[key]}`;
 				}
 				const kvPair = `${key}: ${objValStr}`;
-				objText += i++ === 0 ? `${kvPair} ` : `, ${kvPair}`;
+				objText += i++ === 0 ? `${kvPair}` : `, ${kvPair}`;
 			}
 		}
 		objText += "}";
@@ -208,7 +212,8 @@ class JSCodeExecutioner {
 		let objText = "[";
 		let bodyText = "";
 		arr.forEach(e => {
-			bodyText += bodyText ? `, ${e}` : e;
+			const elemTxt = this.#formatVarriable(e);
+			bodyText += bodyText ? `, ${elemTxt}` : elemTxt;
 		});
 		objText += bodyText + "]";
         return objText;
