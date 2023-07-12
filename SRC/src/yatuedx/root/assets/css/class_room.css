@@ -374,7 +374,7 @@
 }
 
 .msg-board {
-	height: 100% !important;
+	
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
@@ -384,6 +384,18 @@
 	background: #ccffff !important;
 	color: #000000;
 	border:outset 4px orange;
+}
+
+.msg-board-dimention-big {
+	height: 600px !important;
+}
+
+.msg-board-dimention-midium {
+	height: 636px !important;
+}
+
+.msg-board-dimention-small {
+	height: 100px !important;
 }
 
 .yt-video-area {
