@@ -36,12 +36,12 @@ const CONTAINER_HTML_TMPLATE =
 	<button id="{enlgeshrkbtnid}" title="" class="show-hide-button">+</button>
 	<textarea class="{codelnnum} blob-num"
 	  spellcheck="false"
-	  rows="32"></textarea>
+	  rows="46"></textarea>
 	<textarea class="input-board-float"
 	  id="{codebrdid}" 
 	  spellcheck="false"
 	  placeholder="Type your code here...."
-	  rows="32"></textarea>
+	  rows="46"></textarea>
 	<div id="{otptcntnrid}" class="output-board-float-container ta-container-zorder-left" style="display:none">
 		<button title="Close" id="{shwhdbtnid}" class="show-hide-button">-</button>							
 		<textarea class="output-board"

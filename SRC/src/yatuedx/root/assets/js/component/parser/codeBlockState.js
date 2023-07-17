@@ -24,7 +24,11 @@ class CodeBlockState extends ParsingState {
 	
 	advance(nextToken, pos) {
 		const tokenInfo = Token.getTokenInfo(nextToken.name);
-			
+		if (nextToken.isElse) {
+			// ignore else since it is just another block or expression
+			return new StateAction(null, null, false);
+		}
+
 		// enering a new code block:
 		if (nextToken.isOpenCurlyBracket) {
 			const newScope = new Scope(this.scope);	
@@ -32,7 +36,7 @@ class CodeBlockState extends ParsingState {
 			const nextState = new CodeBlockState(pos, nextToken, newScope, this.codeAnalyst);	
 			return new StateAction(nextState, null, false);
 		}
-		
+				
 		// current code block ended:
 		if (nextToken.isCloseCurlyBracket) {
 			// also set parent state to finish if any
@@ -94,7 +98,6 @@ class CodeBlockState extends ParsingState {
 													this.codeAnalyst, false);
 			return new StateAction(nextState, null, false);
 		}
-		
 		
 		// IF statement encountered:
 		if (tokenInfo && tokenInfo.keyType === TokenConst.IF_KEY) {

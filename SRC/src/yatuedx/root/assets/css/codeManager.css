@@ -31,10 +31,25 @@
 
 .yt-list-panel-right {
 	width: 48% !important;
+	height: 700px;
+	overflow-y: auto;
 	margin-right: 0 !important;
 	border-top: outset 4px orange;
 	border-right: outset 4px orange;
 	border-bottom: outset 4px orange;
+}
+
+.yt-list-panel-left {
+	height: 700px !important;
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+	font-family: 'Merriweather';
+    font-weight: 300;
+	font-size: 20px;
+    line-height: 1.5;
+	background: #ccffff !important;
+	color: #000000;
+	border:outset 4px orange;
 }
 
 .yt-list-element {

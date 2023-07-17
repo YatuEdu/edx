@@ -10,38 +10,43 @@
     background: rgb(244, 236, 244);
     margin: 6px 0;
   }
+
    textarea {
     background: black;
 	  color: #e0e31b;
     margin: 6px 0;
   }
-  </style>
+
+  .animated {
+    overflow: hidden;
+    width: 11rem;
+    white-space: nowrap;
+  }
+
+.animated > * {
+  display: inline-block;
+  position: relative;
+  animation: 3s linear 0s infinite alternate move;
+}
+
+.animated > *.min {
+  min-width: 100%;
+}
+
+@keyframes move {
+  0%,
+  25% {
+    transform: translateX(0%);
+    left: 0%;
+  }
+  75%,
+  100% {
+    transform: translateX(-100%);
+    left: 100%;
+  }
+}
+</style>
 </head>
 <body>
-  <h1>My fun page</h1>
-  <textarea id="ta" class="student-input-board-extend" width="60%" spellcheck="true"></textarea>
-  <button>Is it a prime?</button>
-  
-  <script>
-    $( "button" ).click(function() {
-      const txt = document.getElementById("ta").value;
-      const n = parseInt(txt);
-      if (n === 0 || n === 2 || n % 2 === 0) {
-        document.getElementById("ta").value = "Not a prime";
-        return;
-      }
-
-      for (i = 3; i < n; i += 2) {
-        if (n % i === 0) {
-          document.getElementById("ta").value = "Not a prime";
-          return;
-        }
-      }
-     
-      document.getElementById("ta").value = "Is a prime"
-    
-    });
-  </script>
- 
 </body>
 </html>

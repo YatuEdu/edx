@@ -4,6 +4,10 @@ import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
 import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
 import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
 
+const CSS_VIDEO_MIN 						= 'yt-video';
+const CSS_VIDEO_MAX 						= 'yt-video-max';
+const CSS_VIDEO_ANY 						= 'yt-video-any';
+
 class ProgrammingClassCommandUI extends AuthPage {
 	#jsCodeExecutioner;
 	#codeInputId;
@@ -13,6 +17,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 	#timer;
 	#codeSyncManager;
 	#groupId;
+	#classMode
 	
 	constructor(codeInputId, resultConsolId, videoAreaId, screenShareBtnId) {
 		super();
@@ -20,6 +25,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		this.#resultConsolId = resultConsolId;
 		this.#videoAreaId = videoAreaId;
 		this.#screenShareBtnId = screenShareBtnId;
+		this.#classMode = 0;
 	}
 	
 	async init() {
@@ -30,6 +36,9 @@ class ProgrammingClassCommandUI extends AuthPage {
 		
 		// create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
+
+		// handle maximize or minimize video screen
+		$(this.videoAreaId).click(this.toggleVideoSize);
 	}
 	
 	/**
@@ -87,6 +96,29 @@ class ProgrammingClassCommandUI extends AuthPage {
 	 **/
 	syncCode(codeSrc) {
 		return this.#codeSyncManager.syncCode(codeSrc);
+	}
+
+	/**
+		When a video is clicked,  toggle bewtween a min / max sized screen.
+	 **/
+	toggleVideoSize(e) {
+		// the click is only on the video area
+		if ($(e.target).hasClass(CSS_VIDEO_ANY))  {
+			e.preventDefault(); 
+
+			if ($(e.target).hasClass(CSS_VIDEO_MIN)) {
+				$(e.target).removeClass(CSS_VIDEO_MIN);
+				$(e.target).addClass(CSS_VIDEO_MAX);
+			}
+			else {
+				$(e.target).removeClass(CSS_VIDEO_MAX);
+				$(e.target).addClass(CSS_VIDEO_MIN);
+			}
+
+			e.stopPropagation();
+			e.preventDefault();
+		}
+			
 	}
 	
 	/**
@@ -166,7 +198,7 @@ class ProgrammingClassCommandUI extends AuthPage {
 		we don't need to call initGroups logic of that in parent class (AuthPage)
 	 */
 	v_isLiveChatPage() {
-		return true;
+		return this.#classMode === 0;
 	}
 	
 	/**
@@ -202,8 +234,8 @@ class ProgrammingClassCommandUI extends AuthPage {
 			const re = /^/gm;
 			this.value = val.substring(0, start) + selected.replace(re, sysConstStrings.TAB_STRING) + val.substring(end);
 			//Keep the cursor in the right index
-			this.selectionStart=start+1;
-			this.selectionEnd=start+1; 
+			this.selectionStart=start + sysConstStrings.TAB_STRING.length;
+			this.selectionEnd  =start + sysConstStrings.TAB_STRING.length; 
 			e.stopPropagation();
 			e.preventDefault(); 			
 		}
@@ -251,6 +283,11 @@ class ProgrammingClassCommandUI extends AuthPage {
 	
 	executeCode(codeText) {
 		return this.#jsCodeExecutioner.executeCode(codeText);
+	}
+	
+	set classMode(cm) {
+		this.#classMode = cm;
+
 	}
 	
 	get groupId() {
