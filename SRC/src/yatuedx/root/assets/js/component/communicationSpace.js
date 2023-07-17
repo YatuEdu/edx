@@ -65,7 +65,9 @@ class CommunicationSpace {
 			tracks = await VideoUtil.getLocalMediaTracks(true, true);
 			this.#audioTrack = tracks[0];
 			this.#videoTrack = tracks[1];
-			this.handleRemoteVideoTrack(this.#me, this.#videoTrack);
+			if(this.#videoTrack!=null) {
+				this.handleRemoteVideoTrack(this.#me, this.#videoTrack);
+			}
 		} catch (e) {
 			alert('Failed to initialize viedo tracks');
 		}
@@ -103,7 +105,7 @@ class CommunicationSpace {
 		/*
 			If we need video for the communication board, create video client
 		*/
-		if (this.#videoTrack && this.#audioTrack) {
+		if (this.#videoTrack || this.#audioTrack) {
 			this.#videoClient = new VideoClient(this.#commClient, this.#audioTrack , this.#videoTrack);
 
 			// 收到音频轨道或视频轨道，需要放在MediaStream对象中
