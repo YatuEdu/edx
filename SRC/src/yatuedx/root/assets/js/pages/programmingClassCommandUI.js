@@ -234,8 +234,8 @@ class ProgrammingClassCommandUI extends AuthPage {
 			const re = /^/gm;
 			this.value = val.substring(0, start) + selected.replace(re, sysConstStrings.TAB_STRING) + val.substring(end);
 			//Keep the cursor in the right index
-			this.selectionStart=start + sysConstStrings.TAB_STRING.length;
-			this.selectionEnd  =start + sysConstStrings.TAB_STRING.length; 
+			this.selectionStart = start + 1;
+			this.selectionEnd   = start + 1; 
 			e.stopPropagation();
 			e.preventDefault(); 			
 		}

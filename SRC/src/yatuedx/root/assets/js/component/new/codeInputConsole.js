@@ -26,7 +26,7 @@ const CSS_CONTAINER_MAX = "code-console-container-max";
 const TITLE_ENLARGE = "Enlarge";
 const TITLE_SHRINK = "Shrink";
 const LINE_HEIGHT = 17;
-const DATA_ATTR_LINE = "-error-line";
+const DATA_ATTR_LINE = "error-line";
 
 const DIAGNOSTIC_MESSAGE_TEMPLATE = 
 `<a class="nav-link {msgentryclss}" data-{errlineno}="{errln}" href="#">{msg}</a>`;
@@ -171,7 +171,12 @@ class CodeInputConsole extends ComponentBase {
 		});
 		$(this.diagnoticMsgDivIdSelector).html(errorMsgHtml);
 		if (error.exception) {
-			$(this.diagnoticExceptionDivIdSelector).html(`<p>${error.exception.name}: ${error.exception.message}</p>`);
+			const exHtml = DIAGNOSTIC_MESSAGE_TEMPLATE
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE, error.exception.line)
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_LINE_DATA_ATTR, DATA_ATTR_LINE)
+									.replace(REPLACMENT_DIAGNOSTIC_ERROR_ENTRY_CLASS, error.exception.message)
+									.replace(REPLACMENT_DIAGNOSTIC_MESSAGE, error.exception.message);
+			$(this.diagnoticExceptionDivIdSelector).html(exHtml);
 		}
 		
 		// hook up click handler for each message:
