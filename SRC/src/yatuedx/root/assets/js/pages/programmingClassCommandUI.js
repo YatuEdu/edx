@@ -3,6 +3,7 @@ import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
 import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
 import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
 import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
+import {Token}								from '../component/parser/token.js'
 
 const CSS_VIDEO_MIN 						= 'yt-video';
 const CSS_VIDEO_MAX 						= 'yt-video-max';
@@ -216,28 +217,69 @@ class ProgrammingClassCommandUI extends AuthPage {
 	}
 	
 	/**
-		Call this to set tab handler
+		Call this to set tab handler and other coding helper features
 	**/
-	setTabHandler() {
-		$(this.codeInputTextArea).keydown(this.handleTab);
+	setKeyDownHandler() {
+		$(this.codeInputTextArea).keydown(this.handleKeyDown);
 	}
 	
 	/**
 		Hnandle tab by insertng \t
 	**/
-	handleTab(e) {
-		if(e.which===9){ 
-			const start = this.selectionStart;
-			const end = this.selectionEnd;
-			const val = this.value;
-			const selected = val.substring(start, end);
-			const re = /^/gm;
-			this.value = val.substring(0, start) + selected.replace(re, sysConstStrings.TAB_STRING) + val.substring(end);
+	handleKeyDown(e) {
+		const start = this.selectionStart;
+		const end = this.selectionEnd;
+		const uiText = this.value;
+		const selected = uiText.substring(start, end);
+		const re = /^/gm;
+
+		// insert tab char when tab key is hit
+		let inputModified = true;
+		let charAdded = 1;
+		while(true) {
+			if(e.which===9) { 
+				this.value = uiText.substring(0, start) + selected.replace(re, sysConstStrings.TAB_STRING) + uiText.substring(end);
+				break;	
+			}
+
+			// help close open bracket by close bracket 
+			if (Token.isOpenBracket(e.key)) {
+				const closeBracket = Token.getCloseBracketFor(e.key);
+				this.value = uiText.substring(0, start) + selected.replace(re, e.key + closeBracket) + uiText.substring(end);
+				break;
+			}
+
+			// help close " and ' and `
+			if (Token.isQuote(e.key)) {
+				this.value = uiText.substring(0, start) + selected.replace(re, e.key + e.key) + uiText.substring(end);
+				break;
+			}
+
+			// help inserting the right number of tabs when CR is hit
+			if(e.which === 13) {
+				const tabLEvel = PageUtil.findTabLevel(uiText, start);
+				if(tabLEvel > 0) {
+					this.value = uiText.substring(0, start) + 
+								 selected.replace(re, Token.TOKEN_CR + sysConstStrings.TAB_STRING.repeat(tabLEvel)) + 
+								 uiText.substring(end);
+					charAdded = 1 + tabLEvel;
+				} else {
+					inputModified = false;
+				}
+				break;
+			}
+
+			// no modification performed
+			inputModified = false;
+			break;
+		}
+
+		if (inputModified) {
 			//Keep the cursor in the right index
-			this.selectionStart = start + 1;
-			this.selectionEnd   = start + 1; 
+			this.selectionStart = start + charAdded;
+			this.selectionEnd   = start + charAdded; 	
 			e.stopPropagation();
-			e.preventDefault(); 			
+			e.preventDefault(); 	
 		}
 	}
 	
