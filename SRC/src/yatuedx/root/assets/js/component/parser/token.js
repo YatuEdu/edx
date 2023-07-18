@@ -18,7 +18,7 @@ const TOKEN_TYPE_KNOWN_NAME_ = 11;
 
 const TOKEN_SPACE_ = " ";
 const TOKEN_CR_ = "\n";
-const TOKEN_TAB_ = "    ";
+const TOKEN_TAB_ = "\t";
 const TOKEN_STAR_ = "*";
 const SPACE_TOKEN_NAME_ = 'SPC';
 const TAB_TOKEN_NAME_ = 'TAB';
@@ -440,6 +440,21 @@ class Token {
 		return 	tokenInfo && 
 				tokenInfo.type === TOKEN_TYPE_SEPARATOR &&
 				tokenInfo.bracketAction === ACTION_OPEN;
+	}
+
+	static getCloseBracketFor(c) {
+		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+		
+		if (Token.isOpenBracket(c)) {
+			const tokenKeys = [...STANDARD_TOKEN_MAP.entries()]
+        	.filter(({ 1: v }) => v.bracketAction === ACTION_CLOSE &&  v.bracketType === tokenInfo.bracketType)
+        	.map(([k]) => k);
+			if (tokenKeys) {
+				return tokenKeys[0] 
+			}
+		}
+
+		return null;
 	}
 	
 	static isCloseBracket(c) {

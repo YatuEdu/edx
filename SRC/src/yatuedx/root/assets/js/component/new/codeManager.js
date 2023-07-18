@@ -9,10 +9,8 @@ const MY_CODE_LIST_TEMPLATE = `
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
   <div class="col-6 tool-tbtn-dimention">
-	<button class="textButton smallTextButton rpl-code" id="{codeRplId}" title="Replace the code in the code console with this code">Rpl</button>
-	<button class="textButton smallTextButton ins-code" id="{codeInsId}" title="Insert the code at the beginning of the code console">Ins</button>
-	<button class="textButton smallTextButton upd-code" id="{codeUpdId}" title="Update the code in the code depot">Upd</button>
-	<button class="textButton smallTextButton del-code" id="{codeDelId}" title="Delete the code">Del</button>
+	<button class="textButton mediumTextButton upd-code" id="{codeUpdId}" title="Copy the code from the code practice console and update the selected code entry in code depot">Update</button>
+	<button class="textButton mediumTextButton del-code" id="{codeDelId}" title="Delete the code">Delete</button>
   </div>
 </div>
 `;
@@ -26,17 +24,7 @@ const TEMPLETE_2 = '
 
 const TEMPLETE = 
 `<div id='yt_div_code_man' class="row mb-0">
- <div id="yt_col_code_text" class="col-6 tool-tbtn-dimention-left">
-  <div class="ta-container ta-container-zorder-lower-left">
-	<button title="Make it large" class="ta-btn-minmax ta-btn-minmax-zorder-lower-left">+</button>							
-	<textarea class="yt-list-panel-left"
-		  id="yt_ta_selected_code" 
-		  spellcheck="false" 
-		  placeholder="Load code from DB"
-		  rows="44"></textarea>
-  </div>
- </div>
- <div id="yt_col_code_list" class="col-6 tool-tbtn-dimention yt-list-panel-right">
+ <div id="yt_col_code_list" class="col-12  yt-list-panel-right">
 	{codeListHolder}
  </div>
 </div>
@@ -50,8 +38,6 @@ const REPLACE_CODELIST_LABEL = '{lb}';
 const REPLACE_CODELIST_DIV_ID = '{codelstDivId}';
 const REPLACE_CODE_LIST_LINK_ID = '{codeLinkId}';
 const REPLACEMENT_CODE_LIST = '{codeListHolder}';
-const REPLACEMENT_CODE_RPL = '{codeRplId}';
-const REPLACEMENT_CODE_INS = '{codeInsId}';
 const REPLACEMENT_CODE_DEL = '{codeDelId}';
 const REPLACEMENT_CODE_UPD = '{codeUpdId}';
 
@@ -228,42 +214,37 @@ class CodeManContainer extends ComponentBase {
 		
 		// handle insert code to code console by name
 		// code insert button selector
-		$(this.getCodeReplaceSelector(codeName)).click(this.handleReplaceCode.bind(this));
-		$(this.getCodeInsertSelector(codeName)).click(this.handleInsertCode.bind(this));
 		$(this.getCodeDeleteSelector(codeName)).click(this.handleDeleteCode.bind(this));
 		$(this.getCodeUpdateSelector(codeName)).click(this.handleUpdateCode.bind(this));
 	}
 	
-	// when clicked, replace the code board console the the selected code
-	handleReplaceCode(e) {
-		const codeName = this.prv_getCodeNameFromEvent(e);
-		// only react to selected code entry
-		if (this.#selectedCodeName == codeName) {
-			const codeEntry = this.prv_getCodeEntryForFAromCodeMan(codeName);
-			if (codeEntry) {
-				// update board text with the selected code
-				$(this.codeInputBoardSelector).val(codeEntry.text);
-				$(this.codeInputBoardSelector).trigger('change');
-			}		
-		}
-	}
 	
-	// get the code clicked and insert into code input console
-	handleInsertCode(e) {
+	async handleUpdateCode(e) {
 		const codeName = this.prv_getCodeNameFromEvent(e);
 		// only react to selected code entry
 		if (this.#selectedCodeName == codeName) {
-			const codeEntry = this.prv_getCodeEntryForFAromCodeMan(codeName);
-			if (codeEntry) {
-				// insert to code console
-				let existingCodeStr = $(this.codeInputBoardSelector).val();
-				existingCodeStr = codeEntry.text + '\n' + existingCodeStr;
-				// update UI
-				$(this.codeInputBoardSelector).val(existingCodeStr);
+			const uiText = $(this.codeInputBoardSelector).val();
+			const depotText = (this.#codeMan.getCodeEntry(codeName)).text;
+			if (uiText !== depotText) {
+				const updateCode = confirm(`Are you sure you want to replace "${codeName}" in code depot with code from input consle?`);
+				if (!updateCode) {
+					return
+				}
+				// update depot DB
+				const resp = await this.#updateCodeToDbMethod(codeName, uiText);
+				if (resp.code) {
+					alert("Error encountered during updating code to DB. Error code:" +  resp.code);
+				} else {
+					// updater manager
+					this.#codeMan.updateCodeEntry(codeName, uiText, StringUtil.getMessageDigest(uiText));
+					alert(`Code "${codeName}" successfully updated!`);
+				}
+			} else {
+				alert(`Code "${codeName}" has not been changed.`);
 			}
 		}
 	}
-	
+
 	async handleDeleteCode(e) {
 		const codeName = this.prv_getCodeNameFromEvent(e);
 		const deleteCode = confirm(`Are you sure you want to delete "${codeName}" code block permanantly from your code depot?`);
@@ -284,28 +265,6 @@ class CodeManContainer extends ComponentBase {
 			// delete code entry from UI
 			$(this.getCodeListLinkSelector(codeName)).empty();
 			$(this.getCodeListLinkSelector(codeName)).remove();
-		}
-	}
-	
-	async handleUpdateCode(e) {
-		const codeName = this.prv_getCodeNameFromEvent(e);
-		// only react to selected code entry
-		if (this.#selectedCodeName == codeName) {
-			const uiText = $(this.codeConsoleTaSelector).val();
-			const depotText = (this.#codeMan.getCodeEntry(codeName)).text;
-			if (uiText != depotText) {
-				// update depot DB
-				const resp = await this.#updateCodeToDbMethod(codeName, uiText);
-				if (resp.code) {
-					alert("Error encountered during updating code to DB. Error code:" +  resp.code);
-				} else {
-					// updater manager
-					this.#codeMan.updateCodeEntry(codeName, uiText, StringUtil.getMessageDigest(uiText));
-					alert(`Code "${codeName}" successfully updated!`);
-				}
-			} else {
-				alert(`Code "${codeName}" has not been changed.`);
-			}
 		}
 	}
 	
@@ -336,21 +295,27 @@ class CodeManContainer extends ComponentBase {
 								.replace(REPLACE_CODELIST_DIV_ID, this.getCodeListDivId(codeName))
 								.replace(REPLACE_CODELIST_LABEL, codeName)
 								.replace(REPLACE_CODE_LIST_LINK_ID, this.getCodeListLinkId(codeName))
-								.replace(REPLACEMENT_CODE_RPL, this.getCodeReplaceId(codeName))
-								.replace(REPLACEMENT_CODE_INS, this.getCodeInsertId(codeName))
 								.replace(REPLACEMENT_CODE_DEL, this.getCodeDeleteId(codeName))
 								.replace(REPLACEMENT_CODE_UPD, this.getCodeUpdateId(codeName))
 								.replace(REPLACE_CODELIST_TAB, 0);
+							
 	}
 	
 	// get code if the code link is clicked
 	async handleGetCodeFor(e) {
 		const name = StringUtil.getIdStrFromBtnId(e.target.id);
-		const codeText = await this.prv_getCodeFor(name);
+		let codeText = await this.prv_getCodeFor(name);
 		
 		if (this.#selectedCodeName != name) {
+			const existingCode = $(this.codeInputBoardSelector).val();
+			codeText = existingCode 
+						? 
+						codeText + `\n\n /* @ Code ${name} inserted before the following line! @ */ \n\n ` + existingCode 
+						: 
+						codeText;
+
 			this.prv_toggleSelection(this.#selectedCodeName, name);
-			$(this.codeConsoleTaSelector).val(codeText);
+			$(this.codeInputBoardSelector).val(codeText);
 			this.#selectedCodeName = name;
 		}
 	}
@@ -430,31 +395,6 @@ class CodeManContainer extends ComponentBase {
 	// selector for each code entry
 	getCodeListLinkSelector(name) {
 		return `#${this.getCodeListLinkId(name)}`;
-	}
-	
-	// code text console selectot
-	get codeConsoleTaSelector() {
-		return `#yt_ta_selected_code`;
-	}
-	
-	// id for inserting code
-	getCodeInsertId(name) {
-		return `yt_btn_code_insert_${name}`;
-	}
-	
-	// code insert button selector
-	getCodeInsertSelector(name) {
-		return `#${this.getCodeInsertId(name)}`;
-	}
-	
-	// id for replacing code
-	getCodeReplaceId(name) {
-		return `yt_btn_code_replace_${name}`;
-	}
-	
-	// code replace button selector
-	getCodeReplaceSelector(name) {
-		return `#${this.getCodeReplaceId(name)}`;
 	}
 	
 	// id for deleting code

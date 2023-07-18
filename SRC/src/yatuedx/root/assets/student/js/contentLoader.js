@@ -19,6 +19,10 @@ class ContentLoader {
 			window.location.href = "./login.html";
             return;
 		}
+         // token for this page to use
+         window.student_token = credMan.credential.token;
+         window.coding_king_api = sysConstants.YATU_AUTH_URL;
+
         // load content from student db
         // first load from local storage
         let codeTextEncoded = this.#codeStore.getItem();
@@ -35,9 +39,9 @@ class ContentLoader {
             eval(codeToEval);
         }
         else {
-         '<div><h1> Hello </h1></div>'
+            document.body.innerHTML = '<div><h1> Hello </h1></div>';
         }
-       
+    
     }
 }
 

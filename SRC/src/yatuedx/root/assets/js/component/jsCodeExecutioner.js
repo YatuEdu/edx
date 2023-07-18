@@ -1,5 +1,5 @@
 import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
-import {uiMan} 												from '../core/uiManager.js';
+import {credMan} 											from '../core/credMan.js'
 import {CodeAnalyst}										from './new/codeAnalyst.js'
 
 /**
@@ -28,7 +28,30 @@ class JSCodeExecutioner {
 		this.#consoleId = consoleId; 
 
 		// set global functions for our usage
-		window.div = this.#integerDiv;
+		Object.defineProperty(window, 'div', {
+			value: this.#integerDiv,
+			writable: false
+		});
+
+		Object.defineProperty(window, 'print', {
+			value: this.#printLine.bind(this),
+			writable: false
+		});
+
+		Object.defineProperty(window, 'printx', {
+			value: this.#printx.bind(this),
+			writable: false
+		});
+
+		Object.defineProperty(window, 'practice_api_endpoint', {
+			value: sysConstants.YATU_AUTH_URL,
+			writable: false
+		});
+
+		Object.defineProperty(window, 'practice_api_token', {
+			value: credMan.credential.token,
+			writable: false
+		});
 	}
 	
 	/*
@@ -101,9 +124,9 @@ class JSCodeExecutioner {
 					codeOutputHeaderTxt = sysConstStrings.EXE_PROGRAM_OUTPUT;
 				}
 				
-				// exec code
-				const func = new Function('print', 'printx', newSrc);
-				func(this.#printLine.bind(this), this.#printx.bind(this));
+				// Make a function (closure) with the code user has just entered:
+				const func = new Function(newSrc);
+				func();
 				
 				// append the old output with the new output
 				const newTxt = $(consoleId).val();

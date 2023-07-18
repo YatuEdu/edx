@@ -192,7 +192,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 
 		// accept tab and insert \t when tab key is hit by user
 		// note that we do not want to bind this handler the "this" class
-		this.setTabHandler();
+		this.setKeyDownHandler();
 	}
 	
 	/**

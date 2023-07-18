@@ -369,6 +369,27 @@ class PageUtil {
 		  txt.focus();
 		}
 	}
+
+	/**
+	 * At a given cursor location, find out current nested "{}" level (tab level).
+	 * 
+	 * @param {*} uiText 		- current total text on the input
+	 * @param {*} position 		- current inoput cursor location
+	 * @returns 
+	 */
+	static findTabLevel(uiText, position) {
+		// find number of unclosed "{" before this position:
+		let numOpenCurlyBracket = 0;
+		for (let i = position; i >= 0; i--) {
+			if(uiText[i] === "}") {
+				--numOpenCurlyBracket;
+			} else if (uiText[i] === "{") {
+				++numOpenCurlyBracket;
+			}
+		}
+
+		return numOpenCurlyBracket < 0 ? 0 : numOpenCurlyBracket;
+	}
 }
 
 class Dbg {

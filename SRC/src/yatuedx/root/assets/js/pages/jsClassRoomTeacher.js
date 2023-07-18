@@ -118,7 +118,7 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
 		
 		// accept tab and insert \t
-		this.setTabHandler();
+		this.setKeyDownHandler();
 		
 		// handle key up 
 		$(this.codeInputTextArea).mouseup(this.handleMouseUp.bind(this));

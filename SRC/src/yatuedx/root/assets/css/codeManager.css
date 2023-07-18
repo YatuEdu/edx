@@ -3,13 +3,21 @@
   height: 30px;
 }
 
+.mediumTextButton{
+	width: 80px;
+	height: 30px;
+	text-align: right;
+}
+
 .bigTextButton {
-  width: 200px;
+  width: 99%;
   height: 32px;
+  float: right;
+  text-align: right;
 }
 
 .textButton{
-	text-align: left !important;
+	text-align: right !important;
 	border: none;
 	transition: all ease-in-out 0.2s;
 	cursor: pointer;
@@ -30,10 +38,11 @@
 }
 
 .yt-list-panel-right {
-	width: 48% !important;
+	width:90% !important;
 	height: 700px;
 	overflow-y: auto;
 	margin-right: 0 !important;
+	margin-left: 0 !important;
 	border-top: outset 4px orange;
 	border-right: outset 4px orange;
 	border-bottom: outset 4px orange;
