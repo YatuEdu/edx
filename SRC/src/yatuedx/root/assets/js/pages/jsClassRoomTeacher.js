@@ -1,12 +1,10 @@
 import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
 import {Net}			    				from "../core/net.js"
-import {uiMan} 								from '../core/uiManager.js';
 import {PageUtil, StringUtil, TimeUtil}		from '../core/util.js';
 import {DisplayBoardTeacher}				from '../component/displayBoardTeacher.js'
 import {STUDENT_BOARD_TEMPLATE}				from '../component/studentCommCard.js';
 import {PTCC_COMMANDS}						from '../command/programmingClassCommand.js'
-import {IncomingCommand}					from '../command/incomingCommand.js'
 import {ProgrammingClassCommandUI}			from './programmingClassCommandUI.js'
 import {CodeInputConsole}					from '../component/new/codeInputConsole.js';
 
@@ -42,7 +40,6 @@ const REPLACEMENT_LB = '{lb}';
 const REPLACEMENT_STUDENT_ID = '{stdtgid}';
 const REPLACEMENT_STUDENT_ID2 = '{stdtgid2}';
 const REPLACEMENT_STUDENT_MSG_BTN_ID =  '{stdt_msg_btn_id}';
-const REPLACEMENT_CLOSE_BTN_ID =  '{btn_close}';
 const REPLACEMENT_TA_MSG_CONTAINER_ID = '{msg_ctnr_id}'
 const REPLACEMENT_BTN_MSG_SEND_ID = '{msg_send_btn_id}';
 const REPLACEMENT_TA_MSG_ID = '{std_msg_ta_id}';
@@ -50,15 +47,10 @@ const REPLACEMENT_TA_TCHR_MSG_ID = '{tchr_msg_ta_id}';
 
 const TA_STUDENT_CONSOLE_PREFIX = "yt_stdf_inpt_ta_for_";
 const TA_STUDENT_CONSOLE_CONTAINER_PREFIX = "yt_stdt_inpt_ta_ctnr_div_for_";
-const BTN_CONSOLE_CLOSE_PREFIX = 'yt_btn_close_student_board';
 
-const CSS_STUDENT_COMM_NO_TEXT = 'btn-mail-box-dimention-teacher';
 const CSS_STUDENT_COMM_WITH_TEXT = 'btn-mail-box-with-msg';
 const CSS_STUDENT_CONSOLE_HIDE_BTN = 'student-input-board-button-close';
 
-const STUDENT_TOGGLE_BUTTON_MAX = "Code";
-const STUDENT_MESSAGE_BUTTON_MAX = "Message";
-const STUDENT_TOGGLE_BUTTON_MIN = "Hide";
 
 const STUDENT_TOGGLE_BUTTON_TEMPLATE = 'yt_bt_student_console_toggle_';
 const STUDENT_RUN_BUTTON_TEMPLATE = 'yt_bt_student_console_code_run_';
@@ -78,7 +70,6 @@ const MSG_RECEIVER_OPTION_TEMPLATE = `
 **/
 class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 	#displayBoardTeacher;
-	#timer;
 	#codeInputConsoleComponent;
 	
 	/* 
@@ -480,7 +471,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		const errorInfo = super.runCodeFromTextInput();
 		
 		// run code for each student second if we are in teaching mode
-		this.#displayBoardTeacher.runCode();
+		if (this.mode === 0) {
+			this.#displayBoardTeacher.runCode();
+		}
 		
 		// display error?
 		if (errorInfo) {
@@ -498,7 +491,15 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		e.preventDefault(); 
 		const student = StringUtil.getIdStrFromBtnId(e.target.id);
 		const codeText = $(this.getStudentConsoleIdSelector(student)).val();
-		super.executeCode(codeText);
+		const errorInfo = super.executeCode(codeText);
+
+		// display error?
+		if (errorInfo) {
+			this.#codeInputConsoleComponent.showDiagnoticMessage(errorInfo);
+		} else {
+			// show output cosole
+			this.#codeInputConsoleComponent.showOutput();
+		}
 	}
 	
 	sendMessageToStudent(e) {
@@ -551,6 +552,13 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		}
 		this.setMode(newMode);
 		return newMode;
+	}
+	
+	/**
+	 * get current class mode
+	 */
+	get mode() {
+		return $("#yt_div_switch_mode").html() === sysConstStrings.SWITCH_TO_LEARNING ? 1 : 0;
 	}
 	
 	/**

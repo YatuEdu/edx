@@ -257,8 +257,8 @@ pre {
 
 .student-input-board-button-run-code {
 	position: absolute;
-	margin-top: 1px;
-    margin-right: 2px;
+	margin-top: 48px;
+    margin-right: 16px;
 	top: 4.2vw;
 	left: 50vw;
 	z-index: 100 !important;	
@@ -276,7 +276,9 @@ pre {
 	background-size: 2.7vw 1.8vw;
     width: 2.7vw;  
     height: 1.8vw;
-	background-color:#ff0000
+	background-color:#ff0000;
+	position: absolute;
+	margin-top: 48px;
 }
 
 .student-input-board-button-close-size {
