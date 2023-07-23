@@ -9,6 +9,7 @@ const MY_CODE_LIST_TEMPLATE = `
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
   <div class="col-6 tool-tbtn-dimention">
+    <button class="textButton mediumTextButton upd-code" id="{codeInsId}" title="Copy the code from code depot and insert into practice console ut the cursor">Insert</button>
 	<button class="textButton mediumTextButton upd-code" id="{codeUpdId}" title="Copy the code from the code practice console and update the selected code entry in code depot">Update</button>
 	<button class="textButton mediumTextButton del-code" id="{codeDelId}" title="Delete the code">Delete</button>
   </div>
@@ -40,6 +41,7 @@ const REPLACE_CODE_LIST_LINK_ID = '{codeLinkId}';
 const REPLACEMENT_CODE_LIST = '{codeListHolder}';
 const REPLACEMENT_CODE_DEL = '{codeDelId}';
 const REPLACEMENT_CODE_UPD = '{codeUpdId}';
+const REPLACEMENT_CODE_INS = '{codeInsId}';
 
 const CODE_LIST_DIV_PREFIX = 'yt_code_list_entry_';
 const CODE_LIST_LINK_PREFIX = 'yt_code_list_link_';
@@ -216,9 +218,25 @@ class CodeManContainer extends ComponentBase {
 		// code insert button selector
 		$(this.getCodeDeleteSelector(codeName)).click(this.handleDeleteCode.bind(this));
 		$(this.getCodeUpdateSelector(codeName)).click(this.handleUpdateCode.bind(this));
+		$(this.getCodeInsertSelector(codeName)).click(this.handleInsertCode.bind(this));
 	}
 	
+	async handleInsertCode(e) {
+		const name = StringUtil.getIdStrFromBtnId(e.target.id);
+		let codeText = await this.prv_getCodeFor(name);
 	
+		const existingCode = $(this.codeInputBoardSelector).val();
+		codeText = existingCode 
+					? 
+					codeText + `\n\n /* @ Code ${name} inserted before the following line! @ */ \n\n ` + existingCode 
+					: 
+					codeText;
+		this.prv_toggleSelection(this.#selectedCodeName, name);
+		$(this.codeInputBoardSelector).val(codeText);
+		this.#selectedCodeName = name;
+		
+	}
+
 	async handleUpdateCode(e) {
 		const codeName = this.prv_getCodeNameFromEvent(e);
 		// only react to selected code entry
@@ -297,6 +315,7 @@ class CodeManContainer extends ComponentBase {
 								.replace(REPLACE_CODE_LIST_LINK_ID, this.getCodeListLinkId(codeName))
 								.replace(REPLACEMENT_CODE_DEL, this.getCodeDeleteId(codeName))
 								.replace(REPLACEMENT_CODE_UPD, this.getCodeUpdateId(codeName))
+								.replace(REPLACEMENT_CODE_INS, this.getCodeInsertId(codeName))
 								.replace(REPLACE_CODELIST_TAB, 0);
 							
 	}
@@ -308,12 +327,12 @@ class CodeManContainer extends ComponentBase {
 		
 		if (this.#selectedCodeName != name) {
 			const existingCode = $(this.codeInputBoardSelector).val();
-			codeText = existingCode 
-						? 
-						codeText + `\n\n /* @ Code ${name} inserted before the following line! @ */ \n\n ` + existingCode 
-						: 
-						codeText;
-
+			if (existingCode) {
+				const replace = confirm("Do you want to replace the ocde in the code console with the selected code from code depot? ");
+				if (!replace) {
+					return;
+				}
+			}
 			this.prv_toggleSelection(this.#selectedCodeName, name);
 			$(this.codeInputBoardSelector).val(codeText);
 			this.#selectedCodeName = name;
@@ -416,6 +435,17 @@ class CodeManContainer extends ComponentBase {
 	getCodeUpdateSelector(name) {
 		return `#${this.getCodeUpdateId(name)}`;
 	}
+
+	// id for inserting code
+	getCodeInsertId (name) {
+		return `yt_btn_code_ins_${name}`;
+	}
+	
+	// selector for button which insert code
+	getCodeInsertSelector(name) {
+		return `#${this.getCodeInsertId(name)}`;
+	}
+
 	
 	// slector for code input board outside of this component
 	get codeInputBoardSelector() {
