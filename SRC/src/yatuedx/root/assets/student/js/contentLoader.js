@@ -20,8 +20,16 @@ class ContentLoader {
             return;
 		}
          // token for this page to use
-         window.student_token = credMan.credential.token;
-         window.coding_king_api = sysConstants.YATU_AUTH_URL;
+         Object.defineProperty(window, 'practice_api_endpoint', {
+			value: sysConstants.YATU_AUTH_URL,
+			writable: false
+		});
+
+		Object.defineProperty(window, 'practice_api_token', {
+			value: credMan.credential.token,
+			writable: false
+		});
+
 
         // load content from student db
         // first load from local storage

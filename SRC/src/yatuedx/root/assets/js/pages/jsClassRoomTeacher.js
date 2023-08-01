@@ -1,4 +1,4 @@
-import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
+import {sysConstStrings} 					from '../core/sysConst.js'
 import {credMan} 							from '../core/credMan.js'
 import {Net}			    				from "../core/net.js"
 import {PageUtil, StringUtil, TimeUtil}		from '../core/util.js';

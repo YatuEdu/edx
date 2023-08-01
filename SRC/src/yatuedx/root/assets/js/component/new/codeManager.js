@@ -92,11 +92,9 @@ class CodeEntry {
 **/
 class CodeMan {
 	#codeMapByName;
-	#user;
-	#group;
 	
 	// construct code manager using code list acquired from DB
-	constructor(codeDataList, userName, group) {
+	constructor(codeDataList) {
 		// load existing code 
 		this.#codeMapByName = new Map();
 		codeDataList.forEach(e => {
@@ -323,11 +321,14 @@ class CodeManContainer extends ComponentBase {
 	// get code if the code link is clicked
 	async handleGetCodeFor(e) {
 		const name = StringUtil.getIdStrFromBtnId(e.target.id);
+		const oldName = this.#selectedCodeName;
+
 		let codeText = await this.prv_getCodeFor(name);
 		
-		if (this.#selectedCodeName != name) {
+		if (oldName != name) {
 			const existingCode = $(this.codeInputBoardSelector).val();
-			if (existingCode) {
+			const codeInDepod = oldName ?  this.prv_getCodeEntryForFAromCodeMan(oldName) : null;
+			if (existingCode &&  existingCode !== codeInDepod.text) {
 				const replace = confirm("Do you want to replace the ocde in the code console with the selected code from code depot? ");
 				if (!replace) {
 					return;

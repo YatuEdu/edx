@@ -88,7 +88,8 @@ class TokenConst {
 	static get VAR_TYPE_WINDOW() { return 4}
 	static get VAR_TYPE_FUNC_PARAMETER() { return 5}
 	static get VAR_TYPE_TEMP() { return 6; }
-	static get VAR_TYPE_FUNCTION() { return 7};
+	static get VAR_TYPE_MEMBER() { return 7};
+	static get VAR_TYPE_FUNCTION() { return 8};
 
 	static get VAR_DATA_UNKNOWN() { return 0}
 	static get VAR_DATA_NUMBER() { return 1}
@@ -255,7 +256,7 @@ class Token {
 		this.typeDivide();
 		this.#blockTags = [];
 	}
-	
+
 	static createExpressionEndToken(pos) {
 		return new Token(";", TOKEN_TYPE_SEPARATOR, -1, -1);
 	}
@@ -718,7 +719,12 @@ class Token {
 	get isKnownProperty() { return Token.isKnownProperty(this.#name)}
 	get isUnaryOp() { return this.hasBlockTag(TokenConst.BLOCK_TAG_UNARY_FRONT_OP, TokenConst.BLOCK_TAG_UNARY_REAR_OP) }
 	get isIoFunc() { return Token.isIoFunc(this.#name) }
-	
+	get isClass() { return 'class' === this.#name }
+	get isThis() { return 'this' === this.#name }
+	get isExtendKey() { return 'extends' === this.#name }
+	get isConstructor() { return 'constructor' === this.#name }
+	get isSuper() { return 'super' === this.#name }
+
 	/*
 		Test if the token has "any" of the given tags.
 	*/
