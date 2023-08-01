@@ -74,10 +74,64 @@ class ParsingState {
 	}
 	
 	/**
+		Tell if es6 class definition is seen at the current position
+	 **/
+	isEs6Class(pos) {
+		// At least 4 tokens, for example: class a {} 
+		if (this.codeAnalyst.meaningfulTokens.length < pos + 4) {
+			return false;
+		}
+
+		let objName = this.codeAnalyst.meaningfulTokens[pos];
+		if (!objName.isClass){
+			return false;
+		}
+
+		return true;
+	}
+
+	/*
+		find function definition body starting position (right after "{")
+	 */
+	findAheadFuncDefBody(pos) {
+		// At least 4 tokens, for example: foo () {}
+		if (this.codeAnalyst.meaningfulTokens.length < pos + 4) {
+			return null;
+		}
+
+		const objName = this.codeAnalyst.meaningfulTokens[pos];
+		if (!objName.isOpenRoundBracket) {
+			return null;
+		}
+
+		let len = this.codeAnalyst.meaningfulTokens.length;
+		
+		// find '{}'
+		let foundBegin = false;
+		for(let i = pos + 1; i < len-1; i++) {
+			const token = this.codeAnalyst.meaningfulTokens[i];
+			if (!foundBegin) {
+				if (token.isOpenCurlyBracket) {
+					foundBegin = true;
+				}
+			} else {
+				if (token.isName) {
+					return i;
+				}
+				if (token.isCloseCurlyBracket) {
+					return null;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 		Tell if object Subscript syntax is seen: x[a]
 	 **/
 	isSubscript(pos) {
-		// At leasr 4 tokens, for example: a[i]
+		// At least 4 tokens, for example: a[i]
 		if (this.codeAnalyst.meaningfulTokens.length < pos + 4) {
 			return false;
 		}
@@ -97,7 +151,7 @@ class ParsingState {
 		Tell if object Subscript syntax is seen: x[a] = 0;
 	 **/
 	isSubscriptAssignment(pos) {
-		// At leasr 6 tokens, for example: a[i] = 0
+		// At least 6 tokens, for example: a[i] = 0
 		let len = this.codeAnalyst.meaningfulTokens.length;
 		if (len < pos + 6) {
 			return false;
@@ -134,7 +188,7 @@ class ParsingState {
 		Tell if a function call statement is at position 'pos"
 	 **/
 	isFunctionCall(pos) {
-		// At leasr 3 tokens, for example: foo()
+		// At least 3 tokens, for example: foo()
 		if (this.codeAnalyst.meaningfulTokens.length < pos + 3) {
 			return false;
 		}
@@ -179,7 +233,7 @@ class ParsingState {
 			return false;
 		}
 		
-		// At leasr 6 tokens, for example: function foo(){}
+		// At least 6 tokens, for example: function foo(){}
 		if (this.codeAnalyst.meaningfulTokens.length < pos + 6) {
 			this.error = new TokenError("Invalid function definition syntax", nextToken);
 			this.codeAnalyst.push(error);			

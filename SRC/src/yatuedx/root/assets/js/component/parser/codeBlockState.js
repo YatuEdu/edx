@@ -1,4 +1,5 @@
 import {StateAction, ParsingState}		from './parsingState.js'
+import {Es6ClassDefState}				from './es6ClassDefState.js'
 import {ForLoopState}					from './forLoopState.js'
 import {WhileLoopState}					from './whileLoopState.js'
 import {FunctionDefState}				from './functionDefState.js'
@@ -27,6 +28,14 @@ class CodeBlockState extends ParsingState {
 		if (nextToken.isElse) {
 			// ignore else since it is just another block or expression
 			return new StateAction(null, null, false);
+		}
+
+		// entering es6 class block
+		if (this.isEs6Class(pos)) {
+			const newScope = new Scope(this.scope);	
+			// entering a CLASS block state
+			const nextState = new Es6ClassDefState(pos, nextToken, newScope, this.codeAnalyst);	
+			return new StateAction(nextState, null, false);
 		}
 
 		// enering a new code block:

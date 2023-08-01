@@ -27,7 +27,7 @@ class FunctionDefState extends ParsingState {
 		do {
 			if (this.stage === FunctionDefState.FUNCTION_NAME_STATE) {
 				// check function name
-				if (!nextToken.isName) {
+				if (!nextToken.isName && !nextToken.isConstructor) {
 					this.error = new TokenError("Invalid function name found", nextToken);
 					break;
 				}
@@ -131,6 +131,10 @@ class FunctionDefState extends ParsingState {
 		if (this.stage === FunctionDefState.FUNCTION_BODY_STATE && token.isCloseCurlyBracket) {
 			const newFunction = new Variable(this.#funcName, TokenConst.VAR_TYPE_FUNCTION);
 			this.scope.addWindowsVariable(this.#funcName.name, newFunction); 
+			// also set parent state to finish if any
+			if (this.parentState) {
+				this.parentState.isTheLastToken(token);
+			}
 			this.stateEnded = true;
 		}
 		return this.stateEnded;	
