@@ -199,6 +199,7 @@ class CodeInputConsole extends ComponentBase {
 			lineStr += i + topLine + 1 +'\n';
 		}
 		$(this.codeLineTaCssSelector).val(lineStr);
+
 	}
 	
 	/* event handler */
