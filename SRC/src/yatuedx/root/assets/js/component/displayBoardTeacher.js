@@ -73,6 +73,14 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT, begin, end);
 		this.sendMessageToGroup(cmd.str);
 	}
+
+	/**
+		vertically scroll student's text
+	 **/
+	verticallyScroll(pixels) {
+		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_VERTICALLY_SCROLL, pixels);
+		this.sendMessageToGroup(cmd.str);
+	}
 	
 	/**
 		Run code sample we swent prior to this command on student's board remotely

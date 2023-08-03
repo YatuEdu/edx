@@ -126,6 +126,9 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		// hook up event 'change class mode'
 		$(this.runCodeButton).click(this.handleRunCode.bind(this));
 		
+		// hanlding vertical scroll
+		$(this.codeInputTextArea).scroll(this.handleScroll.bind(this));
+
 		$(this.eraseBoardButton).click(this.handleEraseBoard.bind(this));
 		$(this.eraseResultButton).click(this.handleEraseResult.bind(this));
 		$(this.beautifyCodeButton).click(this.handleCodeBeautify.bind(this));
@@ -224,6 +227,15 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		}
 	}
 	
+	/*
+		when teacher scrolls we need to have students window scroll as well
+	**/
+	handleScroll(e) {
+		// regenerate line number to adjust to the top
+		const top = $(e.target).scrollTop();
+		this.#displayBoardTeacher.verticallyScroll(top);
+	}
+
 	/**
 		Recieved student incoming messages, display it with student name included
 	 **/

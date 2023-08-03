@@ -103,6 +103,7 @@ class DisplayBoardForCoding extends CommunicationSpace {
 			
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT:
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_VERTICALLY_SCROLL:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
 			case PTCC_COMMANDS.PTC_PRIVATE_MSG:
 				this.#view.v_execute(cmdObject);

@@ -290,6 +290,13 @@ class ProgrammingClassCommandUI extends AuthPage {
 		PageUtil.highlightSelection(this.#codeInputId, begin, end);
 	}
 	
+	/*
+		Scroll up and down based on teacher's instruction
+	 */
+	scrollVertically(pixels) {
+		$(this.codeInputTextArea).scrollTop (pixels);
+	}
+
 	/**
 		Hnandle running JS code from UI text area
 	**/

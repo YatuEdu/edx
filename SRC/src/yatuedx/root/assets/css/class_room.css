@@ -6,6 +6,14 @@ pre {
          tab-size : 4;
 }
 
+::-moz-selection { 
+    color: red;
+}
+::selection {
+    color: black;  
+	background-color:yellow ;
+}
+
 .blob-code {
 	width: 90%;
     position: relative;

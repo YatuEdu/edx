@@ -514,7 +514,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT:
 				this.highlightSelection(cmd.data[0], cmd.data[1]);
 				break;			
-			
+			// Sroll up or down
+			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_VERTICALLY_SCROLL:
+				this.scrollVertically(cmd.data[0]);
+				break;
 			// resync my code with teachwer
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
 				this.syncCodeWithTeacherer(cmd);
