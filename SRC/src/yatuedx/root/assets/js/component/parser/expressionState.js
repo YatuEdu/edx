@@ -1,12 +1,13 @@
 import {TokenConst, Token, TokenError}		from './token.js'
 import {StateAction, ParsingState}			from './parsingState.js'
 import {Operator, DotOperator}				from './operator.js'
-import {Operand, TempOperand, OpenRoundBrachetOperand, CloseRoundBrachetOperand, CodeOperand} from './oprand.js'
+import {Operand, TempOperand, OpenRoundBrachetOperand, CloseRoundBrachetOperand, CodeOperand, ThisOperand} from './oprand.js'
 import {FunctionCallState}					from './functionCallState.js'
 import {ArraySubscriptionState}				from './arraySubscriptionState.js'
 import {ArrayDefState}						from './arrayDefState.js'
 import {ObjectDefState}						from './objectDefState.js'
-import {ObjectMethodCallState}			from './objectMethodCallState.js'
+import {ObjectMethodCallState}				from './objectMethodCallState.js'
+import {NewInstanceCallState}				from './newInstanceCallState.js'
 
 class ExpressionState extends ParsingState {
 	#operandStack;	
@@ -32,6 +33,18 @@ class ExpressionState extends ParsingState {
 		let newElement = null;
 		let nextState = null;
 		do {
+			// is NEW CLASS INSTANCE call syntax? For example, x = new X();
+
+			if (nextToken.isNew) {
+				// treat function call as a value
+				newElement = this.#addTempOprand("new_clss_instc");
+								
+				// go to function calling state
+				nextState = new NewInstanceCallState(pos, nextToken, this.scope, this.codeAnalyst, false);
+				break;
+			}
+			
+
 			// is function call syntax?
 			const funcCall = this.isFunctionCall(pos);
 			if (funcCall.isFunctionCall) {
@@ -112,8 +125,8 @@ class ExpressionState extends ParsingState {
 				break;
 			}
 			
-			// add new operand?
-			if (Operand.isOperand(nextToken)) {
+			// add new operand? variable and "this" object are operands
+			if (Operand.isOperand(nextToken) || nextToken.isThis) {
 				newElement = this.#addOperand(nextToken);
 				break;
 			}
@@ -254,13 +267,18 @@ class ExpressionState extends ParsingState {
 	
 	#addOperand(token) {
 		const lastOperand = this.#peek();
-		const newOperand = new CodeOperand(token); 
-
+		let newOperand = null;
+		if (token.isThis) {
+			newOperand = new ThisOperand(token); 
+		} else {
+			newOperand = new CodeOperand(token); 
+		}
+		
 		// eat unary operator if applicable:
 		if (this.#currentOperator) {
 			if (this.#currentOperator.isUnaryFront) {
 				// unary op cannot be appiled by const
-				if (newOperand.isConst && !this.#currentOperator.token.opCanApplyToConst || this.#isConstVar(newOperand)) {
+				if (newOperand.isConst && !this.#currentOperator.token.opCanApplyToConst) { // || this.#isConstVar(newOperand)) {
 					this.error = new TokenError(TokenError.ERROR_CANNOT_APPLY_TO_CONST, this.#currentOperator.token);
 					return;
 				}
@@ -277,10 +295,21 @@ class ExpressionState extends ParsingState {
 		if (newOperand.isVariable) {
 			const v = this.scope.findVariable(newOperand.name, false);
 			if (!v) {
-				this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, newOperand.token);
-				return null;
+				let undefinedVar = true;
+				if (lastOperand instanceof ThisOperand ) {
+					if (!newOperand.name.startsWith('#')) {
+						// for non-private variable, no -need to define it first.  this does not apply to
+						// # decorated private member variables:
+						undefinedVar = false;
+					}
+				} 
+				if (undefinedVar) {
+					this.error = new TokenError(TokenError.ERROR_UNDEFINED_VARIABLE_FOUND, newOperand.token);
+					return null;
+				}
 			}
 		}
+
 		// associate the binary op with the last oprand:
 		if (lastOperand) {
 			if (lastOperand.binaryOperatorRight) {

@@ -1,0 +1,20 @@
+.input-output-board {
+	height: 600px !important;       
+    overflow-y: auto;    			/* Trigger vertical scroll    */
+    overflow-x: hidden;  			/* Hide the horizontal scroll */
+    font-weight: 700;
+	font-size: 24px;
+	color: rgb(162, 32, 32);
+	background: #d0d7d4;
+    line-height: 1.5;
+	border:outset 4px rgb(44, 43, 42);
+}
+
+.yt-video-area {
+	background-repeat:no-repeat;
+	background-size:contain;
+	height:100%;
+	width:500px;;
+	background-image: url('../images/dynamic/empty-avatar.png') !important;
+	border:outset 4px orange;
+}

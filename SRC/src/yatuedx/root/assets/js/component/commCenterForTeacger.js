@@ -7,7 +7,7 @@ const VIDEO_TEMPLATE = `
 <video class="yt_video" id="yt_vido_{pid}" autoplay playsinline>"`;
 
 
-class DisplayBoardTeacher extends CommunicationSpace {  
+class CommCenterForLangTeacher extends CommunicationSpace {  
 	#view;
 	
 	/*private*/
@@ -20,8 +20,8 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	 static facotry method for DisplayBoardTeacher to assure that it calls its
 	 async init method.
 	 */
-	static async createDisplayBoardTeacher(liveSession, view) {
-		const myInstance = new DisplayBoardTeacher(view);
+	static async createCommCenterForLangTeacher(liveSession, view) {
+		const myInstance = new CommCenterForLangTeacher(view);
 		await myInstance.init(liveSession);
 		return myInstance;
 	}
@@ -81,14 +81,6 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		this.sendMessageToGroup(cmd.str);
 	}
 	
-	/**
-		Run code sample we swent prior to this command on student's board remotely
-		for all students who are attending the class
-	 **/
-	runCode() {
-		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CODE_RUN, null);
-		this.sendMessageToGroup(cmd.str);
-	}
 	
 	/**
 		Change class mode for all the attending students
@@ -112,4 +104,4 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	}
 }
 
-export { DisplayBoardTeacher };
+export { CommCenterForLangTeacher };

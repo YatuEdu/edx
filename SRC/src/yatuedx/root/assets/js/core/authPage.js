@@ -5,6 +5,16 @@ import {GroupWebSocket}										from '../component/groupTextCommunication.js';
 import {LocalStoreAccess} 									from '../core/localStorage.js';
 import {sysConstants, sysConstStrings, groupTypeConstants} 	from '../core/sysConst.js'
 
+const CLASS_ROOM_MAP = 
+	new Map([
+			 ['10_TEACHER', './class-room-teacher.html'], 
+			 ['13_TEACHER', './class-room-teacher.html'], 
+			 ['10_STUDENT', './class-room.html'], 
+			 ['13_STUDENT', './class-room.html'],
+			 ['100_TEACHER', './class-room-lang-teacher.html'],
+			 ['100_STUDENT', './class-room-lang.html']	 
+	]);
+
 /**
 	
 	Mother of all Yatu pages for authentication purpose.
@@ -135,25 +145,19 @@ class AuthPage {
 		console.log('go to live class ' + liveClass.group_id);
 		const gotoClass = confirm('You have a live class going on. Do you want to go to the classroom?');
 		if (gotoClass) {
-			// js coding and web coding share same class room
-			// todo: better way to direct to different classrooms
-			if (liveClass.group_type == groupTypeConstants.GPT_EDU_JSP ||
-				liveClass.group_type == groupTypeConstants.GPT_EDU_JSP_NODE) {  
-				
-				if (this.credential.name === liveClass.owner_name) {
-					// go to class room as teacher
-					window.location.href =  `./class-room-teacher.html`;
-				}
-				else {
-					// go to class room as student
-					window.location.href =  `./class-room.html`;				
-				}
+			// map group type to different classrooms
+			let role = this.credential.name === liveClass.owner_name ? 'TEACHER' : 'STUDENT';
+			switch (liveClass.group_type) {
+				case groupTypeConstants.GPT_EDU_JSP:
+				case groupTypeConstants.GPT_EDU_JSP_NODE:
+				case groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION:
+					const key = `${liveClass.group_type}_${role}`
+					window.location.href = CLASS_ROOM_MAP.get(key);
+					break;
+
+				default:
+					window.location.href = './legacy/videoChat.html';
 			}
-			// other codeing such as SQL, Java, and Python are not currently supported
-			else {
-				// go to chat page
-				window.location.href =  `./legacy/videoChat.html`; 
-			};
 		}
 		
 		return gotoClass;

@@ -99,6 +99,7 @@ const groupTypeConstants = Object.freeze({
 	// known group types:
 	GPT_EDU_JSP: 10,
 	GPT_EDU_JSP_NODE: 13,
+	GPT_EDU_GENERIC_PRESENTATION: 100,
 });
 
 const regexConstants = Object.freeze({

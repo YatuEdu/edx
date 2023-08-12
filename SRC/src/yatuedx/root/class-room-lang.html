@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="assets/images/dynamic/ck.png" type="image/x-icon">
+    <title>Teacher's Classroom</title>
+    <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
+    <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
+    <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
+	<link rel="stylesheet" href="./assets/css/class_room.css" />
+	<link rel="stylesheet" href="assets/css/lang-class-room.css"/>
+	<link rel="stylesheet" href="assets/css/codeInputConsole.css"/>
+	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container">
+			 <a class="navbar-brand" href="index.html"><img src="assets/images/logo-codeking.png" class="img-fluid" alt="CODEKING"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#unplugNavbar"
+                    aria-controls="demoNavbar6" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="my-5">
+			<section>
+				<div class="row mb-4">
+					<div class="col-2">
+						<div id="yt_div_video_area" class="yt-video-area">
+						</div>	
+					</div>
+					<div class="col-1">
+						<div id="yt_div_students_area">
+						</div>
+					</div>
+					<div class="col-9">
+						<div class="row mb-4"> 
+							<div class="col-1 text-center">
+								<picture id="yt_btn_run_code_on_student_board" class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Send to student</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>	
+							<div class="col-1 text-center">
+								<picture id="yt_btn_erase_result"  class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Erase Board</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>	
+							<div class="col-1 text-center">
+								<picture id="yt_btn_share_screen" class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Share Screen</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/share_scrn.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center"> 
+								<picture id="yt_btn_switch_mode" class="btn tiphost" >
+									<span class="tooltip">
+										<div id="yt_div_switch_mode" class="tooltiptext">Switch mode</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/switch_mode.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_check_clean_code"  class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Check and Clean Code</div>
+									</span>
+									<source width="43" height="43" type="image/webp" srcSet="assets/images/tools/sync_code.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_erase_board"  class="btn tiphost" >
+									<span class="tooltip">
+										<div class="tooltiptext">Erase Text Board</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_screen.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+							<div class="col-1 text-center">
+								<picture id="yt_btn_save_notes" class="btn tiphost">
+									<span class="tooltip">
+										<div class="tooltiptext">Save Notes</div>
+									</span>
+									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/save_notes.webp" />
+									<img src="/my-image.jpg" />
+								</picture>
+							</div>
+						</div>	
+						<div class="row mb-4">
+							<div class="col-12">
+								<div class="input-output-board"
+											id="yt_div_text_board" 
+											contenteditable="true"
+											placeholder="Enter text here"
+											spellcheck="true">
+								</div>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col-8">
+								<textarea class="msg-board"
+								  id="yt_txt_notes_console" 
+								  spellcheck="yes" 
+								  placeholder="Message Board"
+								  rows="5"
+								  ></textarea>
+							</div>
+							<div class="col-4">
+								<div id="yt_div_msg_receiver_select">
+								</div>
+							</div>
+						</div>	
+					</div>
+				</div>
+            </section>
+        </article>
+        
+    </main>
+
+    <footer class="up-common-footer">
+        <div class="container">
+            <nav class="nav footer-social-nav justify-content-center">
+                <a href="#" class="nav-link social-link-facebook"> <i class="mdi mdi-facebook"></i> </a>
+                <a href="#" class="nav-link social-link-twitter"> <i class="mdi mdi-twitter"></i> </a>
+                <a href="#" class="nav-link social-link-behance"> <i class="mdi mdi-behance"></i> </a>
+                <a href="#" class="nav-link social-link-dribbble"> <i class="mdi mdi-dribbble"></i> </a>
+            </nav>
+        </div>
+    </footer>
+    <script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/jquery-ui/jquery-ui.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script> 	
+	<script type="module" src="./assets/js/pages/classRoomLangStudent.js"></script>
+</body>
+</html>

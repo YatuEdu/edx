@@ -432,7 +432,6 @@ class JSClassRoomTeacher extends ProgrammingClassCommandUI {
 		
 		// change student button to indicate that student has new code
 		this.toggleStudentButton(student, shouldUpdate);
-
 	}
 	
 	/**

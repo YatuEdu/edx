@@ -167,7 +167,7 @@ const STANDARD_TOKEN_MAP = new Map([
 	[';', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: SEMICOLON }],
 	[':', 			{type: TOKEN_TYPE_SEPARATOR, punctuationType: COLON, spaceType: TokenConst.SPACE_TYPE_RIGHT}],
 	
-	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR}],	
+	['=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_ASSIGNMENT_OPERATOR,      opMode: OP_MODE_BINARY_, priority: 0 }],	
 	
 	['+=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_ASSIGNMENT_OPERATOR, opMode: OP_MODE_BINARY_, priority: 0 }],
 	['-=', 			{type: TOKEN_TYPE_OPERATOR_, opType: OP_TYPE_MATH_ASSIGNMENT_OPERATOR, opMode: OP_MODE_BINARY_, priority: 0 }],
@@ -724,6 +724,7 @@ class Token {
 	get isExtendKey() { return 'extends' === this.#name }
 	get isConstructor() { return 'constructor' === this.#name }
 	get isSuper() { return 'super' === this.#name }
+	get isNew() { return 'new' === this.#name }
 
 	/*
 		Test if the token has "any" of the given tags.

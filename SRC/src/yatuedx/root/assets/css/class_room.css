@@ -7,8 +7,10 @@ pre {
 }
 
 ::-moz-selection { 
-    color: red;
+	color: black;  
+	background-color:yellow ;
 }
+
 ::selection {
     color: black;  
 	background-color:yellow ;
