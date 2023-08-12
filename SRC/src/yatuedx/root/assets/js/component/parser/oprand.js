@@ -1,6 +1,6 @@
-import {TokenConst, Token}		from './token.js'
+import {Token}					from './token.js'
 import {ExpressionElement}		from './expressionElement.js'
-import {Operator} 				from './operator.js'
+import {Operator, DotOperator} 	from './operator.js'
 
 
 class Operand extends ExpressionElement {
@@ -18,6 +18,7 @@ class Operand extends ExpressionElement {
 				Token.TOKEN_TYPE_NUMBER === token.type ||
 				Token.TOKEN_TYPE_STRING == token.type ||
 				token.isKnownProperty ||
+				token.isThis ||
 				token.isKnownObjectValue;
 	}
 	
@@ -97,4 +98,24 @@ class CodeOperand extends Operand {
 	}
 }
 
-export {Operand, TempOperand, OpenRoundBrachetOperand, CloseRoundBrachetOperand, CodeOperand}
+class ThisOperand extends Operand {
+	
+	constructor(token) {
+		super(token);
+		if (!Operand.isOperand(token) && !token.isRoundBracket) {
+			throw new Error("Invalid operand encountered: " + token.name);
+		}
+	}
+	
+	// an oprand cannot be followed by another operand unlss its ")"
+	canBeFollowedBy(another) { 
+		return 	another instanceof DotOperator;
+	}
+	
+	get isOpenRoundBracket() { return false; }
+	get isCloseRoundBracket() { return  false; }
+	get isVariable() { return false; }
+	get isConst() { return  false; }
+}
+
+export {Operand, TempOperand, OpenRoundBrachetOperand, CloseRoundBrachetOperand, CodeOperand, ThisOperand}

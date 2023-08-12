@@ -3,11 +3,9 @@ import {StringUtil, UtilConst}	from '../core/util.js'
 
 class CodeSyncManager {
 	#lastCodeSaved;
-	#lastCodeLines;
 	
 	constructor() {
 		this.#lastCodeSaved = "";
-		this.#lastCodeLines = [];
 	}
 	
 	/**
