@@ -1,4 +1,4 @@
-import {ComponentBase}		from '../ComponentBase.js';
+import {ComponentBase}		from '../componentBase.js';
 import {PageUtil}			from '../../core/util.js'
 
 const REPLACEMENT_INPUT_ID = "{codebrdid}";
@@ -57,18 +57,20 @@ const CONTAINER_HTML_TMPLATE =
 		<div id="{exdivid}"></div>
 	</div>
 </div>`;
-	
+
+const CONTROL_NAME = "Code_Input_Output_Text_Console";
+
 class CodeInputConsole extends ComponentBase {
-	#inputId;
-	
-	constructor(id, name, parentId, inputId, outputId) {
-		super(id, name, parentId);
-		this.#inputId = inputId;
+	#parentView
+
+	constructor(parentView, parentDivId) {
+		super("id", CONTROL_NAME, parentDivId);
+		this.#parentView = parentView
 		
 		const componentHtml = CONTAINER_HTML_TMPLATE
 								.replace(REPLACEMENT_CSS_CONTAINER, CSS_CONTAINER)
-								.replace(REPLACEMENT_INPUT_ID, inputId)
-								.replace(REPLACEMENT_OUTPUT_ID, outputId)
+								.replace(REPLACEMENT_INPUT_ID, this.inputId)
+								.replace(REPLACEMENT_OUTPUT_ID, this.outputId)
 								.replace(REPLACEMENT_OUTPUT_CONTAINER_ID, this.outputContainerId)
 								.replace(REPLACEMENT_BTN_SHOW_OR_HIDE_ID, this.showOrHideBtnId)
 								.replace(REPLACEMENT_BTN_ENLARGE_SHRINK_ID, this.enlargeOrShrinkBtnId)
@@ -79,7 +81,7 @@ class CodeInputConsole extends ComponentBase {
 								.replace(REPLACMENT_DIAGNOSTIC_EX_DIV, this.diagnoticExceptionDivId);
 								
 		// mount the component to UI
-		super.mount(componentHtml);
+		super.mount(componentHtml, ComponentBase.MOUNT_TYPE_INSERT);
 
 		// initialize dialog boxes for this component
 		$(this.diagnoticDialogIdSelector).dialog({
@@ -146,7 +148,7 @@ class CodeInputConsole extends ComponentBase {
 	
 	/* public methods */
 	
-	showOutput(hide) {
+	showOutput() {
 		$(this.outputContainerIdSelector).show();
 	}
 	
@@ -211,19 +213,50 @@ class CodeInputConsole extends ComponentBase {
 		
 		// highline the error line (note that error line is 1-based and we need to minus 1
 		// because highlightSelectionLine is 0-based)
-		PageUtil.highlightSelectionLine(this.#inputId, errLine-1);
+		PageUtil.highlightSelectionLine(this.inputId, errLine-1);
 	}
 	
-	/* getters */
+	/* getters / setters */
 	
+	// get code from input console
+	get code() {
+		return $(this.inputIdSelector).val();
+	}
+
+	// get code from input console
+	set code(str) {
+		$(this.inputIdSelector).val(str);	
+		$(this.inputIdSelector).trigger('change');
+	}
+
 	// input tex area id
 	get inputId() {
-		return this.#inputId;
+		return "yt_code_input_console";
 	}
 	
 	// selector for input text area id
 	get inputIdSelector() {
 		return  `#${this.inputId}`;
+	}
+
+	 /**
+		get selected text range from code input area
+	 **/
+	getSelection() {
+		return {
+				begin: $(this.inputIdSelector).prop('selectionStart'),
+				end:   $(this.inputIdSelector).prop('selectionEnd')
+		};
+	}
+
+	// output tex area id
+	get outputId() {
+		return "yt_code_output_console";
+	}
+	
+	// selector for input text area id
+	get outputIdSelector() {
+		return  `#${this.outputId}`;
 	}
 	
 	// id for output container

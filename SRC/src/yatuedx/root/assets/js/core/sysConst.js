@@ -29,6 +29,8 @@ const sysConstants = Object.freeze({
 	LIVE_MODE: 0, 		// OR UNDEFINED
 	EXERCISE_MODE: 1,
 
+	// minimum code length to save to db
+	MIN_CODE_LENGTH: 32,
 	
 	// role names
 	YATU_ROLE_TEACHER: 'teacher',
@@ -36,6 +38,7 @@ const sysConstants = Object.freeze({
 	
 	// URL param name:
 	UPN_GROUP: 		'group',
+	UPN_GROUP_TYPE: 'grouptype',
 	UPN_SEQUENCE: 	'sequence',
 	UPN_TEACHER: 	'teacher',
 	UPN_EMAIL:		'email',

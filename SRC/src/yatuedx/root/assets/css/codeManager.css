@@ -6,18 +6,18 @@
 .mediumTextButton{
 	width: 80px;
 	height: 30px;
-	text-align: right;
+	text-align: left;
 }
 
 .bigTextButton {
   width: 99%;
   height: 32px;
-  float: right;
-  text-align: right;
+  float: left;
+  text-align: left;
 }
 
 .textButton{
-	text-align: right !important;
+	text-align: left !important;
 	border: none;
 	transition: all ease-in-out 0.2s;
 	cursor: pointer;
@@ -41,11 +41,11 @@
 	width:90% !important;
 	height: 700px;
 	overflow-y: auto;
-	margin-right: 0 !important;
+	margin-right:0 !important;
 	margin-left: 0 !important;
-	border-top: outset 4px orange;
-	border-right: outset 4px orange;
-	border-bottom: outset 4px orange;
+	padding-right: 2px;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 10px;
 }
 
 .yt-list-panel-left {
@@ -53,12 +53,14 @@
     overflow-y: auto;    			/* Trigger vertical scroll    */
     overflow-x: hidden;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
+	margin-right: 0 !important;
+	margin-left: 0 !important;
     font-weight: 300;
 	font-size: 20px;
     line-height: 1.5;
 	background: #ccffff !important;
 	color: #000000;
-	border:outset 4px orange;
+	padding: 0 !important;
 }
 
 .yt-list-element {

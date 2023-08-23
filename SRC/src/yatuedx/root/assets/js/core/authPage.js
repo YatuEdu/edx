@@ -7,12 +7,12 @@ import {sysConstants, sysConstStrings, groupTypeConstants} 	from '../core/sysCon
 
 const CLASS_ROOM_MAP = 
 	new Map([
-			 ['10_TEACHER', './class-room-teacher.html'], 
-			 ['13_TEACHER', './class-room-teacher.html'], 
+			 ['10_TEACHER', './class-room-owner.html'], 
+			 ['13_TEACHER', './class-room-owner.html'], 
 			 ['10_STUDENT', './class-room.html'], 
 			 ['13_STUDENT', './class-room.html'],
-			 ['100_TEACHER', './class-room-lang-teacher.html'],
-			 ['100_STUDENT', './class-room-lang.html']	 
+			 ['100_TEACHER', './class-room-owner.html'],
+			 ['100_STUDENT', './class-room-owner.html']	 
 	]);
 
 /**
@@ -32,7 +32,7 @@ class AuthPage {
 	}
 	
 	/**
-		Check if we are loggin in
+		Check if we are logged in
 	 **/
 	 async init(publicOk) {
 		this.#loggedIn = await credMan.hasLoggedIn();

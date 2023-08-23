@@ -68,6 +68,8 @@ pre {
 	color: white;
 }
 
+.ui-dialog {z-index: 1000 !important ;}
+
 .js-k {
 	color: #0000FF;
 }
@@ -355,6 +357,28 @@ pre {
 	margin-top: 1px;
 }
 
+.yt_dl {
+	background-color: hwb(0 96% 0%) !important;
+	height: 80px !important;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 5px;
+}
+
+.btn-dl-action {
+	width: 50%;
+	float: right;
+	background-color: hsl(88, 50%, 45%);
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
+	margin-top: 1px;
+}
+
 .btn-mail-box-dimention-teacher {
 	background-color: #1c87c9;
 	-webkit-border-radius: 10px;
@@ -393,16 +417,20 @@ pre {
 }
 
 .msg-board {
-	
+
+	width: 98% !important;
+	padding-right: 6px;
+	margin-right: 4px;
     overflow-y: auto;    			/* Trigger vertical scroll    */
-    overflow-x: hidden;  			/* Hide the horizontal scroll */
+    overflow-x: hidden !important;  			/* Hide the horizontal scroll */
 	font-family: 'Merriweather';
     font-weight: 300;
 	font-size: 20px;
     line-height: 1.5;
-	background: #ccffff !important;
+	background: #ffffff !important;
 	color: #000000;
-	border:outset 4px orange;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 5px;
 }
 
 .msg-board-dimention-big {
@@ -410,11 +438,32 @@ pre {
 }
 
 .msg-board-dimention-midium {
-	height: 636px !important;
+	height: 500px !important;
 }
 
 .msg-board-dimention-small {
+	margin-top: 6px;
 	height: 100px !important;
+}
+
+.msg_in {
+	width: 45%;
+	float: left;
+	margin-left: 2px;
+	margin-top: 2px;
+	color: rgb(35, 33, 33);
+	font-size: 18px;
+	background-color: #b7ff00;
+}
+
+.msg_out {
+	width: 45%;
+	float: right;
+	margin-left: 60px;
+	margin-top: 2px;
+	color: rgb(35, 33, 33);
+	font-size: 18px;
+	background-color: #dff0df;
 }
 
 .yt-video-area {
@@ -485,16 +534,23 @@ pre {
 
 }
 
-.selected-tab {
+.selected_tab {
 	background-color: #39ac73;
 	color: #ffffff; 
 	border:outset 1px red;
 }
 
-.unselected-tab {
+.unselected_tab {
 	background-color: #d3d3d3;
-	color: white; 
+	color: white; 	
 	border:outset 1px white;
+}
+
+.tab_button {
+	width: 100%;
+	background-color: transparent;
+	border: none;
+    outline: none;
 }
 
 .tiphost:hover .tooltiptext {

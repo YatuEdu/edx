@@ -9,6 +9,7 @@ import {Net}			    						from "../core/net.js"
 import {CodeManContainer}							from '../component/new/codeManager.js'
 import {CodeInputConsole}							from '../component/new/codeInputConsole.js';
 import {DomUtil}									from '../core/domUtil.js';
+import { AuthPage } from '../core/authPage.js'
 
 const YT_TA_MSG_ID 					    	= "yt_ta_msg";
 const YT_TA_MSG_INPUT_ID				    = 'yt_ta_msg_input';
@@ -62,7 +63,7 @@ const USER_VIDEO_ID_TEMPLATE = uiConstants.VIDEO_ID_TEMPLATE;
 /**
 	This class handles JS Code runner board
 **/
-class JSClassRoom extends ProgrammingClassCommandUI {
+class JSClassRoom extends AuthPage {
 	
 	#displayBoardForCoding;
 	#notes;
@@ -145,11 +146,8 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 
 		// initialize code editor
 		this.#codeInputConsoleComponent = new CodeInputConsole(
-					"", 
-					YT_DIV_CODE_EDITOR, 
-					YT_DIV_CODE_EDITOR, 
-					YT_TA_CODE_BOARD_ID, 
-					YT_TA_OUTPUT_CONSOLE_ID
+					this, 
+					YT_DIV_CODE_EDITOR
 		);
 		
 		/**
@@ -453,15 +451,15 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		if (ti != this.#tabIndex) {
 			TAB_LIST.forEach( (e, i) => {
 				if (i != ti) {
-					$(`#${e.tab}`).removeClass('selected-tab');
-					$(`#${e.tab}`).addClass('unselected-tab');
+					$(`#${e.tab}`).removeClass('selected_tab');
+					$(`#${e.tab}`).addClass('unselected_tab');
 					e.sub_elements.forEach(se => {
 						$(`#${se}`).hide();
 					});
 				}
 				else {
-					$(`#${e.tab}`).removeClass('unselected-tab');
-					$(`#${e.tab}`).addClass('selected-tab');
+					$(`#${e.tab}`).removeClass('unselected_tab');
+					$(`#${e.tab}`).addClass('selected_tab');
 					e.sub_elements.forEach(se => {
 						$(`#${se}`).show();
 					});
@@ -488,7 +486,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	 **/
 	updateCodeBufferAndSync() {
 		console.log('JSClassRoom.updateCodeBufferAndSync called');
-		const codeUpdateObj = this.updateCode(this.code); 
+		const codeUpdateObj = this.updateCode(this.#codeInputConsoleComponent.code); 
 		if (codeUpdateObj && codeUpdateObj.flag !== UtilConst.STR_CHANGE_NON) {
 			this.#displayBoardForCoding.updateCodeBufferAndSync(codeUpdateObj);
 		}
@@ -542,7 +540,7 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 		Sync code with teacher when teacher asks for it.
 	 **/
 	syncCodeWithTeacherer(cmdObject) {
-		this.#displayBoardForCoding.syncCodeWithRequester(this.code, cmdObject.sender);
+		this.#displayBoardForCoding.syncCodeWithRequester(this.#codeInputConsoleComponent.code, cmdObject.sender);
 	}
 	
 	/**
@@ -593,10 +591,10 @@ class JSClassRoom extends ProgrammingClassCommandUI {
 	**/	
 	updateCodeSample(how) {
 		// obtain the new code sample using an algorithm defined in parent class as a static method
-		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, this.code);
+		const {newContent, digest} = ProgrammingClassCommandUI.updateContentByDifference(how, this.#codeInputConsoleComponent.code);
 		
 		// update the code on UI
-		this.code = newContent;
+		this.#codeInputConsoleComponent.code = newContent;
 		
 		// close output in teaching mode (when new code comes)
 		if (this.#isInTeachingMode) {

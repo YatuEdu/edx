@@ -1,27 +1,22 @@
 import {ComponentBase}		from '../componentBase.js';
 import {StringUtil}			from '../../core/util.js';
+import {Net}			    from "../../core/net.js"
+import {credMan} 			from '../../core/credMan.js'
 
 //const CODE_LIST_TABLE_TEMPLATE = '
 
 const MY_CODE_LIST_TEMPLATE = `
 <div class="row mb-0 yt-list-element" id={codelstDivId}>
-  <div class="col-6 tool-tbtn-dimention-left">
+  <div class="col-4 tool-tbtn-dimention-left">
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
-  <div class="col-6 tool-tbtn-dimention">
+  <div class="col-8 tool-tbtn-dimention">
     <button class="textButton mediumTextButton upd-code" id="{codeInsId}" title="Copy the code from code depot and insert into practice console ut the cursor">Insert</button>
 	<button class="textButton mediumTextButton upd-code" id="{codeUpdId}" title="Copy the code from the code practice console and update the selected code entry in code depot">Update</button>
 	<button class="textButton mediumTextButton del-code" id="{codeDelId}" title="Delete the code">Delete</button>
   </div>
 </div>
 `;
-
-/*
-const TEMPLETE_2 = '
-	<table id='yt_div_code_man'>
-	</table>
-';
-*/
 
 const TEMPLETE = 
 `<div id='yt_div_code_man' class="row mb-0">
@@ -145,46 +140,55 @@ class CodeMan {
 /**
 	This class handles code management functions inside student or teacher pages
 **/
-class CodeManContainer extends ComponentBase {
-	#codeMan;
-	#getCodeFromDbMethod;
-	#updateCodeToDbMethod;
-	#deleteCodeFromDbMethod;		
-	;
+class CodeContainer extends ComponentBase {
+	#codeMan;	
 	#selectedCodeName;
 	#codeInoputBoardId;
+	#groupId;
+	#sequenceId;
 	
-	constructor(id, 
-				name, 
-				parentId, 
-				codeInoputBoardId,
-				codeDataList, 
-				getCodeFromDbMethod,
-				updateCodeToDbMethod,	
-				deleteCodeFromDbMethod,			
-				userName, group) {
-		super(id, name, parentId, "", MY_CSS);
+	constructor(parentId, codeInoputBoardId, groupId, sequenceId) {
+		super("id", "CodeContainer", parentId, "", MY_CSS);
 		this.#codeInoputBoardId = codeInoputBoardId;
-		this.#codeMan = new CodeMan(codeDataList, userName, group);
+		this.#groupId = groupId;
+		this.#sequenceId = sequenceId
+	}
+
+    static async createCodeContainer(parentId, codeInoputBoardId, groupId, sequenceId) {
+        const instance = new CodeContainer(parentId, codeInoputBoardId, groupId, sequenceId);
+        await instance.initCodeDepot();
+        return instance;
+    }
+	
+    /**
+		Load user code text from data base
+	 **/
+	async initCodeDepot() {
+		const codeDataList = [];
+		const resp = await Net.memberListAllCode(credMan.credential.token);
+		if (resp.data.length > 0) {
+			let first = true;
+			
+			resp.data.forEach(codeHeader => {
+				const codeEntry = {sequence_id: codeHeader.sequence_id, name: codeHeader.name, hash: codeHeader.hash};
+				codeDataList.push(codeEntry);
+			});
+		}
+
+        this.#codeMan = new CodeMan(codeDataList);
+
+        // create code container UI 
 		const codeListHtml = this.prv_buildCodeListHtml(codeDataList);
 		const componentHtml = TEMPLETE
 						.replace(REPLACEMENT_CODE_LIST, codeListHtml);
 						
 		
-		// mount the component to UI
+		// mount the component to the page
 		this.mount(componentHtml);
 		
 		// add event handler for all the list entry
 		codeDataList.forEach(codeHeader => $(this.eventHandlerForNewCode(codeHeader.name)));
-					
-		// call this function to get code by name
-		this.#getCodeFromDbMethod = getCodeFromDbMethod;
-		
-		// call this function to update code by name
-		this.#updateCodeToDbMethod = updateCodeToDbMethod;
 
-		// call this function to delete code by name
-		this.#deleteCodeFromDbMethod = deleteCodeFromDbMethod;
 	}
 	
 	
@@ -247,11 +251,11 @@ class CodeManContainer extends ComponentBase {
 					return
 				}
 				// update depot DB
-				const resp = await this.#updateCodeToDbMethod(codeName, uiText);
+				const resp = await this.updateCodeToDb(codeName, uiText);
 				if (resp.code) {
 					alert("Error encountered during updating code to DB. Error code:" +  resp.code);
 				} else {
-					// updater manager
+					// update in-meomry code depot
 					this.#codeMan.updateCodeEntry(codeName, uiText, StringUtil.getMessageDigest(uiText));
 					alert(`Code "${codeName}" successfully updated!`);
 				}
@@ -271,7 +275,7 @@ class CodeManContainer extends ComponentBase {
 		// only react to selected code entry
 		if (this.#selectedCodeName == codeName) {
 			// delete code from depot and DB
-			const result = await this.#deleteCodeFromDbMethod(codeName);
+			const result = await this.#deleteCodeFromDb(codeName);
 			if (result === 0) {
 				alert(`Code block with name "${codeName}" has been deleted!`)
 			} else {
@@ -282,6 +286,34 @@ class CodeManContainer extends ComponentBase {
 			$(this.getCodeListLinkSelector(codeName)).empty();
 			$(this.getCodeListLinkSelector(codeName)).remove();
 		}
+	}
+
+    async #getCodeFor(codeName) {
+		const respCodeText = await Net.memberGetCodeText(credMan.credential.token,
+														 0, 
+														 codeName);
+		if (respCodeText.code === 0) {
+			return StringUtil.decodeText(respCodeText.data[0].text);
+		}
+	}
+
+	async #deleteCodeFromDb(codeName) {
+		const resp = await Net.memberDeleteCode(credMan.credential.token,
+												0, codeName);
+	    return resp.code;
+	}
+
+    async updateCodeToDb(codeName, codeText) {
+		// encode text for safety and viewbility
+		const codeHash = StringUtil.getMessageDigest(codeText);
+		const encodedCodeText = StringUtil.encodeText(codeText);
+		const resp = await Net.memberAddCode(credMan.credential.token, 
+											 this.#groupId,
+											 this.#sequenceId,
+											 codeName, 
+											 encodedCodeText, 
+											 codeHash);
+		return resp;
 	}
 	
 	prv_getCodeNameFromEvent(e) {
@@ -325,13 +357,23 @@ class CodeManContainer extends ComponentBase {
 
 		let codeText = await this.prv_getCodeFor(name);
 		
+		/*
+			complext logic to determine if we want to overwrite the code in the code console, using the
+			code from code depod.  The key is to not implicitly erase the code user just entered.
+		*/
 		if (oldName != name) {
 			const existingCode = $(this.codeInputBoardSelector).val();
-			const codeInDepod = oldName ?  this.prv_getCodeEntryForFAromCodeMan(oldName) : null;
-			if (existingCode &&  existingCode !== codeInDepod.text) {
-				const replace = confirm("Do you want to replace the ocde in the code console with the selected code from code depot? ");
-				if (!replace) {
-					return;
+			const codeInDepod = oldName ?  this.prv_getCodeEntryForCode(oldName) : null;
+			if (existingCode) {
+				let askQuestion = true;
+				if (codeInDepod && existingCode === codeInDepod.text) {
+					askQuestion = false;
+				}
+				if(askQuestion) {
+					const replace = confirm("Do you want to replace the ocde in the code console with the selected code from code depot? ");
+					if (!replace) {
+						return;
+					}
 				}
 			}
 			this.prv_toggleSelection(this.#selectedCodeName, name);
@@ -342,19 +384,16 @@ class CodeManContainer extends ComponentBase {
 	
 	// if we have the code, return it.  Otherwise, ask it from DB
 	async prv_getCodeFor(name) {
-		let codeEntry = this.prv_getCodeEntryForFAromCodeMan(name);
+		let codeEntry = this.prv_getCodeEntryForCode(name);
 		if (!codeEntry.text) {
-			codeEntry.text  = await this.retireveCode(name);
+			codeEntry.text  = await this.#getCodeFor(name);
 		}
 		
 		return codeEntry.text;
 	}
 	
-	async retireveCode(name) {
-		return await this.#getCodeFromDbMethod(name);
-	}
 	
-	prv_getCodeEntryForFAromCodeMan(name) {
+	prv_getCodeEntryForCode(name) {
 		const codeEntry = this.#codeMan.getCodeEntry(name);
 		if (!codeEntry) {
 			throw new Error(`Code [${name}] not found!`);
@@ -454,6 +493,6 @@ class CodeManContainer extends ComponentBase {
 	}
 }
 
-export { CodeManContainer };
+export { CodeContainer };
 
 

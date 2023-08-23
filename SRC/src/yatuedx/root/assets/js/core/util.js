@@ -75,6 +75,13 @@ class StringUtil {
 		We define six change flags here as constant
 	*/
 
+	static isAlphanumeric(str) {
+		if (str) {
+			return /^[a-z0-9]+$/i.test(str)
+		}
+		return false;
+	}
+
 	static findChangeBetweenText(oldStr, newStr)  {
 		const oldLen = oldStr.length;
 		const newLen = newStr.length;

@@ -9,6 +9,12 @@ class ComponentBase {
 	#parentId;
 	#visible;  
 	#css;
+
+	static get MOUNT_TYPE_APPEND() { return 1}
+	static get MOUNT_TYPE_PREPEND() { return 2}
+	static get MOUNT_TYPE_INSERT() { return 3}
+	
+	
 	
 	/**
 		public methods
@@ -53,17 +59,21 @@ class ComponentBase {
 	//**********************************************************************************************
 	mount(html, method) {
 		switch(method) {
-			case 1:
+	
+			case ComponentBase.OUNT_TYPE_APPEND:
 				$(this.parentSelector).append(html);
 				break;
 				
-			case 2:
+			case ComponentBase.MOUNT_TYPE_PREPEND:
 				$(this.parentSelector).prepend(html);
 				break;
 			
-			default:
+			case ComponentBase.MOUNT_TYPE_INSERT:
 				$(this.parentSelector).html(html);
 				break;
+				
+			default:
+				throw new Error('Unknown compnent mounting type')
 		}
 	}
 		

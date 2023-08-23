@@ -541,8 +541,15 @@ class Token {
 	}
 	
 	static isName(c) {
-		const tokenInfo = STANDARD_TOKEN_MAP.get(c);
-		return 	!tokenInfo && tokenInfo.opType && tokenInfo.opType === OP_TYPE_ASSIGNMENT_OPERATOR;
+		if (c) {
+			const tokenInfo = STANDARD_TOKEN_MAP.get(c);
+			if (tokenInfo) {
+				return tokenInfo.type !== TOKEN_TYPE_SEPARATOR
+			}
+			return false;
+		}
+		return false;
+		
 	}
 	
 	static isFunction(c) {
