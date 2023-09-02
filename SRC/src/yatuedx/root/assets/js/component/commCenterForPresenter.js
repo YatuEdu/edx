@@ -2,12 +2,8 @@ import {CommunicationSpace} 	from './communicationSpace.js';
 import {PTCC_COMMANDS}			from '../command/programmingClassCommand.js'
 import {OutgoingCommand}		from '../command/outgoingCommand.js'
 
-const VIDEO_TEMPLATE = `
-<
-<video class="yt_video" id="yt_vido_{pid}" autoplay playsinline>"`;
 
-
-class DisplayBoardTeacher extends CommunicationSpace {  
+class CommCenterForPresenter extends CommunicationSpace {  
 	#view;
 	
 	/*private*/
@@ -20,16 +16,16 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	 static facotry method for DisplayBoardTeacher to assure that it calls its
 	 async init method.
 	 */
-	static async createDisplayBoardTeacher(liveSession, view) {
-		const myInstance = new DisplayBoardTeacher(view);
+	static async createCommCenterForPresenter(liveSession, view) {
+		const myInstance = new CommCenterForPresenter(view);
 		await myInstance.init(liveSession);
 		return myInstance;
 	}
 	
 	
-	/**
+	/*
 		Update code buffer sample and sync with students
-	**/
+	*/
 	updateCodeBufferAndSync(codeUpdateObj) {
 		let cmd = this.composeContentUpateMsg(codeUpdateObj);
 		if (cmd) {
@@ -37,9 +33,9 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		}
 	}
 	
-	/**	
+	/*	
 		Execute command sent by student or hadling events triggered by peers
-	**/	
+	*/	
 	v_execute(cmdObject) {
 		switch (cmdObject.id) {
 			case PTCC_COMMANDS.GM_HELLO_FROM_PEER:	
@@ -56,43 +52,43 @@ class DisplayBoardTeacher extends CommunicationSpace {
 		}
 	}
 	
-	/**
+	/*
 		Send code sample to all students to disaply on students white-board
-	 **/
+	 */
 	sendCode(codeStr) {
 		debugger
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_REFRESH, codeStr);
 		this.sendMessageToGroup(cmd.str);
 	}
 	
-	/**
+	/*
 		Highlight code selection text for all students
-	 **/
+	 */
 	setSelection(begin, end) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_HIGH_LIGHT, begin, end);
 		this.sendMessageToGroup(cmd.str);
 	}
 
-	/**
+	/*
 		vertically scroll student's text
-	 **/
+	 */
 	verticallyScroll(pixels) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_VERTICALLY_SCROLL, pixels);
 		this.sendMessageToGroup(cmd.str);
 	}
 	
-	/**
+	/*
 		Run code sample we swent prior to this command on student's board remotely
 		for all students who are attending the class
-	 **/
+	 */
 	runCode() {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CODE_RUN, null);
 		this.sendMessageToGroup(cmd.str);
 	}
 	
-	/**
+	/*
 		Change class mode for all the attending students
-	**/	
+	*/	
 	setMode(m, user) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_CLASSROOM_SWITCH_MODE, m);
 		if (!user) {
@@ -101,6 +97,19 @@ class DisplayBoardTeacher extends CommunicationSpace {
 			this.sendMessageToUser(user, cmd.str);
 		}
 	}
+
+	/*
+		send messages to everyone in the live class
+	*/
+	sendGroupMessage(msg) {
+		if (msg) {
+			const cmdObject = new OutgoingCommand(PTCC_COMMANDS.GM_HELLO_FROM_PEER, msg);
+			this.sendMessageToGroup(cmdObject.str);
+			return true;
+		}
+		return false;
+       
+    }
 	
 	// {cmd: hi, p1: hello} -> stringfy jason
 	refresh(coomandObj ) {
@@ -112,4 +121,4 @@ class DisplayBoardTeacher extends CommunicationSpace {
 	}
 }
 
-export { DisplayBoardTeacher };
+export { CommCenterForPresenter };

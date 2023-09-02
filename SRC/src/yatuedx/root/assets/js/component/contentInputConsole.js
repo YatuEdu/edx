@@ -12,13 +12,13 @@ const GROUP_TYPE_TO_INPUT_TYPE_MAP = new Map ([
 class ContentInputConsole {
     #delegateToComponent
 
-    constructor(groupType, parentView, divId) {
+    constructor(groupType, parentView, divId, baseIdTag, outputId) {
         const impl = GROUP_TYPE_TO_INPUT_TYPE_MAP.get(groupType);
         if (!impl) {
             alert("Unknown class room type:" + groupType)
             return;
         }
-        this.#delegateToComponent = new impl.implementationClass(parentView, divId);
+        this.#delegateToComponent = new impl.implementationClass(parentView, divId, baseIdTag, outputId);
     }
 
     /**
@@ -27,6 +27,13 @@ class ContentInputConsole {
      */
     showOutput() {
         return this.#delegateToComponent.showOutput();
+    }
+
+    /**
+     * show error dialog if any error occurs during program execution
+     */
+    showDiagnoticMessage(errInfo) {
+        return this.#delegateToComponent.showDiagnoticMessage(errInfo);
     }
 
     /**
@@ -51,6 +58,10 @@ class ContentInputConsole {
 
     get outputId() {
         return this.#delegateToComponent.outputId;
+    }
+
+    get inputIsTextArea() {
+        return this.#delegateToComponent instanceof CodeInputConsole
     }
 
     /**

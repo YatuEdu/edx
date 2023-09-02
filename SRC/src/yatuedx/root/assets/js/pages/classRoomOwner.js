@@ -1,124 +1,107 @@
 import {sysConstStrings} 	            from '../core/sysConst.js'
 import {ClassRoom} 				        from './classRoom.js'
-import {DisplayBoardTeacher}            from '../component/displayBoardTeacher.js'
+import {CommCenterForPresenter}         from '../component/commCenterForPresenter.js'
 import {PTCC_COMMANDS}					from '../command/programmingClassCommand.js'
 import {StringUtil}	                    from '../core/util.js';
 
-const DIV_VIEDO_AREA 					= "yt_div_video_area";
-const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
-const YT_DIV_TEXT_INPUT_ID              = "yt_div_text_board";
-const BTN_MODE_CHANGE 					= 'yt_btn_switch_mode';
-
 // let myEditor = new ysEditor();
 class ClassRoomOwner extends ClassRoom {
-	#commCenterForTeacher;                               
+	#commCenterForPresenter;                               
 
     constructor(classMode, groupType, groupId, sequenceId) {
-		super(YT_DIV_TEXT_INPUT_ID, DIV_VIEDO_AREA, BTN_SHARE_SCREEN, classMode, groupType, groupId, sequenceId)
+		super(classMode, groupType, groupId, sequenceId)
 	}
 
     /**
     *   initialize classroom's communication handler and event handler
     */
 	async init() {
+		 // hide student only elelment
+		 $(this.studentOnlyClassSelector).hide();
+
 		await super.init();
 
         // establish live communication session if we are in class mode	
         if (!this.classMode) {
-			this.#commCenterForTeacher = await DisplayBoardTeacher.createDisplayBoardTeacher(this.liveSession, this);
+			this.#commCenterForPresenter
+ 				= await CommCenterForPresenter.createCommCenterForPresenter(this.liveSession, this);
         } 
-    
+
+		/*
+		 * INITIALIZE CLASS MODE SELECTED
+		 */
+		$(this.classModeSelector).selectmenu();
+
         /****
          * add event listners
          */
-        this.addEventListner(); 
+        this.#addEventListner(); 
       
         // set mode to exercise mode
-		this.setMode(PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE);
+		this.#setMode(sysConstStrings.SWITCH_TO_EXERCISE);
     }
 
-    addEventListner() {
-        // make sure the parent event listner is added first
-        super.addEventListner()
-        
+    #addEventListner() {
 		// handle key up 
 		$(this.contentInputConsole.inputIdSelector).mouseup(this.handleMouseUp.bind(this));
 
-        // hook up event 'run code sample'
-		$(this.modeChangeButton).click(this.handleModeChange.bind(this));
+		// hanlding vertical scroll during live show
+		if (this.#commCenterForPresenter) {
+			 // hook up event 'run code sample'
+			$(this.classModeSelector).on("selectmenuchange", this.#handleModeChange.bind(this));
 
-		// hanlding vertical scroll
-		$(this.contentInputConsole.inputIdSelector).scroll(this.handleScroll.bind(this));
+			// handle vertical scroll during teaching
+			$(this.contentInputConsole.inputIdSelector).scroll(this.handleScroll.bind(this));
+
+			// show UI elements that are only visible during live session
+			$(this.liveOnlyClassSelector).show()
+		} else {
+			// hide UI elements that are only visible during live session
+			$(this.liveOnlyClassSelector).hide()
+		}
     }
 
-    /**
+    /*
 		Change class mode for all the attending students
-	**/	
-	handleModeChange(e) {
+	*/	
+	#handleModeChange(e) {
 		e.preventDefault(); 
-		const newMode = this.switchMode();
+		const selected = $(e.target).find(":selected").val()
+		this.#setMode(selected);
 		// send the command to peers
-		this.#commCenterForTeacher.setMode(newMode);
+		this.#commCenterForPresenter.setMode(selected);
 	}
 
 	/*
 		when teacher scrolls we need to have students window scroll as well
-	**/
+	*/
 	handleScroll(e) {
 		// regenerate line number to adjust to the top
 		const top = $(e.target).scrollTop();
-		this.#commCenterForTeacher.verticallyScroll(top);
+		this.#commCenterForPresenter.verticallyScroll(top);
 	}
 
-	/**
+	/*
 		Handle mouse up event by getting the text selection and pass the selection info to peers
-	**/
+	*/
 	handleMouseUp(e) {
 		e.preventDefault(); 
 		e.stopPropagation();
 		const {begin, end} = this.contentInputConsole.getSelection();
 		if (begin != end) {
-			this.#commCenterForTeacher.setSelection(begin, end);
+			this.#commCenterForPresenter.setSelection(begin, end);
 		}
-	}
-
-    /**
-		Switch students board mode
-	**/
-	switchMode() {
-		// current mode:
-		let currentModeStr = $(this.modeChangeButton).data(sysConstStrings.ATTR_MODE); 
-		const newMode = this.priv_changeMode(currentModeStr);
-		return newMode;
 	}
 	
-	/**
-		Mode switching
-	**/
-	priv_changeMode(currentModeStr) {
-		const currentMode =  parseInt(currentModeStr, 10);
-		let newMode;
-		if ( currentMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
-			newMode = PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE;
-		}
-		else if (currentMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
-			newMode = PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY;	
-		}
-		this.setMode(newMode);
-		return newMode;
-	}
-
     /**
-		Direct mode setting
+		Direct mode setting by start refreshing timer for presentation mode or stop the timer for
+		exercizing mode
 	**/
-	setMode(newMode) {
-		$(this.modeChangeButton).data(sysConstStrings.ATTR_MODE, newMode); 
-		if ( newMode === PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READONLY) {
-			$("#yt_div_switch_mode").html(sysConstStrings.SWITCH_TO_EXERCISE);
+	#setMode(newMode) {
+		if ( newMode === sysConstStrings.SWITCH_TO_LEARNING) {
 			this.startOrStopCodeRefreshTimer(true);
 		}
-		else if (newMode == PTCC_COMMANDS.PTCP_CLASSROOM_MODE_READWRITE) {
-			$("#yt_div_switch_mode").html(sysConstStrings.SWITCH_TO_LEARNING);
+		else if (newMode == sysConstStrings.SWITCH_TO_EXERCISE) {
 			this.startOrStopCodeRefreshTimer(false);	
 		}
 	}
@@ -164,16 +147,21 @@ class ClassRoomOwner extends ClassRoom {
 	}
 
     v_sendGroupMessage(msg) {
-        this.#commCenterForTeacher.sendMessageToGroup(msg);
+		if (msg) {
+			this.#commCenterForPresenter.sendGroupMessage(msg);
+			return true;
+		}
+		return false;
+       
     }
 
-    /**
+    /*
 		Got student code and save it to student consle so that a teacher knows what his student is doing.
 		The data consists of:
 		 1) upadarte id
 		 2) update content
 		 3) from which student user
-	 **/
+	 */
 	updateStudentCode(how, student) {
 		const studentCurrentCode = $(this.getStudentConsoleIdSelector(student)).val();
 		
@@ -192,7 +180,7 @@ class ClassRoomOwner extends ClassRoom {
 				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
 					console.log('content not verified, asking for re-sync');
 					$(this.getStudentConsoleIdSelector(student)).val(newContent); // update anyway
-					this.#commCenterForTeacher.askReSync(student);
+					this.#commCenterForPresenter.askReSync(student);
 				} else {
 					shouldUpdate = true;
 				}
@@ -220,7 +208,7 @@ class ClassRoomOwner extends ClassRoom {
 		Sync code with one student 
 	 **/
 	syncCodeWithStudent(cmdObject) {
-		this.#commCenterForTeacher.syncCodeWithRequester(this.contentInputConsole.code, cmdObject.sender);
+		this.#commCenterForPresenter.syncCodeWithRequester(this.contentInputConsole.code, cmdObject.sender);
 	}
 
 
@@ -239,13 +227,13 @@ class ClassRoomOwner extends ClassRoom {
         const code = this.contentInputConsole.code;
 		const codeUpdateObj = this.updateCode(code); 
 		if (codeUpdateObj) {
-			this.#commCenterForTeacher.updateCodeBufferAndSync(codeUpdateObj);
+			this.#commCenterForPresenter.updateCodeBufferAndSync(codeUpdateObj);
 		}
 	}
 	
     // button for SWITCHING mode
 	get modeChangeButton() {
-		return `#${BTN_MODE_CHANGE}`;
+		return '#yt_btn_switch_mode'
 	}
 
     /*****  
@@ -255,9 +243,11 @@ class ClassRoomOwner extends ClassRoom {
 
     get columnVideoAreaSelector() { return `#yt_col_video_area`;}
 
-    get commCenterForTeacher() { return this.#commCenterForTeacher }
-    
-	get videoAreaId() { return `#${DIV_VIEDO_AREA}` }
+    get commCenterForPresenter() { return this.#commCenterForPresenter }
+
+	get classModeSelectorId() { return 'yt_opt_class_mode' }
+
+	get classModeSelector () { return `#${this.classModeSelectorId}` }
 
 }
 

@@ -62,15 +62,19 @@ const CONTROL_NAME = "Code_Input_Output_Text_Console";
 
 class CodeInputConsole extends ComponentBase {
 	#parentView
+	#outputId
+	#baseIdTag
 
-	constructor(parentView, parentDivId) {
+	constructor(parentView, parentDivId, baseIdTag,  outputId) {
 		super("id", CONTROL_NAME, parentDivId);
 		this.#parentView = parentView
+		this.#outputId = outputId;
+		this.#baseIdTag = baseIdTag;
 		
 		const componentHtml = CONTAINER_HTML_TMPLATE
 								.replace(REPLACEMENT_CSS_CONTAINER, CSS_CONTAINER)
 								.replace(REPLACEMENT_INPUT_ID, this.inputId)
-								.replace(REPLACEMENT_OUTPUT_ID, this.outputId)
+								//.replace(REPLACEMENT_OUTPUT_ID, this.outputId)
 								.replace(REPLACEMENT_OUTPUT_CONTAINER_ID, this.outputContainerId)
 								.replace(REPLACEMENT_BTN_SHOW_OR_HIDE_ID, this.showOrHideBtnId)
 								.replace(REPLACEMENT_BTN_ENLARGE_SHRINK_ID, this.enlargeOrShrinkBtnId)
@@ -94,7 +98,7 @@ class CodeInputConsole extends ComponentBase {
 		});
 		
 		// hook up event handleer
-		$(this.showOrHideBtnIdSelector).click(this.handleHideOutput.bind(this));
+		//$(this.showOrHideBtnIdSelector).click(this.handleHideOutput.bind(this)); todo: remove
 		$(this.enlargeOrShrinkBtnIdSelector).click(this.enlargeOrShrinkCodeConsole);
 		$(this.inputIdSelector).bind('input propertychange', this.handleCodeInput.bind(this)); // handle all text input event
 		$(this.inputIdSelector).change(this.handleCodeInput.bind(this)); // handle text change programmingly
@@ -115,13 +119,6 @@ class CodeInputConsole extends ComponentBase {
 		this.#generateLineNo();
 	}
 	 
-	/**
-		hide the output console to save space
-	 **/
-	handleHideOutput(e) {
-		$(this.outputContainerIdSelector).hide();
-	}
-	
 	/**
 		toggle input cosole between max size and normal size
 	 **/
@@ -149,11 +146,11 @@ class CodeInputConsole extends ComponentBase {
 	/* public methods */
 	
 	showOutput() {
-		$(this.outputContainerIdSelector).show();
+		//$(this.outputContainerIdSelector).show();
 	}
 	
 	hideOutput() {
-		$(this.outputContainerIdSelector).hide();
+		//$(this.outputContainerIdSelector).hide();
 	}
 	
 	showDiagnoticMessage(error) {
@@ -231,7 +228,7 @@ class CodeInputConsole extends ComponentBase {
 
 	// input tex area id
 	get inputId() {
-		return "yt_code_input_console";
+		return `yt_code_input_console_${this.#baseIdTag}`;
 	}
 	
 	// selector for input text area id
@@ -251,7 +248,7 @@ class CodeInputConsole extends ComponentBase {
 
 	// output tex area id
 	get outputId() {
-		return "yt_code_output_console";
+		return this.#outputId
 	}
 	
 	// selector for input text area id
@@ -261,7 +258,7 @@ class CodeInputConsole extends ComponentBase {
 	
 	// id for output container
 	get outputContainerId() {
-		return "yt_ctnr_result_output";
+		return `yt_ctnr_result_output_${this.#baseIdTag}`
 	}
 	
 	// code insert button selector
@@ -271,7 +268,7 @@ class CodeInputConsole extends ComponentBase {
 	
 	// enlarge the console or shrink it
 	get enlargeOrShrinkBtnId() {
-		return "yt_tbn_enlarge_or_shrink";
+		return `yt_tbn_enlarge_or_shrink_${this.#baseIdTag}`
 	}
 	
 	// enlarge-shrink button selector
@@ -281,7 +278,7 @@ class CodeInputConsole extends ComponentBase {
 	
 	// id for "-" button of the output console
 	get showOrHideBtnId() {
-		return 'yt_tbn_show_or_hide';
+		return `yt_tbn_show_or_hide_${this.#baseIdTag}`
 	}
 	
 	// "-" button selector
@@ -298,7 +295,7 @@ class CodeInputConsole extends ComponentBase {
 	}
 	
 	get diagnoticDialogId() {
-		return "yt_dl_diagnostic";
+		return `yt_dl_diagnostic_${this.#baseIdTag}`
 	}
 	
 	get diagnoticDialogIdSelector() {
@@ -314,7 +311,7 @@ class CodeInputConsole extends ComponentBase {
 	}
 	
 	get diagnoticMsgDivId() {
-		return "yt_div_diagnostic_message_div";
+		return `yt_div_diagnostic_message_div_${this.#baseIdTag}`
 	}
 	
 	get diagnoticMsgDivIdSelector() {
@@ -322,7 +319,7 @@ class CodeInputConsole extends ComponentBase {
 	}
 	
 	get diagnoticExceptionDivId() {
-		return "yt_div_diagnostic_exception_div";
+		return `yt_div_diagnostic_exception_div_${this.#baseIdTag}`
 	}
 	
 	get diagnoticExceptionDivIdSelector() {

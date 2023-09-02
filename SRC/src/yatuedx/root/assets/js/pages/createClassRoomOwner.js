@@ -1,15 +1,26 @@
-import {AuthPage} 							from '../core/authPage.js'
+import {AuthPage} 						from '../core/authPage.js'
 import {ClassRoomOwner} 				from './classRoomOwner.js';
+import {ClassRoomAudience}              from './classRoomAudience.js'
 import {JSClassRoomOwner} 				from './jsClassRoomOwner.js';
+import {JSClassRoomAudience}            from './jsClassRoomAudience.js'
 import {groupTypeConstants} 	        from '../core/sysConst.js'
 import {PageUtil}	                    from '../core/util.js';
 import {sysConstants} 	                from '../core/sysConst.js'
 
-const GROUP_TYPE_TO_CLASSROOM_TYPE_MAP = new Map ([
-    [groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION, {description: "rich_text_presentation", implementationClass: ClassRoomOwner }],
-    [groupTypeConstants.GPT_EDU_JSP, {description: "js_programming",         implementationClass: JSClassRoomOwner}],
-    [groupTypeConstants.GPT_EDU_JSP_NODE, {description: "web design with node.js, js, and sql",  implementationClass: JSClassRoomOwner}]
-]);
+const GROUP_TYPE_TO_CLASSROOM_TYPE_LIST = [
+    {role: null, groupType: groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION, 
+        description: "rich_text_presentation", implementationClass: ClassRoomOwner},
+    {role: null, groupType: groupTypeConstants.GPT_EDU_JSP, 
+        description: "js_programming", implementationClass: JSClassRoomOwner},
+    {role: null, groupType: groupTypeConstants.GPT_EDU_JSP_NODE, 
+        description: "web design with node.js, js, and sql",  implementationClass: JSClassRoomOwner},
+    {role: sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE, groupType: groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION, 
+        description: "rich_text_presentation", implementationClass: ClassRoomAudience},
+    {role: sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE, groupType: groupTypeConstants.GPT_EDU_JSP, 
+        description: "js_programming", implementationClass: JSClassRoomAudience},
+    {role: sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE, groupType: groupTypeConstants.GPT_EDU_JSP_NODE, 
+        description: "web design with node.js, js, and sql",  implementationClass: JSClassRoomAudience}
+];
 
 /* 
 	 static facotry method for ClassRoomOwner to assure that it creates appropriate child classes
@@ -25,6 +36,7 @@ async function createClassRoomOwner() {
 		
     // set class mode needs to be called before super.init()
     const classMode = mode;
+    let role = null;
     if (mode && mode === 1) {
         const groupStr = paramMap.get(sysConstants.UPN_GROUP);
         const sequenceStr = paramMap.get(sysConstants.UPN_SEQUENCE);
@@ -39,16 +51,26 @@ async function createClassRoomOwner() {
     } else {
         // live mode, need to use AuthPage to obtain session info
         const authPage = new AuthPage()
-        await authPage.validateLiveSession();
+        authPage.validateLiveSession();
         groupType = authPage.liveSession.group_type;
         groupId = authPage.liveSession.group_id	
         sequenceId = authPage.liveSession.sequence_id;
+
+        // when searching for implementation class, presenter role is the default (null)
+        role = authPage.liveChatRole === sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE 
+                        ? authPage.liveChatRole 
+                        : null;
     }
 
-    const classroomConstructor = GROUP_TYPE_TO_CLASSROOM_TYPE_MAP.get(groupType);
-    const myInstance = new classroomConstructor.implementationClass(classMode, groupType, groupId, sequenceId);
-    await myInstance.init();
-    return myInstance;
+    const classroomConstructor = GROUP_TYPE_TO_CLASSROOM_TYPE_LIST.find( e => {
+        return e.role === role && e.groupType === groupType
+    });
+    if (classroomConstructor) {
+        const myInstance = new classroomConstructor.implementationClass(classMode, groupType, groupId, sequenceId);
+        await myInstance.init();
+        return myInstance;
+    }
+   
 }
 
 let classRoomOwner= null;

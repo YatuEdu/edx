@@ -15,22 +15,14 @@
 	<link rel="stylesheet" href="./assets/css/codeInputConsole.css"/>
 	<link rel="stylesheet" href="./assets/css/codeManager.css"/>
 	<link rel="stylesheet" href="./assets/js/ysEditor/css/ysEditor.css" />
+	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
 </head>
 
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container">
-			 <a class="navbar-brand" href="index.html"><img src="assets/images/logo-codeking.png" class="img-fluid" alt="CODEKING"></a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#unplugNavbar"
-                    aria-controls="demoNavbar6" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="mdi mdi-menu"></span>
-                </button>
-            </div>
-        </nav>
+<body style="margin-top:10px !important;padding:0">
+    <header class="header-room">
+		
     </header>
-
-    <main>
+    <main class="header-room">
 		<div id="yt_dl_ask_to_save" class="yt_dl" title="Save my work with a name">
 			<p>
              <input type="name" name="codename" id="yt_txt_code_name" class="form-control" placeholder="Work Name">  
@@ -38,133 +30,129 @@
 			</p>
 		</div>
         <article class="my-5">
-			<section>
-				<div class="row mb-4">
-					<div  id="yt_col_video_area"  class="col-2">
-						<div id="yt_col_video_area" class="yt_vidyt-video-area">
-						</div>
-						<div id="yt_div_students_area">
+		<div class="row mb-4" style="height: calc(100% - 64px); display: grid">
+			<div  id="yt_col_video_area"  class="col-2">
+				<div id="yt_div_video_area" class="yt_video_area">
+				</div>
+				<div id="yt_div_students_area">
+				</div>
+			</div>
+			<div class="col-10">
+				<div class="row mb-4 tool_panel"> 
+					<div class="col-1 text-center">
+						<button id="yt_btn_run_code_on_student_board" title="Run code" class="save_work_btn" >
+							<img src="./assets/images/tools/run.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_erase_output" title="Erase output board" class="save_work_btn" >
+							<img src="./assets/images/tools/clean_output.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_share_screen" title="Share my screen" class="save_work_btn" >
+							<img src="./assets/images/tools/share_screen.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_erase_board" title="Erase input board" class="save_work_btn" >
+							<img src="./assets/images/tools/clean_output.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_save_work_or_notes" title="Save work" class="save_work_btn">
+							<img src="./assets/images/tools/save_work.png" width="40px" height="43" />
+						</button>
+					</div>
+					<div class="col-3 text-center teacher_only yt_select_class_mode" title="Set class mode">
+						<form action="#">
+						<select name="classMode" id="yt_opt_class_mode">
+							<option value="presentation">Presentation</option>
+							<option value="exercise" selected="selected">Exercise</option>
+						</select>
+						</form>
+					</div>
+					<div class="col-6 text-right student_only" title="Set class mode">
+						<span id="yt_span_current_mode" class="mode_text"></span>
+					</div>
+					<div class="col-1 text-right" title="Set class mode">
+						<button title="Navigate to home page" class="save_work_btn" style="margin-top: 8px;"
+								onclick="(function() {window.location.href='./index.html'})()">
+							<img src="./assets/images/dynamic/home.png" width="40px" height="28px" />
+						</button>
+					</div>
+				</div>	
+				<div class="row row-code-input">
+					<div class="col-7 yt-list-panel-left">
+						<div id="yt_div_content_input">
 						</div>
 					</div>
-					<div class="col-10">
-						<div class="row mb-4"> 
-							<div class="col-1 text-center">
-								<picture id="yt_btn_run_code_on_student_board" class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Send to student</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/run_code.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
-							</div>	
-							<div class="col-1 text-center">
-								<picture id="yt_btn_erase_result"  class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Erase Board</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_result.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
-							</div>	
-							<div class="col-1 text-center">
-								<picture id="yt_btn_share_screen" class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Share Screen</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/share_scrn.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+					<div class="col-5 yt-list-panel-right">
+						<div class="row mb-4">
+							<div id="yt_tb_work_depot" class="col-3 selected_tab yt_tab">
+								<button class="tab_button" data-tabindex="0" title="My saved work">Work</button>
 							</div>
-							<div class="col-1 text-center"> 
-								<picture id="yt_btn_switch_mode" class="btn tiphost" >
-									<span class="tooltip">
-										<div id="yt_div_switch_mode" class="tooltiptext">Switch mode</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/switch_mode.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+							<div id="yt_tb_msg_console" class="col-3 unselected_tab yt_tab">
+								<button data-tabindex="1" class="tab_button" title="Send / receive messages to classroom">Messages</button>
 							</div>
-							<div class="col-1 text-center">
-								<picture id="yt_btn_check_clean_code"  class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Check and Clean Code</div>
-									</span>
-									<source width="43" height="43" type="image/webp" srcSet="assets/images/tools/sync_code.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+							<div id="yt_tb_notes_console" class="col-3 unselected_tab yt_tab">
+								<button class="tab_button" data-tabindex="2" title="Keep notes for the class">Notes</button>
 							</div>
-							<div class="col-1 text-center">
-								<picture id="yt_btn_erase_board"  class="btn tiphost" >
-									<span class="tooltip">
-										<div class="tooltiptext">Erase Text Board</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/erase_screen.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+							<div id="yt_tb_student_console" class="col-3 unselected_tab yt_tab teacher_only live_only">
+								<button class="tab_button" data-tabindex="3" title="View my students status">My students</button>
 							</div>
-							<div class="col-1 text-center">
-								<picture id="yt_btn_save_work_or_notes" class="btn tiphost">
-									<span class="tooltip">
-										<div class="tooltiptext">Save Notes</div>
-									</span>
-									<source width="41" height="41" type="image/webp" srcSet="assets/images/tools/save_notes.webp" />
-									<img src="/my-image.jpg" />
-								</picture>
+						</div>
+						<div class="row mb-4 work_tab_row">
+							<div class="col-12">
+								<div id="yt_work_container" class="work_container">
+								</div>
 							</div>
 						</div>	
-						<div class="row mb-4">
-							<div class="col-7 yt-list-panel-left">
-								<div id="yt_div_content_input">
+						<div class="row mb-4 message_tab_row">
+							<div class="col-12">
+								<div id="yt_div_message_boards" class="message-container">
 								</div>
 							</div>
-							<div class="col-5 yt-list-panel-right">
-								<div class="row mb-4">
-									<div id="yt_tb_work_depot" class="col-4 selected_tab yt_tab">
-										<button class="tab_button" data-tabindex="0" title="My saved work">Work</button>
-									</div>
-									<div id="yt_tb_msg_console" class="col-4 unselected_tab yt_tab">
-										<button data-tabindex="1" class="tab_button" title="Send / receive messages to classroom">Messages</button>
-									</div>
-									<div id="yt_tb_notes_console" class="col-4 unselected_tab yt_tab">
-										<button class="tab_button" data-tabindex="2" title="Keep notes for the class">Notes</button>
-									</div>
-								</div>
-								<div class="row mb-4 work_row">
-									<div class="col-12">
-										<div id="yt_work_container" class="work_container">
-										</div>
-									</div>
-								</div>	
-								<div class="row mb-4 message_row">
-									<div class="col-12">
-										<div id="yt_div_message_boards" class="message-container">
-										</div>
-									</div>
-								</div>
-								<div class="row mb-4 notes_row">
-									<div class="col-12">
-										<div id="yt_div_notes_rte_editor" class="message-container">
-										</div>
-									</div>
+						</div>
+						<div class="row mb-4 notes_tab_row">
+							<div class="col-12">
+								<div id="yt_div_notes_rte_editor" class="message-container">
 								</div>
 							</div>
+						</div>
+						<div class="row mb-4 student_tab_row teacher_only">
+							<div class="col-12">
+								<div id="yt_div_my_students" class="message-container">
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-            </section>
-        </article>
-        
+				<div class="row mb-4 for_coding_only" style="display:none;" id="yt_tab_output_for_coding">
+					<div class="col-12">
+						<ul>
+							<li><a href="#tabs-1">Output console</a></li>
+							<li><a href="#tabs-2">Errors</a></li>
+							<li><a href="#tabs-3">Analysis</a></li>
+						</ul>
+						<div id="tabs-1">
+							<textarea class="output-board"
+									  id="yt_ta_global_output" 
+									  rows="20"  spellcheck="false" 
+									  placeholder="Output Console"></textarea>
+						</div>			 
+						<div id="tabs-2">
+							<p>Coming soon...</p>			  
+						</div>
+						<div id="tabs-3">
+							<p>Coming soon...</p>			  
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+        </article>       
     </main>
-
-    <footer class="up-common-footer">
-        <div class="container">
-            <nav class="nav footer-social-nav justify-content-center">
-                <a href="#" class="nav-link social-link-facebook"> <i class="mdi mdi-facebook"></i> </a>
-                <a href="#" class="nav-link social-link-twitter"> <i class="mdi mdi-twitter"></i> </a>
-                <a href="#" class="nav-link social-link-behance"> <i class="mdi mdi-behance"></i> </a>
-                <a href="#" class="nav-link social-link-dribbble"> <i class="mdi mdi-dribbble"></i> </a>
-            </nav>
-        </div>
-    </footer>
     <script src="./assets/js/jquery/dist/jquery.min.js"></script>
 	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
 	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>

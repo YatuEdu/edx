@@ -1,6 +1,6 @@
 import {sysConstants, sysConstStrings, uiConstants} from '../core/sysConst.js'
 import {credMan} 									from '../core/credMan.js'
-import {DisplayBoardForCoding}						from '../component/displayBoardForCoding.js'
+import {DisplayBoardForCoding}						from '../component/commCenterForAudience.js'
 import {LocalStoreAccess}							from '../core/localStorage.js'
 import {PTCC_COMMANDS}								from '../command/programmingClassCommand.js'
 import {ProgrammingClassCommandUI}					from './programmingClassCommandUI.js'

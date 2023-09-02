@@ -1,12 +1,14 @@
 import {AuthPage} 							from '../core/authPage.js'
 import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
-import {StringUtil, UtilConst, PageUtil, RegexUtil} 	from '../core/util.js'
+import {StringUtil, UtilConst, PageUtil, CollectionUtil, RegexUtil} 	from '../core/util.js'
 import {Token}								from '../component/parser/token.js'
 import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
 import {ContentInputConsole}            	from '../component/contentInputConsole.js'
 import {CodeContainer}						from '../component/new/codeContainer.js'
 import {MessageBoard}						from '../component/messageBoard.js'
 import {RteInputConsole}					from '../component/new/rteInputConsole.js'
+import {credMan} 							from '../core/credMan.js'
+import {Net}			    				from "../core/net.js"
 
 const CSS_VIDEO_MIN 						= 'yt-video';
 const CSS_VIDEO_MAX 						= 'yt-video-max';
@@ -23,22 +25,29 @@ const CSS_MESSAGE_TAB_WITH_MSG 				= 'btn-mail-box-with-msg';
 const CLCC_SELECTED_TAB                 = "selected_tab";
 const CLCC_UNSELECTED_TAB               = "unselected_tab";
 
-const CLCC_WORK_ROW                     = "work_row";
-const CLCC_MESSAGE_ROW                  = "message_row";
-const CLCC_NOTES_ROW                    = "notes_row";
+const CLCC_WORK_ROW                     = "work_tab_row";
+const CLCC_MESSAGE_ROW                  = "message_tab_row";
+const CLCC_NOTES_ROW                    = "notes_tab_row";
+const CLCC_STUDENT_ROW                  = "student_tab_row";
+
+const BTN_RUN_CODE  					= "yt_btn_run_code_on_student_board";
+const BTN_ERASE_OUTPUT					= "yt_btn_erase_output";
 
 const TAB_LIST = [
 	{tab:"yt_tb_work_depot",  	    sub_elements: [CLCC_WORK_ROW] },
 	{tab:"yt_tb_msg_console",    	sub_elements: [CLCC_MESSAGE_ROW] },
 	{tab:"yt_tb_notes_console",     sub_elements: [CLCC_NOTES_ROW] },
+	{tab:"yt_tb_student_console",   sub_elements: [CLCC_STUDENT_ROW] }
 ];
 
 const TAB_INDEX_WORK = 0;
 const TAB_INDEX_MSG = 1;
 const TAB_INDEX_NOTES = 2;
 
+const DIV_VIEDO_AREA 					= "yt_div_video_area";
+const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
+
 class ClassRoom extends AuthPage {
-    #codeInputTextArea
 	#videoAreaId
 	#screenShareBtnId
     #codeSyncManager
@@ -50,18 +59,18 @@ class ClassRoom extends AuthPage {
 	#codeContainer
 	#contentInputConsole
 	#notesConsole
+	#initialNotes
 	#messageBoard
 	#tabIndex  
 	
-	constructor(codeInputTextArea, videoAreaId, screenShareBtnId, classMode, groupType, groupId, sequenceId) {
+	constructor(classMode, groupType, groupId, sequenceId) {
 		super();
 		this.#groupType =  groupType
 		this.#classMode = classMode
 		this.#groupId = groupId
 		this.#sequenceId = sequenceId
-        this.#codeInputTextArea = codeInputTextArea;
-		this.#videoAreaId = videoAreaId;
-		this.#screenShareBtnId = screenShareBtnId;
+		this.#videoAreaId = DIV_VIEDO_AREA;
+		this.#screenShareBtnId = BTN_SHARE_SCREEN;
 		this.#tabIndex = -1;
         // create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
@@ -80,7 +89,7 @@ class ClassRoom extends AuthPage {
 			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
         }
 
-		  /****
+		  /*
           * initialize dialog boxes for this page
           */
 		  $(this.codeSaveDialogSelector).dialog({
@@ -90,10 +99,11 @@ class ClassRoom extends AuthPage {
             hide : "blind", 
         });
 
-		/****
+		/*
          * load content input control
-         *****/
-		this.loadContentInputControl(this.groupType, YT_DIV_CONTENT_INPUT, YT_DIV_NOTES_RTE_EDITOR);
+         */
+		this.#loadContentInputControl(this.groupType, YT_DIV_CONTENT_INPUT, YT_DIV_NOTES_RTE_EDITOR);
+		await this.initNotes()
 
 		/****
          * create code container for saving / updating code
@@ -105,16 +115,51 @@ class ClassRoom extends AuthPage {
 		 */
 		this.#messageBoard = new MessageBoard(YT_DIV_MESSAGE_BOARDS, this.v_sendGroupMessage.bind(this));
 
-		this.addEventListner()
+		this.#addEventListner()
 
 		// switch to default tab index
 		this.#switchTab(0)
+
+		/*
+			initialize tooltips for all ui elements with titles.  This functionality is provided by
+			jQueryUI
+		 */
+		$( document ).tooltip({
+			position: {
+				my: "center bottom-20",
+				at: "center top",
+				using: function( position, feedback ) {
+					$( this ).css( position );
+					$( "<div>" )
+						.addClass( "arrow" )
+						.addClass( feedback.vertical )
+						.addClass( feedback.horizontal )
+						.appendTo( this );
+				}
+			}
+		});
+
+		/**
+		 * Initialize UI components for programming classes
+		 */
+		this.#initProgrammingElements()
 	}
 
+	#initProgrammingElements() {
+		if (this.#groupType <= 20) {
+			/*
+				yt_tab_output
+			*/
+			$( "#yt_tab_output_for_coding" ).tabs({
+				event: "mouseover"
+			});
+		}
+	}
+	
 	/***
 	* add event listners
 	*/
-	addEventListner() {
+	#addEventListner() {
         
         /**** handle tab switching  ****/
         $(this.ytTabSelector).click(this.onSwitchingTab.bind(this));
@@ -123,41 +168,40 @@ class ClassRoom extends AuthPage {
 		$(this.videoAreaId).click(this.toggleVideoSize);
 
 		// handle clicking save button
-		$(this.saveBtnSelector).click(this.handleSavePopup.bind(this));
+		$(this.saveBtnSelector).unbind('click').click(this.handleSaveToDb.bind(this));
 
 		// save clicking save button on the dialog boc
 		$(this.saveBtnOnSaveDialogSelector).click(this.handleSaveCodeToDb.bind(this))
 
+		// hookup erasing output console
+		$(this.eraseOutputButton).click(this.handleEraseOutput.bind(this));
+
 		// accept tab and insert \t
-		$(this.contentInputConsole.inputIdSelector).keydown(this.handleKeyDown);
+		if (this.contentInputConsole.inputIsTextArea) {
+			$(this.contentInputConsole.inputIdSelector).keydown(this.handleKeyDown);
+		}
 	}
 	
 	/****
      * load content input control according to class type
      */
-    loadContentInputControl(classType, parentIdMain, parentIdNotes) {
-        this.#contentInputConsole = new ContentInputConsole(classType, this, parentIdMain);
+    #loadContentInputControl(classType, parentIdMain, parentIdNotes) {
+        this.#contentInputConsole = new ContentInputConsole(classType, this, parentIdMain, "main", this.outputId);
 
 		// also create notes input console
-		this.#notesConsole = new RteInputConsole(this, parentIdNotes);
+		this.#notesConsole = new RteInputConsole(this, parentIdNotes,  "user", this.ysEditorWrapperSelectorForNotes);
     }
 
-	/**
-		Use a timer to periodically sync teacher's code with student's code.
-		We start it when in teaching mode and stop it when in exercise mode.
-	**/
-	startOrStopCodeRefreshTimer(start) {
-		if (start) {
-			if (!this.#timer) {
-				// do not set interval when one is already working
-				this.#timer = setInterval(this.handleTimter.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+	async initNotes() {
+		const resp = await Net.memberGetNotes(credMan.credential.token);
+		if (resp.code === 0 && resp.data.length > 0) {
+			// group by classes:
+			const classNotes = CollectionUtil.groupByReduce(resp.data, "group_id");
+			const myClassNotes = classNotes[this.#groupId];
+			if (myClassNotes && myClassNotes.length) {
+				this.#initialNotes = myClassNotes[0].notes;
+				this.#notesConsole.code = StringUtil.decodeText(this.#initialNotes);;
 			}
-		}
-		else {
-			console.log(this.#timer + ' clearled');
-			clearInterval(this.#timer);
-			this.#timer = undefined;
-			
 		}
 	}
 	
@@ -176,7 +220,7 @@ class ClassRoom extends AuthPage {
     }
 
 	 /**
-		Recieved student incoming messages, display it with student name included
+		Recieved peer incoming messages, display it with student name included
 	 **/
 	handleGroupMsg(data, sender) {
 		const msg = data;
@@ -207,6 +251,25 @@ class ClassRoom extends AuthPage {
 		}
 		else {
 			$(msgTabId).removeClass(CSS_MESSAGE_TAB_WITH_MSG);
+		}
+	}
+
+	/**
+		Use a timer to periodically sync teacher's code with student's code.
+		We start it when in teaching mode and stop it when in exercise mode.
+	**/
+	startOrStopCodeRefreshTimer(start) {
+		if (start) {
+			if (!this.#timer) {
+				// do not set interval when one is already working
+				this.#timer = setInterval(this.handleTimter.bind(this), sysConstants.YATU_CODE_BUFFER_REFRESH_FREQUENCY);
+			}
+		}
+		else {
+			console.log(this.#timer + ' clearled');
+			clearInterval(this.#timer);
+			this.#timer = undefined;
+			
 		}
 	}
 
@@ -361,13 +424,21 @@ class ClassRoom extends AuthPage {
 	v_sendGroupMessage(msg) {
 		throw new Error('v_sendGroupMessage: sub-class-should-overload-this');
 	}
-			
+		
+	handleEraseOutput(e) {
+		$(this.outputSelector).val("")
+	}
+
 	/**
 		Hnandle tab by insertng \t
 	**/
 	handleKeyDown(e) {
 		const start = this.selectionStart;
 		const end = this.selectionEnd;
+		if (!start) {
+			// this function only works for textarea, for contenteditable for do not need it for now
+			return;
+		}
 		const uiText = this.value;
 		const selected = uiText.substring(start, end);
 		const re = /^/gm;
@@ -423,30 +494,24 @@ class ClassRoom extends AuthPage {
 	}
 	
 	/*
-		Highlight a text selection based on teacher instruction
-	 */
-	highlightSelection(begin, end) {
-		//PageUtil.highlightSelection(this.#codeInputTextArea, begin, end);
-		const el = document.getElementById(this.#codeInputTextArea);
-		const range = document.createRange();
-		range.selectNodeContents(el);
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange(range);
-	
+		Save user's work or notes to db
+	*/
+	async handleSaveToDb(e) {
+		e.preventDefault();
+
+		if (this.#tabIndex === TAB_INDEX_WORK ) {
+			this.#handleSavePopup()
+		} else if (this.#tabIndex === TAB_INDEX_NOTES) {
+
+			await this.#saveNotesToDb()
+		}
+		e.stopPropagation()
 	}
-	
-	/*
-		Scroll up and down based on teacher's instruction
-	 */
-	scrollVertically(pixels) {
-		$(this.codeInputTextArea).scrollTop (pixels);
-	}
-	
+
 	/***
 	 * pop up "save" dialog box
 	 */
-	handleSavePopup(e) {
+	#handleSavePopup(e) {
 		e.preventDefault(); 
 		const codeTxt = this.contentInputConsole.code;
 		if (!codeTxt) {
@@ -465,8 +530,6 @@ class ClassRoom extends AuthPage {
 		organize in UI.
 	*/
 	async handleSaveCodeToDb(e) {
-		e.preventDefault();
-		
 		const codeName = $(this.codeNameTextSelector).val();
 		if (!codeName) {
 			alert("Please enter code name!");
@@ -502,6 +565,41 @@ class ClassRoom extends AuthPage {
 		
 		//close dialog box:
 		$(this.codeSaveDialogSelector).dialog("close");
+	}
+
+	/**
+	 * Save notes to db
+	 */
+	async #saveNotesToDb() {
+		const currentNotes = this.#notesConsole.code;
+		if (this.#isNotesDirty(currentNotes)) {
+			const notesB64 = StringUtil.encodeText(currentNotes);
+			const status = await Net.memberAddNotes(credMan.credential.token, this.#groupId, notesB64);
+			if (status.code !== 0) {
+				alert("Failed to save notes, error code is" + status.code);
+				return;
+			} 
+			
+			alert("Notes updated!");
+			this.#initialNotes = notesB64;
+		}
+	}
+
+	#isNotesDirty(notes) {
+		if (!notes && !this.#initialNotes) {
+			return false;
+		}
+
+		if (notes && !this.#initialNotes || !notes && this.#initialNotes) {
+			return true;
+		}
+
+		const notesB64 = StringUtil.encodeText(notes);
+		if (!StringUtil.testEqual(this.#initialNotes, notesB64)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -549,8 +647,6 @@ class ClassRoom extends AuthPage {
 	
 	set groupId(gid) { this.#groupId = gid }
 
-    get codeInputTextArea() { return `#${this.#codeInputTextArea}` }
-
 	get videoAreaId() { return `#${this.#videoAreaId}` }
 	
 	get screenShareBtnId() { return `#${this.#screenShareBtnId}`; }
@@ -567,6 +663,10 @@ class ClassRoom extends AuthPage {
 
     get inputId() { return this.#contentInputConsole.inputId }
 
+	get outputId() { return 'yt_ta_global_output' }
+
+	get outputSelector() { return `#${this.outputId}` }
+
 	get groupType() { return this.#groupType }
 
     get groupId() { return this.#groupId }
@@ -579,6 +679,19 @@ class ClassRoom extends AuthPage {
 
 	get messageTabSelector() { return `#${TAB_LIST[TAB_INDEX_MSG].tab}`; }
 	
+	get ysEditorWrapperSelectorForNotes() { return 'ysEditorWrapperSelectorForNotes'}
+
+	get teacherOnlyClassSelector () { return `.teacher_only`}
+
+	get liveOnlyClassSelector() { return '.live_only'}
+
+	get studentOnlyClassSelector() { return `.student_only`}
+
+	get runCodeButton() { return `#${BTN_RUN_CODE}` }
+
+	get eraseOutputButton() { return `#${BTN_ERASE_OUTPUT}` }
+
+	get forCodingOnlyClassSelector() { return '.for_coding_only'}
 }
 
 

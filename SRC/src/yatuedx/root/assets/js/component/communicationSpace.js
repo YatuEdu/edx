@@ -15,14 +15,14 @@ const REPLACE_PID_TEMPLATE = '{pidtmplt}';
 const VIDEO_TEMPLATE = `
 <video class="yt-video-any yt-video" id="{pidtmplt}{pid}" autoplay playsinline>`;
 
-/**
+/*
 
 	This class (CommunicationSpace) serves as the root class for the communication room, and specifically,
 	our	programming classroom.
 
 	The concrete class room shall derive and inherit from it to obtain the communcation	basics this class offers.
 
- **/
+ */
 class CommunicationSpace {
 	#commClient;
 	#videoClient;
@@ -41,23 +41,12 @@ class CommunicationSpace {
 		this.#userMap = new Map();
 	}
 
-	/**
+	/*
 		Initializing the socket client and get ready for communication between classmates and teacher
-	 **/
+	 */
 	async init(liveSession) {
 		const token = credMan.credential.token;
 		this.#me  = credMan.credential.name;
-
-		// call API to get room
-		/* todo: revisit the logic for "scheduled class".  For now, we only deal with teacher started class,
-		          whose room is known.
-
-		const groupSession = await Net.groupMemberJoiningSession(token, roomName);
-		if (groupSession.err) {
-			alert('Failed to enter room');
-			return;
-		}
-		*/
 
 		// initialize video
 		let tracks = null;
@@ -90,9 +79,9 @@ class CommunicationSpace {
 		this.#commClient.onClose = this.handleClose.bind(this);
 	}
 
-	/**
+	/*
 		Initialize Video client after we successfully joined the group
-	 **/
+	 */
 	handleCommunicationReady() {
 
 		const uList = this.#commClient.getUserList();
@@ -133,9 +122,9 @@ class CommunicationSpace {
 		}
 	}
 
-	/**
+	/*
 		Compose content update message based on how content is updated
-	**/
+	*/
 	composeContentUpateMsg(codeUpdateObj) {
 		let cmd = null;
 		switch (codeUpdateObj.flag) {
@@ -177,9 +166,9 @@ class CommunicationSpace {
 		return cmd;
 	}
 
-	/**
+	/*
 		Handle p2p messages by interpretting it as command and do things accordingly
-	**/
+	*/
 	handleMessage(sender, msg) {
 		const cmdObject = new IncomingCommand(msg, sender);
 
@@ -187,9 +176,9 @@ class CommunicationSpace {
 		this.v_execute(cmdObject);
 	}
 
-	/**
+	/*
 		Handle a new peer viedo added remotely
-	**/
+	*/
 	handleRemoteVideoTrack(user, videoTrack) {
 		// let child class control the visibility of this user
 		if (!this.v_isUserVisible(user)) {
@@ -225,9 +214,9 @@ class CommunicationSpace {
 		}
 	}
 
-	/**
+	/*
 		Handle a new peer audio added remotely
-	**/
+	*/
 	handleRemoteAudioTrack(user, audioTrack) {
 		let mediaStream = new MediaStream();
 		mediaStream.addTrack(audioTrack);
@@ -247,13 +236,13 @@ class CommunicationSpace {
 		}
 	}
 
-	/**
+	/*
 		Handle the event that represents the arrival of a new user:
 		音视频会话必须规定一个发起者，一个接收者。
 		这里采用这种方式：旧用户主动发起会话，新用户被动接受
 		因此在用户加入房间时，主动共享自己的音视频轨道
 		具体场景可以灵活安排
-	**/
+	*/
 	handleNewUser(user) {
 		console.log('User joined: ' + user);
 		// Start receiving a new user's video (if the user is a teacher)
@@ -267,10 +256,10 @@ class CommunicationSpace {
 		this.v_execute(cmdObject);
 	}
 
-	/**
+	/*
 		Handle the event that represents the leaving of a joined user.
 		Remove its video / autio tracks
-	**/
+	*/
 	handleUserLeaving(user) {
 		// todo:
 		console.log('User left: ' + user);
@@ -297,16 +286,16 @@ class CommunicationSpace {
 		this.v_execute(cmdObject);
 	}
 
-	/**
+	/*
 		Send message to entire group
-	**/
+	*/
 	sendMessageToGroup(msgStr) {
 		this.#commClient.sendPublicMsg(msgStr);
 	}
 
-	/**
+	/*
 		Send message to a user
-	**/
+	*/
 	sendMessageToUser(user, msgStr) {
 		if (msgStr) {
 			this.#commClient.sendPrivateMsg(user, msgStr);
@@ -315,17 +304,17 @@ class CommunicationSpace {
 		return false;
 	}
 
-	/**
+	/*
 		Handle the event when the user closing this window: close the videom/ausio sharing
-	**/
+	*/
 	closeWinodw() {
 		this.handleUserLeaving(credMan.credential.name);
 	}
 
-	/**
+	/*
 		Handle the event that represents the reveiving of a user list for all the users
 		that are currently joined.
-	**/
+	*/
 	handleUserList(userList) {
 		// todo:
 		console.log('User list: ' + userList.length);
@@ -335,10 +324,10 @@ class CommunicationSpace {
 		this.v_execute(cmdObject);
 	}
 
-	/**
+	/*
 	 The network is disconnected, wu should disconnect all users,
 	 connect again and establish new connections one by one
-	 **/
+	 */
 	handleClose() {
 		console.log('Communication close');
 		for(let item of this.#userMap) {
@@ -349,19 +338,19 @@ class CommunicationSpace {
 		}
 	}
 
-	/**
+	/*
 	  ask for a user to re-syncronize message with me
-	 **/
+	 */
 	askReSync(user) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC, 	// command id
 										0);										    // uopdate flag
 		this.sendMessageToUser(user, cmd.str);
 	}
 
-	/**
+	/*
 		Send code sample to one person who requested for it, whose code is out of sync.
 		Update thereceiver's board by replacing the entire board content.
-	 **/
+	 */
 	syncCodeWithRequester(codeStr, targetUser) {
 		const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_DISPLAY_BOARD_UPDATE,
 										UtilConst.STR_CHANGE_ALL,
@@ -371,9 +360,9 @@ class CommunicationSpace {
 		console.log('send re-syned code:' + codeStr + ' to: ' + targetUser);
 	}
 
-	/**
+	/*
 		Send private message to my peer.
-	 **/
+	 */
 	sendPrivateMsg(msg, targetUser) {
 		if (msg) {
 			const cmd = new OutgoingCommand(PTCC_COMMANDS.PTC_PRIVATE_MSG,
@@ -386,23 +375,23 @@ class CommunicationSpace {
 		return false;
 	}
 
-	/**
+	/*
 		Execute command sent by peers. Derived class must override it.
-	**/
+	*/
 	v_execute(cmdObject) {
 		throw new Error('v_exe: sub-class-should-overload-this method');
 	}
 
-	/**
+	/*
 		Control visibility of a user for video. Derived class "could" override it.
-	**/
+	*/
 	v_isUserVisible(user) {
 		return true;
 	}
 
-	/**
+	/*
 		Properties
-	 **/
+	 */
 
 	get videoAreaDiv() {
 		return this.#videoDivId;

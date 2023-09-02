@@ -65,12 +65,13 @@ class MyGroupPageHandler extends AuthPage {
 				for(const clssId in groupByClass) {
 					const currentClassList = groupByClass[clssId];
 					const defaultSequenceIdForExercise = currentClassList[0].sequence_id;
+					const defaultType =  currentClassList[0].group_type;
 					const classHtml  = MyClassTemplates.CLASS
 										.replace(MyClassTemplates.REPLAC_CLASS_NAME, currentClassList[0].class_name)
 										.replace(MyClassTemplates.REPLACE_GOTO_EXCERSICE_RM_BTN_CLASS, this.gotoExersizeBtnClass)
 										.replaceAll(MyClassTemplates.REPLACE_GROUP_ID, clssId)
 										.replaceAll(MyClassTemplates.REPLACE_SEQUENCE_ID, defaultSequenceIdForExercise)
-										.replaceAll(MyClassTemplates.REPLACE_GROUP_TYPE_ID, 10)
+										.replaceAll(MyClassTemplates.REPLACE_GROUP_TYPE_ID, defaultType)
 
 					const groupBySequences =  CollectionUtil.groupByReduce(currentClassList, "sequence_id");
 					let sequnceRows = "";

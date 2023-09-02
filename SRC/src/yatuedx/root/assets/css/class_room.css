@@ -63,12 +63,23 @@ pre {
 	font-family: 'Mulish-Bold';
 }
 
-.ui-dialog .ui-dialog-titlebar {
-    background-color: #1c87c9;
-	color: white;
+.yt_select_class_mode {
+	margin-top: 8px !important;
+	width: 100px !important;
 }
 
-.ui-dialog {z-index: 1000 !important ;}
+.student_only {
+	margin-top: 4px;
+	
+}
+
+.mode_text {
+	color: rgb(247, 203, 121);
+	font-family: 'Mulish-Bold';
+	font-weight: 700;
+	font-size: 20px;
+	margin-right: 8px !important;
+}
 
 .js-k {
 	color: #0000FF;
@@ -196,10 +207,7 @@ pre {
 	font-size: 20px;
     line-height: 1.5;
 	background: #ffffff !important;
-	color: #B026FF;
-	border-top: outset 4px orange;
-	#border-right: outset 4px orange;
-	border-bottom: outset 4px orange;
+	color: #f41515;
 	/* border:outset 4px orange; */
 }
 
@@ -535,20 +543,21 @@ pre {
 }
 
 .selected_tab {
-	background-color: #39ac73;
-	color: #ffffff; 
+	background-color: #007fff;
+	color: #ffffff !important; 
 	border:outset 1px red;
 }
 
 .unselected_tab {
 	background-color: #d3d3d3;
-	color: white; 	
+	color: rgb(6, 6, 6); 	
 	border:outset 1px white;
 }
 
 .tab_button {
 	width: 100%;
 	background-color: transparent;
+	color: inherit;
 	border: none;
     outline: none;
 }
@@ -623,3 +632,59 @@ tbody {
     overflow-y: auto;    /* Trigger vertical scroll    */
     overflow-x: hidden;  /* Hide the horizontal scroll */
 }
+
+.header-room {
+	margin-top: 8px !important;
+	margin-bottom: 8px !important;
+}
+
+.ui-tooltip, .arrow:after {
+    background: black;
+    border: 2px solid white;
+  }
+
+.ui-tooltip {
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    font: bold 14px "Helvetica Neue", Sans-Serif;
+    text-transform: uppercase;
+    box-shadow: 0 0 7px black;
+  }
+
+.arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+  }
+
+.arrow.top {
+    top: -16px;
+    bottom: auto;
+  }
+
+.arrow.left {
+    left: 20%;
+  }
+
+.arrow:after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+.arrow.top:after {
+    bottom: -20px;
+    top: auto;
+  }

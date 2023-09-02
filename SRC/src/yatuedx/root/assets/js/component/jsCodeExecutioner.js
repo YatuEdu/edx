@@ -18,9 +18,9 @@ class CodeError {
 	get analyticalInfo() { return this.#analyticalInfo; }
 }
 
-/**
+/*
 	This class handles JS Code runner board
-**/
+*/
 class JSCodeExecutioner {
 	#consoleId;
 
