@@ -110,6 +110,16 @@ const groupTypeConstants = Object.freeze({
 	GPT_EDU_JSP: 10,
 	GPT_EDU_JSP_NODE: 13,
 	GPT_EDU_GENERIC_PRESENTATION: 100,
+
+	isCodingGroup: function(grpId) {
+		switch(grpId) {
+			case groupTypeConstants.GPT_EDU_JSP:
+			case groupTypeConstants.GPT_EDU_JSP_NODE:
+				return true;
+			default:
+				return false;
+		}
+	}
 });
 
 const regexConstants = Object.freeze({

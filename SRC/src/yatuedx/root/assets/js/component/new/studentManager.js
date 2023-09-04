@@ -1,7 +1,7 @@
-import {ComponentBase}              from '../componentBase.js'
-import {ProgrammingClassCommandUI}  from '../../pages/programmingClassCommandUI.js'
-import {StringUtil}                 from '../../core/util.js'
-import {sysConstants }              from '../../core/sysConst.js'
+import {ComponentBase}                      from '../componentBase.js'
+import {ProgrammingClassCommandUI}          from '../../pages/programmingClassCommandUI.js'
+import {StringUtil}                         from '../../core/util.js'
+import {sysConstants, groupTypeConstants}   from '../../core/sysConst.js'
 
 const STUDENT_CONTAINER_TEMPLATE = 
 `<div id="{ctnrid}">
@@ -15,16 +15,33 @@ const STUDENT_CONTAINER_TEMPLATE =
             <img src="../../../../assets/images/tools/run.png" width="40px" height="43"/>
         </button>
     </div>
-    <div>
-    <textarea id="{stdtaid}" spellcheck="false" placeholder="no code written yet" style="background: #274c43"></textarea>
-    </div>
+    <div>{brdcontent}</div>
 </div>`
 
-const RELACEMENT_CONTAINER_ID = "{ctnrid}"
-const RELACEMENT_TEXTAREA_ID = "{stdtaid}"
-const RELACEMENT_STUDENT_NAME = "{stdnm}"
-const RELACEMENT_RUN_BUTTON_ID = "{runid}"
-const RELACEMENT_RUN_BUTTON_CLASS = "{rnbtnclss}"
+const STUDENT_INFO_CODE_BOARD_TEMPLATE = `
+<div class="student_code_board">
+    <textarea id="{stdtaid}" spellcheck="false" placeholder="no code written yet" style="background: #274c43"></textarea>
+</div>
+`;
+
+const STUDENT_INFO_RTE_BOARD_TEMPLATE = `
+<div id="{stdtaid}" class="student_rte_board" contenteditable="true"
+    placeholder="Enter text here"
+    spellcheck="true">
+</div>`;
+
+const REPLACEMENT_CONTAINER_ID = "{ctnrid}"
+const REPLACEMENT_TEXTAREA_ID = "{stdtaid}"
+const REPLACEMENT_STUDENT_NAME = "{stdnm}"
+const REPLACEMENT_RUN_BUTTON_ID = "{runid}"
+const REPLACEMENT_RUN_BUTTON_CLASS = "{rnbtnclss}"
+const REPLACEMENT_BOARD_CONTENT = "{brdcontent}"
+
+const MAP_BOARD_CLASS = new Map([
+    [groupTypeConstants.GPT_EDU_JSP, STUDENT_INFO_CODE_BOARD_TEMPLATE],
+    [groupTypeConstants.GPT_EDU_JSP_NODE, STUDENT_INFO_CODE_BOARD_TEMPLATE],
+    [groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION, STUDENT_INFO_RTE_BOARD_TEMPLATE]
+])
 
 class Student {
     #name
@@ -63,7 +80,7 @@ class StudentManager extends ComponentBase {
 
     #initUi() {
         const componentHtml = STUDENT_CONTAINER_TEMPLATE
-            .replace(RELACEMENT_CONTAINER_ID, this.containerId);
+            .replace(REPLACEMENT_CONTAINER_ID, this.containerId);
         
         // mount the component to UI
         super.mount(componentHtml, ComponentBase.MOUNT_TYPE_INSERT);
@@ -87,22 +104,30 @@ class StudentManager extends ComponentBase {
 
         // re-initialize the root accordin
         this.#initUi()
-        const newStudent = new Student(name, this.studentTaId(name), this.#parentView.contentInputConsole.outputId, this.#parentView.groupType);
+        const newStudent = new Student(name, this.studentTaId(name), 
+                                      this.#parentView.contentInputConsole.outputId, 
+                                      this.#parentView.groupType);
 
         // here comes a new student
         this.#studentList.push(newStudent);
 
         // re-compose html for all students
         this.#studentList.forEach( student => {
-            const studentHtml = STUDENT_INFO_TEMPLATE
-                .replaceAll(RELACEMENT_STUDENT_NAME, student.name)
-                .replace(RELACEMENT_RUN_BUTTON_CLASS, this.runCodeClass)
-                .replace(RELACEMENT_RUN_BUTTON_ID, this.runCodeId(student.name))
-                .replace(RELACEMENT_TEXTAREA_ID, this.studentTaId(student.name));
+            const studentBoardTemplate = MAP_BOARD_CLASS.get(this.#parentView.groupType)
+            const studentBoardHtml = studentBoardTemplate
+                .replace(REPLACEMENT_TEXTAREA_ID, this.studentTaId(student.name));
 
-            $(this.containerSelector).append(studentHtml)
+            const studentContainerHtml = STUDENT_INFO_TEMPLATE
+                .replaceAll(REPLACEMENT_STUDENT_NAME, student.name)
+                .replace(REPLACEMENT_RUN_BUTTON_CLASS, this.runCodeClass)
+                .replace(REPLACEMENT_RUN_BUTTON_ID, this.runCodeId(student.name))
+                .replace(REPLACEMENT_BOARD_CONTENT, studentBoardHtml);
+           
+            $(this.containerSelector).append(studentContainerHtml);
         });
 
+        // enable the correct board
+        const boardClass = 
         // create accordin
         $(this.containerSelector).accordion({
             collapsible: true
@@ -117,6 +142,10 @@ class StudentManager extends ComponentBase {
     */
     runCode(e) {
         e.preventDefault(); 
+        if (!this.#isCodingGroup()) {
+            return;
+        }
+
         const studentName = StringUtil.getIdStrFromBtnId(e.currentTarget.id)
         const student = this.#studentList.find(s => s.name === studentName)
         if (student) {
@@ -131,7 +160,15 @@ class StudentManager extends ComponentBase {
 
     setStudentCode(name, newCode) {
         const studentTaId = this.getStudentTaIdSelector(name);
-        $(studentTaId).val(newCode)
+        if (this.#isCodingGroup()) {
+            $(studentTaId).val(newCode)
+        } else {
+            $(studentTaId).html(newCode)
+        }
+    }
+
+    #isCodingGroup() {
+        return groupTypeConstants.isCodingGroup(this.#parentView.groupType);
     }
 
     /*

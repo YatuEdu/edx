@@ -246,6 +246,13 @@ pre {
     outline: none;	
 }
 
+.student_rte_board {
+	overflow-y: auto;  
+	overflow-x: auto;
+	white-space: nowrap;
+	height: 300px;
+}
+
 .student-msg-board-extend {
 	position:relative;
     border:none;
