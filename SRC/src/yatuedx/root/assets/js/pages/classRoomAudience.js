@@ -185,7 +185,7 @@ class ClassRoomAudience extends ClassRoom {
 	}
 
     #syncCodeWithTeacherer(cmd) {
-
+		this.#commCenterForAudience.syncCodeWithRequester(this.contentInputConsole.code, cmd.sender);
     }
 
     #runCodeFrom() {

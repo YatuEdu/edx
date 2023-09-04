@@ -29,6 +29,9 @@ const sysConstants = Object.freeze({
 	LIVE_MODE: 0, 		// OR UNDEFINED
 	EXERCISE_MODE: 1,
 
+	// class type
+	CLASS_TYPE_JS: 10,
+
 	// minimum code length to save to db
 	MIN_CODE_LENGTH: 32,
 	

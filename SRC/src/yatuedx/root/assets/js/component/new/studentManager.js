@@ -1,5 +1,7 @@
-import {ComponentBase}  from '../componentBase.js'
-import {StringUtil}  from '../../core/util.js'
+import {ComponentBase}              from '../componentBase.js'
+import {ProgrammingClassCommandUI}  from '../../pages/programmingClassCommandUI.js'
+import {StringUtil}                 from '../../core/util.js'
+import {sysConstants }              from '../../core/sysConst.js'
 
 const STUDENT_CONTAINER_TEMPLATE = 
 `<div id="{ctnrid}">
@@ -14,7 +16,7 @@ const STUDENT_CONTAINER_TEMPLATE =
         </button>
     </div>
     <div>
-    <textarea id="{stdtaid}"></textarea>
+    <textarea id="{stdtaid}" spellcheck="false" placeholder="no code written yet" style="background: #274c43"></textarea>
     </div>
 </div>`
 
@@ -24,10 +26,32 @@ const RELACEMENT_STUDENT_NAME = "{stdnm}"
 const RELACEMENT_RUN_BUTTON_ID = "{runid}"
 const RELACEMENT_RUN_BUTTON_CLASS = "{rnbtnclss}"
 
+class Student {
+    #name
+    #programmingClassCommandUI
+
+    constructor(name, inputConsoleId, outputConsoleId, groupType) {
+        this.#name = name
+        if (groupType === sysConstants.CLASS_TYPE_JS) {
+            this.#programmingClassCommandUI = new ProgrammingClassCommandUI(inputConsoleId, outputConsoleId);
+        }
+    }
+
+    runCode() {
+        if (this.#programmingClassCommandUI) {
+            this.#programmingClassCommandUI.runCodeFromTextInput()
+        }
+    }
+
+    /*
+        getters and setters
+    */
+   get name() { return this.#name }
+
+}
+
 class StudentManager extends ComponentBase {
 	#parentView
-	#outputId
-	#baseIdTag
     #studentList
 
 	constructor(parentView, parentDivId) {
@@ -56,23 +80,25 @@ class StudentManager extends ComponentBase {
     }
 
     addStudent(name) {
-        if (this.#studentList.includes(name)) {
+        if (this.#studentList.find(s => s.name === name)) {
             // student already present
             return;
         }
 
         // re-initialize the root accordin
         this.#initUi()
-
-        this.#studentList.push(name);
+        const newStudent = new Student(name, this.studentTaId(name), this.#parentView.contentInputConsole.outputId, this.#parentView.groupType);
 
         // here comes a new student
+        this.#studentList.push(newStudent);
+
+        // re-compose html for all students
         this.#studentList.forEach( student => {
             const studentHtml = STUDENT_INFO_TEMPLATE
-                .replaceAll(RELACEMENT_STUDENT_NAME, student)
+                .replaceAll(RELACEMENT_STUDENT_NAME, student.name)
                 .replace(RELACEMENT_RUN_BUTTON_CLASS, this.runCodeClass)
-                .replace(RELACEMENT_RUN_BUTTON_ID, this.runCodeId(student))
-                .replace(RELACEMENT_TEXTAREA_ID, this.studentTaId(student));
+                .replace(RELACEMENT_RUN_BUTTON_ID, this.runCodeId(student.name))
+                .replace(RELACEMENT_TEXTAREA_ID, this.studentTaId(student.name));
 
             $(this.containerSelector).append(studentHtml)
         });
@@ -91,8 +117,11 @@ class StudentManager extends ComponentBase {
     */
     runCode(e) {
         e.preventDefault(); 
-        const student = StringUtil.getIdStrFromBtnId(e.currentTarget.id);
-        alert(student)
+        const studentName = StringUtil.getIdStrFromBtnId(e.currentTarget.id)
+        const student = this.#studentList.find(s => s.name === studentName)
+        if (student) {
+            student.runCode()
+        }
     }
 
     getSutudentCode(name) {

@@ -1,9 +1,6 @@
-import {AuthPage} 							from '../core/authPage.js'
-import {JSCodeExecutioner}					from '../component/jsCodeExecutioner.js'
-import {sysConstants, sysConstStrings} 		from '../core/sysConst.js'
-import {CodeSyncManager} 					from '../component/codeSyncManager.js'	
-import {StringUtil, UtilConst, PageUtil}	from '../core/util.js'
-import {Token}								from '../component/parser/token.js'
+import {JSCodeExecutioner}		from '../component/jsCodeExecutioner.js'
+import {sysConstants} 			from '../core/sysConst.js'
+import {CodeSyncManager} 		from '../component/codeSyncManager.js'	
 
 const CSS_VIDEO_MIN 						= 'yt-video';
 const CSS_VIDEO_MAX 						= 'yt-video-max';

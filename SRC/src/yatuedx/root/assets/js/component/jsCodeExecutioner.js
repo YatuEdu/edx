@@ -1,6 +1,6 @@
-import {sysConstants, sysConstStrings, languageConstants} 	from '../core/sysConst.js'
-import {credMan} 											from '../core/credMan.js'
-import {CodeAnalyst}										from './new/codeAnalyst.js'
+import {sysConstants, sysConstStrings} 	from '../core/sysConst.js'
+import {credMan} 						from '../core/credMan.js'
+import {CodeAnalyst}					from './new/codeAnalyst.js'
 
 /**
 	This class handles JS Code runner board
@@ -21,6 +21,8 @@ class CodeError {
 /*
 	This class handles JS Code runner board
 */
+const INTEGER_DIVISION = 'div';
+
 class JSCodeExecutioner {
 	#consoleId;
 
@@ -28,6 +30,10 @@ class JSCodeExecutioner {
 		this.#consoleId = consoleId; 
 
 		// set global functions for our usage
+		if (window.hasOwnProperty(INTEGER_DIVISION) && window[INTEGER_DIVISION] === this.#integerDiv) {
+			return;
+		}
+		
 		Object.defineProperty(window, 'div', {
 			value: this.#integerDiv,
 			writable: false

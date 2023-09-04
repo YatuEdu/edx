@@ -17,8 +17,12 @@ class OutgoingCommand {
 		this.#data.push(dataToSendOut);
 		for (let i=0; i<params.length; i++) {
 			let dataToSendOut = params[i];
-			if (this.#encodeIndex === i+1 && dataToSendOut) {
-				dataToSendOut = StringUtil.encodeText(dataToSendOut);
+			if (this.#encodeIndex === i+1) {
+				if (dataToSendOut) {
+					dataToSendOut = StringUtil.encodeText(dataToSendOut);
+				} else {
+					this.#encodeIndex = -1;
+				}
 			}
 			this.#data.push(dataToSendOut);
 		}
