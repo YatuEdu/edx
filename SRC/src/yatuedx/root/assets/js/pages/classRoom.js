@@ -33,16 +33,17 @@ const CLCC_STUDENT_ROW                  = "student_tab_row";
 const BTN_RUN_CODE  					= "yt_btn_run_code_on_student_board";
 const BTN_ERASE_OUTPUT					= "yt_btn_erase_output";
 
+const TAB_INDEX_STUDENTS = 0;
+const TAB_INDEX_WORK = 1
+const TAB_INDEX_MSG = 2
+const TAB_INDEX_NOTES = 3
+
 const TAB_LIST = [
+	{tab:"yt_tb_student_console",   sub_elements: [CLCC_STUDENT_ROW]},
 	{tab:"yt_tb_work_depot",  	    sub_elements: [CLCC_WORK_ROW] },
 	{tab:"yt_tb_msg_console",    	sub_elements: [CLCC_MESSAGE_ROW] },
-	{tab:"yt_tb_notes_console",     sub_elements: [CLCC_NOTES_ROW] },
-	{tab:"yt_tb_student_console",   sub_elements: [CLCC_STUDENT_ROW] }
+	{tab:"yt_tb_notes_console",     sub_elements: [CLCC_NOTES_ROW] }
 ];
-
-const TAB_INDEX_WORK = 0;
-const TAB_INDEX_MSG = 1;
-const TAB_INDEX_NOTES = 2;
 
 const DIV_VIEDO_AREA 					= "yt_div_video_area";
 const BTN_SHARE_SCREEN 					= "yt_btn_share_screen";
@@ -75,6 +76,11 @@ class ClassRoom extends AuthPage {
         // create code synchonization mamager to synchrize code between student and teacher
 		this.#codeSyncManager = new CodeSyncManager();
 	}
+
+	static get TAB_INDEX_STUDENTS() { return TAB_INDEX_STUDENTS}
+	static get TAB_INDEX_WORK() { return TAB_INDEX_WORK} 
+	static get TAB_INDEX_MSG() { return TAB_INDEX_MSG} 
+	static get TAB_INDEX_NOTES() { return TAB_INTAB_INDEX_NOTESDEX_WORK} 
 	
 	async init() {
 		await super.init();
@@ -118,7 +124,8 @@ class ClassRoom extends AuthPage {
 		this.#addEventListner()
 
 		// switch to default tab index
-		this.#switchTab(0)
+		const switchToTab = this.v_switchToDefaultTab()
+		this.#switchTab(switchToTab)
 
 		/*
 			initialize tooltips for all ui elements with titles.  This functionality is provided by

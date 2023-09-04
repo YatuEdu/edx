@@ -3,10 +3,12 @@ import {ClassRoom} 				        from './classRoom.js'
 import {CommCenterForPresenter}         from '../component/commCenterForPresenter.js'
 import {PTCC_COMMANDS}					from '../command/programmingClassCommand.js'
 import {StringUtil}	                    from '../core/util.js';
+import {StudentManager}					from '../component/new/studentManager.js'
 
 // let myEditor = new ysEditor();
 class ClassRoomOwner extends ClassRoom {
 	#commCenterForPresenter;                               
+	#studentManager
 
     constructor(classMode, groupType, groupId, sequenceId) {
 		super(classMode, groupType, groupId, sequenceId)
@@ -20,6 +22,9 @@ class ClassRoomOwner extends ClassRoom {
 		 $(this.studentOnlyClassSelector).hide();
 
 		await super.init();
+
+		// initialize UI
+		this.#initUi()
 
         // establish live communication session if we are in class mode	
         if (!this.classMode) {
@@ -40,6 +45,11 @@ class ClassRoomOwner extends ClassRoom {
         // set mode to exercise mode
 		this.#setMode(sysConstStrings.SWITCH_TO_EXERCISE);
     }
+
+	#initUi() {
+		this.#studentManager = new StudentManager(this, this.getStudentManagerDiv)
+
+	}
 
     #addEventListner() {
 		// handle key up 
@@ -118,7 +128,7 @@ class ClassRoomOwner extends ClassRoom {
 			
 			// new student arrived, add a comm console
 			case PTCC_COMMANDS.PTC_STUDENT_ARRIVAL:
-				//this.addStudentConsole(cmdObject.data[0]);
+				this.addStudent(cmdObject.data[0]);
 				break;
 			
 			// new left, delete the student's comm console
@@ -128,7 +138,7 @@ class ClassRoomOwner extends ClassRoom {
 				
 			// got a list of current users that are alreay in the chat room:
 			case PTCC_COMMANDS.PTC_USER_LIST:
-				//this.addStudentConsoles(cmdObject.data[0]);
+				this.addStudents(cmdObject.data[0]);
 				break;
 			
 			// update the student code console for code from each student
@@ -144,6 +154,10 @@ class ClassRoomOwner extends ClassRoom {
 			default:
 				break;
 		}
+	}
+
+	v_switchToDefaultTab() {
+		return ClassRoom.TAB_INDEX_STUDENTS
 	}
 
     v_sendGroupMessage(msg) {
@@ -163,10 +177,10 @@ class ClassRoomOwner extends ClassRoom {
 		 3) from which student user
 	 */
 	updateStudentCode(how, student) {
-		const studentCurrentCode = $(this.getStudentConsoleIdSelector(student)).val();
+		const studentCurrentCode = this.#studentManager.getSutudentCode(student);
 		
 		// obtain the new code sample using an algorithm defined in parent class as a static method
-		const {newContent, digest} = ClassRoomLang.updateContentByDifference(how, studentCurrentCode);
+		const {newContent, digest} = ClassRoom.updateContentByDifference(how, studentCurrentCode);
 		let shouldUpdate = false;
 		while (true) {		
 			// update the code on UI
@@ -179,7 +193,7 @@ class ClassRoomOwner extends ClassRoom {
 			if (digest) {
 				if (!StringUtil.verifyMessageDigest(newContent, digest)) { 
 					console.log('content not verified, asking for re-sync');
-					$(this.getStudentConsoleIdSelector(student)).val(newContent); // update anyway
+					this.#studentManager.setStudentCode(student, newContent);
 					this.#commCenterForPresenter.askReSync(student);
 				} else {
 					shouldUpdate = true;
@@ -192,7 +206,7 @@ class ClassRoomOwner extends ClassRoom {
 			
 			// update the code for this student on UI
 			if (shouldUpdate) {
-				$(this.getStudentConsoleIdSelector(student)).val(newContent);
+				this.#studentManager.setStudentCode(student, newContent);
 			}
 			
 			// break out of the while loop normally
@@ -200,8 +214,7 @@ class ClassRoomOwner extends ClassRoom {
 		}
 		
 		// change student button to indicate that student has new code
-		this.toggleStudentButton(student, shouldUpdate);
-
+		// this.toggleStudentButton(student, shouldUpdate);
 	}
 
     /**
@@ -211,6 +224,13 @@ class ClassRoomOwner extends ClassRoom {
 		this.#commCenterForPresenter.syncCodeWithRequester(this.contentInputConsole.code, cmdObject.sender);
 	}
 
+	addStudent(name) {
+		this.#studentManager.addStudent(name)
+	}
+
+	addStudents(students) {
+		this.#studentManager.addStudents(students.filter(s => s.userName !== this.#commCenterForPresenter.me))
+	}
 
     /**
 		Execute when timer is triggered.  Call updateCodeBufferAndSync
@@ -248,6 +268,8 @@ class ClassRoomOwner extends ClassRoom {
 	get classModeSelectorId() { return 'yt_opt_class_mode' }
 
 	get classModeSelector () { return `#${this.classModeSelectorId}` }
+
+	get getStudentManagerDiv() { return 'yt_div_my_students' }
 
 }
 

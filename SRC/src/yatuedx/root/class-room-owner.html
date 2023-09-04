@@ -30,7 +30,7 @@
 			</p>
 		</div>
         <article class="my-5">
-		<div class="row mb-4" style="height: calc(100% - 64px); display: grid">
+		<div class="row mb-4">
 			<div  id="yt_col_video_area"  class="col-2">
 				<div id="yt_div_video_area" class="yt_video_area">
 				</div>
@@ -89,17 +89,23 @@
 					</div>
 					<div class="col-5 yt-list-panel-right">
 						<div class="row mb-4">
-							<div id="yt_tb_work_depot" class="col-3 selected_tab yt_tab">
-								<button class="tab_button" data-tabindex="0" title="My saved work">Work</button>
+							<div id="yt_tb_student_console" data-tabindex="0" class="col-3 unselected_tab yt_tab teacher_only live_only">
+								<button class="tab_button"  title="View my students status">My students</button>
 							</div>
-							<div id="yt_tb_msg_console" class="col-3 unselected_tab yt_tab">
-								<button data-tabindex="1" class="tab_button" title="Send / receive messages to classroom">Messages</button>
+							<div id="yt_tb_work_depot"  data-tabindex="1" class="col-3 selected_tab yt_tab">
+								<button class="tab_button" title="My saved work">Work</button>
 							</div>
-							<div id="yt_tb_notes_console" class="col-3 unselected_tab yt_tab">
-								<button class="tab_button" data-tabindex="2" title="Keep notes for the class">Notes</button>
+							<div id="yt_tb_msg_console" data-tabindex="2" class="col-3 unselected_tab yt_tab">
+								<button  class="tab_button" title="Send / receive messages to classroom">Messages</button>
 							</div>
-							<div id="yt_tb_student_console" class="col-3 unselected_tab yt_tab teacher_only live_only">
-								<button class="tab_button" data-tabindex="3" title="View my students status">My students</button>
+							<div id="yt_tb_notes_console" data-tabindex="3" class="col-3 unselected_tab yt_tab">
+								<button class="tab_button"  title="Keep notes for the class">Notes</button>
+							</div>
+						</div>
+						<div class="row mb-4 student_tab_row teacher_only">
+							<div class="col-12">
+								<div id="yt_div_my_students" class="message-container">
+								</div>
 							</div>
 						</div>
 						<div class="row mb-4 work_tab_row">
@@ -117,12 +123,6 @@
 						<div class="row mb-4 notes_tab_row">
 							<div class="col-12">
 								<div id="yt_div_notes_rte_editor" class="message-container">
-								</div>
-							</div>
-						</div>
-						<div class="row mb-4 student_tab_row teacher_only">
-							<div class="col-12">
-								<div id="yt_div_my_students" class="message-container">
 								</div>
 							</div>
 						</div>

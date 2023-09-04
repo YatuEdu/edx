@@ -93,15 +93,52 @@ class ClassRoomAudience extends ClassRoom {
 	}
 
 	/*
+		audience classroom default selected tab
+	*/
+	v_switchToDefaultTab() {
+		return ClassRoom.TAB_INDEX_WORK
+	}
+
+	/*
 	 * send group messages
 	*/
 	v_sendGroupMessage(msg) {
         this.#commCenterForAudience.sendMsgToTeacher(msg);
     }
 
-    #setClassMode(mode) {
+	/*
+		Execute when timer is triggered.  Call updateCodeBufferAndSync to sync code with teacher
+	*/
+	v_handleTimer() {
+		this.#updateCodeBufferAndSync();
+	}
+
+	/*
+		Periodically passing our code to teacher to examine student's progress.
+	 */
+	#updateCodeBufferAndSync() {
+		const codeUpdateObj = this.updateCode(this.contentInputConsole.code); 
+		if (codeUpdateObj && codeUpdateObj.flag !== UtilConst.STR_CHANGE_NON) {
+			this.#commCenterForAudience.updateCodeBufferAndSync(codeUpdateObj);
+		}
+	}
+
+    #setClassMode(newMode) {
 		// set mode by displaying mode in UI
-		$(this.currentModeSelector).html(`Class mode: ${mode}`);
+		$(this.currentModeSelector).html(`Class mode: ${newMode}`);
+
+		// only in live mode do we need to sync code with teacher
+		if (!this.#commCenterForAudience) {
+			return;
+		}
+
+		// start code sync timer if we are in exercise mode
+		if (newMode === sysConstStrings.SWITCH_TO_EXERCISE) {
+			this.startOrStopCodeRefreshTimer(true);
+		}
+		else if (newMode == sysConstStrings.SWITCH_TO_LEARNING) {
+			this.startOrStopCodeRefreshTimer(false);	
+		}
     }
 
     /*
