@@ -19,7 +19,8 @@ const CLASS_TEMPLATE_ROW = `
 		<div class="col-4 text-right text-black">
 			<button class="btn btn-outline-primary translatable {gotoexerm}" 
 				data-clss-id="{grpid}" 
-				data-seq-id="{seqid}" title="Show or hide class description details">Do exercise</button>
+				data-seq-id="{seqid}" 
+				data-gtype-id="{gtypeid}" title="Show or hide class description details">Do exercise</button>
 		</div>
 	</div>
 	{seqrows}
@@ -73,6 +74,7 @@ const REPLACEMENT_SEQUENCE_DESCRPT_EXPAND_CLASS = '{seqexpactclss}';
 const REPLACEMENT_GOTO_LIVE_CLASS = '{gotoliveclss}';
 const REPLACEMENT_SUBJECT_ROW_HTML = '{subjects}';
 const REPLACEMENT_CLASS_ROW_HTML = '{classes}'
+const REPLACE_GROUP_TYPE_ID = '{gtypeid}';
 const REPLACEMENT_SEQUENCE_ROW_HTML = '{seqrows}';
 
 
@@ -102,6 +104,8 @@ class MyClassTemplates {
 
 	static get REPLACE_SEQUENCE_NAME() { return REPLACEMENT_SEQUENCE_NAME}
 	static get REPLACE_SEQUENCE_ID() { return REPLACEMENT_SEQUENCE_ID}
+	static get REPLACE_GROUP_TYPE_ID() { return REPLACE_GROUP_TYPE_ID}
+	
 	
 	static get REPLACE_SEQUENCESTART() {return REPLACEMENT_SEQUENCESTART}
 	static get REPLACE_SEQUENCELEN() { return REPLACEMENT_SEQUENCELEN}

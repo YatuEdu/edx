@@ -42,7 +42,7 @@ const WORD_TEMPLATE =
 <span class="{clss}">{wd}</span>
 `;
 
-class DisplayBoardForCoding extends CommunicationSpace { 
+class CommCenterForAudience extends CommunicationSpace { 
 	#view;
 	#liveSession;
 	
@@ -58,8 +58,8 @@ class DisplayBoardForCoding extends CommunicationSpace {
 	 static facotry method for DisplayBoardForCoding to assure that it calls its
 	 async init method.
 	 */
-	static async createDisplayBoardForCoding(liveSession, view) {
-		const myInstance = new DisplayBoardForCoding(liveSession, view);
+	static async createCommCenterForAudience(liveSession, view) {
+		const myInstance = new CommCenterForAudience(liveSession, view);
 		await myInstance.init(liveSession);
 		return myInstance;
 	}
@@ -106,6 +106,7 @@ class DisplayBoardForCoding extends CommunicationSpace {
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_VERTICALLY_SCROLL:
 			case PTCC_COMMANDS.PTC_DISPLAY_BOARD_RE_SYNC:
 			case PTCC_COMMANDS.PTC_PRIVATE_MSG:
+			case PTCC_COMMANDS.GM_HELLO_FROM_PEER:	
 				this.#view.v_execute(cmdObject);
 				break;
 				
@@ -285,4 +286,4 @@ class DisplayBoardForCoding extends CommunicationSpace {
 	}
 }
 
-export { DisplayBoardForCoding };
+export { CommCenterForAudience };

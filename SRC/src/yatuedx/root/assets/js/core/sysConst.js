@@ -29,13 +29,23 @@ const sysConstants = Object.freeze({
 	LIVE_MODE: 0, 		// OR UNDEFINED
 	EXERCISE_MODE: 1,
 
+	// class type
+	CLASS_TYPE_JS: 10,
+
+	// minimum code length to save to db
+	MIN_CODE_LENGTH: 32,
 	
 	// role names
 	YATU_ROLE_TEACHER: 'teacher',
 	YATU_ROLE_ADMIN: 'admin',
+
+	// classroom role names
+	YATU_CHAT_ROOM_ROLE_PRESENTER: 'presenter',
+	YATU_CHAT_ROOM_ROLE_AUDIENCE: 'audience',
 	
 	// URL param name:
 	UPN_GROUP: 		'group',
+	UPN_GROUP_TYPE: 'grouptype',
 	UPN_SEQUENCE: 	'sequence',
 	UPN_TEACHER: 	'teacher',
 	UPN_EMAIL:		'email',
@@ -58,8 +68,8 @@ const sysConstStrings = Object.freeze({
 
 	EMPTY: '',
 	UNKNOWN: 'UNKNOWN',
-	SWITCH_TO_LEARNING: 'Current mode: exercise',
-	SWITCH_TO_EXERCISE: 'Current mode: learning',
+	SWITCH_TO_LEARNING: 'presentation',
+	SWITCH_TO_EXERCISE: 'exercise',
 	
 	ATTR_MODE: 'mode',
 	TAB_STRING: "\t",

@@ -75,6 +75,17 @@ class StringUtil {
 		We define six change flags here as constant
 	*/
 
+	static isAlphanumeric(str) {
+		if (str) {
+			return /^[a-z0-9]+$/i.test(str)
+		}
+		return false;
+	}
+
+	static insertStringInto(strSource, strToInsert, insertPos) {
+		return `${strSource.slice(0, insertPos)}${strToInsert}${strSource.slice(insertPos)}`
+	}
+
 	static findChangeBetweenText(oldStr, newStr)  {
 		const oldLen = oldStr.length;
 		const newLen = newStr.length;
@@ -352,6 +363,17 @@ class PageUtil {
 	}
 	
 	static highlightSelection(textArealId, begin, end) {
+		const txtInput = document.getElementById(textArealId);
+		const selection = window.getSelection();
+		const range = document.createRange();
+		range.setStart(txtInput, begin);
+		range.setEnd(txtInput, end-1);
+		selection.removeAllRanges();
+		selection.addRange(range);
+		txtInput.focus();
+	}
+
+	static highlightSelection2(textArealId, begin, end) {
 		const txt = document.getElementById(textArealId);
 		if(txt.createTextRange ) {
 		  const selRange = txt.createTextRange();

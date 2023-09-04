@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="assets/images/dynamic/ck.png" type="image/x-icon">
+    <title>Teacher's Classroom</title>
+    <link rel="stylesheet" href="../src/css/unplug-ui-kit.css">
+    <link rel="stylesheet" href="assets/css/unplug-ui-kit-demo.css">
+    <link rel="stylesheet" href="../src/vendors/@mdi/font/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="./assets/css/class_room.css" />
+	<link rel="stylesheet" href="./assets/css/lang-class-room.css"/>
+	<link rel="stylesheet" href="./assets/css/codeInputConsole.css"/>
+	<link rel="stylesheet" href="./assets/css/codeManager.css"/>
+	<link rel="stylesheet" href="./assets/js/ysEditor/css/ysEditor.css" />
+	<link rel="stylesheet" href="./assets/js/jquery-ui/jquery-ui.css">
+</head>
+
+<body style="margin-top:10px !important;padding:0">
+    <header class="header-room">
+		
+    </header>
+    <main class="header-room">
+		<div id="yt_dl_ask_to_save" class="yt_dl" title="Save my work with a name">
+			<p>
+             <input type="name" name="codename" id="yt_txt_code_name" class="form-control" placeholder="Work Name">  
+			 <button id="yt_btn_save_code_to_db" type="button" class="btn btn-dl-action">Save</button>
+			</p>
+		</div>
+        <article class="my-5">
+		<div class="row mb-4">
+			<div  id="yt_col_video_area"  class="col-2">
+				<div id="yt_div_video_area" class="yt_video_area">
+				</div>
+				<div id="yt_div_students_area">
+				</div>
+			</div>
+			<div class="col-10">
+				<div class="row mb-4 tool_panel"> 
+					<div class="col-1 text-center">
+						<button id="yt_btn_run_code_on_student_board" title="Run code" class="save_work_btn" >
+							<img src="./assets/images/tools/run.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_erase_output" title="Erase output board" class="save_work_btn" >
+							<img src="./assets/images/tools/clean_output.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_share_screen" title="Share my screen" class="save_work_btn" >
+							<img src="./assets/images/tools/share_screen.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_erase_board" title="Erase input board" class="save_work_btn" >
+							<img src="./assets/images/tools/clean_output.png" width="40px" height="43"/>
+						</button>
+					</div>
+					<div class="col-1 text-center">
+						<button id="yt_btn_save_work_or_notes" title="Save work" class="save_work_btn">
+							<img src="./assets/images/tools/save_work.png" width="40px" height="43" />
+						</button>
+					</div>
+					<div class="col-3 text-center teacher_only yt_select_class_mode" title="Set class mode">
+						<form action="#">
+						<select name="classMode" id="yt_opt_class_mode">
+							<option value="presentation">Presentation</option>
+							<option value="exercise" selected="selected">Exercise</option>
+						</select>
+						</form>
+					</div>
+					<div class="col-6 text-right student_only" title="Set class mode">
+						<span id="yt_span_current_mode" class="mode_text"></span>
+					</div>
+					<div class="col-1 text-right" title="Set class mode">
+						<button title="Navigate to home page" class="save_work_btn" style="margin-top: 8px;"
+								onclick="(function() {window.location.href='./index.html'})()">
+							<img src="./assets/images/dynamic/home.png" width="40px" height="28px" />
+						</button>
+					</div>
+				</div>	
+				<div class="row row-code-input">
+					<div class="col-7 yt-list-panel-left">
+						<div id="yt_div_content_input">
+						</div>
+					</div>
+					<div class="col-5 yt-list-panel-right">
+						<div class="row mb-4">
+							<div id="yt_tb_student_console" title="View my students status" data-tabindex="0" class="col-3 unselected_tab yt_tab teacher_only live_only">
+								My Students
+							</div>
+							<div id="yt_tb_work_depot" title="My saved work" data-tabindex="1" class="col-3 selected_tab yt_tab">
+								My Work
+							</div>
+							<div id="yt_tb_msg_console" title="Send / receive messages to classroom" data-tabindex="2" class="col-3 unselected_tab yt_tab">
+								Messages
+							</div>
+							<div id="yt_tb_notes_console" title="Notes for the class" data-tabindex="3" class="col-3 unselected_tab yt_tab">
+								My notes
+							</div>
+						</div>
+						<div class="row mb-4 student_tab_row teacher_only">
+							<div class="col-12">
+								<div id="yt_div_my_students" class="message-container">
+								</div>
+							</div>
+						</div>
+						<div class="row mb-4 work_tab_row">
+							<div class="col-12">
+								<div id="yt_work_container" class="work_container">
+								</div>
+							</div>
+						</div>	
+						<div class="row mb-4 message_tab_row">
+							<div class="col-12">
+								<div id="yt_div_message_boards" class="message-container">
+								</div>
+							</div>
+						</div>
+						<div class="row mb-4 notes_tab_row">
+							<div class="col-12">
+								<div id="yt_div_notes_rte_editor" class="message-container">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-4 for_coding_only" style="display:none;" id="yt_tab_output_for_coding">
+					<div class="col-12">
+						<ul>
+							<li><a href="#tabs-1">Output console</a></li>
+							<li><a href="#tabs-2">Errors</a></li>
+							<li><a href="#tabs-3">Analysis</a></li>
+						</ul>
+						<div id="tabs-1">
+							<textarea class="output-board"
+									  id="yt_ta_global_output" 
+									  rows="20"  spellcheck="false" 
+									  placeholder="Output Console"></textarea>
+						</div>			 
+						<div id="tabs-2">
+							<p>Coming soon...</p>			  
+						</div>
+						<div id="tabs-3">
+							<p>Coming soon...</p>			  
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+        </article>       
+    </main>
+    <script src="./assets/js/jquery/dist/jquery.min.js"></script>
+	<script src="./assets/js/popper.js/dist/umd/popper.min.js"></script>
+	<script src="./assets/js/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./assets/js/jquery-ui/jquery-ui.min.js"></script>
+	<script src="./assets/js/helpers/sha256.js"></script>
+	<script src="./assets/js/ysEditor/js/yseditor.js" type="module"></script>
+	<script src="./assets/js/pages/createClassRoomOwner.js" type="module"></script>
+</body>
+</html>

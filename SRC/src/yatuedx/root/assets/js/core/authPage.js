@@ -7,12 +7,12 @@ import {sysConstants, sysConstStrings, groupTypeConstants} 	from '../core/sysCon
 
 const CLASS_ROOM_MAP = 
 	new Map([
-			 ['10_TEACHER', './class-room-teacher.html'], 
-			 ['13_TEACHER', './class-room-teacher.html'], 
-			 ['10_STUDENT', './class-room.html'], 
-			 ['13_STUDENT', './class-room.html'],
-			 ['100_TEACHER', './class-room-lang-teacher.html'],
-			 ['100_STUDENT', './class-room-lang.html']	 
+			 [`10_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'], 
+			 [`13_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'], 
+			 [`10_${sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE}`, './class-room-owner.html'], 
+			 [`13_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'],
+			 [`100_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'],
+			 [`100_${sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE}`, './class-room-owner.html']	 
 	]);
 
 /**
@@ -25,14 +25,15 @@ class AuthPage {
 	#loggedIn;
 	#store
 	#liveSession
-	
+	#liveChatRole
+
 	constructor() {
 		this.#store =  new LocalStoreAccess(sysConstants.YATU_CHAT_GROUP_STORE_KEY);
 		this.validateLiveSession();
 	}
 	
 	/**
-		Check if we are loggin in
+		Check if we are logged in
 	 **/
 	 async init(publicOk) {
 		this.#loggedIn = await credMan.hasLoggedIn();
@@ -44,6 +45,7 @@ class AuthPage {
 		if (this.#loggedIn) {
 			await this.initGroups();
 		}
+
 	 }
 	
 	/**
@@ -146,12 +148,14 @@ class AuthPage {
 		const gotoClass = confirm('You have a live class going on. Do you want to go to the classroom?');
 		if (gotoClass) {
 			// map group type to different classrooms
-			let role = this.credential.name === liveClass.owner_name ? 'TEACHER' : 'STUDENT';
+			this.#liveChatRole = this.credential.name === this.#liveSession.owner_name 
+				? sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER 
+				: sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE;
 			switch (liveClass.group_type) {
 				case groupTypeConstants.GPT_EDU_JSP:
 				case groupTypeConstants.GPT_EDU_JSP_NODE:
 				case groupTypeConstants.GPT_EDU_GENERIC_PRESENTATION:
-					const key = `${liveClass.group_type}_${role}`
+					const key = `${liveClass.group_type}_${this.#liveChatRole}`
 					window.location.href = CLASS_ROOM_MAP.get(key);
 					break;
 
@@ -162,17 +166,6 @@ class AuthPage {
 		
 		return gotoClass;
 	}
-	
-	/* Properties */
-	
-	get loggedIn() {
-		return this.#loggedIn;
-	}
-	
-	get credential() {
-		return credMan.credential;
-	}
-	
 	
 	validateLiveSession() {
 		const itemStr = this.#store.getItem();
@@ -187,15 +180,15 @@ class AuthPage {
 				this.#liveSession = null;
 				this.#store.setItem(null)
 			}
+
+			this.#liveChatRole = this.credential.name === this.#liveSession.owner_name 
+				? sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER 
+				: sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE;
 			
 		} else {
 			this.#liveSession = null;
 		}
 
-		return this.#liveSession;
-	}
-
-	get liveSession() {
 		return this.#liveSession;
 	}
 
@@ -223,6 +216,16 @@ class AuthPage {
 			groupWS.sendGroupTextMessage(message);
 		}
 	}
+
+	/* Properties */
+	
+	get liveChatRole() { return this.#liveChatRole }
+
+	get loggedIn() { return this.#loggedIn }
+	
+	get credential() { return credMan.credential }
+
+	get liveSession() { return this.#liveSession }	
 }
 
 export {AuthPage};
