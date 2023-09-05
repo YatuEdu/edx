@@ -18,7 +18,7 @@ class RteInputConsole extends ComponentBase {
         let editorWrapperId = ysEditorId ? ysEditorId : "yseditor_main";
         editorWrapperId = `${editorWrapperId}_${baseIdTag}`;
         const html = `<div id="${editorWrapperId}"></div>`;
-        const css = "../../assets/js/ysEditor/css/ysEditor.css";
+        const css = "../../assets/js/ysEditor/css/yseditor.css";
 
         super("id", CONTROL_NAME, divId, html, css, ComponentBase.MOUNT_TYPE_INSERT, true);
         this.#parentView = parentView;
