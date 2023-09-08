@@ -79,7 +79,7 @@ class ClassRoomAudience extends ClassRoom {
 				
 			// run code sample and show result on console
 			case PTCC_COMMANDS.PTC_CODE_RUN:
-				this.#runCodeFrom(cmd.data[0]);
+				this.v_runCodeFrom(cmd.data[0]);
 				break;
 				
 			// GOT message from peers
@@ -186,11 +186,6 @@ class ClassRoomAudience extends ClassRoom {
 
     #syncCodeWithTeacherer(cmd) {
 		this.#commCenterForAudience.syncCodeWithRequester(this.contentInputConsole.code, cmd.sender);
-    }
-
-    #runCodeFrom() {
-		this.v_runCodeFrom()
-
     }
 
     #receiveMsgFrom() {

@@ -64,8 +64,16 @@ class JSClassRoomAudience extends ClassRoomAudience {
 	}
 
     /**
-     * Private methods
+     * Overridden methods
      */
+
+	/*
+	 * Run code when teacher asked from remote end
+	 * @param {*} code 
+	 */
+	v_runCodeFrom(code) {
+		this.#runCodeFrom(code)
+	}
 
     /*
 		Run JS Code from given code text, or from code input consoole
@@ -83,10 +91,7 @@ class JSClassRoomAudience extends ClassRoomAudience {
         	// display error?
 		if (errorInfo) {
 			this.contentInputConsole.showDiagnoticMessage(errorInfo);
-		} else {
-			// show output cosole
-			this.contentInputConsole.showOutput();
-		}
+		} 
 	}
 }
 

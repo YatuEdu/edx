@@ -18,7 +18,6 @@ class RteInputConsole extends ComponentBase {
         let editorWrapperId = ysEditorId ? ysEditorId : "yseditor_main";
         editorWrapperId = `${editorWrapperId}_${baseIdTag}`;
         const html = `<div id="${editorWrapperId}"></div>`;
-        //const css = "../../assets/js/ysEditor/css/yseditor.css";
 
         super("id", CONTROL_NAME, divId, html, null, ComponentBase.MOUNT_TYPE_INSERT, true);
         this.#parentView = parentView;
@@ -121,6 +120,13 @@ class RteInputConsole extends ComponentBase {
 				end:   selectedRange.endOffset
 		  };
 	  }
+  }
+
+  /*
+    Erase text on the input board div
+  */
+  eraseInputBoard() {
+    $(this.inputIdSelector).html('');
   }
 
   get outputId() {

@@ -51,9 +51,6 @@ class JSClassRoomOwner extends ClassRoomOwner {
 		// display error?
 		if (errorInfo) {
 			this.contentInputConsole.showDiagnoticMessage(errorInfo);
-		} else {
-			// show output cosole
-			this.contentInputConsole.showOutput();
 		}
 	}
 }

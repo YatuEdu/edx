@@ -14,9 +14,11 @@ const CSS_VIDEO_MIN 						= 'yt-video';
 const CSS_VIDEO_MAX 						= 'yt-video-max';
 const CSS_VIDEO_ANY 						= 'yt-video-any';
 const CSS_CODING_COL_WITH_VIDEO				= 'col-10';
-const CSS_CODING_COL_WITHOUT_VIDEO 			= 'col-12';
+const CSS_CODING_COL_WITHOUT_VIDEO 			= 'col-11 center_col';
+const CSS_CODING_COL_WITHOUT_VIDEO2			= 'center_col';
 
-const YT_DIV_WORK_CONTAINER					= "yt_work_container";
+const YT_DIV_WORK_CONTAINER					= "yt_work_container";  
+const YT_DIV_WORK_AREA 						= "yt_div_work_area";
 const YT_DIV_CONTENT_INPUT              	= "yt_div_content_input";
 const YT_DIV_MESSAGE_BOARDS              	= "yt_div_message_boards";
 const YT_DIV_NOTES_RTE_EDITOR				= "yt_div_notes_rte_editor";
@@ -32,6 +34,7 @@ const CLCC_STUDENT_ROW                  = "student_tab_row";
 
 const BTN_RUN_CODE  					= "yt_btn_run_code_on_student_board";
 const BTN_ERASE_OUTPUT					= "yt_btn_erase_output";
+const BTN_ERASE_INPUT					= "yt_btn_erase_input_board";
 
 const TAB_INDEX_STUDENTS = 0;
 const TAB_INDEX_WORK = 1
@@ -86,13 +89,15 @@ class ClassRoom extends AuthPage {
 		await super.init();
 
 		/**
-		 * set group id ans sequence id from session if in live mode
+		 * DISABLE VIDEO IN NON-LIVE MODE
 		 */
 		if (this.classMode) {
             // Do not show video if we are only doing excersize
 			$(this.columnVideoAreaSelector).hide();
-			$(this.columnCodingAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
-			$(this.columnCodingAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
+			$(this.selectClassModeOptionSelector).hide();
+			$(this.columnWorkAreaSelector).removeClass(CSS_CODING_COL_WITH_VIDEO);
+			$(this.columnWorkAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO);
+			$(this.columnWorkAreaSelector).addClass(CSS_CODING_COL_WITHOUT_VIDEO2);
         }
 
 		  /*
@@ -181,7 +186,8 @@ class ClassRoom extends AuthPage {
 		$(this.saveBtnOnSaveDialogSelector).click(this.handleSaveCodeToDb.bind(this))
 
 		// hookup erasing output console
-		$(this.eraseOutputButton).click(this.handleEraseOutput.bind(this));
+		$(this.eraseOutputSelector).click(this.handleEraseOutput.bind(this));
+		$(this.eraseInputSelector).click(this.handleEraseIntput.bind(this));
 
 		// accept tab and insert \t
 		if (this.contentInputConsole.inputIsTextArea) {
@@ -425,15 +431,25 @@ class ClassRoom extends AuthPage {
 		throw new Error('v_execute: sub-class-should-overload-this');
 	}
 
-	/**
+	/*
 	 * Send group message
 	 */
 	v_sendGroupMessage(msg) {
 		throw new Error('v_sendGroupMessage: sub-class-should-overload-this');
 	}
 		
+	/*
+	 * Erase output content
+	 */
 	handleEraseOutput(e) {
 		$(this.outputSelector).val("")
+	}
+
+	/*
+	 * Erase intput content
+	 */
+	handleEraseIntput(e) {
+		this.#contentInputConsole.eraseInputBoard()
 	}
 
 	/**
@@ -690,15 +706,21 @@ class ClassRoom extends AuthPage {
 
 	get teacherOnlyClassSelector () { return `.teacher_only`}
 
+	get selectClassModeOptionSelector() { return `.yt_select_class_mode`}
+
 	get liveOnlyClassSelector() { return '.live_only'}
 
 	get studentOnlyClassSelector() { return `.student_only`}
 
 	get runCodeButton() { return `#${BTN_RUN_CODE}` }
 
-	get eraseOutputButton() { return `#${BTN_ERASE_OUTPUT}` }
+	get eraseOutputSelector() { return `#${BTN_ERASE_OUTPUT}` }
+
+	get eraseInputSelector() { return `#${BTN_ERASE_INPUT}`}
 
 	get forCodingOnlyClassSelector() { return '.for_coding_only'}
+
+	get columnWorkAreaSelector() { return `#${YT_DIV_WORK_AREA}`}
 }
 
 
