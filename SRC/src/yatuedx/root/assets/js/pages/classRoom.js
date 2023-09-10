@@ -119,7 +119,10 @@ class ClassRoom extends AuthPage {
 		/****
          * create code container for saving / updating code
         */
-		this.#codeContainer = await CodeContainer.createCodeContainer(YT_DIV_WORK_CONTAINER, this.contentInputConsole.inputId, this.groupId, this.sequenceId);
+		this.#codeContainer = await CodeContainer.createCodeContainer(YT_DIV_WORK_CONTAINER, 
+																	 this.contentInputConsole, 
+																	 this.groupId, 
+																	 this.sequenceId);
 
 		/****
 		 * create message board component
@@ -199,10 +202,10 @@ class ClassRoom extends AuthPage {
      * load content input control according to class type
      */
     #loadContentInputControl(classType, parentIdMain, parentIdNotes) {
-        this.#contentInputConsole = new ContentInputConsole(classType, this, parentIdMain, "main", this.outputId);
+        this.#contentInputConsole = new ContentInputConsole(classType, this, parentIdMain, sysConstStrings.RTE_TAG_MAIN, this.outputId);
 
 		// also create notes input console
-		this.#notesConsole = new RteInputConsole(this, parentIdNotes,  "user", this.ysEditorWrapperSelectorForNotes);
+		this.#notesConsole = new RteInputConsole(this, parentIdNotes,  sysConstStrings.RTE_TAG_USER, this.ysEditorWrapperSelectorForNotes);
     }
 
 	async initNotes() {
@@ -534,8 +537,7 @@ class ClassRoom extends AuthPage {
 	/***
 	 * pop up "save" dialog box
 	 */
-	#handleSavePopup(e) {
-		e.preventDefault(); 
+	#handleSavePopup() {
 		const codeTxt = this.contentInputConsole.code;
 		if (!codeTxt) {
 			return;

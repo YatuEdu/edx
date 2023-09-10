@@ -5,7 +5,6 @@ import {PTCC_COMMANDS}					from '../command/programmingClassCommand.js'
 import {StringUtil}	                    from '../core/util.js';
 import {StudentManager}					from '../component/new/studentManager.js'
 
-// let myEditor = new ysEditor();
 class ClassRoomOwner extends ClassRoom {
 	#commCenterForPresenter;                               
 	#studentManager

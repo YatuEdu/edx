@@ -5,6 +5,7 @@
  * Url: https://github.com/yusufsefasezer/ysEditor.js
  * License: MIT
  */
+const FILE_UPLOAD = "imgupload";
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -51,7 +52,7 @@
   // Predefined button options
   //
 
-  var predefinedButtons = {
+  const predefinedButtons = {
     'bold': {
       title: 'Bold',
       command: 'bold',
@@ -431,7 +432,7 @@
         var currentOptions = buttonOptions[currentButton];
 
         if (typeof currentOptions === 'object') {
-          this.addButton(new ToolbarButton(currentOptions.command, currentOptions.text, currentOptions.title, currentOptions.value, currentOptions.callback));
+          this.addButton(new ToolbarButton(currentOptions.command, currentOptions.text, currentOptions.title, currentOptions.id, currentOptions.value, currentOptions.callback));
         }
 
       }
@@ -450,11 +451,12 @@
      * @param {string} value command value
      * @param {function} callback button callback function
      */
-    var ToolbarButton = function (command, text, title, value, callback) {
+    var ToolbarButton = function (command, text, title, id, value, callback) {
       this.command = command;
       this.text = text || '';
       this.title = title || '';
       this.value = value;
+      this.id = id;
       this.callback = callback;
       this.element = null;
     };
@@ -467,17 +469,26 @@
     ToolbarButton.prototype.render = function () {
       var self = this;
       this.element = document.createElement('button');
-      this.element.innerHTML = this.text;
       this.element.title = this.title;
       this.element.type = 'button';
-      this.element.addEventListener('click', function () {
-        if (document.queryCommandSupported(self.command) && document.execCommand(self.command, false, self.value || '')) {
-          editorContent.element.focus();
-        }
-      });
+      this.element.innerHTML = this.text;
+      if (this.id) {
+        this.element.id = this.id;
+      }
 
-      if (typeof this.callback === 'function') this.callback(this, editorContent);
+      // special handling for file upload button
+      if (this.command !== FILE_UPLOAD) {
+        // Click handlers for text buttons  
+        this.element.addEventListener('click', function () {
+          if (document.queryCommandSupported(self.command) && document.execCommand(self.command, false, self.value || '')) {
+            editorContent.element.focus();
+          }
+        });
+      }
 
+      if (typeof this.callback === 'function') {
+        this.callback(this, editorContent);
+      }
       return this.element;
     };
 
