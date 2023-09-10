@@ -273,6 +273,29 @@ class StringUtil {
 		
 		return result;
 	}
+
+	/*
+		Test if as givrn string is HTML 
+	*/
+	static validateHTMLString(str) {
+		const element = document.createElement("div");
+		element.innerHTML = str;
+		const childNodes = element.childNodes;
+		let htmlNodes = 0;
+		let validHtml = false;
+		for (let i = 0; i < childNodes.length; i++) {
+		   	if (childNodes[0].nodeType !== 1) {
+				// first node must be tag (1)
+			  	return false;
+		   	}
+			
+			++htmlNodes;
+		   	if (childNodes[i].nodeType == 1 && i == childNodes.length - 1) {
+				validHtml = true;
+		   	}
+		}
+		return {countHtmlNode: htmlNodes, isValidHtml: validHtml};
+	 }
 }
 
 class RegexUtil {

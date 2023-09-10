@@ -246,6 +246,10 @@ pre {
     outline: none;	
 }
 
+.center_col{
+	margin-left: 5%;
+}
+
 .student_rte_board {
 	overflow-y: auto;  
 	overflow-x: auto;

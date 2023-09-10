@@ -21,7 +21,7 @@ class ContentInputConsole {
         this.#delegateToComponent = new impl.implementationClass(parentView, divId, baseIdTag, outputId);
     }
 
-    /**
+    /*
      * 
      * @returns Interface methods
      */
@@ -29,11 +29,18 @@ class ContentInputConsole {
         return this.#delegateToComponent.showOutput();
     }
 
-    /**
+    /*
      * show error dialog if any error occurs during program execution
      */
     showDiagnoticMessage(errInfo) {
         return this.#delegateToComponent.showDiagnoticMessage(errInfo);
+    }
+
+    /*
+     *  erase content input
+     */
+    eraseInputBoard() {
+        this.#delegateToComponent.eraseInputBoard()
     }
 
     /**

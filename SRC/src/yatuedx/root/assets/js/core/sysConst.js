@@ -80,7 +80,11 @@ const sysConstStrings = Object.freeze({
 	EXE_PROGRAM_FIN:    '\n------  END OF EXECUTION  -------\n\n',
 	
 	// Message const
-	TEACHER_CLASS_STARTED: 'has started a class.  Please go to the class!'
+	TEACHER_CLASS_STARTED: 'has started a class.  Please go to the class!',
+
+	// each RTE console needs its own base tag
+	RTE_TAG_MAIN:	"main",
+	RTE_TAG_USER:	"user",
 	
 });
 

@@ -2,7 +2,6 @@ import {ComponentBase}		from '../componentBase.js';
 import {PageUtil}			from '../../core/util.js'
 
 const REPLACEMENT_INPUT_ID = "{codebrdid}";
-const REPLACEMENT_OUTPUT_ID = "{otptbrdid}";
 const REPLACEMENT_OUTPUT_CONTAINER_ID = "{otptcntnrid}";
 const REPLACEMENT_BTN_SHOW_OR_HIDE_ID = "{shwhdbtnid}";
 const REPLACEMENT_BTN_ENLARGE_SHRINK_ID = "{enlgeshrkbtnid}";
@@ -146,11 +145,15 @@ class CodeInputConsole extends ComponentBase {
 	/* public methods */
 	
 	showOutput() {
-		//$(this.outputContainerIdSelector).show();
+		$(this.outputContainerIdSelector).show();
 	}
 	
 	hideOutput() {
-		//$(this.outputContainerIdSelector).hide();
+		$(this.outputContainerIdSelector).hide();
+	}
+
+	eraseInputBoard() {
+		this.code = ''
 	}
 	
 	showDiagnoticMessage(error) {

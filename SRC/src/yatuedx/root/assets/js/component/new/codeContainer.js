@@ -143,19 +143,19 @@ class CodeMan {
 class CodeContainer extends ComponentBase {
 	#codeMan;	
 	#selectedCodeName;
-	#codeInoputBoardId;
+	#codeEditor;
 	#groupId;
 	#sequenceId;
 	
-	constructor(parentId, codeInoputBoardId, groupId, sequenceId) {
+	constructor(parentId, codeEditor, groupId, sequenceId) {
 		super("id", "CodeContainer", parentId, "", MY_CSS);
-		this.#codeInoputBoardId = codeInoputBoardId;
+		this.#codeEditor = codeEditor;
 		this.#groupId = groupId;
 		this.#sequenceId = sequenceId
 	}
 
-    static async createCodeContainer(parentId, codeInoputBoardId, groupId, sequenceId) {
-        const instance = new CodeContainer(parentId, codeInoputBoardId, groupId, sequenceId);
+    static async createCodeContainer(parentId, codeEditor, groupId, sequenceId) {
+        const instance = new CodeContainer(parentId, codeEditor, groupId, sequenceId);
         await instance.initCodeDepot();
         return instance;
     }
@@ -227,14 +227,14 @@ class CodeContainer extends ComponentBase {
 		const name = StringUtil.getIdStrFromBtnId(e.target.id);
 		let codeText = await this.prv_getCodeFor(name);
 	
-		const existingCode = $(this.codeInputBoardSelector).val();
+		const existingCode = this.#codeEditor.code;
 		codeText = existingCode 
 					? 
 					codeText + `\n\n /* @ Code ${name} inserted before the following line! @ */ \n\n ` + existingCode 
 					: 
 					codeText;
 		this.prv_toggleSelection(this.#selectedCodeName, name);
-		$(this.codeInputBoardSelector).val(codeText);
+		this.#codeEditor.code = codeText;
 		this.#selectedCodeName = name;
 		
 	}
@@ -243,7 +243,7 @@ class CodeContainer extends ComponentBase {
 		const codeName = this.prv_getCodeNameFromEvent(e);
 		// only react to selected code entry
 		if (this.#selectedCodeName == codeName) {
-			const uiText = $(this.codeInputBoardSelector).val();
+			const uiText = this.#codeEditor.code;
 			const depotText = (this.#codeMan.getCodeEntry(codeName)).text;
 			if (uiText !== depotText) {
 				const updateCode = confirm(`Are you sure you want to replace "${codeName}" in code depot with code from input consle?`);
@@ -362,7 +362,7 @@ class CodeContainer extends ComponentBase {
 			code from code depod.  The key is to not implicitly erase the code user just entered.
 		*/
 		if (oldName != name) {
-			const existingCode = $(this.codeInputBoardSelector).val();
+			const existingCode = this.#codeEditor.code
 			const codeInDepod = oldName ?  this.prv_getCodeEntryForCode(oldName) : null;
 			if (existingCode) {
 				let askQuestion = true;
@@ -377,7 +377,7 @@ class CodeContainer extends ComponentBase {
 				}
 			}
 			this.prv_toggleSelection(this.#selectedCodeName, name);
-			$(this.codeInputBoardSelector).val(codeText);
+			this.#codeEditor.code = codeText;
 			this.#selectedCodeName = name;
 		}
 	}
@@ -484,12 +484,6 @@ class CodeContainer extends ComponentBase {
 	// selector for button which insert code
 	getCodeInsertSelector(name) {
 		return `#${this.getCodeInsertId(name)}`;
-	}
-
-	
-	// slector for code input board outside of this component
-	get codeInputBoardSelector() {
-		return `#${this.#codeInoputBoardId}`;
 	}
 }
 

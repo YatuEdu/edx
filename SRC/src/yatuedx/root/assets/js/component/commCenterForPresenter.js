@@ -78,7 +78,7 @@ class CommCenterForPresenter extends CommunicationSpace {
 	}
 	
 	/*
-		Run code sample we swent prior to this command on student's board remotely
+		Run code sample we sent prior to this command on student's board remotely
 		for all students who are attending the class
 	 */
 	runCode() {
