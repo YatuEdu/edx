@@ -6,7 +6,7 @@ import {credMan} 			from '../../core/credMan.js'
 //const CODE_LIST_TABLE_TEMPLATE = '
 
 const MY_CODE_LIST_TEMPLATE = `
-<div class="row mb-0 yt-list-element" id={codelstDivId}>
+<div class="row mb-0 yt-list-element {codelstclssforall} {codelstclss}" id="{codelstDivId}">
   <div class="col-4 tool-tbtn-dimention-left">
 	<button id="{codeLinkId}" class="textButton bigTextButton" data-tabindex="{tb}">{lb}</button>
   </div>
@@ -18,9 +18,21 @@ const MY_CODE_LIST_TEMPLATE = `
 </div>
 `;
 
-const TEMPLETE = 
-`<div id='yt_div_code_man' class="row mb-0">
- <div id="yt_col_code_list" class="col-12  yt-list-panel-right">
+const MY_CODE_LIST_SUBJECT_SEQUENCE_SELECT_TEMPLATE = `
+	<option value="{sub_seq}">{sub:seq:name}</option>
+`;
+
+const CODE_CONTAINER_TEMPLETE = 
+`<div class="row mb-0 yt-list-element">
+	<div class="col-12 tool-tbtn-dimention-left">
+		<select name="subject_sequences" id="{codesujslct}">
+	  		<option value="{allsubs}" selected="selected">All subjects/sequences</option>
+	  		{codesujslct-itms}
+  		</select>
+	</div>
+</div>
+<div id='yt_div_code_man' class="row mb-0">
+ <div id="yt_col_code_list" class="col-11  yt-list-panel-right">
 	{codeListHolder}
  </div>
 </div>
@@ -29,10 +41,17 @@ const TEMPLETE =
 const MY_CSS = "codeManager.css";
 const CSS_SELECTED_CODE_ENTRY = "textButton-seledcted";
 
+const REPLACE_ALL_SUBJECTS_SEQUENCES ="{allsubs}"
 const REPLACE_CODELIST_TAB = '{tb}';
 const REPLACE_CODELIST_LABEL = '{lb}';
 const REPLACE_CODELIST_DIV_ID = '{codelstDivId}';
-const REPLACE_CODE_LIST_LINK_ID = '{codeLinkId}';
+const REPLACE_CODELIST_CLASS = "{codelstclss}";
+const REPLACE_CODELIST_CLASS_FOR_ALL  = "{codelstclssforall}";
+const REPLACE_CODE_SUBJECT_SEQUENCE_SELECT_ITEMS = "{codesujslct-itms}"
+const REPLACE_SUBJECT_SEQUENCE_ID = "{sub_seq}";
+const REPLACE_SUBJECT_SEQUENCE_NAME = "{sub:seq:name}";
+const REPLACE_CODE_SUBJECT_SEQUENCE_SELECT = "{codesujslct}";
+const REPLACE_CODE_LIST_LINK_ID = "{codeLinkId}";
 const REPLACEMENT_CODE_LIST = '{codeListHolder}';
 const REPLACEMENT_CODE_DEL = '{codeDelId}';
 const REPLACEMENT_CODE_UPD = '{codeUpdId}';
@@ -41,50 +60,53 @@ const REPLACEMENT_CODE_INS = '{codeInsId}';
 const CODE_LIST_DIV_PREFIX = 'yt_code_list_entry_';
 const CODE_LIST_LINK_PREFIX = 'yt_code_list_link_';
 
-/**
+/*
 	This class handles code management functions inside student or teacher pages
-**/
+*/
 class CodeEntry {
 	#name;
 	#sequenceId;
+	#sequenceName
+	#subjectId
+	#subjectName
 	#text;
 	#hash;
 	
-	constructor(name, seqId, hash, text) {
+	constructor(name, hash, text, seqId, seqName, subId, subName) {
 		this.#name = name;
-		this.#sequenceId = seqId;
 		this.#hash = hash;
-		this.#text =  text;
+		this.#text = text;
+		this.#sequenceId = seqId;
+		this.#sequenceName = seqName;
+		this.#subjectId = subId;
+		this.#subjectName = subName;
+		
 	}
 	
-	get name() {
-		return this.#name;
-	}
+	get name() { return this.#name; }
 	
-	get sequenceId() {
-		return this.#sequenceId;
-	}
+	get sequenceId() { return this.#sequenceId;}
 
-	get text() {
-		return this.#text;
-	}
+	get sequenceName() { return this.#sequenceName }
 	
-	set text(t) {
-		this.#text = t;
-	}
+	get subjectId() { return this.#subjectId }
+
+	get subjectName() { return this.#subjectName }
 	
-	get hash() {
-		return this.#hash;
-	}
+	get text() { return this.#text; }
+	
+	set text(t) { this.#text = t; }
+	
+	get hash() { return this.#hash; }
 	
 	set hash(h) {
 		this.#hash = h;
 	}
 }
 
-/**
+/*
 	This class handles code management functions inside student or teacher pages
-**/
+*/
 class CodeMan {
 	#codeMapByName;
 	
@@ -93,7 +115,7 @@ class CodeMan {
 		// load existing code 
 		this.#codeMapByName = new Map();
 		codeDataList.forEach(e => {
-			const ce = new CodeEntry(e.name, e.hash, e.text);
+			const ce = new CodeEntry(e.name, e.hash, e.text, e.sequence_id, e.sequence_name, e.subject_id, e.subject_name);
 			this.#codeMapByName.set(e.name, ce);
 		});
 	}
@@ -137,16 +159,17 @@ class CodeMan {
 	}
 }
 
-/**
+/*
 	This class handles code management functions inside student or teacher pages
-**/
+*/
 class CodeContainer extends ComponentBase {
 	#codeMan;	
 	#selectedCodeName;
 	#codeEditor;
 	#groupId;
 	#sequenceId;
-	
+	#sequenceMap
+
 	constructor(parentId, codeEditor, groupId, sequenceId) {
 		super("id", "CodeContainer", parentId, "", MY_CSS);
 		this.#codeEditor = codeEditor;
@@ -160,27 +183,42 @@ class CodeContainer extends ComponentBase {
         return instance;
     }
 	
-    /**
+    /*
 		Load user code text from data base
-	 **/
+	 */
 	async initCodeDepot() {
 		const codeDataList = [];
+		this.#sequenceMap = new Map();
 		const resp = await Net.memberListAllCode(credMan.credential.token);
 		if (resp.data.length > 0) {
 			let first = true;
 			
 			resp.data.forEach(codeHeader => {
-				const codeEntry = {sequence_id: codeHeader.sequence_id, name: codeHeader.name, hash: codeHeader.hash};
+				const codeEntry = {
+					name: codeHeader.name, 
+					hash: codeHeader.hash,
+					sequence_id: codeHeader.sequence_id,
+					sequence_name: codeHeader.sequence_name,
+					subject_id: codeHeader.subject_id,
+					subject_name: codeHeader.subject_name,
+				};
 				codeDataList.push(codeEntry);
+				// map a sequence id to its subject and subject name (1-1 mapping)
+				if (!this.#sequenceMap.get(codeHeader.sequence_id)) {
+					this.#sequenceMap.set(codeHeader.sequence_id, [codeEntry.sequence_name, codeEntry.subject_id, codeEntry.subject_name])
+				}
 			});
 		}
 
         this.#codeMan = new CodeMan(codeDataList);
 
         // create code container UI 
-		const codeListHtml = this.prv_buildCodeListHtml(codeDataList);
-		const componentHtml = TEMPLETE
-						.replace(REPLACEMENT_CODE_LIST, codeListHtml);
+		const {codeListHtml, sequenceSelectHtml} = this.prv_buildCodeListHtml(codeDataList);
+		const componentHtml = CODE_CONTAINER_TEMPLETE
+						.replace(REPLACE_ALL_SUBJECTS_SEQUENCES, this.optionForAll)
+						.replace(REPLACEMENT_CODE_LIST, codeListHtml)
+						.replace(REPLACE_CODE_SUBJECT_SEQUENCE_SELECT, this.subjectSequenceSelectId)
+						.replace(REPLACE_CODE_SUBJECT_SEQUENCE_SELECT_ITEMS, sequenceSelectHtml)
 						
 		
 		// mount the component to the page
@@ -188,6 +226,12 @@ class CodeContainer extends ComponentBase {
 		
 		// add event handler for all the list entry
 		codeDataList.forEach(codeHeader => $(this.eventHandlerForNewCode(codeHeader.name)));
+
+		/*
+		 * INITIALIZE subject-sequence selector control
+		*/
+	   $(this.subjectSequenceSelectSelector).selectmenu();
+	   $(this.subjectSequenceSelectSelector).on("selectmenuchange", this.#handleSubjectSequenceChange.bind(this));
 
 	}
 	
@@ -198,7 +242,8 @@ class CodeContainer extends ComponentBase {
 	
 	addCodeEntry(codeName, codeText) {
 		const codeHash = StringUtil.getMessageDigest(codeText);
-		const codeEntry = new CodeEntry(codeName, codeHash, codeText);
+		const sequenceInfo = this.#sequenceMap.get(this.#sequenceId)
+		const codeEntry = new CodeEntry(codeName, codeHash, codeText, this.#sequenceId, sequenceInfo[0], sequenceInfo[1], sequenceInfo[2]);
 		if (this.#codeMan.addCodeEntry(codeEntry)) {
 			// added a new code entry to the list
 			const newEntryHtml = this.prv_generateNewEntryHtml(codeName);
@@ -315,41 +360,101 @@ class CodeContainer extends ComponentBase {
 											 codeHash);
 		return resp;
 	}
-	
-	prv_getCodeNameFromEvent(e) {
-		const id = $(e.target).attr("id");
-		return StringUtil.getIdStrFromBtnId(id);
+
+	/*
+		Event handlers
+	*/
+
+	/*
+	 * Handle drop down selection to show only subjects (or sequences) that are qualified.
+	 *
+	 * @param {*} e 
+	 * @returns 
+	 */
+	#handleSubjectSequenceChange(e) {
+		e.preventDefault(); 
+		const selected = $(e.target).find(":selected").val()
+		if (selected === this.optionForAll) {
+			// show all items
+			$(this.codeListClassForAllElementsSelector).show()
+			return
+		}
+		const selectedSubSeq = selected.split("_")
+		const sid = parseInt(selectedSubSeq[0])
+		const qid = selectedSubSeq[1] ? parseInt(selectedSubSeq[1]) : 0
+		const qualifierClassId = !qid ? this.getCodeClassForSubjectId(sid) : this.getCodeClassForSequenceId(qid)
+		const allElements = $(this.codeListClassForAllElementsSelector).get()
+		allElements.forEach(e => {
+			if ($(e).hasClass(qualifierClassId)) {
+				$(e).show()
+			} else {
+				$(e).hide()
+			}
+		})
 	}
 	
 	/*
 		private methods
 	*/
+
+	prv_getCodeNameFromEvent(e) {
+		const id = $(e.target).attr("id");
+		return StringUtil.getIdStrFromBtnId(id);
+	}
 			
 	prv_buildCodeListHtml(codeDataList) {
 		if (codeDataList.length == 0 ) {
 			return 'No code in your code depot';
 		}
 		let htmlResult = '';
-		for(let i =0; i < codeDataList.length; i++) {
+		let selectHtml = '';
+		const addedSubjects = []
+		const addedSequence = []
+		for(let i = 0; i < codeDataList.length; i++) {
 			const codeHeader = codeDataList[i];
-			htmlResult += this.prv_generateNewEntryHtml(codeHeader.name);
+			htmlResult += this.prv_generateNewEntryHtml(codeHeader);
+			selectHtml += this.prv_generateNewOptionHtml(codeHeader, addedSubjects, addedSequence);
 		}		
 		
-		return htmlResult;
+		return {codeListHtml: htmlResult, sequenceSelectHtml: selectHtml}
 	}
 	
-	prv_generateNewEntryHtml(codeName) {
+	prv_generateNewEntryHtml(codeHeader) {
 		return MY_CODE_LIST_TEMPLATE
-								.replace(REPLACE_CODELIST_DIV_ID, this.getCodeListDivId(codeName))
-								.replace(REPLACE_CODELIST_LABEL, codeName)
-								.replace(REPLACE_CODE_LIST_LINK_ID, this.getCodeListLinkId(codeName))
-								.replace(REPLACEMENT_CODE_DEL, this.getCodeDeleteId(codeName))
-								.replace(REPLACEMENT_CODE_UPD, this.getCodeUpdateId(codeName))
-								.replace(REPLACEMENT_CODE_INS, this.getCodeInsertId(codeName))
+								.replace(REPLACE_CODELIST_DIV_ID, this.getCodeListDivId(codeHeader.name))
+								.replace(REPLACE_CODELIST_CLASS,  this.getCodeListClass(codeHeader))
+								.replace(REPLACE_CODELIST_CLASS_FOR_ALL, this.codeListClassForAllElements)
+								.replace(REPLACE_CODELIST_LABEL, codeHeader.name)
+								.replace(REPLACE_CODE_LIST_LINK_ID, this.getCodeListLinkId(codeHeader.name))
+								.replace(REPLACEMENT_CODE_DEL, this.getCodeDeleteId(codeHeader.name))
+								.replace(REPLACEMENT_CODE_UPD, this.getCodeUpdateId(codeHeader.name))
+								.replace(REPLACEMENT_CODE_INS, this.getCodeInsertId(codeHeader.name))
 								.replace(REPLACE_CODELIST_TAB, 0);
 							
 	}
 	
+	prv_generateNewOptionHtml(codeHeader, addedSubjects, addedSequence) {
+		const sid = codeHeader.subject_id;
+		const qid = codeHeader.sequence_id;
+		let optionHtml = ''
+		if (!addedSubjects.includes(sid)) {
+			// see a new subject, add an option for all of its sequences
+			addedSubjects.push(sid)
+			optionHtml = MY_CODE_LIST_SUBJECT_SEQUENCE_SELECT_TEMPLATE
+				.replace(REPLACE_SUBJECT_SEQUENCE_ID, `${sid}_`)
+				.replace(REPLACE_SUBJECT_SEQUENCE_NAME, `${codeHeader.subject_name}`);
+		}
+		if (!addedSequence.includes(qid)) {
+			// see a new sequence, add an option for it
+			addedSequence.push(qid)
+			optionHtml += MY_CODE_LIST_SUBJECT_SEQUENCE_SELECT_TEMPLATE
+					.replace(REPLACE_SUBJECT_SEQUENCE_ID, `${sid}_${qid}`)
+					.replace(REPLACE_SUBJECT_SEQUENCE_NAME, `-- sequence: ${codeHeader.sequence_name}`);
+		}
+		return optionHtml;
+							
+	}
+
 	// get code if the code link is clicked
 	async handleGetCodeFor(e) {
 		const name = StringUtil.getIdStrFromBtnId(e.target.id);
@@ -435,10 +540,27 @@ class CodeContainer extends ComponentBase {
 	get codeListSelector() {
 		return `#yt_col_code_list`;
 	}
+
+	get subjectSequenceSelectId() { return 'yt_opt_subject_sequence'}
+
+	get subjectSequenceSelectSelector() { return `#${this.subjectSequenceSelectId}`;}
+
+	get optionForAll() { return 'all' }
+
+	get codeListClassForAllElements() { return 'yt_clss_code_list_item'}
+	get codeListClassForAllElementsSelector() { return `.${this.codeListClassForAllElements}`}
 	
 	// id for code list div
 	getCodeListDivId(name) {
 		return `${CODE_LIST_DIV_PREFIX}${name}`;
+	}
+
+	getCodeClassForSubjectId(subjectId) { return `subject_${subjectId}`}
+
+	getCodeClassForSequenceId(sequenceId) { return `sequence_${sequenceId}`}
+
+	getCodeListClass(codeHeader) { 
+		return `${this.getCodeClassForSubjectId(codeHeader.subject_id)} ${this.getCodeClassForSequenceId(codeHeader.sequence_id)}`
 	}
 	
 	// selector for each code entry div
@@ -485,6 +607,7 @@ class CodeContainer extends ComponentBase {
 	getCodeInsertSelector(name) {
 		return `#${this.getCodeInsertId(name)}`;
 	}
+
 }
 
 export { CodeContainer };

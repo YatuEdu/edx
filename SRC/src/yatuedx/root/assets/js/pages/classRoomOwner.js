@@ -97,7 +97,7 @@ class ClassRoomOwner extends ClassRoom {
 		e.preventDefault(); 
 		e.stopPropagation();
 		const {begin, end} = this.contentInputConsole.getSelection();
-		if (begin != end) {
+		if (this.#commCenterForPresenter && begin != end) {
 			this.#commCenterForPresenter.setSelection(begin, end);
 		}
 	}
