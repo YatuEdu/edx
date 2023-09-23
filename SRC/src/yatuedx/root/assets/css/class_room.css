@@ -16,6 +16,10 @@ pre {
 	background-color:yellow ;
 }
 
+b, strong {
+    font-weight: 900;
+}
+
 .blob-code {
 	width: 90%;
     position: relative;

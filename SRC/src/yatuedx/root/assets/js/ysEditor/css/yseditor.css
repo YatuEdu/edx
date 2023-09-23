@@ -45,6 +45,7 @@
   width: 100% !important;
   height: 600px !important;
   overflow:auto;
+  text-align: left;
 }
 
 .yseditor .yseditor-footer {
