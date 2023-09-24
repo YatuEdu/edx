@@ -10,7 +10,7 @@ const CLASS_ROOM_MAP =
 			 [`10_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'], 
 			 [`13_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'], 
 			 [`10_${sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE}`, './class-room-owner.html'], 
-			 [`13_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'],
+			 [`13_${sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE}`, './class-room-owner.html'],
 			 [`100_${sysConstants.YATU_CHAT_ROOM_ROLE_PRESENTER}`, './class-room-owner.html'],
 			 [`100_${sysConstants.YATU_CHAT_ROOM_ROLE_AUDIENCE}`, './class-room-owner.html']	 
 	]);
