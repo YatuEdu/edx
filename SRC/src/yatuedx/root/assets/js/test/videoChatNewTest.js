@@ -1,8 +1,8 @@
 import {CommClient} from "../communication/commClient.js";
-import {VideoChatNew} from "../component/videoChatNew.js"
-import {VideoUtil} from "../component/videoUtil.js";
+import {VideoClient} from "../communication/VideoClient.js"
+import {VideoUtil} from "../core/videoUtil.js";
 
-let videoChatNew = null;
+let videoClient = null;
 let myVideoTrack = null;
 let myAudioTrack = null;
 
@@ -28,12 +28,12 @@ $(document).ready(async function () {
     commClient.onReady = async () => {
         // 通信组件准备就绪，可以准备视频组件了
         console.log('onReady');
-        videoChatNew = new VideoChatNew(commClient, myAudioTrack, myVideoTrack);
+        videoClient = new VideoClient(commClient, myAudioTrack, myVideoTrack);
 
         // 收到音频轨道或视频轨道，需要放在MediaStream对象中
         // 如果音视频轨道放在同一个MediaStream对象中，会进行音视频同步，否则独立播放
         // 这里展示独立播放
-        videoChatNew.onRemoteVideoTrack = (user, videoTrack) => {
+        videoClient.onRemoteVideoTrack = (user, videoTrack) => {
             let mediaStream = new MediaStream();
             mediaStream.addTrack(videoTrack);
 
@@ -46,7 +46,7 @@ $(document).ready(async function () {
             videoTags[user] = videoTag;
         };
 
-        videoChatNew.onRemoteAudioTrack = (user, audioTrack) => {
+        videoClient.onRemoteAudioTrack = (user, audioTrack) => {
             let mediaStream = new MediaStream();
             mediaStream.addTrack(audioTrack);
 
@@ -64,11 +64,11 @@ $(document).ready(async function () {
             let shareTrack = await VideoUtil.getScreenShareTrack();
             if (shareTrack!=null) {
                 $("#screenShareBtn").disabled = true;
-                videoChatNew.setLocalVideoTrack(shareTrack);
+                videoClient.setLocalVideoTrack(shareTrack);
 
                 shareTrack.addEventListener('ended', () => {
                     console.log('用户停止共享屏幕 这里切换回摄像头视频');
-                    videoChatNew.setLocalVideoTrack(myVideoTrack);
+                    videoClient.setLocalVideoTrack(myVideoTrack);
                     $("#screenShareBtn").disabled = false;
                 });
             }
