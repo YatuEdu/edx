@@ -1,8 +1,5 @@
-import {CommClient} from "../communication/commClient.js";
-import {VideoClient} from "../communication/VideoClient.js"
 import {VideoUtil} from "../core/videoUtil.js";
 
-let videoClient = null;
 let myVideoTrack = null;
 let myAudioTrack = null;
 
